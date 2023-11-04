@@ -5,6 +5,11 @@ local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
 local ADD_STORAGE_MULTIPLE_NETWORKS = -1
 
+logistica.networks = networks
+
+local p2h = minetest.hash_node_position
+local h2p = minetest.get_position_from_hash
+
 local adjecent = {
   vector.new( 1,  0,  0),
   vector.new( 0,  1,  0),
@@ -13,6 +18,7 @@ local adjecent = {
   vector.new( 0, -1,  0),
   vector.new( 0,  0, -1),
 }
+
 local function has_machine(network, id)
   if not network then return false end
   if network.demanders and network.demanders[id] then
@@ -27,7 +33,7 @@ local function has_machine(network, id)
 end
 
 function logistica.get_network_name_or_nil(pos)
-  local hash = minetest.hash_node_position(pos)
+  local hash = p2h(pos)
   for nHash, network in pairs(networks) do
     if hash == nHash then return network.name end
     if network.cables[hash] then return network.name end
@@ -37,7 +43,7 @@ function logistica.get_network_name_or_nil(pos)
 end
 
 function logistica.get_network_or_nil(pos)
-  local hash = minetest.hash_node_position(pos)
+  local hash = p2h(pos)
   for nHash, network in pairs(networks) do
     if hash == nHash then return network end
     if network.cables[hash] then return network end
@@ -59,7 +65,7 @@ end
 local function dumb_remove_from_network(networkName, pos)
   local network = networks[networkName]
   if not network then return false end
-  local hashedPos = minetest.hash_node_position(pos)
+  local hashedPos = p2h(pos)
   if network.cables[hashedPos] then
     network.cables[hashedPos] = nil
     return true
@@ -94,6 +100,14 @@ local function break_logistica_node(pos)
   logistica.swap_node(pos, node.name .. "_disabled")
 end
 
+-- calls updateStorageCache(network) if the current position belongs to a network
+function logistica.updateStorageCacheFromPosition(pos)
+  local network = logistica.get_network_or_nil(pos)
+  if network then
+    logistica.updateStorageCache(network)
+  end
+end
+
 --[[ updates the storage cach which holds where items may be found
   The cache is in the followiing format:
   network.storage_cache = {
@@ -108,11 +122,10 @@ function logistica.updateStorageCache(network)
   -- for now, do full rescan
   network.storage_cache = {}
   for storageHash, _ in pairs(network.mass_storage) do
-    local storagePos = minetest.get_position_from_hash(storageHash)
+    local storagePos = h2p(storageHash)
     logistica.load_position(storagePos)
-    local meta = minetest.get_meta(storagePos)
-    local inv = meta:get_inventory():get_list("filter")
-    for _, itemStack in pairs(inv) do
+    local filterList = minetest.get_meta(storagePos):get_inventory():get_list("filter") or {}
+    for _, itemStack in pairs(filterList) do
       local name = itemStack:get_name()
       if not network.storage_cache[name] then network.storage_cache[name] = {} end
       network.storage_cache[name][storageHash] = true
@@ -124,7 +137,7 @@ local function dumb_add_storage_to_network(networkId, pos)
   local network = networks[networkId]
   if not network then return false end
   local node = minetest.get_node(pos)
-  local hashedPos = minetest.hash_node_position(pos)
+  local hashedPos = p2h(pos)
   if logistica.is_mass_storage(node.name) then
     network.mass_storage[hashedPos] = true
     return true
@@ -139,7 +152,7 @@ local function dumb_add_cable_to_network(networkName, pos)
   local network = networks[networkName]
   if not network then return false end
   local node = minetest.get_node(pos)
-  local hashedPos = minetest.hash_node_position(pos)
+  local hashedPos = p2h(pos)
   if logistica.is_cable(node.name) then
     network.cables[hashedPos] = true
     return true
@@ -165,7 +178,7 @@ local function recursive_scan_for_nodes_for_controller(network, positions, numSc
     for _, offset in pairs(adjecent) do
       local otherPos = vector.add(pos, offset)
       logistica.load_position(otherPos)
-      local otherHash = minetest.hash_node_position(otherPos)
+      local otherHash = p2h(otherPos)
       local tiersMatch = isAllTier
       if tiersMatch ~= true then
         local otherTiers = logistica.get_item_tiers(minetest.get_node(otherPos).name)
@@ -203,7 +216,7 @@ local function create_network(controllerPosition)
   local node = minetest.get_node(controllerPosition)
   if not node.name:find("_controller") or not node.name:find("logistica:") then return false end
   local meta = minetest.get_meta(controllerPosition)
-  local controllerHash = minetest.hash_node_position(controllerPosition)
+  local controllerHash = p2h(controllerPosition)
   local network = {}
   local networkName = logistica.get_network_name_for(controllerPosition)
   networks[controllerHash] = network
@@ -242,7 +255,7 @@ local function rescan_network(networkName)
   if not network then return false end
   if not network.controller then return false end
   local conHash = network.controller
-  local controllerPosition = minetest.get_position_from_hash(conHash)
+  local controllerPosition = h2p(conHash)
   clear_network(networkName)
   create_network(controllerPosition)
 end
@@ -301,7 +314,7 @@ local function try_to_add_mass_storage_to_network(pos)
 end
 
 local function remove_mass_storage_from_network(pos)
-  local hash = minetest.hash_node_position(pos)
+  local hash = p2h(pos)
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
   if not network.mass_storage[hash] then return end
@@ -361,7 +374,7 @@ function logistica.on_cable_change(pos, oldNode)
 end
 
 function logistica.on_controller_change(pos, oldNode)
-  local hashPos = minetest.hash_node_position(pos)
+  local hashPos = p2h(pos)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
     try_to_add_network(pos)

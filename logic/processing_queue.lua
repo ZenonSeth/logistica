@@ -55,4 +55,3 @@ function logistica.proq.get_all(pos)
     end
   return positions
 end
-

@@ -1,4 +1,7 @@
 
+local META_SERIALIZED_INV = "logistica:ser_inv"
+local META_ITEM_NAME = "logistica:item_name"
+
 local function get_mass_storage_upgrade_inv(posForm, numUpgradeSlots)
   if numUpgradeSlots <= 0 then return "" end
   local upIconX = 1.5 + 1.25 * (7 - numUpgradeSlots) -- sort of hardcoded
@@ -34,9 +37,11 @@ end
 
 -- callbacks
 
-local function after_place_mass_storage(pos, placer, numSlots, numUpgradeSlots)
+local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
 	local meta = minetest.get_meta(pos)
-	meta:set_string("owner", placer:get_player_name())
+  if placer and placer:is_player() then
+	  meta:set_string("owner", placer:get_player_name())
+  end
 	local inv = meta:get_inventory()
 	inv:set_size("main", 1)
 	inv:set_size("filter", numSlots)
@@ -44,12 +49,55 @@ local function after_place_mass_storage(pos, placer, numSlots, numUpgradeSlots)
 	inv:set_size("upgrade", numUpgradeSlots)
   -- and connect to network
   logistica.on_storage_change(pos)
+  -- restore inventory, if any
+  local itemstackMetaInv = itemstack:get_meta():get_string(META_SERIALIZED_INV)
+  if itemstackMetaInv then
+    local listsTable = logistica.deserialize_inv(itemstackMetaInv)
+    for name, listTable in pairs(listsTable) do
+      inv:set_list(name, listTable)
+    end
+  end
+end
+
+local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
+  local drop = drops[1]
+  local meta = minetest.get_meta(pos)
+  if not drop or not meta then return end
+  local inv = meta:get_inventory()
+  local serialized = logistica.serialize_inv(inv)
+  drop:get_meta():set_string(META_SERIALIZED_INV, serialized)
+  -- update description
+  local name = minetest.registered_nodes[oldnode.name].logistica.baseName
+  if inv:is_empty("storage") then
+    name = name.."\n(Empty)"
+  else
+    name = name.."\n(Contains items)" -- TODO set a node name or use a stackname
+  end
+  drop:get_meta():set_string("description", name)
+end
+
+local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player) then return 0 end
+  if listname == "storage" then
+    return logistica.clamp(stack:get_count(), 0, stack:get_stack_max())
+  end
+  if listname == "main" then return stack:get_count() end
+  if listname == "filter" then
+			local inv = minetest.get_meta(pos):get_inventory()
+      if not inv:get_stack("storage", index):is_empty() then return 0 end
+			local storageStack = inv:get_stack("filter", index)
+			storageStack:clear()
+			inv:set_stack("filter", index, storageStack)
+      logistica.updateStorageCacheFromPosition(pos)
+      return 0
+  end
+  return stack:get_count()
 end
 
 local function allow_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   if minetest.is_protected(pos, player) then return 0 end
   if from_list == "main" and to_list == "main" then return count end
-  if from_list == "filter" and to_list == "filter" then return count end
+  if from_list == "upgrade" and to_list == "upgrade" then return count end
   return 0
 end
 
@@ -65,27 +113,12 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
     copyStack:set_count(1)
     local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack("filter", index, copyStack)
+    logistica.updateStorageCacheFromPosition(pos)
     return 0
   end
   return stack:get_count()
 end
 
-local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player) then return 0 end
-  if listname == "storage" then
-    return logistica.clamp(stack:get_count(), 0, stack:get_stack_max())
-  end
-  if listname == "main" then return stack:get_count() end
-  if listname == "filter" then
-			local inv = minetest.get_meta(pos):get_inventory()
-      if not inv:get_stack("storage", index):is_empty() then return 0 end
-			local stack = inv:get_stack("filter", index)
-			stack:clear()
-			inv:set_stack("filter", index, stack)
-      return 0
-  end
-  return stack:get_count()
-end
 
 local function on_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   if minetest.is_protected(pos, player) then return 0 end
@@ -123,12 +156,6 @@ local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointe
   )
 end
 
-local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
-  local drop = drops[1]
-  if not drop then return end
-  
-end
-
 ----------------------------------------------------------------
 -- Public Registration API
 ----------------------------------------------------------------
@@ -136,21 +163,23 @@ end
 function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, numUpgradeSlots)
   local lname = string.lower(string.gsub(simpleName, " ", "_"))
   local storageName = "logistica:mass_storage_"..lname
-  local grps = {cracky = 3, choppy = 3, oddly_breakable_by_hand = 2}
+  local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1}
   numUpgradeSlots = logistica.clamp(numUpgradeSlots, 0, 4)
   grps[logistica.TIER_ALL] = 1
   logistica.mass_storage[storageName] = true
 
   local def = {
-    description = simpleName.." Mass Storage",
+    description = simpleName.." Mass Storage\n(Empty)",
     tiles = { "logistica_"..lname.."_mass_storage.png" },
     groups = grps,
+    sounds = default.node_sound_metal_defaults(),
     after_place_node = function(pos, placer, itemstack)
-      after_place_mass_storage(pos, placer, numSlots, numUpgradeSlots)
+      after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
     end,
     after_destruct = logistica.on_storage_change,
     drop = storageName,
     logistica = {
+      baseName = simpleName.." Mass Storage",
       maxItems = numItemsPerSlot,
       numSlots = numSlots,
       numUpgradeSlots = numUpgradeSlots,

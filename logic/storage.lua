@@ -66,24 +66,43 @@ function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
 end
 
 -- takes a list of ItemStacks and returns a single string representation
-function logistica.inv_to_table(list)
-  local itemStackStrings = {}
-  for _,v in pairs(list) do
-    itemStackStrings:insert(v:to_string())
+function logistica.inv_list_to_table(list)
+  local itemstackTable = {}
+  for k,v in ipairs(list) do
+    itemstackTable[k] = v and v:to_string() or ""
   end
+  return itemstackTable
 end
 
-function logistica.table_to_inv(string)
-
+function logistica.table_to_inv_list(table)
+  local list = {}
+  for k,v in ipairs(table) do
+    if v == nil or v == "" then
+      list[k] = ""
+    else
+      list[k] = ItemStack(v)
+    end
+  end
+  return list
 end
 
-local LIST_SEPARATOR = "L|L"
--- takes a inventory and returns a single string represetation
-function logistica.serliaze_inventory(list)
-  
+-- returns a serialized string of the inventory
+function logistica.serialize_inv(inv)
+  local lists = inv:get_lists()
+  local invTable = {}
+  for name, list in pairs(lists) do
+    invTable[name] = logistica.inv_list_to_table(list)
+  end
+  return minetest.serialize(invTable)
 end
 
--- takes a inventory and returns a single string represetation
-function logistica.deserliaze_inventory(list)
-  
+-- takes a inventory serialized string and returns a table
+function logistica.deserialize_inv(serializedInv)
+  local strTable = minetest.deserialize(serializedInv)
+  if not strTable then return {} end
+  local liveTable = {}
+  for name, listStrTable in pairs(strTable) do
+    liveTable[name] = logistica.table_to_inv_list(listStrTable)
+  end
+  return liveTable
 end

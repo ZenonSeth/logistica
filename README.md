@@ -1,4 +1,5 @@
 # Logistica
+# WORK IN PROGRESS - PRE-ALPHA STATE
 
 Logistica is a item transport, distribution and storage mod.
 

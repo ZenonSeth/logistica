@@ -66,7 +66,7 @@ logistica.register_controller("Simple Controller", {
   description = "Simple Controller",
   tiles = { "logistica_silver_cable.png" },
   groups = {
-    oddly_breakable_by_hand = 2,
+    oddly_breakable_by_hand = 1,
   },
   sounds = default.node_sound_metal_defaults(),
   paramtype = "light",
