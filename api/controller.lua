@@ -52,9 +52,9 @@ function logistica.register_controller(simpleName, def, tier)
 	local def_disabled = {}
 	for k, v in pairs(def) do def_disabled[k] = v end
   local tiles_disabled = {}
-  for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_controller_disabled.png" end
+  for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { choppy = 3, oddly_breakable_by_hand = 2 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3 }
   def_disabled.on_construct = nil
   def_disabled.after_desctruct = nil
   def_disabled.on_timer = nil
@@ -66,7 +66,6 @@ logistica.register_controller("Simple Controller", {
   description = "Simple Controller",
   tiles = { "logistica_silver_cable.png" },
   groups = {
-    choppy = 3,
     oddly_breakable_by_hand = 2,
   },
   sounds = default.node_sound_metal_defaults(),

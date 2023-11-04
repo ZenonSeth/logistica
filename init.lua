@@ -8,5 +8,5 @@ dofile(logistica.MODPATH.."/util/util.lua")
 dofile(logistica.MODPATH.."/logic/logic.lua")
 dofile(logistica.MODPATH.."/tools/tools.lua")
 
--- api should be kept last
+-- api should be below the other files except the registrations
 dofile(logistica.MODPATH.."/api/api.lua")

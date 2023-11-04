@@ -27,6 +27,7 @@ function logistica.register_cable(tier, size)
 		inventory_image = "logistica_" .. ltier .. "_cable_inv.png",
 		wield_image = "logistica_" .. ltier .. "_cable_inv.png",
 		groups = {
+			cracky = 3,
 			choppy = 3,
 			oddly_breakable_by_hand = 2,
 			[cable_group] = 1,
@@ -48,17 +49,16 @@ function logistica.register_cable(tier, size)
 	for k, v in pairs(def) do def_broken[k] = v end
 	def_broken.tiles = { "logistica_" .. ltier .. "_cable.png^logistica_broken.png" }
 	def_broken.inventory_image = "logistica_" .. ltier .. "_cable_inv.png^logistica_broken.png"
-	def_broken.groups = { choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
+	def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
 	def_broken.description = "Broken " .. tier .. " Cable"
 	def_broken.node_box = { type = "fixed", fixed = { -0.5, -size, -size, 0.5, size, size } }
+	def_broken.connects_to = nil
 	def_broken.on_construct = nil
 	def_broken.after_destruct = nil
 
-	minetest.register_node(cable_name .. "_broken", def_broken)
+	minetest.register_node(cable_name .. "_disabled", def_broken)
 end
 
 logistica.register_cable("Copper", 1 / 8)
 logistica.register_cable("Silver", 1 / 8)
 logistica.register_cable("Gold", 1 / 8)
-
-

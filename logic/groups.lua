@@ -3,7 +3,8 @@ logistica.machines = {}
 logistica.controllers = {}
 logistica.demanders = {}
 logistica.suppliers = {}
-logistica.storage = {}
+logistica.mass_storage = {}
+logistica.item_storage = {}
 -- logistica.demand_and_supplier = {}
 logistica.tiers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
@@ -18,51 +19,31 @@ function logistica.get_machine_group(tier)
 end
 
 function logistica.is_cable(name)
-  if logistica.cables[name] then
-    return true
-  else
-    return false
-  end
+  return logistica.cables[name] ~= nil
 end
 
 function logistica.is_machine(name)
-  if logistica.machines[name] then
-    return true
-  else
-    return false
-  end
+  return logistica.machines[name] ~= nil
 end
 
 function logistica.is_demander(name)
-  if logistica.demanders[name] then
-    return true
-  else
-    return false
-  end
+  return logistica.demanders[name] ~= nil
 end
 
 function logistica.is_supplier(name)
-  if logistica.suppliers[name] then
-    return true
-  else
-    return false
-  end
+  return logistica.suppliers[name] ~= nil
 end
 
-function logistica.is_storage(name)
-  if logistica.storage[name] then
-    return true
-  else
-    return false
-  end
+function logistica.is_mass_storage(name)
+  return logistica.mass_storage[name] ~= nil
+end
+
+function logistica.is_item_storage(name)
+  return logistica.item_storage[name] ~= nil
 end
 
 function logistica.is_controller(name)
-  if logistica.controllers[name] then
-    return true
-  else
-    return false
-  end
+  return logistica.controllers[name] ~= nil
 end
 
 function logistica.get_item_tiers(name)
