@@ -202,7 +202,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2 }
+  def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1 }
 
 	minetest.register_node(storageName.."_disabled", def_disabled)
 

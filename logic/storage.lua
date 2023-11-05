@@ -26,6 +26,7 @@ function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
   local node = minetest.get_node(pos)
   if not logistica.is_mass_storage(node.name) and not logistica.is_item_storage(node.name) then return 0 end
   local isMassStorage = string.find(node.name, "mass")
+  logistica.load_position(pos)
   local inv = minetest.get_meta(pos):get_inventory()
   if isMassStorage then
     local maxItems = logistica.get_mass_storage_max_size(pos)

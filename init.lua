@@ -5,6 +5,7 @@ logistica.MODPATH = minetest.get_modpath(logistica.MODNAME)
 
 -- order of loading files DOES matter
 dofile(logistica.MODPATH.."/util/util.lua")
+dofile(logistica.MODPATH.."/entity/entity.lua")
 dofile(logistica.MODPATH.."/logic/logic.lua")
 dofile(logistica.MODPATH.."/tools/tools.lua")
 

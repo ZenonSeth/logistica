@@ -50,6 +50,12 @@ function logistica.get_network_id_or_nil(pos)
   if not network then return nil else return network.controller end
 end
 
+local function notify_connected(pos, node, networkId)
+  local def = minetest.registered_nodes[node.name]
+  if def and def.logistica and def.logistica.on_connect_to_network then
+    def.logistica.on_connect_to_network(pos, networkId)
+  end
+end
 
 ----------------------------------------------------------------
 -- Network operation functions
@@ -86,7 +92,7 @@ local function find_adjecent_networks(pos)
   end
   local retNetworks = {}
   for k,_ in pairs(connectedNetworks) do
-    table.insert(networks[k])
+    table.insert(retNetworks, networks[k])
   end
   return retNetworks
 end
@@ -149,22 +155,27 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           if existingNetwork ~= nil and existingNetwork ~= network then
             return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
           end
+          local valid = false
           if logistica.is_cable(otherNode.name) then
             network.cables[otherHash] = true
             connections[otherHash] = true
-            newToScan = newToScan + 1
+            valid = true
           elseif logistica.is_demander(otherNode.name) then
             network.demanders[otherHash] = true
-            newToScan = newToScan + 1
+            valid = true
           elseif logistica.is_supplier(otherNode.name) then
             network.suppliers[otherHash] = true
-            newToScan = newToScan + 1
+            valid = true
           elseif logistica.is_mass_storage(otherNode.name) then
             network.mass_storage[otherHash] = true
-            newToScan = newToScan + 1
+            valid = true
           elseif logistica.is_item_storage(otherNode.name) then
             network.item_storage[otherHash] = true
+            valid = true
+          end
+          if valid then
             newToScan = newToScan + 1
+            notify_connected(otherPos, otherNode, network.controller)
           end
         end -- end if tiersMatch
       end -- end of general checks
@@ -310,7 +321,7 @@ function logistica.on_cable_change(pos, oldNode)
     else
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
-        otherNetwork.cables[p2h(connections[1])] = true
+        otherNetwork.cables[p2h(pos)] = true
       end
     end
     return -- was a network end, no need to do anything else

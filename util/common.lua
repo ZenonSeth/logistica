@@ -3,13 +3,13 @@
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 local function rand_str(length, seed)
   math.randomseed(seed)
-	local ret = {}
-	local r
-	for i = 1, length do
-		r = math.random(1, #charset)
-		table.insert(ret, charset:sub(r, r))
-	end
-	return table.concat(ret)
+  local ret = {}
+  local r
+  for i = 1, length do
+    r = math.random(1, #charset)
+    table.insert(ret, charset:sub(r, r))
+  end
+  return table.concat(ret)
 end
 
 ----------------------------------------------------------------
@@ -17,13 +17,13 @@ end
 ----------------------------------------------------------------
 
 function logistica.load_position(pos)
-	if pos.x < -30912 or pos.y < -30912 or pos.z < -30912 or
-	   pos.x >  30927 or pos.y >  30927 or pos.z >  30927 then return end
-	if minetest.get_node_or_nil(pos) then
-		return
-	end
-	local vm = minetest.get_voxel_manip()
-	vm:read_from_map(pos, pos)
+  if pos.x < -30912 or pos.y < -30912 or pos.z < -30912 or
+     pos.x >  30927 or pos.y >  30927 or pos.z >  30927 then return end
+  if minetest.get_node_or_nil(pos) then
+    return
+  end
+  local vm = minetest.get_voxel_manip()
+  vm:read_from_map(pos, pos)
 end
 
 function logistica.swap_node(pos, newName)
@@ -79,4 +79,12 @@ function logistica.clamp(v, min, max)
     if v < min then return min end
     if v > max then return max end
     return v
+end
+
+function logistica.start_node_timer(pos, time)
+	local timer = minetest.get_node_timer(pos)
+	if not timer:is_started() then
+		timer:start(time)
+	end
+	return timer
 end

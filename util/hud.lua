@@ -1,7 +1,11 @@
 
 local playerHud = {}
 
-function logistica.show_short_popup(playerName, text)
+local SHORT_TIME = 3
+local LONG_TIME = 10
+
+function logistica.show_popup(playerName, text, time)
+  if not time then time = SHORT_TIME end
   local player = minetest.get_player_by_name(playerName)
   if not player then return end
 
@@ -21,7 +25,7 @@ function logistica.show_short_popup(playerName, text)
   })
   playerHud[playerName] = {}
   playerHud[playerName].hudId = hudId
-  local job = minetest.after(3, function()
+  local job = minetest.after(time, function()
     local pl = minetest.get_player_by_name(playerName)
     if not pl then return end
     if not playerHud[playerName] then return end

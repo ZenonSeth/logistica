@@ -52,6 +52,7 @@ function logistica.register_cable(tier, size)
 	def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
 	def_broken.description = "Broken " .. tier .. " Cable"
 	def_broken.node_box = { type = "fixed", fixed = { -0.5, -size, -size, 0.5, size, size } }
+	def_broken.selection_box = def_broken.node_box
 	def_broken.connects_to = nil
 	def_broken.on_construct = nil
 	def_broken.after_destruct = nil

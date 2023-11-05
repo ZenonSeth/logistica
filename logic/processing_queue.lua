@@ -1,6 +1,11 @@
 
 logistica.proq = {}
 
+local function get_meta(pos)
+  logistica.load_position(pos)
+  return minetest.get_meta(pos)
+end
+
 local QUEUE_KEY = "log_proq"
 local DELIM = "|"
 
@@ -16,7 +21,7 @@ end
 
 -- listOfPositions must be a list (naturally numbered table) of position vectors
 function logistica.proq.add(pos, listOfPositions)
-  local meta = minetest.get_meta(pos)
+  local meta = get_meta(pos)
   local positions = logistica.proq.get_all(pos)
   for _, v in ipairs(listOfPositions) do
     table.insert(positions, v)
@@ -26,7 +31,7 @@ end
 
 -- returns a table of up to the next N positions
 function logistica.proq.pop_next(pos, count)
-  local meta = minetest.get_meta(pos)
+  local meta = get_meta(pos)
   local positions = logistica.proq.get_all(pos)
   local ret = {}
   local rem = {}
@@ -42,7 +47,7 @@ function logistica.proq.pop_next(pos, count)
 end
 
 function logistica.proq.get_all(pos)
-  local meta = minetest.get_meta(pos)
+  local meta = get_meta(pos)
   if not meta:contains(QUEUE_KEY) then return {} end
   local compressedString = meta:get_string(QUEUE_KEY)
   local positionStrings = string.split(compressedString, DELIM, false)
