@@ -4,7 +4,7 @@ local STATUS_OK = 0
 local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
 
-logistica.networks = networks
+-- logistica.networks = networks
 
 local p2h = minetest.hash_node_position
 local h2p = minetest.get_position_from_hash
@@ -44,6 +44,12 @@ function logistica.get_network_name_or_nil(pos)
   if not network then return nil else return network.name end
 end
 
+function logistica.rename_network(networkId, newName)
+  local network = networks[networkId]
+  if not network then return false end
+  network.name = newName
+  return true
+end
 
 function logistica.get_network_id_or_nil(pos)
   local network = logistica.get_network_or_nil(pos)
@@ -187,13 +193,15 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
   else return recursive_scan_for_nodes_for_controller(network, connections, numScanned) end
 end
 
-local function create_network(controllerPosition)
+local function create_network(controllerPosition, oldNetworkName)
   local node = minetest.get_node(controllerPosition)
   if not node.name:find("_controller") or not node.name:find("logistica:") then return false end
   local meta = minetest.get_meta(controllerPosition)
   local controllerHash = p2h(controllerPosition)
   local network = {}
-  local networkName = logistica.get_network_name_for(controllerPosition)
+  local nameFromMeta = meta:get_string("name")
+  if nameFromMeta == "" then nameFromMeta = nil end
+  local networkName = oldNetworkName or nameFromMeta or logistica.get_network_name_for(controllerPosition)
   networks[controllerHash] = network
   meta:set_string("infotext", "Controller of Network: "..networkName)
   network.controller = controllerHash
@@ -227,14 +235,15 @@ end
 -- worker functions for cable/machine/controllers
 ----------------------------------------------------------------
 
-local function rescan_network(networkName)
-  local network = networks[networkName]
+local function rescan_network(networkId)
+  local network = networks[networkId]
   if not network then return false end
   if not network.controller then return false end
   local conHash = network.controller
   local controllerPosition = h2p(conHash)
-  clear_network(networkName)
-  create_network(controllerPosition)
+  local oldNetworkName = network.name
+  clear_network(networkId)
+  create_network(controllerPosition, oldNetworkName)
 end
 
 local function find_cable_connections(pos, node)

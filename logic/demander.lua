@@ -127,12 +127,14 @@ end
 function logistica.start_demander_timer(pos, duration)
   if duration == nil then duration = TIMER_DURATION_SHORT end
   logistica.start_node_timer(pos, duration)
+  logistica.set_logistica_node_infotext(pos, true)
 end
 
 function logistica.on_demander_timer(pos, elapsed)
   local network = logistica.get_network_or_nil(pos)
-  if not network then
-    return false -- this will get restarted once the demander is added to a network
+  if not network or not logistica.is_machine_on(pos) then
+    logistica.set_logistica_node_infotext(pos, false)
+    return false
   end
   take_demanded_items_from_network(pos, network)
   return true

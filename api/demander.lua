@@ -1,22 +1,33 @@
 
 local NUM_DEMAND_SLOTS = 4 -- maybe at some point make this a param, but why?
 local PUSH_LIST_PICKER = "push_pick"
+local ON_OFF_BUTTON = "on_off_btn"
 local FORMSPEC_NAME = "logistica_demander"
 
 local demanderForms = {}
+
+
 
 local function get_demander_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local pushPos = logistica.get_demander_target(pos)
   local meta = minetest.get_meta(pos)
   local selectedList = meta:get_string("demtarlist")
+  local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
     "size[10.6,7]" ..
     logistica.ui.background..
-    logistica.get_push_list_dropdown(PUSH_LIST_PICKER, 8.5, 0.7, pushPos, selectedList)..
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 7.5, 0.7, pushPos, selectedList)..
+    logistica.ui.on_off_btn(isOn, 9.5, 0.5, ON_OFF_BUTTON)..
     "list["..posForm..";filter;0.5,0.5;"..NUM_DEMAND_SLOTS..",1;0]"..
-    "list[current_player;main;0.5,2;8,4;0]" 
-    
+    "list[current_player;main;0.5,2;8,4;0]"
+end
+
+local function show_demander_formspec(playerName, pos)
+  local pInfo = {}
+  pInfo.position = pos
+  demanderForms[playerName] = pInfo
+  minetest.show_formspec(playerName, FORMSPEC_NAME, get_demander_formspec(pos))
 end
 
 local function on_player_receive_fields(player, formname, fields)
@@ -26,6 +37,13 @@ local function on_player_receive_fields(player, formname, fields)
   if not demanderForms[playerName] then return false end
   if fields.quit then
     demanderForms[playerName] = nil
+  elseif fields[ON_OFF_BUTTON] then
+    local pos = demanderForms[playerName].position
+    if not pos then return false end
+    if logistica.toggle_machine_on_off(pos) then
+      logistica.start_demander_timer(pos, 1)
+    end
+    show_demander_formspec(player:get_player_name(), pos)
   elseif fields[PUSH_LIST_PICKER] then
     local selected = fields[PUSH_LIST_PICKER]
     if logistica.is_allowed_push_list(selected) then
@@ -47,10 +65,7 @@ end
 
 local function on_demander_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  local pInfo = {}
-  pInfo.position = pos
-  demanderForms[clicker:get_player_name()] = pInfo
-  minetest.show_formspec(clicker:get_player_name(), FORMSPEC_NAME, get_demander_formspec(pos))
+  show_demander_formspec(clicker:get_player_name(), pos)
 end
 
 local function after_place_demander(pos, placer, itemstack, numDemandSlots)

@@ -1,4 +1,5 @@
 
+local META_ON_OFF_KEY = "logonoff"
 
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 local function rand_str(length, seed)
@@ -87,4 +88,28 @@ function logistica.start_node_timer(pos, time)
 		timer:start(time)
 	end
 	return timer
+end
+
+function logistica.is_machine_on(pos)
+  local meta = minetest.get_meta(pos)
+  return meta:get_int(META_ON_OFF_KEY) > 0
+end
+
+-- toggles the state and returns the new state (true for on, false for off)
+function logistica.toggle_machine_on_off(pos)
+  local meta = minetest.get_meta(pos)
+  local newState = (meta:get_int(META_ON_OFF_KEY) + 1) % 2
+  meta:set_int(META_ON_OFF_KEY, newState)
+  return newState > 0
+end
+
+-- isOn is optional
+function logistica.set_logistica_node_infotext(pos, isOn)
+	if isOn == nil then isOn = logistica.is_machine_on(pos) end
+	logistica.load_position(pos)
+  local meta = minetest.get_meta(pos)
+  local node = minetest.get_node(pos)
+	local text = minetest.registered_nodes[node.name].description..
+							"\n"..(isOn and "Running" or "Stopped")
+	meta:set_string("infotext", text)
 end
