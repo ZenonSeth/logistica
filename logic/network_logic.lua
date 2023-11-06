@@ -81,14 +81,6 @@ local function break_logistica_node(pos)
   logistica.swap_node(pos, node.name .. "_disabled")
 end
 
--- calls updateStorageCache(network) if the current position belongs to a network
-function logistica.updateStorageCacheFromPosition(pos)
-  local network = logistica.get_network_or_nil(pos)
-  if network then
-    logistica.updateStorageCache(network)
-  end
-end
-
 -- returns a naturally numbered list of networks on adjecent nodes
 local function find_adjecent_networks(pos)
   local connectedNetworks = {}
@@ -106,38 +98,13 @@ local function find_adjecent_networks(pos)
   return retNetworks
 end
 
---[[ updates the storage cach which holds where items may be found
-  The cache is in the followiing format:
-  network.storage_cache = {
-    itemName = {
-      storagePositionHash1 = true,
-      storagePositionHash2 = true,
-    }
-  }
-]]
-function logistica.updateStorageCache(network)
-  -- this maybe can be improved by doing add/remove operations, but increases complexity
-  -- for now, do full rescan
-  network.storage_cache = {}
-  for storageHash, _ in pairs(network.mass_storage) do
-    local storagePos = h2p(storageHash)
-    logistica.load_position(storagePos)
-    local filterList = minetest.get_meta(storagePos):get_inventory():get_list("filter") or {}
-    for _, itemStack in pairs(filterList) do
-      local name = itemStack:get_name()
-      if not network.storage_cache[name] then network.storage_cache[name] = {} end
-      network.storage_cache[name][storageHash] = true
-    end
-  end
-end
-
 local function recursive_scan_for_nodes_for_controller(network, positionHashes, numScanned)
   if not numScanned then numScanned = 0 end
 
   if numScanned > HARD_NETWORK_NODE_LIMIT then
     return CREATE_NETWORK_STATUS_TOO_MANY_NODES
   end
-  
+
   local connections = {}
   local newToScan = 0
   for posHash, _ in pairs(positionHashes) do
@@ -215,6 +182,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.mass_storage = {}
   network.item_storage = {}
   network.storage_cache = {}
+  network.supplier_cache = {}
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
@@ -226,7 +194,8 @@ local function create_network(controllerPosition, oldNetworkName)
     errorMsg = "Controller max nodes limit of "..HARD_NETWORK_NODE_LIMIT.." nodes per network exceeded!"
   elseif status == STATUS_OK then
     -- controller scan skips updating storage cache, do so now
-    logistica.updateStorageCache(network)
+    logistica.update_mass_storage_cache(network)
+    logistica.update_supplier_cache(network)
   end
   if errorMsg ~= nil then
     networks[controllerHash] = nil
@@ -275,7 +244,7 @@ local function try_to_add_network(pos)
   create_network(pos)
 end
 
-local function try_to_add_mass_storage_to_network(pos)
+local function try_to_add_to_network(pos, ops)
   local connectedNetworks = find_adjecent_networks(pos)
   if #connectedNetworks <= 0 then return STATUS_OK end -- nothing to connect to
   if #connectedNetworks >= 2 then
@@ -283,36 +252,55 @@ local function try_to_add_mass_storage_to_network(pos)
     minetest.get_meta(pos):set_string("infotext", "ERROR: cannot connect to multiple networks!")
   end
   -- else, we have 1 network, add us to it!
-  connectedNetworks[1].mass_storage[p2h(pos)] = true
-  logistica.updateStorageCache(connectedNetworks[1])
+  ops.get_list(connectedNetworks[1])[p2h(pos)] = true
+  ops.update_cache_node_added(connectedNetworks[1])
+end
+
+local function remove_from_network(pos, ops)
+  local hash = p2h(pos)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return end
+  ops.get_list(network)[hash] = nil
+  ops.update_cache_node_removed(network)
+end
+
+local function MASS_STORAGE_OPS(pos) return {
+  get_list = function(network) return network.mass_storage end,
+  update_cache_node_added = function(_) logistica.update_mass_storage_on_item_added(pos) end,
+  update_cache_node_removed = function(network) logistica.update_mass_storage_cache(network) end,
+} end
+local function try_to_add_mass_storage_to_network(pos)
+  try_to_add_to_network(pos, MASS_STORAGE_OPS(pos))
 end
 
 local function remove_mass_storage_from_network(pos)
-  local hash = p2h(pos)
-  local network = logistica.get_network_or_nil(pos)
-  if not network then return end
-  if not network.mass_storage[hash] then return end
-  network.mass_storage[hash] = nil
+  remove_from_network(pos, MASS_STORAGE_OPS(pos))
 end
 
+local DEMANDER_OPS = {
+  get_list = function(network) return network.demanders end,
+  update_cache_node_added = function(_) end,
+  update_cache_node_removed = function(_) end,
+}
 local function try_to_add_demander_to_network(pos)
-  local connectedNetworks = find_adjecent_networks(pos)
-  if #connectedNetworks <= 0 then return STATUS_OK end -- nothing to connect to
-  if #connectedNetworks >= 2 then
-    break_logistica_node(pos) -- swap out storage node for disabled one 
-    minetest.get_meta(pos):set_string("infotext", "ERROR: cannot connect to multiple networks!")
-  end
-  -- else, we have 1 network, add us to it!
-  connectedNetworks[1].demanders[p2h(pos)] = true
+  try_to_add_to_network(pos,DEMANDER_OPS)
+end
+local function remove_demander_from_network(pos)
+  remove_from_network(pos, DEMANDER_OPS)
 end
 
-local function remove_demander_from_network(pos)
-  local hash = p2h(pos)
-  local network = logistica.get_network_or_nil(pos)
-  if not network then return end
-  if not network.mass_storage[hash] then return end
-  network.mass_storage[hash] = nil
+local function SUPPLIER_OPS(pos) return {
+  get_list = function(network) return network.suppliers end,
+  update_cache_node_added = function(_) logistica.update_supplier_on_item_added(pos) end,
+  update_cache_node_removed = function(network) logistica.update_supplier_cache(network) end,
+} end
+local function try_to_add_supplier_to_network(pos)
+  try_to_add_to_network(pos, SUPPLIER_OPS(pos))
 end
+local function remove_supplier_from_network(pos)
+  remove_from_network(pos, SUPPLIER_OPS(pos))
+end
+
 ----------------------------------------------------------------
 -- global namespaced functions
 ----------------------------------------------------------------
@@ -383,12 +371,20 @@ function logistica.on_storage_change(pos, oldNode)
   end
 end
 
-
 function logistica.on_demander_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
     try_to_add_demander_to_network(pos)
   else
     remove_demander_from_network(pos)
+  end
+end
+
+function logistica.on_supplier_change(pos, oldNode)
+  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
+  if placed == true then
+    try_to_add_supplier_to_network(pos)
+  else
+    remove_supplier_from_network(pos)
   end
 end

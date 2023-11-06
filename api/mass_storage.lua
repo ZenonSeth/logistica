@@ -122,7 +122,7 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
     copyStack:set_count(1)
     local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack("filter", index, copyStack)
-    logistica.updateStorageCacheFromPosition(pos)
+    logistica.update_supplier_on_item_added(pos)
     return 0
   end
   return stack:get_count()
@@ -131,7 +131,7 @@ end
 
 local function on_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   if minetest.is_protected(pos, player) then return 0 end
-
+  return 0
 end
 
 local function on_mass_storage_inv_put(pos, listname, index, stack, player)

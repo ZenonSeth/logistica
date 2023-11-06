@@ -15,8 +15,8 @@ local function get_demander_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.6,7]" ..
     logistica.ui.background..
-    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.5, 0.7, pushPos, selectedList, "Put items in:")..
-    logistica.ui.on_off_btn(isOn, 9.3, 0.5, ON_OFF_BUTTON)..
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 0.7, pushPos, selectedList, "Put items in:")..
+    logistica.ui.on_off_btn(isOn, 9.3, 0.5, ON_OFF_BUTTON, "Enable")..
     "list["..posForm..";filter;0.5,0.5;"..NUM_DEMAND_SLOTS..",1;0]"..
     "list[current_player;main;0.5,2;8,4;0]"
 end
@@ -174,5 +174,5 @@ function logistica.register_demander(simpleName, transferRate)
 
 end
 
-logistica.register_demander("Basic", 1)
+logistica.register_demander("Item", 1)
 logistica.register_demander("Stack", 99)
