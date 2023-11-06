@@ -6,8 +6,6 @@ local FORMSPEC_NAME = "logistica_demander"
 
 local demanderForms = {}
 
-
-
 local function get_demander_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local pushPos = logistica.get_demander_target(pos)
@@ -40,9 +38,7 @@ local function on_player_receive_fields(player, formname, fields)
   elseif fields[ON_OFF_BUTTON] then
     local pos = demanderForms[playerName].position
     if not pos then return false end
-    if logistica.toggle_machine_on_off(pos) then
-      logistica.start_demander_timer(pos)
-    end
+    logistica.toggle_machine_on_off(pos)
     show_demander_formspec(player:get_player_name(), pos)
   elseif fields[PUSH_LIST_PICKER] then
     local selected = fields[PUSH_LIST_PICKER]
@@ -150,7 +146,12 @@ function logistica.register_demander(simpleName, transferRate)
       demander_transfer_rate = transferRate,
       on_connect_to_network = function(pos, networkId)
         logistica.start_demander_timer(pos)
-      end
+      end,
+      on_power = function(pos, isPoweredOn)
+        if isPoweredOn then
+          logistica.start_demander_timer(pos)
+        end
+      end,
     }
   }
 

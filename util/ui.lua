@@ -29,17 +29,16 @@ end
 -- public functions
 --------------------------------
 
-function logistica.ui.on_off_btn(isOn, x, y, name, showLabel, w, h)
-  if showLabel == nil then showLabel = true end
+function logistica.ui.on_off_btn(isOn, x, y, name, label, w, h)
+  if not label then label = "" end
   if not w or not h then
     w = 1; h = 1
   end
-  local label=""
-  if showLabel then label = "label["..(x+0.2)..","..y..";Power]" end
 
   local texture = (isOn and "logistica_icon_on.png" or "logistica_icon_off.png")
   return "image_button["..x..","..y..";"..w..","..h..";"..
-        ""..texture..";"..name..";;false;false;"..texture.."]"..label
+        ""..texture..";"..name..";;false;false;"..texture.."]"..
+        "label["..(x+0.1)..","..y..";"..label.."]"
 end
 
 function logistica.ui.pull_list_picker(name, x, y, pullFromPos, default, label)

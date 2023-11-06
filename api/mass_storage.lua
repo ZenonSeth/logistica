@@ -2,6 +2,13 @@
 local META_SERIALIZED_INV = "logistica:ser_inv"
 local META_ITEM_NAME = "logistica:item_name"
 
+local FORMSPEC_NAME = "mass_storage_formspec"
+local ON_OFF_BTN = "on_off_btn"
+
+local MASS_STORAGE_TIMER = 1
+
+local storageForms = {}
+
 local function get_mass_storage_upgrade_inv(posForm, numUpgradeSlots)
   if numUpgradeSlots <= 0 then return "" end
   local upIconX = 1.5 + 1.25 * (7 - numUpgradeSlots) -- sort of hardcoded
@@ -16,6 +23,7 @@ end
 local function get_mass_storage_formspec(pos, numUpgradeSlots)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local upgradeInvString = get_mass_storage_upgrade_inv(posForm, numUpgradeSlots)
+  local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]"..
     "size[12,10.5]" ..
     logistica.ui.background..
@@ -32,6 +40,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots)
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring[current_player;main]"..
+    logistica.ui.on_off_btn(isOn, 3.4, 3.6, ON_OFF_BTN, "Pull Items")..
     upgradeInvString
 end
 
@@ -147,14 +156,46 @@ local function on_mass_storage_inv_take(pos, listname, index, stack, player)
 
 end
 
-local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
-  local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
+local function show_mass_storage_formspec(pos, name, numUpgradeSlots)
+  if not numUpgradeSlots then
+    local node = minetest.get_node(pos)
+    numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
+  end
+  storageForms[name] = { position = pos }
   minetest.show_formspec(
-    clicker:get_player_name(),
-    "mass_storage_formspec",
+    name,
+    FORMSPEC_NAME,
     get_mass_storage_formspec(pos, numUpgradeSlots)
   )
 end
+
+local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
+  local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
+  local name = clicker:get_player_name()
+  show_mass_storage_formspec(pos, name, numUpgradeSlots)
+end
+
+local function on_receive_storage_formspec(player, formname, fields)
+  if formname ~= FORMSPEC_NAME then return end
+  local playerName = player:get_player_name()
+  if fields.quit and not fields.key_enter_field then
+    storageForms[playerName] = nil
+  elseif fields[ON_OFF_BTN] then
+    local pos = storageForms[playerName].position
+    if logistica.toggle_machine_on_off(pos) then
+      logistica.start_node_timer(pos, MASS_STORAGE_TIMER)
+    end
+    show_mass_storage_formspec(pos, playerName)
+  end
+  return true
+end
+
+
+----------------------------------------------------------------
+-- register
+----------------------------------------------------------------
+
+minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 
 ----------------------------------------------------------------
 -- Public Registration API
