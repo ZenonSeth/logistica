@@ -4,7 +4,7 @@ local FORMSPEC_NAME = "logconren"
 local controllerForms = {}
 
 local function get_controller_formspec(pos)
-  local name = logistica.get_network_name_or_nil(pos) or "<NO NETWORK>"
+  local name = logistica.get_network_name_or_nil(pos) or "<ERROR>"
   return "formspec_version[6]" ..
     "size[10.5,2]" ..
     logistica.ui.background..
@@ -22,7 +22,6 @@ end
 local function on_controller_receive_fields(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
-  minetest.chat_send_all("rec: "..logistica.ttos(fields))
   if fields.quit and not fields.key_enter_field then
     controllerForms[playerName] = nil
   elseif (fields[SET_BUTTON] or fields.key_enter_field) and fields[NAME_FIELD] then
@@ -114,7 +113,7 @@ logistica.register_controller("Simple Controller", {
   groups = {
     oddly_breakable_by_hand = 1, cracky = 2,
   },
-  sounds = default.node_sound_metal_defaults(),
+  sounds = logistica.node_sound_metallic(),
   paramtype = "light",
   sunlight_propagates = false,
   drawtype = "normal",

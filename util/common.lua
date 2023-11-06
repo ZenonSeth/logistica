@@ -104,12 +104,36 @@ function logistica.toggle_machine_on_off(pos)
 end
 
 -- isOn is optional
-function logistica.set_logistica_node_infotext(pos, isOn)
+-- extraText is optional
+function logistica.set_node_on_off_state(pos, isOn, extraText)
+	if extraText == nil then extraText = "" else extraText = "\n"..extraText end
 	if isOn == nil then isOn = logistica.is_machine_on(pos) end
 	logistica.load_position(pos)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
 	local text = minetest.registered_nodes[node.name].description..
-							"\n"..(isOn and "Running" or "Stopped")
+							extraText.."\n"..(isOn and "Running" or "Stopped")
 	meta:set_string("infotext", text)
+end
+
+-- returns a value of [1,#listSize], incrementing the slot each 
+-- time this is called, and returining a slot that has an item
+-- if there's no item in the list, it will return 0
+function logistica.get_next_filled_item_slot(nodeMeta, listName)
+  local metaKey = listName.."rot"
+  local inv = nodeMeta:get_inventory()
+  local listSize = inv:get_list(listName)
+  if not listSize then return 0 end
+	listSize = #listSize
+  local startPos = nodeMeta:get_int(metaKey) or 0
+	for i = startPos, startPos + listSize do
+		i = (i % listSize) + 1
+		local items = inv:get_stack(listName, i)
+		if items:get_count() > 0 then
+			nodeMeta:set_int(metaKey, i)
+			return i
+		end
+	end
+	nodeMeta:set_int(metaKey, 0)
+  return 0
 end

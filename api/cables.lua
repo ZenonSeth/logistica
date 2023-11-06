@@ -32,7 +32,7 @@ function logistica.register_cable(tier, size)
 			oddly_breakable_by_hand = 2,
 			[cable_group] = 1,
 		},
-		sounds = default.node_sound_metal_defaults(),
+		sounds = logistica.node_sound_metallic(),
 		drop = cable_name,
 		paramtype = "light",
 		sunlight_propagates = true,

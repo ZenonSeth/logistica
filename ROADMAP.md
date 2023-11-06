@@ -11,6 +11,7 @@ High Priority:
 - Crafting Supplier
 - Ability to name storages
 - Machine Upgrades
+- Mesecons compat
 
 Medium Priority
 - Wirelss Network Extender
@@ -19,6 +20,9 @@ Medium Priority
 - Rework all UI icons to be.. 48x48? 64x64? something else?
 - Direct pipeworks compatibility
 - Direct tubelib compatibility
+- Demander modes: AND/OR 
+  - Mode AND: supply target with "item 1 AND item 2..."
+  - Mode OR: supply target with "item 1" OR (if not available) "item 2"
 
 Low Priority:
 - Improve node sounds

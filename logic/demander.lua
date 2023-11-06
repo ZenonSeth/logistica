@@ -1,8 +1,6 @@
-local TIMER_DURATION_SHORT = 2.0
-local TIMER_DURATION_LONG = 4.0
+local TIMER_DURATION_SHORT = 1.0
+local TIMER_DURATION_LONG = 3.0
 local META_DEMANDER_LISTNAME = "demtarlist"
-local MASS_STORAGE_LIST_NAME = "storage"
-local ITEM_STORAGE_LIST_NAME = "main"
 local TARGET_NODES_REQUIRING_TIMER = {}
 TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
@@ -10,6 +8,18 @@ TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
+end
+
+local function get_max_rate_for_demander(pos)
+  local node = minetest.get_node_or_nil(pos)
+  if not node then return 0 end
+  local nodeDef = minetest.registered_nodes[node.name]
+  if nodeDef and nodeDef.logistica and nodeDef.logistica.demander_transfer_rate then
+    if nodeDef.logistica.demander_transfer_rate <= 0 then return 9999
+    else return nodeDef.logistica.demander_transfer_rate end
+  else
+    return 0
+  end
 end
 
 local function get_valid_demander_and_target_inventory(demanderPos)
@@ -27,6 +37,7 @@ local function get_valid_demander_and_target_inventory(demanderPos)
   if not targetInv:get_list(targetList) then return end
 
   return {
+    demanderPos = demanderPos,
     demanderInventory = meta:get_inventory(),
     targetInventory = targetInv,
     targetList = targetList,
@@ -34,10 +45,10 @@ local function get_valid_demander_and_target_inventory(demanderPos)
   }
 end
 
-local function get_actual_demand_for_item(demandStack, storageInv, storageListName)
-  local storageList = storageInv:get_list(storageListName)
+local function get_actual_demand_for_item(demandStack, invs)
+  local storageList = invs.targetInventory:get_list(invs.targetList)
   local remaining = demandStack:get_count()
-    for i,v in ipairs(storageList) do
+    for i,_ in ipairs(storageList) do
       local stored = storageList[i]
       if demandStack:get_name() == stored:get_name() then
         remaining = remaining - stored:get_count()
@@ -53,71 +64,35 @@ local function get_actual_demand_for_item(demandStack, storageInv, storageListNa
     end
 end
 
-local function try_to_fulfil_demanded_item_from_network_item_storage(pos, filterStack, network, inventories)
-  for storageHash, _ in pairs(network.item_storage) do
-    local storagePos = minetest.get_position_from_hash(storageHash)
-    local storageInv = get_meta(storagePos):get_inventory()
-    if storageInv:contains_item(ITEM_STORAGE_LIST_NAME, filterStack) then
-      local leftover = 
-        logistica.insert_itemstack_for_demander(pos, filterStack)
-      if leftover == 0 then -- stack max is 1, so just take the whole itemstack out
-        storageInv:remove_item(ITEM_STORAGE_LIST_NAME, filterStack)
-        return true
-      end -- otherwise, the insert failed for some reason..
-    end
-  end
-  return false
-end
-
-local function try_to_fulfil_demanded_item_from_locations(pos, filterStack, locations, inventories)
-  local filterStackName = filterStack:get_name()
-  local remainingDemand = filterStack:get_count()
-  for storageHash, _ in pairs(locations) do
-    if filterStack:get_count() == 0 then return end
-    local storagePos = minetest.get_position_from_hash(storageHash)
-    local storageInv = get_meta(storagePos):get_inventory()
-    local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME)
-    -- we can't use the usual take/put methods because mass storage exceeds max stack
-    for i = #storageList, 1, -1 do -- traverse backwards for taking items
-      local storageStack = storageList[i]
-      if filterStackName == storageStack:get_name() then
-        local numTaken = math.min(storageStack:get_count(), remainingDemand)
-        local takenStack = ItemStack(filterStack)
-        takenStack:set_count(numTaken)
-        local leftover =
-          logistica.insert_itemstack_for_demander(pos, takenStack)
-        numTaken = numTaken - leftover
-        storageStack:set_count(storageStack:get_count() - numTaken)
-        remainingDemand = remainingDemand - numTaken
-        if remainingDemand <= 0 then 
-          storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
-          return true
-        end
-      end
-      i = i - 1
-    end
-    storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
-  end
-  return false
+-- returns:
+-- nil: nothing in inventory?
+-- 0: no item has demand
+-- ItemStack: the next demanded item
+local function get_next_demanded_stack(pos)
+  local inventories = get_valid_demander_and_target_inventory(pos)
+  if not inventories then return nil end
+  local demandStack = nil
+  local nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
+  local startingSlot = nextSlot
+  repeat
+    if nextSlot <= 0 then return nil end
+    local filterStack = inventories.demanderInventory:get_list("filter")[nextSlot]
+    demandStack = get_actual_demand_for_item(filterStack, inventories)
+    if demandStack:get_count() > 0 then return demandStack end
+    nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
+  until( nextSlot == startingSlot ) -- until we get back to the starting slot
+  return 0 -- we had filled slots, but none had demand
 end
 
 local function take_demanded_items_from_network(pos, network)
-  local inventories = get_valid_demander_and_target_inventory(pos)
-  if not inventories then return true end
-  for _, filterStack in pairs(inventories.demanderInventory:get_list("filter")) do
-    local demandStack = 
-      get_actual_demand_for_item(filterStack, inventories.targetInventory, inventories.targetList)
-    local filterStackName = demandStack:get_name()
-    local isTool = demandStack:get_stack_max() <= 1
-    if isTool then
-      try_to_fulfil_demanded_item_from_network_item_storage(pos, demandStack, network, inventories)
-    else -- check chaced mass-storage
-      local locations = network.storage_cache[filterStackName]
-      if not locations then return true end
-      try_to_fulfil_demanded_item_from_locations(pos, demandStack, locations, inventories)
-    end
-  end
-
+  local demandStack = get_next_demanded_stack(pos)
+  if demandStack == nil then return false end
+  if demandStack == 0 then return true end -- had items but nothing in demand
+  -- limiting the number of items requested
+  demandStack:set_count(math.min(get_max_rate_for_demander(pos), demandStack:get_count()))
+  local collect = function(st) return logistica.insert_itemstack_for_demander(pos, st) end
+  logistica.take_stack_from_network(demandStack, network, collect)
+  return true
 end
 
 ----------------------------------------------------------------
@@ -127,17 +102,17 @@ end
 function logistica.start_demander_timer(pos, duration)
   if duration == nil then duration = TIMER_DURATION_SHORT end
   logistica.start_node_timer(pos, duration)
-  logistica.set_logistica_node_infotext(pos, true)
+  logistica.set_node_on_off_state(pos, true)
 end
 
 function logistica.on_demander_timer(pos, elapsed)
   local network = logistica.get_network_or_nil(pos)
   if not network or not logistica.is_machine_on(pos) then
-    logistica.set_logistica_node_infotext(pos, false)
+    logistica.set_node_on_off_state(pos, false)
     return false
   end
-  take_demanded_items_from_network(pos, network)
-  return true
+  if take_demanded_items_from_network(pos, network) then return true
+  else return false end
 end
 
 function logistica.set_demander_target_list(pos, listName)

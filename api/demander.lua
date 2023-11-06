@@ -17,8 +17,8 @@ local function get_demander_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.6,7]" ..
     logistica.ui.background..
-    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 7.5, 0.7, pushPos, selectedList)..
-    logistica.ui.on_off_btn(isOn, 9.5, 0.5, ON_OFF_BUTTON)..
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.5, 0.7, pushPos, selectedList, "Put items in:")..
+    logistica.ui.on_off_btn(isOn, 9.3, 0.5, ON_OFF_BUTTON)..
     "list["..posForm..";filter;0.5,0.5;"..NUM_DEMAND_SLOTS..",1;0]"..
     "list[current_player;main;0.5,2;8,4;0]"
 end
@@ -41,7 +41,7 @@ local function on_player_receive_fields(player, formname, fields)
     local pos = demanderForms[playerName].position
     if not pos then return false end
     if logistica.toggle_machine_on_off(pos) then
-      logistica.start_demander_timer(pos, 1)
+      logistica.start_demander_timer(pos)
     end
     show_demander_formspec(player:get_player_name(), pos)
   elseif fields[PUSH_LIST_PICKER] then
@@ -54,7 +54,6 @@ local function on_player_receive_fields(player, formname, fields)
   end
   return true
 end
-
 
 local function on_demander_punch(pos, node, puncher, pointed_thing)
   local targetPos = logistica.get_demander_target(pos)
@@ -86,6 +85,7 @@ local function allow_demander_storage_inv_put(pos, listname, index, stack, playe
   local slotStack = inv:get_stack(listname, index)
   slotStack:add_item(stack)
   inv:set_stack(listname, index, slotStack)
+  logistica.start_demander_timer(pos, 1)
   return 0
 end
 
@@ -112,8 +112,9 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 ----------------------------------------------------------------
 -- Public Registration API
 ----------------------------------------------------------------
-
-function logistica.register_demander(simpleName)
+-- `simpleName` is used for the description and for the name (can contain spaces)
+-- transferRate is how many items per tick this demander can transfer, -1 for unlimited
+function logistica.register_demander(simpleName, transferRate)
   local lname = string.lower(simpleName:gsub(" ", "_"))
   local demander_name = "logistica:demander_"..lname
   logistica.demanders[demander_name] = true
@@ -135,7 +136,7 @@ function logistica.register_demander(simpleName)
     is_ground_content = false,
     groups = grps,
     drop = demander_name,
-    sounds = default.node_sound_metal_defaults(),
+    sounds = logistica.node_sound_metallic(),
     on_timer = logistica.on_demander_timer,
     after_place_node = function (pos, placer, itemstack)
       after_place_demander(pos, placer, itemstack, NUM_DEMAND_SLOTS)
@@ -146,6 +147,7 @@ function logistica.register_demander(simpleName)
     allow_metadata_inventory_take = allow_demander_inv_take,
     allow_metadata_inventory_move = allow_demander_inv_move,
     logistica = {
+      demander_transfer_rate = transferRate,
       on_connect_to_network = function(pos, networkId)
         logistica.start_demander_timer(pos)
       end
@@ -171,4 +173,5 @@ function logistica.register_demander(simpleName)
 
 end
 
-logistica.register_demander("Basic")
+logistica.register_demander("Basic", 1)
+logistica.register_demander("Stack", 99)

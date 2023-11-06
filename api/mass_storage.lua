@@ -172,7 +172,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     description = simpleName.." Mass Storage\n(Empty)",
     tiles = { "logistica_"..lname.."_mass_storage.png" },
     groups = grps,
-    sounds = default.node_sound_metal_defaults(),
+    sounds = logistica.node_sound_metallic(),
     after_place_node = function(pos, placer, itemstack)
       after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
     end,

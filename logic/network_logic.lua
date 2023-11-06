@@ -28,6 +28,9 @@ local function has_machine(network, id)
   end
 end
 
+function logistica.get_network_by_id_or_nil(networkId)
+  return networks[networkId]
+end
 
 function logistica.get_network_or_nil(pos)
   local hash = p2h(pos)
