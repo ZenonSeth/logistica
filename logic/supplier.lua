@@ -40,7 +40,6 @@ function logistica.take_item_from_supplier(pos, stack)
   if not logistica.is_machine_on(pos) then return ItemStack("") end
   local meta = minetest.get_meta(pos)
   local canTake = math.min(stack:get_count(), logistica.get_supplier_max_item_transfer(pos))
-  minetest.chat_send_all("-- canTake: "..canTake)
   local copyStack = ItemStack(stack)
   copyStack:set_count(canTake)
 

@@ -2,6 +2,7 @@ Missing Features:
 - Storage Injector implementation
 - Item Storage implementation
 - Storage Access Point
+  - 
 - Crafting recipes
 
 High Priority:
@@ -25,4 +26,5 @@ Medium Priority
   - Mode OR: supply target with "item 1" OR (if not available) "item 2"
 
 Low Priority:
+- Liquid Storage
 - Improve node sounds

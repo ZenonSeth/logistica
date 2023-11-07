@@ -104,9 +104,6 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
 end
 
 local function allow_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player) then return 0 end
-  if from_list == "main" and to_list == "main" then return count end
-  if from_list == "upgrade" and to_list == "upgrade" then return count end
   return 0
 end
 
@@ -153,7 +150,6 @@ end
 
 local function on_mass_storage_inv_take(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player) then return 0 end
-
 end
 
 local function show_mass_storage_formspec(pos, name, numUpgradeSlots)
@@ -167,6 +163,12 @@ local function show_mass_storage_formspec(pos, name, numUpgradeSlots)
     FORMSPEC_NAME,
     get_mass_storage_formspec(pos, numUpgradeSlots)
   )
+end
+
+local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
+  if not puncher and not puncher:is_player() then return end
+  if minetest.is_protected(pos, puncher) then return end
+  logistica.try_to_add_player_wield_item_to_mass_storage(pos, puncher)
 end
 
 local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
@@ -238,6 +240,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     on_metadata_inventory_put = on_mass_storage_inv_put,
     on_metadata_inventory_take = on_mass_storage_inv_take,
     on_metadata_inventory_move = on_mass_storage_inv_move,
+    on_punch = on_mass_storage_punch,
     on_rightclick = on_mass_storage_right_click,
     preserve_metadata = on_mass_storage_preserve_metadata,
     stack_max = 1,

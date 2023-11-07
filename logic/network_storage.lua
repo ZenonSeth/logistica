@@ -75,6 +75,26 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   return false
 end
 
+-- try to insert the item into the storage, returning how many items were taken
+function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
+  local node = minetest.get_node(pos)
+  if not logistica.is_mass_storage(node.name) and not logistica.is_item_storage(node.name) then return 0 end
+  local isMassStorage = string.find(node.name, "mass")
+  logistica.load_position(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  if isMassStorage then
+    local remainingStack = logistica.insert_item_into_mass_storage(pos, inv, inputStack, dryRun)
+    return inputStack:get_count() - remainingStack:get_count()
+  else -- it's not mass storage, must be tool storage
+    if inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
+      -- tool storage only takes individual items
+      inv:add_item("main", inputStack)
+      return 1
+    end
+  end
+  return 0
+end
+
 -- attempts to insert the given itemstack in the network, returns how many items were inserted
 function logistica.insert_item_in_network(itemstack, networkId)
   local network = logistica.networks[networkId]

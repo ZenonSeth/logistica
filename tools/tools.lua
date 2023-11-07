@@ -18,7 +18,6 @@ minetest.register_craftitem("logistica:network_tool",{
   end
 })
 
-
 minetest.register_craftitem("logistica:wand",{
   description = "Inv List Scanner",
   inventory_image = "logistica_wand.png",
@@ -28,7 +27,7 @@ minetest.register_craftitem("logistica:wand",{
     local pos = pointed_thing.under
     if not placer or not pos then return end
     local inv = minetest.get_meta(pos):get_inventory()
-    
+
     local lists = inv:get_lists()
     local names = ""
     for name, _ in pairs(lists) do

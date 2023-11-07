@@ -132,6 +132,24 @@ function logistica.get_next_filled_item_slot(nodeMeta, listName)
   return 0
 end
 
+-- takes a list of ItemStacks and returns a single string representation
+function logistica.inv_list_to_table(list)
+  local itemstackTable = {}
+  for k,v in ipairs(list) do
+    itemstackTable[k] = v and v:to_string() or ""
+  end
+  return itemstackTable
+end
+
+function logistica.table_to_inv_list(table)
+  local list = {}
+  for k,v in ipairs(table) do
+    if v == nil then list[k] = ""
+		else list[k] = ItemStack(v) end
+  end
+  return list
+end
+
 -- returns a serialized string of the inventory
 function logistica.serialize_inv(inv)
   local lists = inv:get_lists()

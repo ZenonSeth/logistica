@@ -20,7 +20,7 @@ function logistica.show_popup(playerName, text, time)
     offset    = {x = 0, y = 40},
     text      = text,
     scale     = { x = 1, y = 1},
-    alignment = { x = 0.5, y = 0 },
+    alignment = { x = 0, y = 0 },
     number    = 0xDFDFDF,
   })
   playerHud[playerName] = {}
