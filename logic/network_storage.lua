@@ -19,7 +19,6 @@ function logistica.take_stack_from_network(stackToTake, network, collectorFunc)
   end
 end
 
-
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- returns true if item successfully found and given to collector, false otherwise

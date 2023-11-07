@@ -20,9 +20,7 @@ end
 function logistica.load_position(pos)
   if pos.x < -30912 or pos.y < -30912 or pos.z < -30912 or
      pos.x >  30927 or pos.y >  30927 or pos.z >  30927 then return end
-  if minetest.get_node_or_nil(pos) then
-    return
-  end
+  if minetest.get_node_or_nil(pos) then return end
   local vm = minetest.get_voxel_manip()
   vm:read_from_map(pos, pos)
 end
@@ -50,29 +48,19 @@ end
 function logistica.ttos(val, name, skipnewlines, depth)
     skipnewlines = skipnewlines or true
     depth = depth or 0
-
     local tmp = string.rep(" ", depth)
-
+		local newline = (not skipnewlines and "\n" or "")
     if name then tmp = tmp .. name .. " = " end
-
     if type(val) == "table" then
-        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
-
+        tmp = tmp .."{"..newline
         for k, v in pairs(val) do
-            tmp =  tmp .. logistica.ttos(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+            tmp =  tmp..logistica.ttos(v, k, skipnewlines, depth + 1)..","..newline
         end
-
         tmp = tmp .. string.rep(" ", depth) .. "}"
-    elseif type(val) == "number" then
-        tmp = tmp .. tostring(val)
-    elseif type(val) == "string" then
-        tmp = tmp .. string.format("%q", val)
-    elseif type(val) == "boolean" then
-        tmp = tmp .. (val and "true" or "false")
-    else
-        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
-    end
-
+    elseif type(val) == "number" then tmp = tmp .. tostring(val)
+    elseif type(val) == "string" then tmp = tmp .. string.format("%q", val)
+    elseif type(val) == "boolean" then tmp = tmp .. (val and "true" or "false")
+		else tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\"" end
     return tmp
 end
 
@@ -142,4 +130,25 @@ function logistica.get_next_filled_item_slot(nodeMeta, listName)
 	end
 	nodeMeta:set_int(metaKey, 0)
   return 0
+end
+
+-- returns a serialized string of the inventory
+function logistica.serialize_inv(inv)
+  local lists = inv:get_lists()
+  local invTable = {}
+  for name, list in pairs(lists) do
+    invTable[name] = logistica.inv_list_to_table(list)
+  end
+  return minetest.serialize(invTable)
+end
+
+-- takes a inventory serialized string and returns a table
+function logistica.deserialize_inv(serializedInv)
+  local strTable = minetest.deserialize(serializedInv)
+  if not strTable then return {} end
+  local liveTable = {}
+  for name, listStrTable in pairs(strTable) do
+    liveTable[name] = logistica.table_to_inv_list(listStrTable)
+  end
+  return liveTable
 end

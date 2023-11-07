@@ -9,8 +9,7 @@ local supplierForms = {}
 local function get_supplier_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local pushPos = logistica.get_supplier_target(pos)
-  local meta = minetest.get_meta(pos)
-  local selectedList = meta:get_string("suptarlist")
+  local selectedList =  logistica.get_supplier_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
     "size[10.6,8]" ..
@@ -70,7 +69,7 @@ local function after_place_supplier(pos, placer, itemstack, numDemandSlots)
 	  meta:set_string("owner", placer:get_player_name())
   end
   logistica.toggle_machine_on_off(pos)
-  meta:set_string("suptarlist", "dst")
+  logistica.set_supplier_target_list(pos, "dst")
 	local inv = meta:get_inventory()
 	inv:set_size("filter", numDemandSlots)
   logistica.on_supplier_change(pos)

@@ -9,8 +9,7 @@ local demanderForms = {}
 local function get_demander_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local pushPos = logistica.get_demander_target(pos)
-  local meta = minetest.get_meta(pos)
-  local selectedList = meta:get_string("demtarlist")
+  local selectedList = logistica.get_demander_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
     "size[10.6,7]" ..
@@ -68,7 +67,7 @@ local function after_place_demander(pos, placer, itemstack, numDemandSlots)
   if placer and placer:is_player() then
 	  meta:set_string("owner", placer:get_player_name())
   end
-  meta:set_string("demtarlist", "main")
+  logistica.set_demander_target_list("main")
 	local inv = meta:get_inventory()
 	inv:set_size("filter", numDemandSlots)
   logistica.on_demander_change(pos)

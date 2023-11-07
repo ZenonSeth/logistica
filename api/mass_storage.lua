@@ -97,7 +97,7 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
 			local storageStack = inv:get_stack("filter", index)
 			storageStack:clear()
 			inv:set_stack("filter", index, storageStack)
-      logistica.updateStorageCacheFromPosition(pos)
+      logistica.update_mass_storage_cache_pos(pos)
       return 0
   end
   return stack:get_count()
@@ -219,11 +219,18 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     end,
     after_destruct = logistica.on_storage_change,
     drop = storageName,
+    on_timer = logistica.on_mass_storage_timer,
     logistica = {
       baseName = simpleName.." Mass Storage",
       maxItems = numItemsPerSlot,
       numSlots = numSlots,
       numUpgradeSlots = numUpgradeSlots,
+      on_power = function(pos, isPoweredOn)
+        if isPoweredOn then logistica.start_mass_storage_timer(pos) end
+      end,
+      on_connect_to_network = function(pos, networkId)
+        logistica.start_mass_storage_timer(pos)
+      end
     },
     allow_metadata_inventory_put = allow_mass_storage_inv_put,
     allow_metadata_inventory_take = allow_mass_storage_inv_take,

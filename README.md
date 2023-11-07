@@ -33,6 +33,8 @@ Storage Injectors take items from other nodes' inventories and make them availab
 ## Mass Storage
 Mass Storage box provide mass-storage for items, and are the first place a Demander will look for to fulfil any demand. Mass Storage needs to be configured with the exact items to store, and can also be upgraded to store more items. Mass Storage can also be set to actively pull items in from Suppliers and Storage Injectors.
 
+Mass Storage boxes also keep their inventory when they are dug, allowing them to be easily moved.
+
 ## Item Storage
 The Item Storage box provides a large number of storage slots, spread over 2 pages -- but it can only store tools (specifically, items that have a max stack size of 1). Item storage is also accessed by Demanders to provide items.
 

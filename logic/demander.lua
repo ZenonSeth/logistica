@@ -1,7 +1,6 @@
 local TIMER_DURATION_SHORT = 1.0
 local TIMER_DURATION_LONG = 3.0
 local META_DEMANDER_LISTNAME = "demtarlist"
-local META_SUPPLIER_LISTNAME = "suptarlist"
 local TARGET_NODES_REQUIRING_TIMER = {}
 TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
@@ -126,18 +125,6 @@ function logistica.get_demander_target_list(pos)
   return meta:get_string(META_DEMANDER_LISTNAME)
 end
 
-function logistica.set_supplier_target_list(pos, listName)
-  local meta = get_meta(pos)
-  meta:set_string(META_SUPPLIER_LISTNAME, listName)
-end
-
-function logistica.get_supplier_target_list(pos)
-  local meta = get_meta(pos)
-  return meta:get_string(META_SUPPLIER_LISTNAME)
-end
-
-
-
 -- function logistica.update_demander_demand(demanderPos)
 --   local meta = get_meta(demanderPos)
 --   local inventories = get_valid_demander_and_target_inventory(demanderPos)
@@ -162,16 +149,6 @@ end
 
 -- returns the demander's target position or nil if the demander isn't loaded
 function logistica.get_demander_target(pos)
-  local node = minetest.get_node_or_nil(pos)
-  if not node then return nil end
-  local shift = logistica.get_rot_directions(node.param2).backward
-  if not shift then return nil end
-  return {x = (pos.x + shift.x),
-          y = (pos.y + shift.y),
-          z = (pos.z + shift.z)}
-end
-
-function logistica.get_supplier_target(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return nil end
   local shift = logistica.get_rot_directions(node.param2).backward

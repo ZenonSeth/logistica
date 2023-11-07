@@ -12,6 +12,8 @@ local function get_controller_formspec(pos)
     "button[5.6,0.6;3,0.8;"..SET_BUTTON..";Set]"
 end
 
+
+
 local function show_controller_formspec(pos, playerName)
   local pInfo = {}
   pInfo.position = pos
