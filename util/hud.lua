@@ -16,6 +16,7 @@ function logistica.show_popup(playerName, text, time)
   end
   local hudId = player:hud_add({
     hud_elem_type = "text",
+    style     = 1,
     position  = {x = 0.5, y = 0.5},
     offset    = {x = 0, y = 40},
     text      = text,
