@@ -294,11 +294,19 @@ local function SUPPLIER_OPS(pos) return {
   update_cache_node_added = function(_) logistica.update_supplier_on_item_added(pos) end,
   update_cache_node_removed = function(network) logistica.update_supplier_cache(network) end,
 } end
+
 local function try_to_add_supplier_to_network(pos)
   try_to_add_to_network(pos, SUPPLIER_OPS(pos))
 end
+
 local function remove_supplier_from_network(pos)
   remove_from_network(pos, SUPPLIER_OPS(pos))
+end
+
+local function cable_can_extend_network_from(pos)
+  local node = minetest.get_node_or_nil(pos)
+  if not node then return false end
+  return logistica.is_cable(node.name)
 end
 
 ----------------------------------------------------------------
@@ -318,7 +326,7 @@ function logistica.on_cable_change(pos, oldNode)
     if not placed then -- removed a network end
       local network = logistica.get_network_or_nil(pos)
       if network then network.cables[p2h(pos)] = nil end
-    else
+  elseif cable_can_extend_network_from(connections[1]) then
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
         otherNetwork.cables[p2h(pos)] = true
@@ -331,7 +339,7 @@ function logistica.on_cable_change(pos, oldNode)
   local connectedNetworks = {}
   for _, connectedPos in pairs(connections) do
     local otherNetwork = logistica.get_network_id_or_nil(connectedPos)
-    if otherNetwork then
+    if otherNetwork and cable_can_extend_network_from(connectedPos) then
       connectedNetworks[otherNetwork] = true
     end
   end
