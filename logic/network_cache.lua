@@ -12,6 +12,19 @@ local CACHE_PICKER_SUPPLIER = {
   nodes = function (network) return network.suppliers end,
 }
 
+-- local function notify_demanders_of_new_cache(network)
+--   for hash, _ in pairs(network.demanders) do
+--     local pos = minetest.get_position_from_hash(hash)
+--     local node = minetest.get_node_or_nil(pos)
+--     if node then
+--       local def = minetest.registered_nodes[node.name]
+--       if def and def.logistica and def.logistica.on_connect_to_network then
+--         def.logistica.on_connect_to_network(pos, network.controller)
+--       end
+--     end
+--   end
+-- end
+
 --[[ Completely updates the storage cache which holds where items may be found
   The cache is in the followiing format:
   network.storage_cache = {
@@ -36,6 +49,7 @@ local function update_network_cache(network, cacheOps)
       cache[name][hash] = true
     end
   end
+  -- notify_demanders_of_new_cache(network)
 end
 
 -- calls updateStorageCache(network) if the current position belongs to a network
@@ -49,16 +63,18 @@ local function update_network_cache_for_pos(pos, cacheOps)
 end
 
 local function update_cache_on_item_added(pos, network, cacheOps)
-  local nodes = cacheOps.nodes(network)
+  -- local nodes = cacheOps.nodes(network)
   local cache = cacheOps.cache(network)
   local listName = cacheOps.listName
   logistica.load_position(pos)
+  local posHash = minetest.hash_node_position(pos)
   local filterList = minetest.get_meta(pos):get_inventory():get_list(listName) or {}
   for _, itemStack in pairs(filterList) do
     local name = itemStack:get_name()
     if not cache[name] then cache[name] = {} end
-    cache[name][minetest.hash_node_position(pos)] = true
+    cache[name][posHash] = true
   end
+  -- notify_demanders_of_new_cache(network)
 end
 
 local function update_cache_on_item_added_at_pos(pos, cacheOps)
@@ -80,7 +96,7 @@ function logistica.update_mass_storage_cache(network)
   update_network_cache(network, CACHE_PICKER_MASS_STORAGE)
 end
 
-function logistica.update_mass_storage_on_item_added(pos)
+function logistica.update_mass_storage_cache_on_item_added(pos)
   update_cache_on_item_added_at_pos(pos, CACHE_PICKER_MASS_STORAGE)
 end
 

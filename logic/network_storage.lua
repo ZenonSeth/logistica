@@ -11,18 +11,18 @@ end
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_network(stackToTake, network, collectorFunc)
+function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest)
   if stackToTake:get_stack_max() <= 1 then
-    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc)
+    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   else
-    logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc)
+    logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   end
 end
 
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_item_storage(filterStack, network, collectorFunc)
+function logistica.take_stack_from_item_storage(filterStack, network, collectorFunc, isAutomatedRequest)
   for storageHash, _ in pairs(network.item_storage) do
     local storagePos = minetest.get_position_from_hash(storageHash)
     local storageInv = get_meta(storagePos):get_inventory()
@@ -42,7 +42,7 @@ end
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc)
+function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   local stackToTakeName = stackToTake:get_name()
   local remainingDemand = stackToTake:get_count()
   local massLocations = network.storage_cache[stackToTake:get_name()]
@@ -50,13 +50,17 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   for storageHash, _ in pairs(massLocations) do
     if stackToTake:get_count() == 0 then return end
     local storagePos = minetest.get_position_from_hash(storageHash)
-    local storageInv = get_meta(storagePos):get_inventory()
+    local meta = get_meta(storagePos)
+    local storageInv = meta:get_inventory()
     local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME)
     -- we can't use the usual take/put methods because mass storage exceeds max stack
     for i = #storageList, 1, -1 do -- traverse backwards for taking items
       local storageStack = storageList[i]
-      if stackToTakeName == storageStack:get_name() then
-        local numTaken = math.min(storageStack:get_count(), remainingDemand)
+      local slotReserve = logistica.get_mass_storage_reserve(meta, i)
+      local available = storageStack:get_count()
+      if isAutomatedRequest then available = math.max(0, available - slotReserve) end
+      if stackToTakeName == storageStack:get_name() and available > 0 then
+        local numTaken = math.min(available, remainingDemand)
         local takenStack = ItemStack(stackToTake)
         takenStack:set_count(numTaken)
         local leftover = collectorFunc(takenStack)

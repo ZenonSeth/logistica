@@ -74,8 +74,9 @@ function logistica.start_node_timer(pos, time)
 	local timer = minetest.get_node_timer(pos)
 	if not timer:is_started() then
 		timer:start(time)
+		return timer
 	end
-	return timer
+	return nil
 end
 
 function logistica.is_machine_on(pos)

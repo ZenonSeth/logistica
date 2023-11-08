@@ -91,7 +91,7 @@ local function take_demanded_items_from_network(pos, network)
   -- limiting the number of items requested
   demandStack:set_count(math.min(get_max_rate_for_demander(pos), demandStack:get_count()))
   local collect = function(st) return logistica.insert_itemstack_for_demander(pos, st) end
-  logistica.take_stack_from_network(demandStack, network, collect)
+  logistica.take_stack_from_network(demandStack, network, collect, true)
   return true
 end
 
@@ -111,8 +111,12 @@ function logistica.on_demander_timer(pos, elapsed)
     logistica.set_node_on_off_state(pos, false)
     return false
   end
-  if take_demanded_items_from_network(pos, network) then return true
-  else return false end
+  if take_demanded_items_from_network(pos, network) then
+    logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
+  else
+    logistica.start_node_timer(pos, TIMER_DURATION_LONG)
+  end
+  return false
 end
 
 function logistica.set_demander_target_list(pos, listName)

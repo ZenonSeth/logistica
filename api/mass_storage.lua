@@ -1,6 +1,7 @@
 
-local META_SERIALIZED_INV = "logistica:ser_inv"
-local META_ITEM_NAME = "logistica:item_name"
+local META_SERIALIZED_INV = "logserlist"
+local META_IMG_INDEX = "logimginxd"
+local META_SELECTED_RES = "logselres"
 
 local FORMSPEC_NAME = "mass_storage_formspec"
 local ON_OFF_BTN = "on_off_btn"
@@ -9,63 +10,192 @@ local MASS_STORAGE_TIMER = 1
 
 local storageForms = {}
 
-local function get_mass_storage_upgrade_inv(posForm, numUpgradeSlots)
+local RESERVE_TOOLTIP = "How many items to reserve.\nReserved items won't be taken by other network machines"
+local IMAGE_TOOLTIP = "Pick which slot to use as front image.\nClick the selected slot again to disable the front image."
+
+local function get_sel_index(vals, selectedValue)
+  for i, v in ipairs(vals) do if v == selectedValue then return i end end
+  return 0
+end
+
+local function upgrade_inv(posForm, numUpgradeSlots, y)
   if numUpgradeSlots <= 0 then return "" end
   local upIconX = 1.5 + 1.25 * (7 - numUpgradeSlots) -- sort of hardcoded
   local upInvX = upIconX + 1.25
-  local y = 3.5
   return "image["..upIconX..","..y..";1,1;logistica_icon_upgrade.png]" ..
          "list["..posForm..";upgrade;"..upInvX..","..y..";"..numUpgradeSlots..",1;0]"
 end
 
--- formspec
+local function image_picker(initialX, y, index, selectedImgIndex, meta)
+  local x = initialX + (index - 1)*1.25
+  local itemName = ""
+  if selectedImgIndex == index then
+    itemName = meta:get_inventory():get_stack("filter", index):get_name()
+  end
+  return "item_image_button["..x..","..y..";0.7,0.7;"..itemName..";ico"..index..";]"
+end
 
-local function get_mass_storage_formspec(pos, numUpgradeSlots)
+local function reserve_dropdown(x, y, index, vals, valsAsStr, selectedValue)
+  local selectedIndex = get_sel_index(vals, selectedValue)
+  return "dropdown["..x..","..y..";1.2,0.6;res"..index..";"..valsAsStr..";"..selectedIndex..";false]"
+end
+
+local get_sr = logistica.get_mass_storage_reserve
+
+local function get_reserve_as_string(name, meta)
+  local numSlots = minetest.registered_nodes[name].logistica.numSlots
+  local ret = ""
+  for i = 1, numSlots do
+    if i == 1 then ret = logistica.get_mass_storage_reserve(meta, i)
+    else ret = ret..","..logistica.get_mass_storage_reserve(meta, i) end
+  end
+  return ret
+end
+
+local function get_reserve_from_string(name, str)
+  local vals = string.split(str, ",", false)
+  local numSlots = minetest.registered_nodes[name].logistica.numSlots
+  local ret = {}
+  for i = 1, numSlots do
+    ret[i] = vals[i] ~= nil and tonumber(vals[i]) or 0
+  end
+  return ret
+end
+
+----------------------------------------------------------------
+-- formspec
+----------------------------------------------------------------
+
+-- `meta` is optional
+local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
-  local upgradeInvString = get_mass_storage_upgrade_inv(posForm, numUpgradeSlots)
+  local upgradeInvString = upgrade_inv(posForm, numUpgradeSlots, 3.8)
   local isOn = logistica.is_machine_on(pos)
+  local meta = optionalMeta or minetest.get_meta(pos)
+  local selectedImgIndex = logistica.get_mass_storage_image_slot(meta)
+  local vals = logistica.get_mass_storage_valid_reserve_list(pos)
+  local valsAsStr = table.concat(vals, ",")
+  local imgPickX = 1.65
+  local imgPickY = 0.1
   return "formspec_version[4]"..
     "size[12,10.5]" ..
     logistica.ui.background..
     "list[current_player;main;1.5,5;8,4;0]" ..
-    "list["..posForm..";storage;1.5,2.1;8,1;0]" ..
-    "list["..posForm..";filter;1.5,1;8,1;0]" ..
-    "image[0.25,1;1,1;logistica_icon_filter.png]" ..
-    "list["..posForm..";main;1.5,3.5;1,1;0]" ..
-    "image[0.25,2.1;1,1;logistica_icon_mass_storage.png]" ..
-    "image[0.25,3.5;1,1;logistica_icon_input.png]"..
+    "list["..posForm..";storage;1.5,1.9;8,1;0]" ..
+    "list["..posForm..";filter;1.5,0.8;8,1;0]" ..
+    "image[0.25,0.8;1,1;logistica_icon_filter.png]" ..
+    "list["..posForm..";main;1.5,3.8;1,1;0]" ..
+    "image[0.25,1.9;1,1;logistica_icon_mass_storage.png]" ..
+    "image[0.2,3.8;1,1;logistica_icon_input.png]" ..
+    image_picker(imgPickX, imgPickY, 1, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 2, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 3, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 4, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 5, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 6, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 7, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 8, selectedImgIndex, meta)..
+    "label[0.2,0.4;Front Img]"..
+    reserve_dropdown( 1.40, 3, 1, vals, valsAsStr, get_sr(meta, 1))..
+    reserve_dropdown( 2.65, 3, 2, vals, valsAsStr, get_sr(meta, 2))..
+    reserve_dropdown( 3.90, 3, 3, vals, valsAsStr, get_sr(meta, 3))..
+    reserve_dropdown( 5.15, 3, 4, vals, valsAsStr, get_sr(meta, 4))..
+    reserve_dropdown( 6.40, 3, 5, vals, valsAsStr, get_sr(meta, 5))..
+    reserve_dropdown( 7.65, 3, 6, vals, valsAsStr, get_sr(meta, 6))..
+    reserve_dropdown( 8.90, 3, 7, vals, valsAsStr, get_sr(meta, 7))..
+    reserve_dropdown(10.15, 3, 8, vals, valsAsStr, get_sr(meta, 8))..
+    "label[0.2,3.3;Res (?)]"..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring["..posForm..";storage]"..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring[current_player;main]"..
-    logistica.ui.on_off_btn(isOn, 3.4, 3.6, ON_OFF_BTN, "Pull Items")..
-    upgradeInvString
+    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, "Pull Items")..
+    upgradeInvString..
+    "tooltip[0.2,3.0;1,0.5;"..RESERVE_TOOLTIP.."]"..
+    "tooltip[0.2,0.1;1,0.5;"..IMAGE_TOOLTIP.."]"
 end
 
+local function show_mass_storage_formspec(pos, name, meta)
+  local node = minetest.get_node(pos)
+  local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
+  storageForms[name] = { position = pos }
+  minetest.show_formspec(
+    name,
+    FORMSPEC_NAME,
+    get_mass_storage_formspec(pos, numUpgradeSlots, meta)
+  )
+end
+
+----------------------------------------------------------------
 -- callbacks
+----------------------------------------------------------------
+
+local function on_receive_storage_formspec(player, formname, fields)
+  if formname ~= FORMSPEC_NAME then return end
+  local playerName = player:get_player_name()
+  local pos = storageForms[playerName].position
+  if fields.quit and not fields.key_enter_field then
+    logistica.update_mass_storage_front_image(pos)
+    storageForms[playerName] = nil
+  elseif fields[ON_OFF_BTN] then
+    if logistica.toggle_machine_on_off(pos) then
+      logistica.start_node_timer(pos, MASS_STORAGE_TIMER)
+    end
+    show_mass_storage_formspec(pos, playerName)
+  else
+    for i = 1, 8 do
+      if fields["ico"..i] then
+        logistica.on_mass_storage_image_select_change(pos, i)
+        show_mass_storage_formspec(pos, playerName)
+        return
+      end
+    end
+    for i = 1, 8 do
+      if fields["res"..i] then
+        logistica.on_mass_storage_reserve_changed(pos, i, fields["res"..i])
+        show_mass_storage_formspec(pos, playerName)
+        return
+      end
+    end
+    return true
+  end
+  return true
+end
 
 local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
 	local meta = minetest.get_meta(pos)
   if placer and placer:is_player() then
 	  meta:set_string("owner", placer:get_player_name())
   end
+  local nodeName = minetest.get_node(pos).name
 	local inv = meta:get_inventory()
 	inv:set_size("main", 1)
 	inv:set_size("filter", numSlots)
 	inv:set_size("storage", numSlots)
 	inv:set_size("upgrade", numUpgradeSlots)
-  -- and connect to network
-  logistica.on_storage_change(pos)
   -- restore inventory, if any
-  local itemstackMetaInv = itemstack:get_meta():get_string(META_SERIALIZED_INV)
+  local itemMeta = itemstack:get_meta()
+  local itemstackMetaInv = itemMeta:get_string(META_SERIALIZED_INV)
   if itemstackMetaInv then
     local listsTable = logistica.deserialize_inv(itemstackMetaInv)
     for name, listTable in pairs(listsTable) do
       inv:set_list(name, listTable)
     end
   end
+  local selImgIndex = itemMeta:get_int(META_IMG_INDEX)
+  local reserves = get_reserve_from_string(nodeName, itemMeta:get_string(META_SELECTED_RES))
+
+  logistica.set_mass_storage_image_slot(meta, selImgIndex)
+  for i, v in ipairs(reserves) do logistica.set_mass_storage_reserve(meta, i, v) end
+  logistica.update_mass_storage_front_image(pos)
+  logistica.on_storage_change(pos)
+end
+
+local function after_mass_storage_destruct(pos, oldNode)
+  logistica.remove_item_on_block_front(pos)
+  logistica.on_storage_change(pos, oldNode)
 end
 
 local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
@@ -74,7 +204,10 @@ local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
   if not drop or not meta then return end
   local inv = meta:get_inventory()
   local serialized = logistica.serialize_inv(inv)
-  drop:get_meta():set_string(META_SERIALIZED_INV, serialized)
+  local dropMeta = drop:get_meta()
+  dropMeta:set_string(META_SERIALIZED_INV, serialized)
+  dropMeta:set_int(META_IMG_INDEX, logistica.get_mass_storage_image_slot(meta))
+  dropMeta:set_string(META_SELECTED_RES, get_reserve_as_string(oldnode.name, meta))
   -- update description
   local name = minetest.registered_nodes[oldnode.name].logistica.baseName
   if inv:is_empty("storage") then
@@ -152,19 +285,6 @@ local function on_mass_storage_inv_take(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player) then return 0 end
 end
 
-local function show_mass_storage_formspec(pos, name, numUpgradeSlots)
-  if not numUpgradeSlots then
-    local node = minetest.get_node(pos)
-    numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
-  end
-  storageForms[name] = { position = pos }
-  minetest.show_formspec(
-    name,
-    FORMSPEC_NAME,
-    get_mass_storage_formspec(pos, numUpgradeSlots)
-  )
-end
-
 local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
   if not puncher and not puncher:is_player() then return end
   if minetest.is_protected(pos, puncher) then return end
@@ -172,26 +292,13 @@ local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
 end
 
 local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
-  local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
   local name = clicker:get_player_name()
-  show_mass_storage_formspec(pos, name, numUpgradeSlots)
+  show_mass_storage_formspec(pos, name)
 end
 
-local function on_receive_storage_formspec(player, formname, fields)
-  if formname ~= FORMSPEC_NAME then return end
-  local playerName = player:get_player_name()
-  if fields.quit and not fields.key_enter_field then
-    storageForms[playerName] = nil
-  elseif fields[ON_OFF_BTN] then
-    local pos = storageForms[playerName].position
-    if logistica.toggle_machine_on_off(pos) then
-      logistica.start_node_timer(pos, MASS_STORAGE_TIMER)
-    end
-    show_mass_storage_formspec(pos, playerName)
-  end
-  return true
+local function on_mass_storage_rotate(pos, node, player, mode)
+  logistica.update_mass_storage_front_image(pos)
 end
-
 
 ----------------------------------------------------------------
 -- register
@@ -213,15 +320,18 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
 
   local def = {
     description = simpleName.." Mass Storage\n(Empty)",
-    tiles = { "logistica_"..lname.."_mass_storage.png" },
+    tiles = { "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage.png",
+              "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage.png",
+              "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage_front.png" },
     groups = grps,
     sounds = logistica.node_sound_metallic(),
     after_place_node = function(pos, placer, itemstack)
       after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
     end,
-    after_destruct = logistica.on_storage_change,
+    after_destruct = after_mass_storage_destruct,
     drop = storageName,
     on_timer = logistica.on_mass_storage_timer,
+    paramtype2 = "facedir",
     logistica = {
       baseName = simpleName.." Mass Storage",
       maxItems = numItemsPerSlot,
@@ -234,6 +344,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
         logistica.start_mass_storage_timer(pos)
       end
     },
+    connect_sides = {"top", "bottom", "left", "back", "right" },
     allow_metadata_inventory_put = allow_mass_storage_inv_put,
     allow_metadata_inventory_take = allow_mass_storage_inv_take,
     allow_metadata_inventory_move = allow_mass_storage_inv_move,
@@ -242,6 +353,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     on_metadata_inventory_move = on_mass_storage_inv_move,
     on_punch = on_mass_storage_punch,
     on_rightclick = on_mass_storage_right_click,
+    on_rotate = on_mass_storage_rotate,
     preserve_metadata = on_mass_storage_preserve_metadata,
     stack_max = 1,
   }
@@ -259,4 +371,4 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
 
 end
 
-logistica.register_mass_storage("Basic", 8, 512, 4)
+logistica.register_mass_storage("Basic", 8, 512, 2)

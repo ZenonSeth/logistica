@@ -1,3 +1,7 @@
+local META_IMG_PIC = "logimgpick"
+local META_RES_VAL = "logresval"
+local VALID_RESERVE_VALUES = {}
+for i = 0,4096,128 do table.insert(VALID_RESERVE_VALUES, i) end
 
 local function mass_storage_room_for_item(pos, meta, stack)
   local stackName = stack:get_name()
@@ -101,7 +105,6 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
     if numTaken >= spaceForItems then return end -- everything isnerted, return
     requestStack:set_count(spaceForItems - numTaken)
   end
-  -- todo: storage injectors
 end
 
 function logistica.start_mass_storage_timer(pos)
@@ -150,4 +153,62 @@ function logistica.try_to_add_player_wield_item_to_mass_storage(pos, player)
     end
   end
   show_deposited_item_popup(player, numDesposited, wieldStack:get_short_description())
+end
+
+-- returns a table of {0,128,256,512...} up to the max this box supports
+function logistica.get_mass_storage_valid_reserve_list(pos)
+  local max = logistica.get_mass_storage_max_size(pos)
+  local vals = {}
+  for _, v in ipairs(VALID_RESERVE_VALUES) do
+    if v <= max then 
+      table.insert(vals, v)
+    end
+  end
+  return vals
+end
+
+function logistica.set_mass_storage_reserve(meta, i, value)
+  meta:set_int(META_RES_VAL..tostring(i), value)
+end
+
+function logistica.on_mass_storage_reserve_changed(pos, i, value)
+  local meta = minetest.get_meta(pos)
+  local intVal = tonumber(value)
+  if type(intVal) ~= "number" then return end
+  local invalid = true
+  for _, v in ipairs(VALID_RESERVE_VALUES) do if v == intVal then invalid = false end end
+  if invalid then return end
+  meta:set_int(META_RES_VAL..tostring(i), intVal)
+end
+
+function logistica.on_mass_storage_image_select_change(pos, i)
+  local meta = minetest.get_meta(pos)
+  local prev = meta:get_int(META_IMG_PIC)
+  if prev == i then meta:set_int(META_IMG_PIC, 0)
+  else meta:set_int(META_IMG_PIC, i) end
+end
+
+function logistica.set_mass_storage_image_slot(meta, index)
+  return meta:set_int(META_IMG_PIC, index)
+end
+
+-- returns an index of which slot is picked to be the front image, or 0 if there isn't one
+function logistica.get_mass_storage_image_slot(meta)
+  return meta:get_int(META_IMG_PIC)
+end
+
+-- returns the picked reserve for the given index
+function logistica.get_mass_storage_reserve(meta, index)
+  return meta:get_int(META_RES_VAL..tostring(index))
+end
+
+function logistica.update_mass_storage_front_image(origPos)
+  local pos = vector.new(origPos)
+  logistica.remove_item_on_block_front(pos)
+  local meta = minetest.get_meta(pos)
+  local slot = logistica.get_mass_storage_image_slot(meta)
+  if slot > 0 then
+    local item = meta:get_inventory():get_list("filter")[slot] or ItemStack("")
+    logistica.display_item_on_block_front(pos, item:get_name())
+  end
 end

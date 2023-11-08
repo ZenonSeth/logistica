@@ -266,7 +266,7 @@ end
 
 local function MASS_STORAGE_OPS(pos) return {
   get_list = function(network) return network.mass_storage end,
-  update_cache_node_added = function(_) logistica.update_mass_storage_on_item_added(pos) end,
+  update_cache_node_added = function(_) logistica.update_mass_storage_cache_on_item_added(pos) end,
   update_cache_node_removed = function(network) logistica.update_mass_storage_cache(network) end,
 } end
 local function try_to_add_mass_storage_to_network(pos)
