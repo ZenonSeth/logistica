@@ -5,9 +5,9 @@ Missing Features:
 - Crafting recipes
 
 High Priority:
-- Ability to name storages
 - Machine Upgrades
 - Mesecons compat
+- Rename nodes for a more user-intuitive names (as how they act towards nodes rather than the network)
 
 Medium Priority
 - Wirelss Network Extender
@@ -24,3 +24,4 @@ Medium Priority
 Low Priority:
 - Liquid Storage
 - Improve node sounds
+- Ability to name storages
