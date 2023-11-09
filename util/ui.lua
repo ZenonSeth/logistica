@@ -2,18 +2,6 @@ logistica.ui = {}
 
 logistica.ui.background = "no_prepend[]bgcolor[#0000]background9[0,0;1,1;logistica_formspec_background.png;true;8]"
 
--- returns a string of comma separated lists we're allowed to push to at the given pushToPos
-local function get_lists(pushToPos, allowedLists)
-  logistica.load_position(pushToPos)
-  local availableLists = minetest.get_meta(pushToPos):get_inventory():get_lists()
-  local pushLists = {}
-  for name, _ in pairs(availableLists) do
-    if allowedLists[name] then
-      table.insert(pushLists, name)
-    end
-  end
-  return pushLists
-end
 
 
 local function list_dropdown(name, itemTable, x, y, default, label)
@@ -42,9 +30,9 @@ function logistica.ui.on_off_btn(isOn, x, y, name, label, w, h)
 end
 
 function logistica.ui.pull_list_picker(name, x, y, pullFromPos, default, label)
-  return list_dropdown(name, get_lists(pullFromPos, logistica.ALLOWED_PULL_LISTS), x, y, default, label)
+  return list_dropdown(name, logistica.get_pull_lists(pullFromPos), x, y, default, label)
 end
 
 function logistica.ui.push_list_picker(name, x, y, pushToPos, default, label)
-  return list_dropdown(name, get_lists(pushToPos, logistica.ALLOWED_PUSH_LISTS), x, y, default, label)
+  return list_dropdown(name, logistica.get_push_lists(pushToPos), x, y, default, label)
 end

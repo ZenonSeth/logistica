@@ -20,7 +20,11 @@ local adjecent = {
 
 local function has_machine(network, id)
   if not network then return false end
-  if network.demanders[id] or network.suppliers[id] or network.mass_storage[id] or network.item_storage[id]
+  if network.demanders[id]
+    or network.suppliers[id]
+    or network.mass_storage[id]
+    or network.item_storage[id]
+    or network.injectors[id]
   then
     return true
   else
@@ -139,6 +143,9 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           elseif logistica.is_demander(otherNode.name) then
             network.demanders[otherHash] = true
             valid = true
+          elseif logistica.is_injector(otherNode.name) then
+            network.injectors[otherHash] = true
+            valid = true
           elseif logistica.is_supplier(otherNode.name) then
             network.suppliers[otherHash] = true
             valid = true
@@ -178,11 +185,13 @@ local function create_network(controllerPosition, oldNetworkName)
   network.name = networkName
   network.cables = {}
   network.demanders = {}
+  network.injectors = {}
   network.suppliers = {}
   network.mass_storage = {}
   network.item_storage = {}
   network.storage_cache = {}
   network.supplier_cache = {}
+  network.demander_cache = {}
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
@@ -196,6 +205,7 @@ local function create_network(controllerPosition, oldNetworkName)
     -- controller scan skips updating storage cache, do so now
     logistica.update_mass_storage_cache(network)
     logistica.update_supplier_cache(network)
+    logistica.update_demander_cache(network)
   end
   if errorMsg ~= nil then
     networks[controllerHash] = nil
@@ -269,25 +279,12 @@ local function MASS_STORAGE_OPS(pos) return {
   update_cache_node_added = function(_) logistica.update_mass_storage_cache_on_item_added(pos) end,
   update_cache_node_removed = function(network) logistica.update_mass_storage_cache(network) end,
 } end
-local function try_to_add_mass_storage_to_network(pos)
-  try_to_add_to_network(pos, MASS_STORAGE_OPS(pos))
-end
 
-local function remove_mass_storage_from_network(pos)
-  remove_from_network(pos, MASS_STORAGE_OPS(pos))
-end
-
-local DEMANDER_OPS = {
+local function DEMANDER_OPS(pos) return {
   get_list = function(network) return network.demanders end,
-  update_cache_node_added = function(_) end,
-  update_cache_node_removed = function(_) end,
-}
-local function try_to_add_demander_to_network(pos)
-  try_to_add_to_network(pos,DEMANDER_OPS)
-end
-local function remove_demander_from_network(pos)
-  remove_from_network(pos, DEMANDER_OPS)
-end
+  update_cache_node_added = function(_) logistica.update_demander_on_item_added(pos) end,
+  update_cache_node_removed = function(network) logistica.update_demander_cache(network) end,
+} end
 
 local function SUPPLIER_OPS(pos) return {
   get_list = function(network) return network.suppliers end,
@@ -295,13 +292,11 @@ local function SUPPLIER_OPS(pos) return {
   update_cache_node_removed = function(network) logistica.update_supplier_cache(network) end,
 } end
 
-local function try_to_add_supplier_to_network(pos)
-  try_to_add_to_network(pos, SUPPLIER_OPS(pos))
-end
-
-local function remove_supplier_from_network(pos)
-  remove_from_network(pos, SUPPLIER_OPS(pos))
-end
+local INJECTOR_OPS = {
+  get_list = function(network) return network.injectors end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
 
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
@@ -370,29 +365,38 @@ function logistica.on_controller_change(pos, oldNode)
   end
 end
 
-function logistica.on_storage_change(pos, oldNode)
+function logistica.on_mass_storage_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_mass_storage_to_network(pos)
+    try_to_add_to_network(pos, MASS_STORAGE_OPS(pos))
   else
-    remove_mass_storage_from_network(pos)
+    remove_from_network(pos, MASS_STORAGE_OPS(pos))
   end
 end
 
 function logistica.on_demander_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_demander_to_network(pos)
+    try_to_add_to_network(pos, DEMANDER_OPS(pos))
   else
-    remove_demander_from_network(pos)
+    remove_from_network(pos, DEMANDER_OPS(pos))
   end
 end
 
 function logistica.on_supplier_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_supplier_to_network(pos)
+    try_to_add_to_network(pos, SUPPLIER_OPS(pos))
   else
-    remove_supplier_from_network(pos)
+    remove_from_network(pos, SUPPLIER_OPS(pos))
+  end
+end
+
+function logistica.on_injector_change(pos, oldNode)
+  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
+  if placed == true then
+    try_to_add_to_network(pos, INJECTOR_OPS)
+  else
+    remove_from_network(pos, INJECTOR_OPS)
   end
 end

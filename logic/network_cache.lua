@@ -11,6 +11,12 @@ local CACHE_PICKER_SUPPLIER = {
   cache = function (network) return network.supplier_cache end,
   nodes = function (network) return network.suppliers end,
 }
+local CACHE_PICKER_DEMANDER = {
+  listName = "filter",
+  clear = function (network) network.demander_cache = {} end,
+  cache = function (network) return network.demander_cache end,
+  nodes = function (network) return network.demanders end,
+}
 
 -- local function notify_demanders_of_new_cache(network)
 --   for hash, _ in pairs(network.demanders) do
@@ -110,4 +116,16 @@ end
 
 function logistica.update_supplier_on_item_added(pos)
   update_cache_on_item_added_at_pos(pos, CACHE_PICKER_SUPPLIER)
+end
+
+function logistica.update_demander_cache_pos(pos)
+  update_network_cache_for_pos(pos, CACHE_PICKER_DEMANDER)
+end
+
+function logistica.update_demander_cache(network)
+  update_network_cache(network, CACHE_PICKER_DEMANDER)
+end
+
+function logistica.update_demander_on_item_added(pos)
+  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_DEMANDER)
 end

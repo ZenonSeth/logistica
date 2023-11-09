@@ -190,12 +190,12 @@ local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpg
   logistica.set_mass_storage_image_slot(meta, selImgIndex)
   for i, v in ipairs(reserves) do logistica.set_mass_storage_reserve(meta, i, v) end
   logistica.update_mass_storage_front_image(pos)
-  logistica.on_storage_change(pos)
+  logistica.on_mass_storage_change(pos)
 end
 
 local function after_mass_storage_destruct(pos, oldNode)
   logistica.remove_item_on_block_front(pos)
-  logistica.on_storage_change(pos, oldNode)
+  logistica.on_mass_storage_change(pos, oldNode)
 end
 
 local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
@@ -366,6 +366,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1 }
+  def_disabled.after_destruct = nil
 
 	minetest.register_node(storageName.."_disabled", def_disabled)
 

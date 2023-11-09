@@ -87,15 +87,16 @@ end
 -- toggles the state and returns the new state (true for on, false for off)
 function logistica.toggle_machine_on_off(pos)
 	logistica.load_position(pos)
+	local node = minetest.get_node(pos)
   local meta = minetest.get_meta(pos)
   local newState = (meta:get_int(META_ON_OFF_KEY) + 1) % 2
-  meta:set_int(META_ON_OFF_KEY, newState)
-	local node = minetest.get_node(pos)
 	local def = minetest.registered_nodes[node.name]
 	if def and def.logistica and def.logistica.on_power then
 		def.logistica.on_power(pos, newState)
+  	meta:set_int(META_ON_OFF_KEY, newState)
+  	return newState > 0
 	end
-  return newState > 0
+	return nil
 end
 
 -- isOn is optional

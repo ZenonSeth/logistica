@@ -79,7 +79,7 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   return false
 end
 
--- try to insert the item into the storage, returning how many items were taken
+-- try to insert the item into the storage, returning how many items remain
 function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
   local node = minetest.get_node(pos)
   if not logistica.is_mass_storage(node.name) and not logistica.is_item_storage(node.name) then return 0 end
@@ -88,30 +88,33 @@ function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
   local inv = minetest.get_meta(pos):get_inventory()
   if isMassStorage then
     local remainingStack = logistica.insert_item_into_mass_storage(pos, inv, inputStack, dryRun)
-    return inputStack:get_count() - remainingStack:get_count()
+    return remainingStack:get_count()
   else -- it's not mass storage, must be tool storage
     if inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
       -- tool storage only takes individual items
       inv:add_item("main", inputStack)
-      return 1
+      return 0
     end
   end
-  return 0
+  return inputStack:get_count()
 end
 
--- attempts to insert the given itemstack in the network, returns how many items were inserted
+-- attempts to insert the given itemstack in the network, returns how many items remain
 function logistica.insert_item_in_network(itemstack, networkId)
-  local network = logistica.networks[networkId]
-  if not itemstack or not network then return 0 end
+  local network = logistica.get_network_by_id_or_nil(networkId)
+  if not itemstack or itemstack:is_empty() then return 0 end
+  if not network then return itemstack:get_count() end
 
   local workingStack = ItemStack(itemstack)
+
   -- check demanders first
-  for hash, _ in pairs(network.demanders) do
+  local listOfDemandersInNeedOfItem = network.demander_cache[itemstack:get_name()] or {}
+  for hash, _ in pairs(listOfDemandersInNeedOfItem) do
     local pos = minetest.get_position_from_hash(hash)
     logistica.load_position(pos)
-    local taken = 0 -- logistica.try_to_give_item_to_demander(pos, workingStack)
-    local leftover = workingStack:get_count() - taken
-    if leftover <= 0 then return itemstack:get_count() end -- we took all items
+    local leftover = logistica.insert_itemstack_for_demander(pos, workingStack, true)
+    minetest.chat_send_all("insert_in_network: from: "..itemstack:get_count().." remain "..leftover)
+    if leftover <= 0 then return 0 end -- we took all items
     workingStack:set_count(leftover)
   end
 
@@ -125,11 +128,10 @@ function logistica.insert_item_in_network(itemstack, networkId)
   for hash, _ in pairs(storages) do
     local pos = minetest.get_position_from_hash(hash)
     logistica.load_position(pos)
-    local taken = logistica.try_to_add_item_to_storage(pos, workingStack)
-    local leftover = workingStack:get_count() - taken
-    if leftover <= 0 then return itemstack:get_count() end -- we took all items
-    workingStack:set_count(leftover)
+    local remain = logistica.try_to_add_item_to_storage(pos, workingStack)
+    if remain <= 0 then return 0 end -- we took all items
+    workingStack:set_count(remain)
   end
 
-  return itemstack:get_count() - workingStack:get_count()
+  return workingStack:get_count()
 end

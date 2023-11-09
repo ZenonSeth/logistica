@@ -1,6 +1,7 @@
 logistica.cables = {}
 logistica.machines = {}
 logistica.controllers = {}
+logistica.injectors = {}
 logistica.demanders = {}
 logistica.suppliers = {}
 logistica.mass_storage = {}
@@ -44,6 +45,10 @@ end
 
 function logistica.is_controller(name)
   return logistica.controllers[name] ~= nil
+end
+
+function logistica.is_injector(name)
+  return logistica.injectors[name] ~= nil
 end
 
 function logistica.get_item_tiers(name)

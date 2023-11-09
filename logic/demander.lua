@@ -3,6 +3,9 @@ local TIMER_DURATION_LONG = 3.0
 local META_DEMANDER_LISTNAME = "demtarlist"
 local TARGET_NODES_REQUIRING_TIMER = {}
 TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
+TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve0"] = true
+TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve1"] = true
+TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve2"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
 
 local function get_meta(pos)
@@ -45,7 +48,7 @@ local function get_valid_demander_and_target_inventory(demanderPos)
   }
 end
 
-local function get_actual_demand_for_item(demandStack, invs)
+local function get_target_missing_item_stack(demandStack, invs)
   local storageList = invs.targetInventory:get_list(invs.targetList)
   local remaining = demandStack:get_count()
     for i,_ in ipairs(storageList) do
@@ -77,7 +80,7 @@ local function get_next_demanded_stack(pos)
   repeat
     if nextSlot <= 0 then return nil end
     local filterStack = inventories.demanderInventory:get_list("filter")[nextSlot]
-    demandStack = get_actual_demand_for_item(filterStack, inventories)
+    demandStack = get_target_missing_item_stack(filterStack, inventories)
     if demandStack:get_count() > 0 then return demandStack end
     nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
   until( nextSlot == startingSlot ) -- until we get back to the starting slot
@@ -93,6 +96,15 @@ local function take_demanded_items_from_network(pos, network)
   local collect = function(st) return logistica.insert_itemstack_for_demander(pos, st) end
   logistica.take_stack_from_network(demandStack, network, collect, true)
   return true
+end
+
+local function get_filter_demand_for(inv, itemName)
+  local filterList = inv:get_list("filter")
+  local maxDemand = 0
+  for _, v in ipairs(filterList) do
+    if v:get_name() == itemName and v:get_count() > maxDemand then maxDemand = v:get_count() end
+  end
+  return maxDemand
 end
 
 ----------------------------------------------------------------
@@ -155,27 +167,38 @@ end
 function logistica.get_demander_target(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return nil end
-  local shift = logistica.get_rot_directions(node.param2).backward
-  if not shift then return nil end
-  return {x = (pos.x + shift.x),
-          y = (pos.y + shift.y),
-          z = (pos.z + shift.z)}
+  return vector.add(pos, logistica.get_rot_directions(node.param2).backward)
 end
 
 -- returns how many items remain from the itemstack after we attempt to insert it
 -- `targetInventory` and `targetList` are optional (tied together), if not passed, it will be looked up
-function logistica.insert_itemstack_for_demander(demanderPos, itemstack)
+-- `limitByDemand` is optional - if set to true, no more items than needed will be inserted
+function logistica.insert_itemstack_for_demander(demanderPos, itemstack, limitByDemand)
   if not itemstack or itemstack:is_empty() then return 0 end
+  if not logistica.is_machine_on(demanderPos) then return itemstack:get_count() end
 
+  local itemStackCount = itemstack:get_count()
+  local itemStackName = itemstack:get_name()
   local inventories = get_valid_demander_and_target_inventory(demanderPos)
-  if not inventories then return itemstack:get_count() end
+  if not inventories then return itemStackCount end
   local targetInventory = inventories.targetInventory
   local targetList = inventories.targetList
 
-  local leftover = targetInventory:add_item(targetList, itemstack)
+  local toInsertStack = ItemStack(itemstack)
+  local demand = itemStackCount
+  if limitByDemand then
+    demand = get_filter_demand_for(inventories.demanderInventory, itemStackName)
+    minetest.chat_send_all("-- filterDemand = "..demand)
+    toInsertStack:set_count(demand)
+    toInsertStack = get_target_missing_item_stack(toInsertStack, inventories)
+    minetest.chat_send_all("-- missing item stack = "..toInsertStack:get_count())
+  end
+  if toInsertStack:is_empty() then return itemStackCount end
+
+  local leftover = targetInventory:add_item(targetList, toInsertStack)
   local targetNode = minetest.get_node(inventories.targetPos)
-  if leftover:get_count() < itemstack:get_count() and TARGET_NODES_REQUIRING_TIMER[targetNode.name] then
+  if leftover:get_count() < toInsertStack:get_count() and TARGET_NODES_REQUIRING_TIMER[targetNode.name] then
     logistica.start_node_timer(inventories.targetPos, 1)
   end
-  return leftover:get_count()
+  return leftover:get_count() + itemStackCount - demand
 end

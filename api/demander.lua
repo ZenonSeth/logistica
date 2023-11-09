@@ -71,6 +71,7 @@ local function after_place_demander(pos, placer, itemstack, numDemandSlots)
 	local inv = meta:get_inventory()
 	inv:set_size("filter", numDemandSlots)
   logistica.on_demander_change(pos)
+  logistica.update_demander_on_item_added(pos)
   logistica.start_demander_timer(pos)
 end
 
@@ -80,6 +81,7 @@ local function allow_demander_storage_inv_put(pos, listname, index, stack, playe
   local slotStack = inv:get_stack(listname, index)
   slotStack:add_item(stack)
   inv:set_stack(listname, index, slotStack)
+  logistica.update_demander_on_item_added(pos)
   logistica.start_demander_timer(pos, 1)
   return 0
 end
@@ -90,6 +92,7 @@ local function allow_demander_inv_take(pos, listname, index, stack, player)
   local slotStack = inv:get_stack(listname, index)
   slotStack:take_item(stack:get_count())
   inv:set_stack(listname, index, slotStack)
+  logistica.update_demander_cache_pos(pos)
   return 0
 end
 
@@ -136,6 +139,7 @@ function logistica.register_demander(simpleName, transferRate)
     after_place_node = function (pos, placer, itemstack)
       after_place_demander(pos, placer, itemstack, NUM_DEMAND_SLOTS)
     end,
+    after_destruct = logistica.on_demander_change,
     on_punch = on_demander_punch,
     on_rightclick = on_demander_rightclick,
     allow_metadata_inventory_put = allow_demander_storage_inv_put,
@@ -163,7 +167,7 @@ function logistica.register_demander(simpleName, transferRate)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_desctruct = nil
+  def_disabled.after_destruct = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

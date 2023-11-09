@@ -14,9 +14,9 @@ local function get_supplier_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.6,8]" ..
     logistica.ui.background..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 6.7, 0.7, pushPos, selectedList, "Take from:")..
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 6.7, 0.7, pushPos, selectedList, "Supply from:")..
     logistica.ui.on_off_btn(isOn, 9.3, 0.5, ON_OFF_BUTTON, "Enable")..
-    "label[0.6,1.2;Items to Supply (if empty nothing will be taken)]"..
+    "label[0.6,1.2;Items to make available as Supply. If left empty, nothing is supplied]"..
     "list["..posForm..";filter;0.5,1.5;"..NUM_SUPPLY_SLOTS..",1;0]"..
     "list[current_player;main;0.5,3;8,4;0]"
 end
@@ -135,6 +135,7 @@ function logistica.register_supplier(simpleName, maxTransferRate)
     after_place_node = function (pos, placer, itemstack)
       after_place_supplier(pos, placer, itemstack, NUM_SUPPLY_SLOTS)
     end,
+    after_destruct = logistica.on_supplier_change,
     on_punch = on_supplier_punch,
     on_rightclick = on_supplier_rightclick,
     allow_metadata_inventory_put = allow_supplier_storage_inv_put,
@@ -154,7 +155,7 @@ function logistica.register_supplier(simpleName, maxTransferRate)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_desctruct = nil
+  def_disabled.after_destruct = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil
