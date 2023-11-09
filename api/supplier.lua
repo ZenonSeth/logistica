@@ -51,19 +51,12 @@ local function on_player_receive_fields(player, formname, fields)
   return true
 end
 
-local function on_supplier_punch(pos, node, puncher, pointed_thing)
-  local targetPos = logistica.get_supplier_target(pos)
-  if targetPos and puncher:is_player() and puncher:get_player_control().sneak then
-    minetest.add_entity(targetPos, "logistica:output_entity")
-  end
-end
-
 local function on_supplier_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
   show_supplier_formspec(clicker:get_player_name(), pos)
 end
 
-local function after_place_supplier(pos, placer, itemstack, numDemandSlots)
+local function after_place_supplier(pos, placer, itemstack, numRequestSlots)
   local meta = minetest.get_meta(pos)
   if placer and placer:is_player() then
 	  meta:set_string("owner", placer:get_player_name())
@@ -71,7 +64,7 @@ local function after_place_supplier(pos, placer, itemstack, numDemandSlots)
   logistica.toggle_machine_on_off(pos)
   logistica.set_supplier_target_list(pos, "dst")
 	local inv = meta:get_inventory()
-	inv:set_size("filter", numDemandSlots)
+	inv:set_size("filter", numRequestSlots)
   logistica.on_supplier_change(pos)
 end
 
@@ -136,7 +129,6 @@ function logistica.register_supplier(simpleName, maxTransferRate)
       after_place_supplier(pos, placer, itemstack, NUM_SUPPLY_SLOTS)
     end,
     after_destruct = logistica.on_supplier_change,
-    on_punch = on_supplier_punch,
     on_rightclick = on_supplier_rightclick,
     allow_metadata_inventory_put = allow_supplier_storage_inv_put,
     allow_metadata_inventory_take = allow_supplier_inv_take,

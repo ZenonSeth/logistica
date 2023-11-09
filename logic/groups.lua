@@ -2,11 +2,11 @@ logistica.cables = {}
 logistica.machines = {}
 logistica.controllers = {}
 logistica.injectors = {}
-logistica.demanders = {}
+logistica.requesters = {}
 logistica.suppliers = {}
 logistica.mass_storage = {}
 logistica.item_storage = {}
--- logistica.demand_and_supplier = {}
+-- logistica.request_and_supplier = {}
 logistica.tiers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
 logistica.GROUP_ALL = "group:" .. logistica.TIER_ALL
@@ -27,8 +27,8 @@ function logistica.is_machine(name)
   return logistica.machines[name] ~= nil
 end
 
-function logistica.is_demander(name)
-  return logistica.demanders[name] ~= nil
+function logistica.is_requester(name)
+  return logistica.requesters[name] ~= nil
 end
 
 function logistica.is_supplier(name)

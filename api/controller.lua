@@ -47,14 +47,6 @@ minetest.register_on_player_receive_fields(on_controller_receive_fields)
   - on_timer
   - on_rightclick
 
-  The definition must also provide a `logistica_controller` table. This table should contains:
-  {
-    get_max_demand_processing = function(pos)
-    -- function that will be called to determine how many demand nodes this controller can process per tick
-
-    get_max_storage_
-  }
-
   simpleName is used for the node registration, and will, if necessary, be converted 
   to lowerspace and all spaces replaced with _
 

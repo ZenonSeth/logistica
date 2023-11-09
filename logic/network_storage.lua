@@ -44,7 +44,7 @@ end
 -- returns true if item successfully found and given to collector, false otherwise
 function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   local stackToTakeName = stackToTake:get_name()
-  local remainingDemand = stackToTake:get_count()
+  local remainingRequest = stackToTake:get_count()
   local massLocations = network.storage_cache[stackToTake:get_name()]
   if massLocations == nil then return end
   for storageHash, _ in pairs(massLocations) do
@@ -60,14 +60,14 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
       local available = storageStack:get_count()
       if isAutomatedRequest then available = math.max(0, available - slotReserve) end
       if stackToTakeName == storageStack:get_name() and available > 0 then
-        local numTaken = math.min(available, remainingDemand)
+        local numTaken = math.min(available, remainingRequest)
         local takenStack = ItemStack(stackToTake)
         takenStack:set_count(numTaken)
         local leftover = collectorFunc(takenStack)
         numTaken = numTaken - leftover
         storageStack:set_count(storageStack:get_count() - numTaken)
-        remainingDemand = remainingDemand - numTaken
-        if remainingDemand <= 0 then
+        remainingRequest = remainingRequest - numTaken
+        if remainingRequest <= 0 then
           storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
           return true
         end
@@ -107,12 +107,12 @@ function logistica.insert_item_in_network(itemstack, networkId)
 
   local workingStack = ItemStack(itemstack)
 
-  -- check demanders first
-  local listOfDemandersInNeedOfItem = network.demander_cache[itemstack:get_name()] or {}
-  for hash, _ in pairs(listOfDemandersInNeedOfItem) do
+  -- check requesters first
+  local listOfRequestersInNeedOfItem = network.requester_cache[itemstack:get_name()] or {}
+  for hash, _ in pairs(listOfRequestersInNeedOfItem) do
     local pos = minetest.get_position_from_hash(hash)
     logistica.load_position(pos)
-    local leftover = logistica.insert_itemstack_for_demander(pos, workingStack, true)
+    local leftover = logistica.insert_itemstack_for_requester(pos, workingStack, true)
     minetest.chat_send_all("insert_in_network: from: "..itemstack:get_count().." remain "..leftover)
     if leftover <= 0 then return 0 end -- we took all items
     workingStack:set_count(leftover)

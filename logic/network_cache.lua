@@ -1,3 +1,7 @@
+local META_KEY_PREV = "logprev_"
+local META_KEY_CURR = "logcurr_"
+
+local SEP = ";"
 
 local CACHE_PICKER_MASS_STORAGE = {
   listName = "filter",
@@ -11,15 +15,15 @@ local CACHE_PICKER_SUPPLIER = {
   cache = function (network) return network.supplier_cache end,
   nodes = function (network) return network.suppliers end,
 }
-local CACHE_PICKER_DEMANDER = {
+local CACHE_PICKER_REQUESTER = {
   listName = "filter",
-  clear = function (network) network.demander_cache = {} end,
-  cache = function (network) return network.demander_cache end,
-  nodes = function (network) return network.demanders end,
+  clear = function (network) network.requester_cache = {} end,
+  cache = function (network) return network.requester_cache end,
+  nodes = function (network) return network.requesters end,
 }
 
--- local function notify_demanders_of_new_cache(network)
---   for hash, _ in pairs(network.demanders) do
+-- local function notify_requesters_of_new_cache(network)
+--   for hash, _ in pairs(network.requesters) do
 --     local pos = minetest.get_position_from_hash(hash)
 --     local node = minetest.get_node_or_nil(pos)
 --     if node then
@@ -55,7 +59,7 @@ local function update_network_cache(network, cacheOps)
       cache[name][hash] = true
     end
   end
-  -- notify_demanders_of_new_cache(network)
+  -- notify_requesters_of_new_cache(network)
 end
 
 -- calls updateStorageCache(network) if the current position belongs to a network
@@ -80,7 +84,7 @@ local function update_cache_on_item_added(pos, network, cacheOps)
     if not cache[name] then cache[name] = {} end
     cache[name][posHash] = true
   end
-  -- notify_demanders_of_new_cache(network)
+  -- notify_requesters_of_new_cache(network)
 end
 
 local function update_cache_on_item_added_at_pos(pos, cacheOps)
@@ -90,9 +94,9 @@ local function update_cache_on_item_added_at_pos(pos, cacheOps)
   end
 end
 
---------------------------------
--- public functions
---------------------------------
+---------------------------------
+--- public functions
+---------------------------------
 
 function logistica.update_mass_storage_cache_pos(pos)
   update_network_cache_for_pos(pos, CACHE_PICKER_MASS_STORAGE)
@@ -118,14 +122,14 @@ function logistica.update_supplier_on_item_added(pos)
   update_cache_on_item_added_at_pos(pos, CACHE_PICKER_SUPPLIER)
 end
 
-function logistica.update_demander_cache_pos(pos)
-  update_network_cache_for_pos(pos, CACHE_PICKER_DEMANDER)
+function logistica.update_requester_cache_pos(pos)
+  update_network_cache_for_pos(pos, CACHE_PICKER_REQUESTER)
 end
 
-function logistica.update_demander_cache(network)
-  update_network_cache(network, CACHE_PICKER_DEMANDER)
+function logistica.update_requester_cache(network)
+  update_network_cache(network, CACHE_PICKER_REQUESTER)
 end
 
-function logistica.update_demander_on_item_added(pos)
-  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_DEMANDER)
+function logistica.update_requester_on_item_added(pos)
+  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_REQUESTER)
 end
