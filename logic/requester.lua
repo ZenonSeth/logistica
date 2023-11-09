@@ -136,15 +136,16 @@ end
 function logistica.start_requester_timer(pos, duration)
   if duration == nil then duration = TIMER_DURATION_SHORT end
   logistica.start_node_timer(pos, duration)
-  logistica.set_node_on_off_state(pos, true)
 end
 
 function logistica.on_requester_timer(pos, elapsed)
   local network = logistica.get_network_or_nil(pos)
-  if not network or not logistica.is_machine_on(pos) then
-    logistica.set_node_on_off_state(pos, false)
+  if not network then
+    logistica.toggle_machine_on_off(pos)
+    logistica.set_node_tooltip_from_state(pos)
     return false
   end
+  logistica.set_node_tooltip_from_state(pos)
   update_requester_actual_request(pos)
   if take_requested_items_from_network(pos, network) then
     logistica.start_node_timer(pos, TIMER_DURATION_SHORT)

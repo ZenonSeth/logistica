@@ -230,7 +230,7 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
 			local storageStack = inv:get_stack("filter", index)
 			storageStack:clear()
 			inv:set_stack("filter", index, storageStack)
-      logistica.update_mass_storage_cache_pos(pos)
+      logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
       return 0
   end
   return stack:get_count()
@@ -244,7 +244,7 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player) then return 0 end
   if listname == "storage" then return 0 end
   if listname == "main" then
-    return logistica.try_to_add_item_to_storage(pos, stack, true)
+    return stack:get_count() - logistica.try_to_add_item_to_storage(pos, stack, true)
   end
   if listname == "filter" then
     if stack:get_stack_max() == 1 then return 0 end
@@ -252,7 +252,7 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
     copyStack:set_count(1)
     local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack("filter", index, copyStack)
-    logistica.update_supplier_on_item_added(pos)
+    logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
     return 0
   end
   return stack:get_count()
@@ -267,7 +267,8 @@ end
 local function on_mass_storage_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player) then return 0 end
   if listname == "main" then
-    local taken = logistica.try_to_add_item_to_storage(pos, stack)
+    local remaining = logistica.try_to_add_item_to_storage(pos, stack)
+    local taken = stack:get_count() - remaining
     if taken > 0 then
       local inv = minetest.get_meta(pos):get_inventory()
       local fullstack = inv:get_stack(listname, index)
@@ -330,7 +331,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     end,
     after_destruct = after_mass_storage_destruct,
     drop = storageName,
-    on_timer = logistica.on_mass_storage_timer,
+    on_timer = logistica.on_timer_powered(logistica.on_mass_storage_timer),
     paramtype2 = "facedir",
     logistica = {
       baseName = simpleName.." Mass Storage",

@@ -1,49 +1,85 @@
 local META_KEY_PREV = "logprev_"
-local META_KEY_CURR = "logcurr_"
+--local META_KEY_CURR = "logcurr_"
 
 local SEP = ";"
 
-local CACHE_PICKER_MASS_STORAGE = {
+LOG_CACHE_MASS_STORAGE = {
   listName = "filter",
   clear = function (network) network.storage_cache = {} end,
   cache = function (network) return network.storage_cache end,
   nodes = function (network) return network.mass_storage end,
 }
-local CACHE_PICKER_SUPPLIER = {
+LOG_CACHE_SUPPLIER = {
   listName = "filter",
   clear = function (network) network.supplier_cache = {} end,
   cache = function (network) return network.supplier_cache end,
   nodes = function (network) return network.suppliers end,
 }
-local CACHE_PICKER_REQUESTER = {
+LOG_CACHE_REQUESTER = {
   listName = "filter",
   clear = function (network) network.requester_cache = {} end,
   cache = function (network) return network.requester_cache end,
   nodes = function (network) return network.requesters end,
 }
 
--- local function notify_requesters_of_new_cache(network)
---   for hash, _ in pairs(network.requesters) do
---     local pos = minetest.get_position_from_hash(hash)
---     local node = minetest.get_node_or_nil(pos)
---     if node then
---       local def = minetest.registered_nodes[node.name]
---       if def and def.logistica and def.logistica.on_connect_to_network then
---         def.logistica.on_connect_to_network(pos, network.controller)
---       end
---     end
---   end
+-- returns {{b is missing these from a}, {b has these new to a}}
+local function diff(seta, setb)
+    local d = {}
+    local e = {}
+    for k,v in pairs(seta) do d[k]=true end
+    for k,v in pairs(setb) do if not d[k] then e[k] = true else d[k]=nil end end
+    return {d, e}
+end
+
+local function get_meta(pos)
+  logistica.load_position(pos)
+  return minetest.get_meta(pos)
+end
+
+local function list_to_cache_nameset(list)
+  local ret = {}
+  for i, item in ipairs(list) do ret[item:get_name()] = true end
+  return ret
+end
+
+local function nameset_to_cache_str(nameset)
+  local str = ""
+  local first = true
+  for k, _ in pairs(nameset) do
+    if first then str = k ; first = false
+    else str = str..","..k end
+  end
+  return str
+end
+
+local function cache_str_to_nameset(cache_str)
+  local vals = string.split(cache_str, SEP, false)
+  local ret = {}
+  for _,v in ipairs(vals) do ret[v] = true end
+  return ret
+end
+
+local function save_prev_cache(nodeMeta, listName, nameset)
+  nodeMeta:set_string(META_KEY_PREV..listName, nameset_to_cache_str(nameset))
+end
+
+local function clear_prev_cache(nodeMeta, listName)
+  nodeMeta:set_string(META_KEY_PREV..listName, "")
+end
+
+local function get_prev_cache_as_nameset(nodeMeta, listName)
+  return cache_str_to_nameset(nodeMeta:get_string(META_KEY_PREV..listName))
+end
+
+-- local function save_curr_cache(nodeMeta, listName, cacheStr)
+--   nodeMeta:set_string(META_KEY_CURR..listName, cacheStr)
 -- end
 
---[[ Completely updates the storage cache which holds where items may be found
-  The cache is in the followiing format:
-  network.storage_cache = {
-    itemName = {
-      storagePositionHash1 = true,
-      storagePositionHash2 = true,
-    }
-  }
-]]
+-- local function get_curr_cache_as_namelist(nodeMeta, listName)
+--   return nodeMeta:get_string(META_KEY_CURR..listName)
+-- end
+
+-- clears all cache for the given ops, and re-caches them
 local function update_network_cache(network, cacheOps)
   cacheOps.clear(network)
   local nodes = cacheOps.nodes(network)
@@ -52,84 +88,74 @@ local function update_network_cache(network, cacheOps)
   for hash, _ in pairs(nodes) do
     local storagePos = minetest.get_position_from_hash(hash)
     logistica.load_position(storagePos)
-    local filterList = minetest.get_meta(storagePos):get_inventory():get_list(listName) or {}
-    for _, itemStack in pairs(filterList) do
+    local nodeMeta = get_meta(storagePos)
+    local list = nodeMeta:get_inventory():get_list(listName) or {}
+    for _, itemStack in pairs(list) do
       local name = itemStack:get_name()
       if not cache[name] then cache[name] = {} end
       cache[name][hash] = true
     end
+    save_prev_cache(nodeMeta, listName, list_to_cache_nameset(list))
   end
-  -- notify_requesters_of_new_cache(network)
 end
 
--- calls updateStorageCache(network) if the current position belongs to a network
--- `pos` the position for which to try and get the network and update
--- `cacheOps` = one of the predefined `logistica.CACHE_PICKER_XXXXX` consts
+-- smartly tries to update the the cache for the given position
 local function update_network_cache_for_pos(pos, cacheOps)
   local network = logistica.get_network_or_nil(pos)
-  if network then
-    update_network_cache(network, cacheOps)
-  end
-end
-
-local function update_cache_on_item_added(pos, network, cacheOps)
-  -- local nodes = cacheOps.nodes(network)
-  local cache = cacheOps.cache(network)
+  if not network then return end
+  local meta = get_meta(pos)
+  local hash = minetest.hash_node_position(pos)
   local listName = cacheOps.listName
-  logistica.load_position(pos)
-  local posHash = minetest.hash_node_position(pos)
-  local filterList = minetest.get_meta(pos):get_inventory():get_list(listName) or {}
-  for _, itemStack in pairs(filterList) do
-    local name = itemStack:get_name()
-    if not cache[name] then cache[name] = {} end
-    cache[name][posHash] = true
+  local prevCacheItems = get_prev_cache_as_nameset(meta, listName)
+  local currCacheItems = list_to_cache_nameset(meta:get_inventory():get_list(listName))
+
+  local cache = cacheOps.cache(network)
+  local remAndAdd = diff(prevCacheItems, currCacheItems)
+  for name, _ in pairs(remAndAdd[1]) do
+    local posCache = cache[name]
+    if posCache then posCache[hash] = nil end
   end
-  -- notify_requesters_of_new_cache(network)
+  for name, _ in pairs(remAndAdd[2]) do
+    local posCache = cache[name]
+    if posCache then posCache[hash] = true end
+  end
+  save_prev_cache(meta, listName, currCacheItems)
 end
 
-local function update_cache_on_item_added_at_pos(pos, cacheOps)
+local function remove_network_cache_for_pos(pos, cacheOps)
   local network = logistica.get_network_or_nil(pos)
-  if network then
-    update_cache_on_item_added(pos, network, cacheOps)
+  if not network then return end
+  local meta = get_meta(pos)
+  local hash = minetest.hash_node_position(pos)
+  local listName = cacheOps.listName
+  local cache = cacheOps.cache(network)
+  local prevCacheItems = get_prev_cache_as_nameset(meta, listName)
+
+  for name, _ in pairs(prevCacheItems) do
+    local posCache = cache[name]
+    if posCache then posCache[hash] = nil end
   end
+  --clear_prev_cache(meta, listName)
 end
 
----------------------------------
---- public functions
----------------------------------
+--------------------------------
+-- public functions
+--------------------------------
 
-function logistica.update_mass_storage_cache_pos(pos)
-  update_network_cache_for_pos(pos, CACHE_PICKER_MASS_STORAGE)
+-- clears previous specified cache and updates entirely
+-- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
+function logistica.update_cache_network(network, type)
+  update_network_cache(network, type)
 end
 
-function logistica.update_mass_storage_cache(network)
-  update_network_cache(network, CACHE_PICKER_MASS_STORAGE)
+-- updates the storage cache for the specific position
+-- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
+function logistica.update_cache_at_pos(pos, type)
+  update_network_cache_for_pos(pos, type)
 end
 
-function logistica.update_mass_storage_cache_on_item_added(pos)
-  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_MASS_STORAGE)
-end
-
-function logistica.update_supplier_cache_pos(pos)
-  update_network_cache_for_pos(pos, CACHE_PICKER_SUPPLIER)
-end
-
-function logistica.update_supplier_cache(network)
-  update_network_cache(network, CACHE_PICKER_SUPPLIER)
-end
-
-function logistica.update_supplier_on_item_added(pos)
-  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_SUPPLIER)
-end
-
-function logistica.update_requester_cache_pos(pos)
-  update_network_cache_for_pos(pos, CACHE_PICKER_REQUESTER)
-end
-
-function logistica.update_requester_cache(network)
-  update_network_cache(network, CACHE_PICKER_REQUESTER)
-end
-
-function logistica.update_requester_on_item_added(pos)
-  update_cache_on_item_added_at_pos(pos, CACHE_PICKER_REQUESTER)
+-- removes the given pos's cache from the network
+-- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
+function logistica.update_cache_node_removed_at_pos(pos, type)
+  remove_network_cache_for_pos(pos, type)
 end

@@ -81,7 +81,7 @@ local function allow_requester_storage_inv_put(pos, listname, index, stack, play
   local slotStack = inv:get_stack(listname, index)
   slotStack:add_item(stack)
   inv:set_stack(listname, index, slotStack)
-  logistica.update_requester_on_item_added(pos)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER)
   logistica.start_requester_timer(pos, 1)
   return 0
 end
@@ -92,7 +92,7 @@ local function allow_requester_inv_take(pos, listname, index, stack, player)
   local slotStack = inv:get_stack(listname, index)
   slotStack:take_item(stack:get_count())
   inv:set_stack(listname, index, slotStack)
-  logistica.update_requester_cache_pos(pos)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER)
   return 0
 end
 
@@ -134,7 +134,7 @@ function logistica.register_requester(simpleName, transferRate)
     groups = grps,
     drop = requester_name,
     sounds = logistica.node_sound_metallic(),
-    on_timer = logistica.on_requester_timer,
+    on_timer = logistica.on_timer_powered(logistica.on_requester_timer),
     after_place_node = function (pos, placer, itemstack)
       after_place_requester(pos, placer, itemstack, NUM_REQUEST_SLOTS)
     end,
@@ -150,6 +150,7 @@ function logistica.register_requester(simpleName, transferRate)
         logistica.start_requester_timer(pos)
       end,
       on_power = function(pos, isPoweredOn)
+
         if isPoweredOn then
           logistica.start_requester_timer(pos)
         end

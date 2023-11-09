@@ -107,7 +107,7 @@ function logistica.register_injector(simpleName, transferRate)
     groups = grps,
     drop = injectorName,
     sounds = logistica.node_sound_metallic(),
-    on_timer = logistica.on_injector_timer,
+    on_timer = logistica.on_timer_powered(logistica.on_injector_timer),
     after_place_node = function (pos, placer, itemstack)
       after_place_injector(pos, placer, itemstack)
     end,

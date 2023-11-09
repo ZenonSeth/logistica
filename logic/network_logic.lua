@@ -203,9 +203,9 @@ local function create_network(controllerPosition, oldNetworkName)
     errorMsg = "Controller max nodes limit of "..HARD_NETWORK_NODE_LIMIT.." nodes per network exceeded!"
   elseif status == STATUS_OK then
     -- controller scan skips updating storage cache, do so now
-    logistica.update_mass_storage_cache(network)
-    logistica.update_supplier_cache(network)
-    logistica.update_requester_cache(network)
+    logistica.update_cache_network(network, LOG_CACHE_MASS_STORAGE)
+    logistica.update_cache_network(network, LOG_CACHE_REQUESTER)
+    logistica.update_cache_network(network, LOG_CACHE_SUPPLIER)
   end
   if errorMsg ~= nil then
     networks[controllerHash] = nil
@@ -263,7 +263,7 @@ local function try_to_add_to_network(pos, ops)
   end
   -- else, we have 1 network, add us to it!
   ops.get_list(connectedNetworks[1])[p2h(pos)] = true
-  ops.update_cache_node_added(connectedNetworks[1])
+  ops.update_cache_node_added(pos)
 end
 
 local function remove_from_network(pos, ops)
@@ -271,26 +271,26 @@ local function remove_from_network(pos, ops)
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
   ops.get_list(network)[hash] = nil
-  ops.update_cache_node_removed(network)
+  ops.update_cache_node_removed(pos)
 end
 
-local function MASS_STORAGE_OPS(pos) return {
+local MASS_STORAGE_OPS = {
   get_list = function(network) return network.mass_storage end,
-  update_cache_node_added = function(_) logistica.update_mass_storage_cache_on_item_added(pos) end,
-  update_cache_node_removed = function(network) logistica.update_mass_storage_cache(network) end,
-} end
+  update_cache_node_added = function(pos) logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE) end,
+  update_cache_node_removed = function(pos) logistica.update_cache_node_removed_at_pos(pos, LOG_CACHE_MASS_STORAGE) end,
+}
 
-local function REQUESTER_OPS(pos) return {
+local REQUESTER_OPS = {
   get_list = function(network) return network.requesters end,
-  update_cache_node_added = function(_) logistica.update_requester_on_item_added(pos) end,
-  update_cache_node_removed = function(network) logistica.update_requester_cache(network) end,
-} end
+  update_cache_node_added = function(pos) logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER) end,
+  update_cache_node_removed = function(pos) logistica.update_cache_node_removed_at_pos(pos, LOG_CACHE_REQUESTER) end,
+}
 
-local function SUPPLIER_OPS(pos) return {
+local SUPPLIER_OPS = {
   get_list = function(network) return network.suppliers end,
-  update_cache_node_added = function(_) logistica.update_supplier_on_item_added(pos) end,
-  update_cache_node_removed = function(network) logistica.update_supplier_cache(network) end,
-} end
+  update_cache_node_added = function(pos) logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER) end,
+  update_cache_node_removed = function(pos) logistica.update_cache_node_removed_at_pos(pos, LOG_CACHE_SUPPLIER) end,
+}
 
 local INJECTOR_OPS = {
   get_list = function(network) return network.injectors end,
@@ -368,27 +368,27 @@ end
 function logistica.on_mass_storage_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_to_network(pos, MASS_STORAGE_OPS(pos))
+    try_to_add_to_network(pos, MASS_STORAGE_OPS)
   else
-    remove_from_network(pos, MASS_STORAGE_OPS(pos))
+    remove_from_network(pos, MASS_STORAGE_OPS)
   end
 end
 
 function logistica.on_requester_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_to_network(pos, REQUESTER_OPS(pos))
+    try_to_add_to_network(pos, REQUESTER_OPS)
   else
-    remove_from_network(pos, REQUESTER_OPS(pos))
+    remove_from_network(pos, REQUESTER_OPS)
   end
 end
 
 function logistica.on_supplier_change(pos, oldNode)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
-    try_to_add_to_network(pos, SUPPLIER_OPS(pos))
+    try_to_add_to_network(pos, SUPPLIER_OPS)
   else
-    remove_from_network(pos, SUPPLIER_OPS(pos))
+    remove_from_network(pos, SUPPLIER_OPS)
   end
 end
 

@@ -74,7 +74,7 @@ local function allow_supplier_storage_inv_put(pos, listname, index, stack, playe
   local newStack = ItemStack(stack)
   newStack:set_count(1)
   inv:set_stack(listname, index, newStack)
-  logistica.update_supplier_on_item_added(pos)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
   return 0
 end
 
@@ -84,6 +84,7 @@ local function allow_supplier_inv_take(pos, listname, index, stack, player)
   local slotStack = inv:get_stack(listname, index)
   slotStack:take_item(stack:get_count())
   inv:set_stack(listname, index, slotStack)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
   return 0
 end
 

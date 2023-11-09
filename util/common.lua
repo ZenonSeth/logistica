@@ -92,7 +92,7 @@ function logistica.toggle_machine_on_off(pos)
   local newState = (meta:get_int(META_ON_OFF_KEY) + 1) % 2
 	local def = minetest.registered_nodes[node.name]
 	if def and def.logistica and def.logistica.on_power then
-		def.logistica.on_power(pos, newState)
+		def.logistica.on_power(pos, newState > 0)
   	meta:set_int(META_ON_OFF_KEY, newState)
   	return newState > 0
 	end
@@ -101,9 +101,9 @@ end
 
 -- isOn is optional
 -- extraText is optional
-function logistica.set_node_on_off_state(pos, isOn, extraText)
+function logistica.set_node_tooltip_from_state(pos, extraText)
 	if extraText == nil then extraText = "" else extraText = "\n"..extraText end
-	if isOn == nil then isOn = logistica.is_machine_on(pos) end
+	local isOn = logistica.is_machine_on(pos)
 	logistica.load_position(pos)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
@@ -171,4 +171,11 @@ function logistica.deserialize_inv(serializedInv)
     liveTable[name] = logistica.table_to_inv_list(listStrTable)
   end
   return liveTable
+end
+
+-- returns a timer that will not do anything is power is turned off
+function logistica.on_timer_powered(func)
+	return function(pos, elapsed)
+		if logistica.is_machine_on(pos) then func(pos, elapsed) end
+	end
 end

@@ -78,7 +78,7 @@ function logistica.register_controller(simpleName, def, tier)
   def.groups[controller_group] = 1
   def.on_construct = on_construct
   def.after_destruct = after_destruct
-  def.on_timer = on_timer
+  def.on_timer = logistica.on_timer_powered(on_timer)
   def.drop = controller_name
   def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
     if clicker and clicker:is_player() then
