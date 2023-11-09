@@ -142,7 +142,8 @@ function logistica.register_supplier(simpleName, maxTransferRate)
     allow_metadata_inventory_take = allow_supplier_inv_take,
     allow_metadata_inventory_move = allow_supplier_inv_move,
     logistica = {
-      supplier_transfer_rate = maxTransferRate
+      supplier_transfer_rate = maxTransferRate,
+      on_power = function() end,  -- necessary for power toggle to work
     }
   }
 

@@ -68,27 +68,46 @@ local function get_target_missing_item_stack(demandStack, invs)
 end
 
 -- returns:
--- nil: nothing in inventory?
--- 0: no item has demand
+-- nil: nothing in inventory
 -- ItemStack: the next demanded item
-local function get_next_demanded_stack(pos)
-  local inventories = get_valid_demander_and_target_inventory(pos)
+local function get_next_demanded_stack(pos, inventories)
   if not inventories then return nil end
+  local nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "actual")
+  if nextSlot <= 0 then return nil end
+  return inventories.demanderInventory:get_list("actual")[nextSlot]
+end
+
+-- updates the inv list called 'actual' with the latest checked demand
+local function update_demander_actual_demand(pos)
+  local inventories = get_valid_demander_and_target_inventory(pos)
+  if not inventories then return end
+  local demanderInv = inventories.demanderInventory
+  local actualDemandList = {}
   local demandStack = nil
   local nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
   local startingSlot = nextSlot
   repeat
     if nextSlot <= 0 then return nil end
-    local filterStack = inventories.demanderInventory:get_list("filter")[nextSlot]
+    local filterStack = demanderInv:get_list("filter")[nextSlot]
     demandStack = get_target_missing_item_stack(filterStack, inventories)
-    if demandStack:get_count() > 0 then return demandStack end
+    local demStackCount = demandStack:get_count()
+    if demStackCount > 0 then
+      local prev = actualDemandList[demandStack:get_name()] or 0
+      if demStackCount > prev then
+        actualDemandList[demandStack:get_name()] = demStackCount
+      end
+    end
     nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
   until( nextSlot == startingSlot ) -- until we get back to the starting slot
-  return 0 -- we had filled slots, but none had demand
+  local newActualDemandList = {}
+  for itemname, count in pairs(actualDemandList) do
+    table.insert(newActualDemandList, ItemStack(itemname.." "..count))
+  end
+  demanderInv:set_list("actual", newActualDemandList)
 end
 
 local function take_demanded_items_from_network(pos, network)
-  local demandStack = get_next_demanded_stack(pos)
+  local demandStack = get_next_demanded_stack(pos, get_valid_demander_and_target_inventory(pos))
   if demandStack == nil then return false end
   if demandStack == 0 then return true end -- had items but nothing in demand
   -- limiting the number of items requested
@@ -98,13 +117,16 @@ local function take_demanded_items_from_network(pos, network)
   return true
 end
 
-local function get_filter_demand_for(inv, itemName)
-  local filterList = inv:get_list("filter")
-  local maxDemand = 0
-  for _, v in ipairs(filterList) do
-    if v:get_name() == itemName and v:get_count() > maxDemand then maxDemand = v:get_count() end
+-- returns 0 if no demand, or the count of demanded items
+local function get_filter_demand_for(demanderInventory, itemStackName)
+  local actualDemandList = demanderInventory:get_list("actual")
+  if not actualDemandList then return 0 end
+  for _, v in ipairs(actualDemandList) do
+    if v:get_name() == itemStackName then
+      return v:get_count()
+    end
   end
-  return maxDemand
+  return 0
 end
 
 ----------------------------------------------------------------
@@ -123,6 +145,7 @@ function logistica.on_demander_timer(pos, elapsed)
     logistica.set_node_on_off_state(pos, false)
     return false
   end
+  update_demander_actual_demand(pos)
   if take_demanded_items_from_network(pos, network) then
     logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
   else

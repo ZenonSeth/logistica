@@ -70,8 +70,8 @@ local function after_place_demander(pos, placer, itemstack, numDemandSlots)
   logistica.set_demander_target_list(pos, "main")
 	local inv = meta:get_inventory()
 	inv:set_size("filter", numDemandSlots)
+	inv:set_size("actual", numDemandSlots)
   logistica.on_demander_change(pos)
-  logistica.update_demander_on_item_added(pos)
   logistica.start_demander_timer(pos)
 end
 
@@ -96,9 +96,8 @@ local function allow_demander_inv_take(pos, listname, index, stack, player)
   return 0
 end
 
-local function allow_demander_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if from_list ~= "filter" and to_list ~= "filter" then return 0 end
-  return count
+local function allow_demander_inv_move(_, _, _, _, _, _, _)
+  return 0
 end
 
 ----------------------------------------------------------------

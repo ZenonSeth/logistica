@@ -62,9 +62,7 @@ function logistica.on_injector_timer(pos, elapsed)
 
   local inv = targetMeta:get_inventory()
   local copyStack = inv:get_stack(targetList, targetSlot)
-  local copyStackSize = copyStack:get_count()
   local numRemaining = logistica.insert_item_in_network(copyStack, networkId)
-  minetest.chat_send_all("attempted to insert: "..copyStackSize..", remain: "..numRemaining)
   copyStack:set_count(numRemaining)
   inv:set_stack(targetList, targetSlot, copyStack)
 
