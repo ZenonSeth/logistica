@@ -212,11 +212,8 @@ local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
   dropMeta:set_string(META_SELECTED_RES, get_reserve_as_string(oldnode.name, meta))
   -- update description
   local name = minetest.registered_nodes[oldnode.name].logistica.baseName
-  if inv:is_empty("storage") then
-    name = name.."\n(Empty)"
-  else
-    name = name.."\n(Contains items)" -- TODO set a node name or use a stackname
-  end
+  name = name..logistica.get_mass_storage_imgname_or_first_item(meta)
+ -- TODO set a node name or use a stackname
   drop:get_meta():set_string("description", name)
 end
 

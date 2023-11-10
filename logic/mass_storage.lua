@@ -217,3 +217,15 @@ function logistica.update_mass_storage_front_image(origPos)
     logistica.display_item_on_block_front(pos, item:get_name())
   end
 end
+
+function logistica.get_mass_storage_imgname_or_first_item(meta)
+  local inv = meta:get_inventory()
+  if inv:is_empty("filter") then return "\n(Empty)" end
+  local index = meta:get_int(META_IMG_PIC)
+  local itemStack = inv:get_stack("filter", index)
+  if not itemStack:is_empty() then return "\n(Has: "..itemStack:get_description()..")" end
+  for _, v in ipairs(inv:get_list("filter")) do
+    if not v:is_empty() then return "\n(Has: "..v:get_description()..")" end
+  end
+  return "\n(Empty)"
+end
