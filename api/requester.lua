@@ -75,6 +75,7 @@ local function after_place_requester(pos, placer, itemstack, numRequestSlots)
   inv:set_size("actual", numRequestSlots)
   logistica.on_requester_change(pos)
   logistica.start_requester_timer(pos)
+  logistica.show_output_at(logistica.get_injector_target(pos))
 end
 
 local function allow_requester_storage_inv_put(pos, listname, index, stack, player)

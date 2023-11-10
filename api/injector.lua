@@ -13,7 +13,7 @@ local function get_injector_formspec(pos)
   return "formspec_version[4]" ..
     "size[7,2.0]" ..
     logistica.ui.background..
-    "label[0.5,0.3;Active Suppliers try to insert items in the network one at a time]"..
+    "label[0.5,0.3;Network Inserters take items from target and add them to the network]"..
     logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 1.0, pushPos, selectedList, "Take items from:")..
     logistica.ui.on_off_btn(isOn, 4.5, 0.8, ON_OFF_BUTTON, "Enable")
 end
@@ -70,6 +70,7 @@ local function after_place_injector(pos, placer, itemstack)
   logistica.set_injector_target_list(pos, "main")
   logistica.on_injector_change(pos)
   logistica.start_injector_timer(pos)
+  logistica.show_input_at(logistica.get_injector_target(pos))
 end
 
 ----------------------------------------------------------------
