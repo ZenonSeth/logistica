@@ -49,8 +49,8 @@ end
 
 local function after_place_supplier(pos, placer, itemstack)
   local meta = minetest.get_meta(pos)
-	local inv = meta:get_inventory()
-	inv:set_size("main", logistica.get_supplier_inv_size(pos))
+  local inv = meta:get_inventory()
+  inv:set_size("main", logistica.get_supplier_inv_size(pos))
   logistica.set_node_tooltip_from_state(pos)
   logistica.on_supplier_change(pos)
 end
@@ -124,7 +124,7 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
 
   minetest.register_node(supplier_name, def)
 
-	local def_disabled = table.copy(def)
+  local def_disabled = table.copy(def)
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
@@ -137,7 +137,7 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
   def_disabled.on_timer = nil
   def_disabled.logistica = nil
 
-	minetest.register_node(supplier_name.."_disabled", def_disabled)
+  minetest.register_node(supplier_name.."_disabled", def_disabled)
 
 end
 

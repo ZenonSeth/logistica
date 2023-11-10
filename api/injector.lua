@@ -65,7 +65,7 @@ end
 local function after_place_injector(pos, placer, itemstack)
   local meta = minetest.get_meta(pos)
   if placer and placer:is_player() then
-	  meta:set_string("owner", placer:get_player_name())
+    meta:set_string("owner", placer:get_player_name())
   end
   logistica.set_injector_target_list(pos, "main")
   logistica.on_injector_change(pos)
@@ -122,7 +122,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
 
   minetest.register_node(injectorName, def)
 
-	local def_disabled = table.copy(def)
+  local def_disabled = table.copy(def)
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
@@ -135,7 +135,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
   def_disabled.on_timer = nil
   def_disabled.logistica = nil
 
-	minetest.register_node(injectorName.."_disabled", def_disabled)
+  minetest.register_node(injectorName.."_disabled", def_disabled)
 
 end
 

@@ -70,8 +70,8 @@ function logistica.register_controller(name, def, tier)
     logistica.tiers[ltier] = true
     controller_group = logistica.get_machine_group(ltier)
   end
- 	local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
-	logistica.controllers[controller_name] = tier
+   local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
+  logistica.controllers[controller_name] = tier
 
   local on_construct = function(pos)
       logistica.start_controller_timer(pos)
@@ -95,9 +95,9 @@ function logistica.register_controller(name, def, tier)
     end
   end
 
-	minetest.register_node(controller_name, def)
+  minetest.register_node(controller_name, def)
 
-	local def_disabled = table.copy(def)
+  local def_disabled = table.copy(def)
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
@@ -107,7 +107,7 @@ function logistica.register_controller(name, def, tier)
   def_disabled.on_timer = nil
   def_disabled.on_rightclick = nil
 
-	minetest.register_node(controller_name.."_disabled", def_disabled)
+  minetest.register_node(controller_name.."_disabled", def_disabled)
 end
 
 logistica.register_controller("simple_controller", {

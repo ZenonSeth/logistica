@@ -178,7 +178,7 @@ local function create_network(controllerPosition, oldNetworkName)
   local network = {}
   local nameFromMeta = meta:get_string("name")
   if nameFromMeta == "" then nameFromMeta = nil end
-  local networkName = oldNetworkName or nameFromMeta or logistica.get_network_name_for(controllerPosition)
+  local networkName = oldNetworkName or nameFromMeta or logistica.get_rand_string_for(controllerPosition)
   networks[controllerHash] = network
   meta:set_string("infotext", "Controller of Network: "..networkName)
   network.controller = controllerHash

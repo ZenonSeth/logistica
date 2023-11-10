@@ -167,16 +167,16 @@ local function on_receive_storage_formspec(player, formname, fields)
 end
 
 local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
-	local meta = minetest.get_meta(pos)
+  local meta = minetest.get_meta(pos)
   if placer and placer:is_player() then
-	  meta:set_string("owner", placer:get_player_name())
+    meta:set_string("owner", placer:get_player_name())
   end
   local nodeName = minetest.get_node(pos).name
-	local inv = meta:get_inventory()
-	inv:set_size("main", 1)
-	inv:set_size("filter", numSlots)
-	inv:set_size("storage", numSlots)
-	inv:set_size("upgrade", numUpgradeSlots)
+  local inv = meta:get_inventory()
+  inv:set_size("main", 1)
+  inv:set_size("filter", numSlots)
+  inv:set_size("storage", numSlots)
+  inv:set_size("upgrade", numUpgradeSlots)
   -- restore inventory, if any
   local itemMeta = itemstack:get_meta()
   local itemstackMetaInv = itemMeta:get_string(META_SERIALIZED_INV)
@@ -227,11 +227,11 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
   end
   if listname == "main" then return stack:get_count() end
   if listname == "filter" then
-			local inv = minetest.get_meta(pos):get_inventory()
+      local inv = minetest.get_meta(pos):get_inventory()
       if not inv:get_stack("storage", index):is_empty() then return 0 end
-			local storageStack = inv:get_stack("filter", index)
-			storageStack:clear()
-			inv:set_stack("filter", index, storageStack)
+      local storageStack = inv:get_stack("filter", index)
+      storageStack:clear()
+      inv:set_stack("filter", index, storageStack)
       logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
       return 0
   end
@@ -364,14 +364,14 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
   minetest.register_node(storageName, def)
 
   local def_disabled = {}
-	for k, v in pairs(def) do def_disabled[k] = v end
+  for k, v in pairs(def) do def_disabled[k] = v end
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1 }
   def_disabled.after_destruct = nil
 
-	minetest.register_node(storageName.."_disabled", def_disabled)
+  minetest.register_node(storageName.."_disabled", def_disabled)
 
 end
 

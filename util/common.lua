@@ -33,7 +33,7 @@ function logistica.swap_node(pos, newName)
   end
 end
 
-function logistica.get_network_name_for(pos)
+function logistica.get_rand_string_for(pos)
   local p1 = rand_str(3, pos.x)
   local p2 = rand_str(3, pos.y)
   local p3 = rand_str(3, pos.z)
@@ -49,7 +49,7 @@ function logistica.ttos(val, name, skipnewlines, depth)
     skipnewlines = skipnewlines or true
     depth = depth or 0
     local tmp = string.rep(" ", depth)
-		local newline = (not skipnewlines and "\n" or "")
+    local newline = (not skipnewlines and "\n" or "")
     if name then tmp = tmp .. name .. " = " end
     if type(val) == "table" then
         tmp = tmp .."{"..newline
@@ -60,7 +60,7 @@ function logistica.ttos(val, name, skipnewlines, depth)
     elseif type(val) == "number" then tmp = tmp .. tostring(val)
     elseif type(val) == "string" then tmp = tmp .. string.format("%q", val)
     elseif type(val) == "boolean" then tmp = tmp .. (val and "true" or "false")
-		else tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\"" end
+    else tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\"" end
     return tmp
 end
 
@@ -71,12 +71,12 @@ function logistica.clamp(v, min, max)
 end
 
 function logistica.start_node_timer(pos, time)
-	local timer = minetest.get_node_timer(pos)
-	if not timer:is_started() then
-		timer:start(time)
-		return timer
-	end
-	return nil
+  local timer = minetest.get_node_timer(pos)
+  if not timer:is_started() then
+    timer:start(time)
+    return timer
+  end
+  return nil
 end
 
 function logistica.is_machine_on(pos)
@@ -86,32 +86,32 @@ end
 
 -- toggles the state and returns the new state (true for on, false for off)
 function logistica.toggle_machine_on_off(pos)
-	logistica.load_position(pos)
-	local node = minetest.get_node(pos)
+  logistica.load_position(pos)
+  local node = minetest.get_node(pos)
   local meta = minetest.get_meta(pos)
   local newState = (meta:get_int(META_ON_OFF_KEY) + 1) % 2
-	local def = minetest.registered_nodes[node.name]
-	if def and def.logistica and def.logistica.on_power then
-		def.logistica.on_power(pos, newState > 0)
-  	meta:set_int(META_ON_OFF_KEY, newState)
-  	return newState > 0
-	end
-	return nil
+  local def = minetest.registered_nodes[node.name]
+  if def and def.logistica and def.logistica.on_power then
+    def.logistica.on_power(pos, newState > 0)
+    meta:set_int(META_ON_OFF_KEY, newState)
+    return newState > 0
+  end
+  return nil
 end
 
 -- `isOn` is optional
 -- `extraText` is optional
 -- `overrideState` is optional
 function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
-	if extraText == nil then extraText = "" else extraText = "\n"..extraText end
-	local isOn = overrideState
-	if isOn == nil then isOn = logistica.is_machine_on(pos) end
-	logistica.load_position(pos)
+  if extraText == nil then extraText = "" else extraText = "\n"..extraText end
+  local isOn = overrideState
+  if isOn == nil then isOn = logistica.is_machine_on(pos) end
+  logistica.load_position(pos)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
-	local text = minetest.registered_nodes[node.name].description..
-							extraText.."\n"..(isOn and "Running" or "Stopped")
-	meta:set_string("infotext", text)
+  local text = minetest.registered_nodes[node.name].description..
+              extraText.."\n"..(isOn and "Running" or "Stopped")
+  meta:set_string("infotext", text)
 end
 
 -- returns a value of [1,#listSize], incrementing the slot each 
@@ -122,17 +122,17 @@ function logistica.get_next_filled_item_slot(nodeMeta, listName)
   local inv = nodeMeta:get_inventory()
   local listSize = inv:get_list(listName)
   if not listSize then return 0 end
-	listSize = #listSize
+  listSize = #listSize
   local startPos = nodeMeta:get_int(metaKey) or 0
-	for i = startPos, startPos + listSize do
-		i = (i % listSize) + 1
-		local items = inv:get_stack(listName, i)
-		if items:get_count() > 0 then
-			nodeMeta:set_int(metaKey, i)
-			return i
-		end
-	end
-	nodeMeta:set_int(metaKey, 0)
+  for i = startPos, startPos + listSize do
+    i = (i % listSize) + 1
+    local items = inv:get_stack(listName, i)
+    if items:get_count() > 0 then
+      nodeMeta:set_int(metaKey, i)
+      return i
+    end
+  end
+  nodeMeta:set_int(metaKey, 0)
   return 0
 end
 
@@ -149,7 +149,7 @@ function logistica.table_to_inv_list(table)
   local list = {}
   for k,v in ipairs(table) do
     if v == nil then list[k] = ""
-		else list[k] = ItemStack(v) end
+    else list[k] = ItemStack(v) end
   end
   return list
 end
@@ -177,11 +177,11 @@ end
 
 -- returns a timer that will not do anything is power is turned off
 function logistica.on_timer_powered(func)
-	return function(pos, elapsed)
-		if logistica.is_machine_on(pos) then func(pos, elapsed) end
-	end
+  return function(pos, elapsed)
+    if logistica.is_machine_on(pos) then func(pos, elapsed) end
+  end
 end
 
 function logistica.table_is_empty(table)
-	return table == nil or (next(table) == nil)
+  return table == nil or (next(table) == nil)
 end

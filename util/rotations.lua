@@ -39,35 +39,35 @@ for i=0,23 do
 end
 
 local objRot = {
-	[0]  = {pitch = 0, yaw = 0, roll = 0},
-	[12] = {pitch = 0, yaw = 0, roll = 3},
-	[16] = {pitch = 0, yaw = 0, roll = 1},
-	[20] = {pitch = 0, yaw = 0, roll = 20},
+  [0]  = {pitch = 0, yaw = 0, roll = 0},
+  [12] = {pitch = 0, yaw = 0, roll = 3},
+  [16] = {pitch = 0, yaw = 0, roll = 1},
+  [20] = {pitch = 0, yaw = 0, roll = 20},
 
-	[1]  = {pitch = 0, yaw = 1, roll = 0},
-	[5]  = {pitch = 0, yaw = 1, roll = 1},
-	[9]  = {pitch = 0, yaw = 1, roll = 3},
-	[23] = {pitch = 0, yaw = 1, roll = 2},
+  [1]  = {pitch = 0, yaw = 1, roll = 0},
+  [5]  = {pitch = 0, yaw = 1, roll = 1},
+  [9]  = {pitch = 0, yaw = 1, roll = 3},
+  [23] = {pitch = 0, yaw = 1, roll = 2},
 
-	[2]  = {pitch = 0, yaw = 2, roll = 0},
-	[14] = {pitch = 0, yaw = 2, roll = 1},
-	[18] = {pitch = 0, yaw = 2, roll = 3},
-	[22] = {pitch = 0, yaw = 2, roll = 2},
+  [2]  = {pitch = 0, yaw = 2, roll = 0},
+  [14] = {pitch = 0, yaw = 2, roll = 1},
+  [18] = {pitch = 0, yaw = 2, roll = 3},
+  [22] = {pitch = 0, yaw = 2, roll = 2},
 
-	[3]  = {pitch = 0, yaw = 3, roll = 0},
-	[7]  = {pitch = 0, yaw = 3, roll = 3},
-	[11] = {pitch = 0, yaw = 3, roll = 1},
-	[21] = {pitch = 0, yaw = 3, roll = 2},
+  [3]  = {pitch = 0, yaw = 3, roll = 0},
+  [7]  = {pitch = 0, yaw = 3, roll = 3},
+  [11] = {pitch = 0, yaw = 3, roll = 1},
+  [21] = {pitch = 0, yaw = 3, roll = 2},
 
-	[4]  = {pitch = -4.7, yaw = 0, roll = 0},
-	[10] = {pitch = -4.7, yaw = 2, roll = 0},
-	[13] = {pitch = -4.7, yaw = 1, roll = 0},
-	[19] = {pitch = -4.7, yaw = 3, roll = 0},
+  [4]  = {pitch = -4.7, yaw = 0, roll = 0},
+  [10] = {pitch = -4.7, yaw = 2, roll = 0},
+  [13] = {pitch = -4.7, yaw = 1, roll = 0},
+  [19] = {pitch = -4.7, yaw = 3, roll = 0},
 
-	[8]  = {pitch = -4.7, yaw = 0, roll = 0},
-	[6]  = {pitch = -4.7, yaw = 2, roll = 0},
-	[15] = {pitch = -4.7, yaw = 3, roll = 0},
-	[17] = {pitch = -4.7, yaw = 1, roll = 0},
+  [8]  = {pitch = -4.7, yaw = 0, roll = 0},
+  [6]  = {pitch = -4.7, yaw = 2, roll = 0},
+  [15] = {pitch = -4.7, yaw = 3, roll = 0},
+  [17] = {pitch = -4.7, yaw = 1, roll = 0},
 }
 
 function logistica.get_rot_directions(param2)
