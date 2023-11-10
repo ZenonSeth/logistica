@@ -15,6 +15,21 @@ local function get_injector_rate(nodeName)
   return 0
 end
 
+local function get_next_injector_filtered_slot(targetMeta, targetList, targetInv, injInv)
+  local tmpSlot = logistica.get_next_filled_item_slot(targetMeta, targetList)
+  if injInv:is_empty("filter") then return tmpSlot end
+  if tmpSlot == 0 then return 0 end
+  local startSlot = tmpSlot
+  while true do
+    local itemCopy = ItemStack(targetInv:get_stack(targetList, tmpSlot)) ; itemCopy:set_count(1)
+    if injInv:contains_item("filter", itemCopy) then
+      return tmpSlot
+    end
+    tmpSlot = logistica.get_next_filled_item_slot(targetMeta, targetList)
+    if tmpSlot == startSlot then return 0 end
+  end
+end
+
 -- public functions 
 
 function logistica.get_injector_target(pos)
@@ -52,18 +67,23 @@ function logistica.on_injector_timer(pos, elapsed)
   local targetList = logistica.get_injector_target_list(pos)
   local targetPos = logistica.get_injector_target(pos)
   local targetMeta = minetest.get_meta(targetPos)
-  local targetSlot = logistica.get_next_filled_item_slot(targetMeta, targetList)
+  local targetInv = targetMeta:get_inventory()
+  local injInv = meta:get_inventory()
+  local targetSlot = get_next_injector_filtered_slot(targetMeta, targetList, targetInv, injInv)
+
   local maxStack = get_injector_rate(node.name)
   if targetSlot <= 0 or maxStack <= 0 then
     logistica.start_node_timer(pos, TIMER_DURATION_LONG)
     return false
   end
-
-  local inv = targetMeta:get_inventory()
-  local copyStack = inv:get_stack(targetList, targetSlot)
+  local copyStack = targetInv:get_stack(targetList, targetSlot)
+  local targetStackSize = copyStack:get_count()
+  local numToTake = math.min(targetStackSize, maxStack)
+  copyStack:set_count(numToTake)
   local numRemaining = logistica.insert_item_in_network(copyStack, networkId)
+  numRemaining = targetStackSize - numToTake + numRemaining
   copyStack:set_count(numRemaining)
-  inv:set_stack(targetList, targetSlot, copyStack)
+  targetInv:set_stack(targetList, targetSlot, copyStack)
 
   logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
   return false

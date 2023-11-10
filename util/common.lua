@@ -114,7 +114,7 @@ function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
   meta:set_string("infotext", text)
 end
 
--- returns a value of [1,#listSize], incrementing the slot each 
+-- returns a value in the range [1,#listSize], incrementing the slot each 
 -- time this is called, and returining a slot that has an item
 -- if there's no item in the list, it will return 0
 function logistica.get_next_filled_item_slot(nodeMeta, listName)

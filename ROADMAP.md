@@ -2,7 +2,6 @@ Missing Features:
 - Item Storage implementation
 - Storage Access Point
 - Crafting recipes
-- Network Inserter filter
 
 High Priority:
 - Mesecons compat

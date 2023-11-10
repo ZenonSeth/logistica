@@ -2,6 +2,7 @@
 local PULL_LIST_PICKER = "pull_pick"
 local ON_OFF_BUTTON = "on_off_btn"
 local FORMSPEC_NAME = "logistica_storinject"
+local NUM_FILTER_SLOTS = 8
 
 local injectorForms = {}
 
@@ -11,11 +12,14 @@ local function get_injector_formspec(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size[7,2.0]" ..
+    "size[10.7,8.5]" ..
     logistica.ui.background..
-    "label[0.5,0.3;Network Inserters take items from target and add them to the network]"..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 1.0, pushPos, selectedList, "Take items from:")..
-    logistica.ui.on_off_btn(isOn, 4.5, 0.8, ON_OFF_BUTTON, "Enable")
+    "label[0.5,0.3;Network Importer take items from target and add them to the network]"..
+    "label[0.5,0.8;Filter: Import only filtered. If empty, imports all items.]"..
+    "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
+    "list[current_player;main;0.5,3.3;8,4;0]" ..
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pushPos, selectedList, "Take items from:")..
+    logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, "Enable")
 end
 
 local function show_injector_formspec(playerName, pos)
@@ -67,10 +71,34 @@ local function after_place_injector(pos, placer, itemstack)
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
+  local inv = meta:get_inventory()
+  inv:set_size("filter", NUM_FILTER_SLOTS)
   logistica.set_injector_target_list(pos, "main")
   logistica.on_injector_change(pos)
   logistica.start_injector_timer(pos)
   logistica.show_input_at(logistica.get_injector_target(pos))
+end
+
+local function allow_injector_storage_inv_put(pos, listname, index, stack, player)
+  if listname ~= "filter" then return 0 end
+  local inv = minetest.get_meta(pos):get_inventory()
+  local copyStack = ItemStack(stack:get_name())
+  copyStack:set_count(1)
+  inv:set_stack("filter", index, copyStack)
+  return 0
+end
+
+local function allow_injector_inv_take(pos, listname, index, stack, player)
+  if listname ~= "filter" then return 0 end
+  local inv = minetest.get_meta(pos):get_inventory()
+  local storageStack = inv:get_stack("filter", index)
+  storageStack:clear()
+  inv:set_stack("filter", index, storageStack)
+  return 0
+end
+
+local function allow_injector_inv_move(_, _, _, _, _, _, _)
+  return 0
 end
 
 ----------------------------------------------------------------
@@ -108,6 +136,9 @@ function logistica.register_injector(description, name, transferRate, tiles)
     after_destruct = logistica.on_injector_change,
     on_punch = on_injector_punch,
     on_rightclick = on_injector_rightclick,
+    allow_metadata_inventory_put = allow_injector_storage_inv_put,
+    allow_metadata_inventory_take = allow_injector_inv_take,
+    allow_metadata_inventory_move = allow_injector_inv_move,
     logistica = {
       injector_transfer_rate = transferRate,
       on_connect_to_network = function(pos, networkId)
@@ -117,6 +148,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
         if isPoweredOn then
           logistica.start_injector_timer(pos)
         end
+        logistica.set_node_tooltip_from_state(pos, nil, isPoweredOn)
       end,
     }
   }
@@ -149,5 +181,5 @@ local function get_tiles(name) return {
   "logistica_"..name.."_injector_front.png",
 } end
 
-logistica.register_injector("Item Network Inserter\nInserts 1 item per cycle", "item", 1, get_tiles("item"))
-logistica.register_injector("Stack Network Inserter\nInserts 1 stack per cycle", "stack", 99, get_tiles("stack"))
+logistica.register_injector("Item Network Importer\nImports 1 item at a time", "item", 1, get_tiles("item"))
+logistica.register_injector("Stack Network Importer\nImports 1 stack at a time", "stack", 99, get_tiles("stack"))
