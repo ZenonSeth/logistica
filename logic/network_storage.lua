@@ -174,7 +174,6 @@ function logistica.insert_item_in_network(itemstack, networkId)
     local pos = minetest.get_position_from_hash(hash)
     logistica.load_position(pos)
     local leftover = logistica.insert_itemstack_for_requester(pos, workingStack, true)
-    minetest.chat_send_all("insert_in_network: from: "..itemstack:get_count().." remain "..leftover)
     if leftover <= 0 then return 0 end -- we took all items
     workingStack:set_count(leftover)
   end
