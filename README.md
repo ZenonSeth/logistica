@@ -7,7 +7,9 @@ The core principle behind this mod is that item transportation is demand-driven:
 
 # Machines
 
-All machines require to be connected to an active network to perform their tasks. Nodes without a network, or nodes with conflicting network connections will not do anything.
+Almost all machines can connect to a network, unless otherwise stated, and can perform useful tasks when connected to an active network.
+
+Machines that have inputs or outputs can be sneak + punched to show their i/o.
 
 ## Controller
 A Controller is the node required to create an active network. Exactly one controller can be conneted to a network, and removing it will disconnect all other devices connected to the network. Controllers allow you to rename the network.
@@ -15,8 +17,8 @@ A Controller is the node required to create an active network. Exactly one contr
 ## Cables
 Cables are used to connect a controller to other machines, allowing the establishing of a network. Placing a cable that bridges two different active networks will burn that cable. Burned cables can simply be picked up, and return normal cables. TODO Cables come in TODO variants, all being identical in function, but different variants do not connect to each other, allowing parallel networks.
 
-## Request Inserter (technical name: demander)
-A Request Inserter is a machine that inserts items into almost any other node that has an inventory. The Request Inserter takes items from the network and tries to keep its target's inventory full of the specific items and the exact count it's configured with. For example, a Request Inserter might be configured to target a Furnace's "fuel" inventory and always try to keep 2 coal in it.
+## Request Inserter
+A Request Inserter is a machine that Requests specific items from the Network and tries to insert them into another inventory. The Request Inserter tries to keep its target's inventory full of the specific items and the exact count its configured with. For example, a Request Inserter might be configured to target a Furnace's "fuel" inventory and always try to keep 2 coal in it.
 
 There's two variation of the Request Inserter:
 - Item Request Inserter: Moves 1 item at a time to fulfil the requested items.
@@ -24,22 +26,24 @@ There's two variation of the Request Inserter:
 
 Request Inserters check network storage first to fulfil their demand, and if not, they will check any Passive Suppliers.
 
-## Passive Supplier
-A Passive Supplier acts as a source for specific items and must be configured. It takes items from other nodes' inventories (e.g. chests, furnaces) and makes them available to any demand in the network. Suppliers won't actively push items into the network, but Demanders and Storage nodes can both take items from Suppliers when needed. Note that if no items are configured in the Supplier's filter, suppliers will not provide any items at all.
+## Passive Supplier Chest
+A Passive Supplier Chest acts as a source for specific items and must be configured. It makes any items added to its inventory available to any demand in the network. Passive Supplier Chests won't actively push items into the network, but Demanders and Storage nodes can both take items from Suppliers when needed. Since many machines can quickly access the Passive Supplier Chest's inventory, they are able to fulfil requests much quicker than Network Inserters.
 
-Passive Suppliers are ideal for fulfiling demand when you know exactly what kind of items you want to supply to the network.
+Passive Supplier Chests, when filled by Item Movers, are usually better at supplying a network when the source inventory has many different types of items that need to be supplied (e.g. the output of an automted sieve)
 
-## Active Supplier
-Active Supplier try to push items into the network, first checking if an item is needed by demanders and then checking storage. Active Suppliers iterate over the source's node's chosen inventory slot by slot.
+## Network Importer
+Network Importer scan another block's inventory one slot at a time and attempt to push items from it into the network. Network Importer thus can directly fulfil requests and add to storage. However, they do not act as suppliers that other requesters can check, so the rate at which they add items to the network is limited by the Importer itself. However, Network Importer can directly take items from another node's inventory, unlike Passive Supplier Chests.
 
-There's 2 version of the Storage Injectors:
-- Item Storage Injector: Takes 1 item at a time from each slot it scans.
-- Stack Storage Injector: Injects one stack at a time from each slot it scans.
+Network Importer are usually better used for taking items from small inventories (e.g. the default Furnace's output inventory).
 
-Active suppliers are ideal for cases where there might be many different items in an inventory. However because they check one inventory slot at a time, they may take a bit longer to fulfil demand if the source's inventory has many different types of items.
+There's 2 version of the Network Importer:
+- Item Network Importer: Takes 1 item from a slot at a time, and tries to insert it in the network.
+- Stack Network Importer: Takes up to 99 items from a slot at a time, and tries to insert them in the network.
+
+When finding places to add items to, Network Importer prioritize Requesters first, then Storage. Stack Importers can place exact number of requsted items in a Requester, and will then continue and attempt to insert any leftover of the stack into other Requesters and/or Storage nodes.
 
 ## Mass Storage
-Mass Storage box provide mass-storage for items, and are the first place a Demander will look for to fulfil any demand. Mass Storage needs to be configured with the exact items to store, and can also be upgraded to store more items.
+Mass Storage box provide mass-storage for items, and are the first place a Requester will look for to fulfil any requests. Mass Storage needs to be configured with the exact items to store, and can also be upgraded to store more items.
 Features:
 - Can be dug and keeps its inventory when placed again
 - Can quickly deposit items by punching it with a stack or shift-punching it for deposit all stack items.
@@ -47,8 +51,17 @@ Features:
 - Reserves a number of items per slot. Reserved items won't be taken by other machines on the network.
 - Pull items on/off: On: This storage will also actively try to pull from Passive Suppliers
 
-## Item Storage
-The Item Storage box provides a large number of storage slots, spread over 2 pages -- but it can only store tools (specifically, items that have a max stack size of 1). Item storage is also accessed by Demanders to provide items.
+## Tool Box
+The Tool Box provides a large number of storage slots -- but it can only store tools (specifically, items that have a max stack size of 1). Tool Box is also accessed by Requesters to provide items. Tool Box cannot be dug while it contains items (unlike Mass Storage, which will keep its inventory)
+
+## Item Mover
+The Item Mover is a simple node that moves items one inventory to inventory. It does not require a network, and in fact it cannot connect to a network.
+
+The Item Mover's main use is to automatically add items into Passive Supplier Chests and Active Supplier Chests. It can be configured to only move certain types of items. It scans its source node's inventory one slot at a time, rotating which slot it takes from each time.
+
+There's two types of Item Movers:
+- Individual Item Mover: Moves 1 item at a time.
+- Stack Item Mover: Moves up to 99 items at a time.
 
 # Tools
 
