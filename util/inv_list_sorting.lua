@@ -1,22 +1,22 @@
+local S = logistica.TRANSLATOR
+local LANG_EN = "en"
 
 --------------------------------
 -- private funcs
 --------------------------------
 
-local function get_description(st) return st:get_short_description() end
-local function get_name(st) return st:get_name() end
+local function get_description(st) return minetest.get_translated_string(LANG_EN, st:get_short_description()) end
+local function get_name(st) d.log(st:get_name()) ; return st:get_name() end
 local function get_stack_size(st) return st:get_count() end
 local function get_wear(st) return st:get_wear() end
 
 local compareSmallestFirst = function(s1,s2) return s1 < s2 end
 local compareLargestFirst = function(s1,s2) return s1 > s2 end
 
-local function create_sorter(valOf, compare)
-  return {
-    areEq = function(stack1, stack2) return valOf(stack1) == valOf(stack2) end,
-    compare = function (stack1, stack2) return compare(valOf(stack1), valOf(stack2)) end
-  }
-end
+local function create_sorter(valOf, compare) return {
+  areEq = function(stack1, stack2) return valOf(stack1) == valOf(stack2) end,
+  compare = function (stack1, stack2) return compare(valOf(stack1), valOf(stack2)) end
+} end
 
 local function do_sort(list, crit1, crit2)
   if crit2 then
@@ -36,7 +36,7 @@ end
 LOG_SORT_NAME_AZ = create_sorter(get_description, compareSmallestFirst)
 LOG_SORT_NAME_ZA = create_sorter(get_description, compareLargestFirst)
 LOG_SORT_MOD_AZ = create_sorter(get_name, compareSmallestFirst)
-LOG_SORT_MOD_AZ = create_sorter(get_name, compareLargestFirst)
+LOG_SORT_MOD_ZA = create_sorter(get_name, compareLargestFirst)
 LOG_SORT_DURABILITY_FWD = create_sorter(get_wear, compareSmallestFirst)
 LOG_SORT_DURABILITY_REV = create_sorter(get_wear, compareLargestFirst)
 LOG_SORT_STACK_SIZE_FWD = create_sorter(get_stack_size, compareSmallestFirst)

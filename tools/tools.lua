@@ -1,6 +1,8 @@
+local S = logistica.TRANSLATOR
 
 minetest.register_craftitem("logistica:network_tool",{
-  description = "Logistica Network Tool\nUse on a node to see network info",
+  description = S("Logistica Network Tool\nUse on a node to see network info"),
+  short_description = S("Logistica Network Tool"),
   inventory_image = "logistica_network_tool.png",
   wield_image = "logistica_network_tool.png",
   stack_max = 1,
@@ -19,7 +21,7 @@ minetest.register_craftitem("logistica:network_tool",{
 })
 
 minetest.register_craftitem("logistica:wand",{
-  description = "Inv List Scanner",
+  description = S("Inv List Scanner"),
   inventory_image = "logistica_wand.png",
   wield_image = "logistica_wand.png",
   stack_max = 1,

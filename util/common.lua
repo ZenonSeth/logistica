@@ -1,4 +1,7 @@
 
+logistica.TRANSLATOR = minetest.get_translator(logistica.MODNAME)
+
+
 local META_ON_OFF_KEY = "logonoff"
 
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
