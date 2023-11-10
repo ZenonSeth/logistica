@@ -83,17 +83,26 @@ end
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_item_storage(filterStack, network, collectorFunc, isAutomatedRequest)
+function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest)
+  local stackName = stack:get_name()
   for storageHash, _ in pairs(network.item_storage) do
     local storagePos = minetest.get_position_from_hash(storageHash)
     local storageInv = get_meta(storagePos):get_inventory()
-    if storageInv:contains_item(ITEM_STORAGE_LIST_NAME, filterStack) then
-      local leftover = collectorFunc(filterStack)
-      if leftover == 0 then -- stack max is 1, so just take the whole itemstack out
-        storageInv:remove_item(ITEM_STORAGE_LIST_NAME, filterStack)
-        return true
-      end -- otherwise, the insert failed for some reason..
-    end
+    if logistica.is_machine_on(storagePos) then
+      local storageList = storageInv:get_list(ITEM_STORAGE_LIST_NAME) or {}
+      for i, storedStack in ipairs(storageList) do
+        if storedStack:get_name() == stackName then
+          local leftover = collectorFunc(storedStack)
+          if leftover == 0 then -- stack max is 1, so just take the whole itemstack out
+            storageList[i] = ItemStack("")
+            storageInv:set_list(ITEM_STORAGE_LIST_NAME, storageList)
+            return true
+          else  -- otherwise, the insert failed, don't take stack
+            return false
+          end
+        end -- end check if names equal
+      end -- end loop over storageList
+    end -- end if machine is on
   end
   return false
 end

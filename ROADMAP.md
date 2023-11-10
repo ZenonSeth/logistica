@@ -1,9 +1,10 @@
 Missing Features:
-- Item Storage implementation
+- Item Mover
 - Storage Access Point
 - Crafting recipes
 
 High Priority:
+- Item Storage Sorting
 - Mesecons compat
 - Machine Upgrades
 

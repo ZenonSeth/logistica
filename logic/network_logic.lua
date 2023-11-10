@@ -300,6 +300,13 @@ local INJECTOR_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
+
+local ITEM_STORAGE_OPS = {
+  get_list = function(network) return network.item_storage end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
@@ -400,5 +407,14 @@ function logistica.on_injector_change(pos, oldNode)
     try_to_add_to_network(pos, INJECTOR_OPS)
   else
     remove_from_network(pos, INJECTOR_OPS)
+  end
+end
+
+function logistica.on_item_storage_change(pos, oldNode)
+  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
+  if placed == true then
+    try_to_add_to_network(pos, ITEM_STORAGE_OPS)
+  else
+    remove_from_network(pos, ITEM_STORAGE_OPS)
   end
 end
