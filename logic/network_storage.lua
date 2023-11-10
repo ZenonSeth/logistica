@@ -107,13 +107,13 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   local stackToTakeName = stackToTake:get_name()
   local remainingRequest = stackToTake:get_count()
   local massLocations = network.storage_cache[stackToTake:get_name()]
+  if stackToTake:get_count() == 0 then return end
   if massLocations == nil then return end
   for storageHash, _ in pairs(massLocations) do
-    if stackToTake:get_count() == 0 then return end
     local storagePos = minetest.get_position_from_hash(storageHash)
     local meta = get_meta(storagePos)
     local storageInv = meta:get_inventory()
-    local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME)
+    local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME) or {}
     -- we can't use the usual take/put methods because mass storage exceeds max stack
     for i = #storageList, 1, -1 do -- traverse backwards for taking items
       local storageStack = storageList[i]

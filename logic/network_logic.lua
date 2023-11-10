@@ -270,8 +270,10 @@ local function remove_from_network(pos, ops)
   local hash = p2h(pos)
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
-  ops.get_list(network)[hash] = nil
+  -- first clear the cache while the position is still counted as being "in-network"
   ops.update_cache_node_removed(pos)
+  -- then remove the position from the network
+  ops.get_list(network)[hash] = nil
 end
 
 local MASS_STORAGE_OPS = {
