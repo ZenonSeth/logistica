@@ -80,6 +80,7 @@ end
 
 local function allow_requester_storage_inv_put(pos, listname, index, stack, player)
   if listname ~= "filter" then return 0 end
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local slotStack = inv:get_stack(listname, index)
   slotStack:add_item(stack)
@@ -91,6 +92,7 @@ end
 
 local function allow_requester_inv_take(pos, listname, index, stack, player)
   if listname ~= "filter" then return 0 end
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local slotStack = inv:get_stack(listname, index)
   slotStack:take_item(stack:get_count())

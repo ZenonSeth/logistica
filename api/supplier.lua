@@ -56,14 +56,17 @@ local function after_place_supplier(pos, placer, itemstack)
 end
 
 local function allow_supplier_storage_inv_put(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_supplier_inv_take(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_supplier_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return count
 end
 

@@ -80,6 +80,7 @@ local function after_place_injector(pos, placer, itemstack)
 end
 
 local function allow_injector_storage_inv_put(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local copyStack = ItemStack(stack:get_name())
@@ -89,6 +90,7 @@ local function allow_injector_storage_inv_put(pos, listname, index, stack, playe
 end
 
 local function allow_injector_inv_take(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local storageStack = inv:get_stack("filter", index)

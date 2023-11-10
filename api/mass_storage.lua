@@ -218,7 +218,7 @@ local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
 end
 
 local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player) then return 0 end
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname == "storage" then
     return logistica.clamp(stack:get_count(), 0, stack:get_stack_max())
   end
@@ -240,7 +240,7 @@ local function allow_mass_storage_inv_move(pos, from_list, from_index, to_list, 
 end
 
 local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player) then return 0 end
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname == "storage" then return 0 end
   if listname == "main" then
     return stack:get_count() - logistica.try_to_add_item_to_storage(pos, stack, true)
