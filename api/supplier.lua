@@ -74,6 +74,11 @@ local function on_suppler_inventory_take(pos, listname, index, stack, player)
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
 end
 
+local function can_dig_supplier(pos, player)
+  local inv = minetest.get_meta(pos):get_inventory()
+  return inv:is_empty("main")
+end
+
 ----------------------------------------------------------------
 -- Minetest registration
 ----------------------------------------------------------------
@@ -109,6 +114,7 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
     allow_metadata_inventory_move = allow_supplier_inv_move,
     on_metadata_inventory_put = on_suppler_inventory_put,
     on_metadata_inventory_take = on_suppler_inventory_take,
+    can_dig = can_dig_supplier,
     logistica = {
       inventory_size = inventorySize,
       on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end

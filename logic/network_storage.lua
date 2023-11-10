@@ -53,9 +53,12 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
       if supplyCount >= remaining then -- enough to fulfil requested
         local toSend = ItemStack(supplyStack) ; toSend:set_count(remaining)
         local leftover = collectorFunc(toSend)
-        supplyStack:set_count(supplyCount - remaining + leftover)
+        local newSupplyCount = supplyCount - remaining + leftover
+        supplyStack:set_count(newSupplyCount)
         supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
-        updateSupplierCacheFor(modifiedPos)
+        if newSupplyCount <= 0 then
+          updateSupplierCacheFor(modifiedPos)
+        end
         return true
       else -- not enough to fulfil requested
         local toSend = ItemStack(supplyStack)
@@ -64,7 +67,6 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
         supplyStack:set_count(leftover)
         if leftover > 0 then -- for some reason we could not insert all - exit early
           supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
-          updateSupplierCacheFor(modifiedPos)
           return true
         end
       end
