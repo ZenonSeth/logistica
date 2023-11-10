@@ -55,7 +55,7 @@ end
 local function on_requester_punch(pos, node, puncher, pointed_thing)
   local targetPos = logistica.get_requester_target(pos)
   if targetPos and puncher:is_player() and puncher:get_player_control().sneak then
-    minetest.add_entity(targetPos, "logistica:output_entity")
+    logistica.show_output_at(targetPos)
   end
 end
 

@@ -53,7 +53,7 @@ end
 local function on_injector_punch(pos, node, puncher, pointed_thing)
   local targetPos = logistica.get_injector_target(pos)
   if targetPos and puncher:is_player() and puncher:get_player_control().sneak then
-    minetest.add_entity(targetPos, "logistica:input_entity")
+    logistica.show_input_at(targetPos)
   end
 end
 
