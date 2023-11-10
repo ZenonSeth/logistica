@@ -4,12 +4,12 @@ Missing Features:
 - Crafting recipes
 
 High Priority:
-- Item Storage Sorting
-- Mesecons compat
 - Machine Upgrades
+- Wirelss Network Extender
+- Mesecons compat
 
 Medium Priority
-- Wirelss Network Extender
+- inv_plus compatibility
 - Remote Storage Access Point
 - Crafting Supplier
 - Rework all node models and textures; make new textures 32x32

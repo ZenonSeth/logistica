@@ -2,18 +2,25 @@
 local FORMSPEC_NAME = "logistica_itemstor"
 local ON_OFF_BUTTON = "on_off_btn"
 local ITEM_STORAGE_SIZE_PER_PAGE = 128
+local SORT_PICKER = "sortby"
+local SORT_BUTTON = "sortBtn"
 
 local itemStorageForms = {}
 
 local function get_item_storage_formspec(pos)
+  local meta = minetest.get_meta(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local isOn = logistica.is_machine_on(pos)
+  local sortValues = logistica.get_item_storage_sort_list_str()
+  local selectedSortIdx = logistica.get_item_storage_selected_sort_index(meta)
 
   return "formspec_version[4]" ..
     "size[20.5,16]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, "Allow Network to take")..
     "label[5.3,10.6;Tool Box: Accepts only tools, no stackable items]"..
+    logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, "Allow Network to take")..
+    "dropdown[16,12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
+    "button[18.5,12;1,0.8;"..SORT_BUTTON..";Sort]"..
     "list["..posForm..";main;0.4,0.5;16,8;0]"..
     "list[current_player;main;5.35,11.0;8,4;0]"..
     "listring[]"
@@ -33,12 +40,17 @@ local function on_player_receive_fields(player, formname, fields)
   if not itemStorageForms[playerName] then return false end
   local pos = itemStorageForms[playerName].position
   if minetest.is_protected(pos, playerName) then return true end
+  local meta = minetest.get_meta(pos)
 
   if fields.quit then
     itemStorageForms[playerName] = nil
+  elseif fields[SORT_BUTTON] then
+    logistica.sort_item_storage_list(meta)
   elseif fields[ON_OFF_BUTTON] then
     logistica.toggle_machine_on_off(pos)
     show_item_storage_formspec(player:get_player_name(), pos)
+  elseif fields[SORT_PICKER] then
+    logistica.set_item_storage_selected_sort_value(meta, fields[SORT_PICKER])
   end
   return true
 end
