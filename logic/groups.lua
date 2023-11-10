@@ -1,5 +1,4 @@
 logistica.cables = {}
-logistica.machines = {}
 logistica.controllers = {}
 logistica.injectors = {}
 logistica.requesters = {}
@@ -20,12 +19,13 @@ function logistica.get_machine_group(tier)
   return "logistica_" .. tier .. "_machine"
 end
 
-function logistica.is_cable(name)
-  return logistica.cables[name] ~= nil
+function logistica.is_machine(name)
+  return logistica.is_requester(name) or logistica.is_supplier(name) or logistica.is_mass_storage(name)
+          or logistica.is_item_storage(name) or logistica.is_controller(name) or logistica.is_injector(name)
 end
 
-function logistica.is_machine(name)
-  return logistica.machines[name] ~= nil
+function logistica.is_cable(name)
+  return logistica.cables[name] ~= nil
 end
 
 function logistica.is_requester(name)

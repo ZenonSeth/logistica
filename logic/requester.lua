@@ -142,6 +142,11 @@ function logistica.on_requester_timer(pos, elapsed)
   if not logistica.is_machine_on(pos) then return false end
   local network = logistica.get_network_or_nil(pos)
   if not network then return false end
+  local node = minetest.get_node(pos)
+  if logistica.is_machine(node.name) then
+    logistica.start_node_timer(pos, TIMER_DURATION_LONG)
+    return false
+  end
   logistica.set_node_tooltip_from_state(pos)
   update_requester_actual_request(pos)
   if take_requested_items_from_network(pos, network) then
@@ -188,7 +193,9 @@ end
 function logistica.get_requester_target(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return nil end
-  return vector.add(pos, logistica.get_rot_directions(node.param2).backward)
+  local target = vector.add(pos, logistica.get_rot_directions(node.param2).backward)
+  if not minetest.get_node_or_nil(target) then return nil end
+  return target
 end
 
 -- returns how many items remain from the itemstack after we attempt to insert it

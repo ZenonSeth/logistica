@@ -8,7 +8,7 @@ local injectorForms = {}
 
 local function get_injector_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
-  local pushPos = logistica.get_injector_target(pos)
+  local pullPos = logistica.get_injector_target(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
@@ -18,14 +18,12 @@ local function get_injector_formspec(pos)
     "label[0.5,0.8;Filter: Import only filtered. If empty, imports all items.]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
     "list[current_player;main;0.5,3.3;8,4;0]" ..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pushPos, selectedList, "Take items from:")..
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, "Take items from:")..
     logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, "Enable")
 end
 
 local function show_injector_formspec(playerName, pos)
-  local pInfo = {}
-  pInfo.position = pos
-  injectorForms[playerName] = pInfo
+  injectorForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_injector_formspec(pos))
 end
 

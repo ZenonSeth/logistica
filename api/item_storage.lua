@@ -27,9 +27,7 @@ local function get_item_storage_formspec(pos)
 end
 
 local function show_item_storage_formspec(playerName, pos)
-  local pInfo = {}
-  pInfo.position = pos
-  itemStorageForms[playerName] = pInfo
+  itemStorageForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_item_storage_formspec(pos))
 end
 

@@ -21,9 +21,7 @@ local function get_requester_formspec(pos)
 end
 
 local function show_requester_formspec(playerName, pos)
-  local pInfo = {}
-  pInfo.position = pos
-  requesterForms[playerName] = pInfo
+  requesterForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_requester_formspec(pos))
 end
 
@@ -75,7 +73,7 @@ local function after_place_requester(pos, placer, itemstack, numRequestSlots)
   inv:set_size("actual", numRequestSlots)
   logistica.on_requester_change(pos)
   logistica.start_requester_timer(pos)
-  logistica.show_output_at(logistica.get_injector_target(pos))
+  logistica.show_output_at(logistica.get_requester_target(pos))
 end
 
 local function allow_requester_storage_inv_put(pos, listname, index, stack, player)

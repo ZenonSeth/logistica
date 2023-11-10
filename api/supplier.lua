@@ -19,9 +19,7 @@ local function get_supplier_formspec(pos)
 end
 
 local function show_supplier_formspec(playerName, pos)
-  local pInfo = {}
-  pInfo.position = pos
-  supplierForms[playerName] = pInfo
+  supplierForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_supplier_formspec(pos))
 end
 

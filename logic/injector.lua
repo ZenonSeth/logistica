@@ -33,9 +33,11 @@ end
 -- public functions 
 
 function logistica.get_injector_target(pos)
-  local node = minetest.get_node(pos)
-  if not node then return pos end
-  return vector.add(pos, logistica.get_rot_directions(node.param2).backward)
+  local node = minetest.get_node_or_nil(pos)
+  if not node then return nil end
+  local target = vector.add(pos, logistica.get_rot_directions(node.param2).backward)
+  if not minetest.get_node_or_nil(target) then return nil end
+  return target
 end
 
 function logistica.get_injector_target_list(pos)
@@ -66,6 +68,10 @@ function logistica.on_injector_timer(pos, elapsed)
   end
   local targetList = logistica.get_injector_target_list(pos)
   local targetPos = logistica.get_injector_target(pos)
+  if targetPos == nil or logistica.is_machine(minetest.get_node(targetPos).name) then
+    logistica.start_node_timer(pos, TIMER_DURATION_LONG)
+    return false
+  end
   local targetMeta = minetest.get_meta(targetPos)
   local targetInv = targetMeta:get_inventory()
   local injInv = meta:get_inventory()

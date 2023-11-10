@@ -14,6 +14,8 @@ allowedPush["shift"] = true
 
 local function get_lists(targetPosition, allowedLists)
   logistica.load_position(targetPosition)
+  local node = minetest.get_node(targetPosition)
+  if logistica.is_machine(node.name) then return {} end
   local availableLists = minetest.get_meta(targetPosition):get_inventory():get_lists()
   local pushLists = {}
   for name, _ in pairs(availableLists) do

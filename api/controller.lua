@@ -13,9 +13,7 @@ local function get_controller_formspec(pos)
 end
 
 local function show_controller_formspec(pos, playerName)
-  local pInfo = {}
-  pInfo.position = pos
-  controllerForms[playerName] = pInfo
+  controllerForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_controller_formspec(pos))
 end
 

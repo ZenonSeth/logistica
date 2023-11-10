@@ -44,6 +44,7 @@ outputDef.textures =
 minetest.register_entity(OUTPUT_ENAME, outputDef)
 
 local function show_entity(pos, optionalKey, name)
+  if not pos then return end
   local key = optionalKey or logistica.get_rand_string_for(pos)
   local entity = entityTable[key]
   if entity ~= nil then
