@@ -139,12 +139,9 @@ function logistica.start_requester_timer(pos, duration)
 end
 
 function logistica.on_requester_timer(pos, elapsed)
+  if not logistica.is_machine_on(pos) then return false end
   local network = logistica.get_network_or_nil(pos)
-  if not network then
-    logistica.toggle_machine_on_off(pos)
-    logistica.set_node_tooltip_from_state(pos)
-    return false
-  end
+  if not network then return false end
   logistica.set_node_tooltip_from_state(pos)
   update_requester_actual_request(pos)
   if take_requested_items_from_network(pos, network) then

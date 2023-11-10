@@ -10,6 +10,7 @@ logistica.item_storage = {}
 logistica.tiers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
 logistica.GROUP_ALL = "group:" .. logistica.TIER_ALL
+logistica.TIER_CONTROLLER = "controller"
 
 function logistica.get_cable_group(tier)
   return "logistica_" .. tier .. "_cable"

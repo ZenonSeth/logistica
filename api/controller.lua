@@ -12,8 +12,6 @@ local function get_controller_formspec(pos)
     "button[5.6,0.6;3,0.8;"..SET_BUTTON..";Set]"
 end
 
-
-
 local function show_controller_formspec(pos, playerName)
   local pInfo = {}
   pInfo.position = pos
@@ -37,7 +35,12 @@ local function on_controller_receive_fields(player, formname, fields)
   return true
 end
 
+local function after_controller_place(pos)
+  logistica.start_controller_timer(pos)
+end
+
 -- registration stuff
+
 minetest.register_on_player_receive_fields(on_controller_receive_fields)
 
 --[[
@@ -52,7 +55,7 @@ minetest.register_on_player_receive_fields(on_controller_receive_fields)
 
   tier may be `nil` which will result in the controller connecting to everything
 ]]
-function logistica.register_controller(simpleName, def, tier)
+function logistica.register_controller(name, def, tier)
   local controller_group = nil
   if not tier then
     tier = logistica.TIER_ALL
@@ -62,7 +65,7 @@ function logistica.register_controller(simpleName, def, tier)
     logistica.tiers[ltier] = true
     controller_group = logistica.get_machine_group(ltier)
   end
- 	local controller_name = "logistica:" .. string.lower(simpleName:gsub(" ", "_")) .. "_controller"
+ 	local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
 	logistica.controllers[controller_name] = tier
 
   local on_construct = function(pos)
@@ -70,15 +73,16 @@ function logistica.register_controller(simpleName, def, tier)
       logistica.on_controller_change(pos, nil)
   end
   local after_destruct = logistica.on_controller_change
-  local on_timer = logistica.on_controller_timer
 
   if not def.groups then
     def.groups = {}
   end
   def.groups[controller_group] = 1
+  def.groups[logistica.TIER_CONTROLLER] = 1
+  def.on_timer = logistica.on_controller_timer
   def.on_construct = on_construct
   def.after_destruct = after_destruct
-  def.on_timer = logistica.on_timer_powered(on_timer)
+  def.after_place_node = after_controller_place
   def.drop = controller_name
   def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
     if clicker and clicker:is_player() then
@@ -101,7 +105,7 @@ function logistica.register_controller(simpleName, def, tier)
 	minetest.register_node(controller_name.."_disabled", def_disabled)
 end
 
-logistica.register_controller("Simple Controller", {
+logistica.register_controller("simple_controller", {
   description = "Simple Controller",
   tiles = { "logistica_silver_cable.png" },
   groups = {

@@ -38,12 +38,9 @@ function logistica.start_injector_timer(pos)
 end
 
 function logistica.on_injector_timer(pos, elapsed)
+  if not logistica.is_machine_on(pos) then return false end
   local networkId = logistica.get_network_id_or_nil(pos)
-  if not networkId then
-    logistica.toggle_machine_on_off(pos)
-    logistica.set_node_tooltip_from_state(pos)
-    return false
-  end
+  if not networkId then return false end
 
   logistica.set_node_tooltip_from_state(pos)
   local node = minetest.get_node_or_nil(pos)

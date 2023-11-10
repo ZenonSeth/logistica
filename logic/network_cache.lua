@@ -10,7 +10,7 @@ LOG_CACHE_MASS_STORAGE = {
   nodes = function (network) return network.mass_storage end,
 }
 LOG_CACHE_SUPPLIER = {
-  listName = "filter",
+  listName = "main",
   clear = function (network) network.supplier_cache = {} end,
   cache = function (network) return network.supplier_cache end,
   nodes = function (network) return network.suppliers end,
@@ -38,7 +38,11 @@ end
 
 local function list_to_cache_nameset(list)
   local ret = {}
-  for i, item in ipairs(list) do ret[item:get_name()] = true end
+  for i, item in ipairs(list) do
+    if item:get_name() ~= "" then
+      ret[item:get_name()] = true
+    end
+  end
   return ret
 end
 
@@ -90,10 +94,12 @@ local function update_network_cache(network, cacheOps)
     logistica.load_position(storagePos)
     local nodeMeta = get_meta(storagePos)
     local list = nodeMeta:get_inventory():get_list(listName) or {}
-    for _, itemStack in pairs(list) do
+    for _, itemStack in ipairs(list) do
       local name = itemStack:get_name()
-      if not cache[name] then cache[name] = {} end
-      cache[name][hash] = true
+      if name ~= "" then
+        if not cache[name] then cache[name] = {} end
+        cache[name][hash] = true
+      end
     end
     save_prev_cache(nodeMeta, listName, list_to_cache_nameset(list))
   end
@@ -112,12 +118,12 @@ local function update_network_cache_for_pos(pos, cacheOps)
   local cache = cacheOps.cache(network)
   local remAndAdd = diff(prevCacheItems, currCacheItems)
   for name, _ in pairs(remAndAdd[1]) do
-    local posCache = cache[name]
-    if posCache then posCache[hash] = nil end
+    if cache[name] then cache[name][hash] = nil end
+    if logistica.table_is_empty(cache[name]) then cache[name] = nil end
   end
   for name, _ in pairs(remAndAdd[2]) do
-    local posCache = cache[name]
-    if posCache then posCache[hash] = true end
+    if not cache[name] then cache[name] = {} end
+    if cache[name] then cache[name][hash] = true end
   end
   save_prev_cache(meta, listName, currCacheItems)
 end

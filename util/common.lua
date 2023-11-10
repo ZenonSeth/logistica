@@ -99,11 +99,13 @@ function logistica.toggle_machine_on_off(pos)
 	return nil
 end
 
--- isOn is optional
--- extraText is optional
-function logistica.set_node_tooltip_from_state(pos, extraText)
+-- `isOn` is optional
+-- `extraText` is optional
+-- `overrideState` is optional
+function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
 	if extraText == nil then extraText = "" else extraText = "\n"..extraText end
-	local isOn = logistica.is_machine_on(pos)
+	local isOn = overrideState
+	if isOn == nil then isOn = logistica.is_machine_on(pos) end
 	logistica.load_position(pos)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
@@ -178,4 +180,8 @@ function logistica.on_timer_powered(func)
 	return function(pos, elapsed)
 		if logistica.is_machine_on(pos) then func(pos, elapsed) end
 	end
+end
+
+function logistica.table_is_empty(table)
+	return table == nil or (next(table) == nil)
 end

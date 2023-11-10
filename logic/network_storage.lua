@@ -1,10 +1,17 @@
 
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
+local SUPPLIER_LIST_NAME = "main"
 
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
+end
+
+local function updateSupplierCacheFor(supplierPosList)
+  for _, pos in ipairs(supplierPosList) do
+    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  end
 end
 
 -- tries to take a stack from the network locations
@@ -12,11 +19,63 @@ end
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest)
+  if not network then return false end
+  -- first check suppliers
+  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest) then
+    return
+  end
+  -- then check storages
   if stackToTake:get_stack_max() <= 1 then
     logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   else
     logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   end
+end
+
+-- tries to take the given stack from the passive suppliers on the network
+-- calls the collectorFunc with the stack when necessary
+-- note that it may be called multiple times as the itemstack is gathered from mass storage
+function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest)
+  local requestedAmount = stackToTake:get_count()
+  local remaining = requestedAmount
+  local stackName = stackToTake:get_name()
+  local validSupplers = network.supplier_cache[stackName] or {}
+  local modifiedPos = {}
+  for hash, _ in pairs(validSupplers) do
+    local supplierPos = minetest.get_position_from_hash(hash)
+    local supplierInv = get_meta(supplierPos):get_inventory()
+    local machineIsOn = logistica.is_machine_on(supplierPos)
+    local supplyList = (machineIsOn and supplierInv:get_list(SUPPLIER_LIST_NAME)) or {}
+    for i, supplyStack in ipairs(supplyList) do
+    if supplyStack:get_name() == stackName then
+      table.insert(modifiedPos, supplierPos)
+      local supplyCount = supplyStack:get_count()
+      if supplyCount >= remaining then -- enough to fulfil requested
+        local toSend = ItemStack(supplyStack) ; toSend:set_count(remaining)
+        local leftover = collectorFunc(toSend)
+        supplyStack:set_count(supplyCount - remaining + leftover)
+        supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
+        updateSupplierCacheFor(modifiedPos)
+        return true
+      else -- not enough to fulfil requested
+        local toSend = ItemStack(supplyStack)
+        local leftover = collectorFunc(toSend)
+        remaining = remaining - (supplyCount - leftover)
+        supplyStack:set_count(leftover)
+        if leftover > 0 then -- for some reason we could not insert all - exit early
+          supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
+          updateSupplierCacheFor(modifiedPos)
+          return true
+        end
+      end
+    end
+    end
+    -- if we get there, we did not fulfil the request from this supplier
+    -- but some items still may have been inserted
+    if machineIsOn then supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList) end
+  end
+  updateSupplierCacheFor(modifiedPos)
+  return false
 end
 
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
