@@ -84,23 +84,16 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 
 -- `simpleName` is used for the description and for the name (can contain spaces)
 -- transferRate is how many items per tick this injector can transfer, -1 for unlimited
-function logistica.register_injector(simpleName, transferRate)
-  local lname = string.lower(simpleName:gsub(" ", "_"))
+function logistica.register_injector(description, name, transferRate, tiles)
+  local lname = string.lower(name:gsub(" ", "_"))
   local injectorName = "logistica:injector_"..lname
   logistica.injectors[injectorName] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
   grps[logistica.TIER_ALL] = 1
   local def = {
-    description = simpleName.." Active Supplier",
+    description = description,
     drawtype = "normal",
-    tiles = {
-      "logistica_"..lname.."_injector_side.png^[transformR270",
-      "logistica_"..lname.."_injector_side.png^[transformR90",
-      "logistica_"..lname.."_injector_side.png^[transformR180",
-      "logistica_"..lname.."_injector_side.png",
-      "logistica_"..lname.."_injector_back.png",
-      "logistica_"..lname.."_injector_front.png",
-    },
+    tiles = tiles,
     paramtype = "light",
     paramtype2 = "facedir",
     is_ground_content = false,
@@ -146,5 +139,14 @@ function logistica.register_injector(simpleName, transferRate)
 
 end
 
-logistica.register_injector("Item", 1)
-logistica.register_injector("Stack", 99)
+local function get_tiles(name) return {
+  "logistica_"..name.."_injector_side.png^[transformR270",
+  "logistica_"..name.."_injector_side.png^[transformR90",
+  "logistica_"..name.."_injector_side.png^[transformR180",
+  "logistica_"..name.."_injector_side.png",
+  "logistica_"..name.."_injector_back.png",
+  "logistica_"..name.."_injector_front.png",
+} end
+
+logistica.register_injector("Item Network Inserter\nInserts 1 item per cycle", "item", 1, get_tiles("item"))
+logistica.register_injector("Stack Network Inserter\nInserts 1 stack per cycle", "stack", 99, get_tiles("stack"))

@@ -141,7 +141,7 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
 
 end
 
-logistica.register_supplier("Passive Supplier", "simple", 32, {
+logistica.register_supplier("Passive Supplier Chest", "simple", 32, {
       "logistica_passive_supplier_top.png",
       "logistica_passive_supplier_bottom.png",
       "logistica_passive_supplier_side.png^[transformFX",

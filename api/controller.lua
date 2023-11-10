@@ -49,9 +49,11 @@ minetest.register_on_player_receive_fields(on_controller_receive_fields)
 --[[
   The definition table will get the fololwing fields overriden (and currently originals are not called):
   - on_construct
+  - after_place_node
   - after_destruct
   - on_timer
   - on_rightclick
+  - drop
 
   simpleName is used for the node registration, and will, if necessary, be converted 
   to lowerspace and all spaces replaced with _
