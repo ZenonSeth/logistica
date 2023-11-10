@@ -136,6 +136,8 @@ local function on_receive_storage_formspec(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
   local pos = storageForms[playerName].position
+  if minetest.is_protected(pos, playerName) then return true end
+
   if fields.quit and not fields.key_enter_field then
     logistica.update_mass_storage_front_image(pos)
     storageForms[playerName] = nil

@@ -22,10 +22,13 @@ end
 local function on_controller_receive_fields(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
+  local pos = controllerForms[playerName].position
+  if not pos then return false end
+  if minetest.is_protected(pos, playerName) then return true end
+
   if fields.quit and not fields.key_enter_field then
     controllerForms[playerName] = nil
   elseif (fields[SET_BUTTON] or fields.key_enter_field) and fields[NAME_FIELD] then
-    local pos = controllerForms[playerName].position
     local newNetworkName = fields[NAME_FIELD]
     logistica.rename_network(minetest.hash_node_position(pos), newNetworkName)
     local meta = minetest.get_meta(pos)

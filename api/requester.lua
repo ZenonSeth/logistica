@@ -32,10 +32,12 @@ local function on_player_receive_fields(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return false end
   local playerName = player:get_player_name()
   if not requesterForms[playerName] then return false end
+  local pos = requesterForms[playerName].position
+  if minetest.is_protected(pos, playerName) then return true end
+
   if fields.quit then
     requesterForms[playerName] = nil
   elseif fields[ON_OFF_BUTTON] then
-    local pos = requesterForms[playerName].position
     if not pos then return false end
     logistica.toggle_machine_on_off(pos)
     show_requester_formspec(player:get_player_name(), pos)

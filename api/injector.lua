@@ -32,18 +32,18 @@ local function on_player_receive_fields(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return false end
   local playerName = player:get_player_name()
   if not injectorForms[playerName] then return false end
+  local pos = injectorForms[playerName].position
+  if not pos then return false end
+  if minetest.is_protected(pos, playerName) then return true end
+
   if fields.quit then
     injectorForms[playerName] = nil
   elseif fields[ON_OFF_BUTTON] then
-    local pos = injectorForms[playerName].position
-    if not pos then return false end
     logistica.toggle_machine_on_off(pos)
     show_injector_formspec(player:get_player_name(), pos)
   elseif fields[PULL_LIST_PICKER] then
     local selected = fields[PULL_LIST_PICKER]
     if logistica.is_allowed_pull_list(selected) then
-      local pos = injectorForms[playerName].position
-      if not pos then return false end
       logistica.set_injector_target_list(pos, selected)
     end
   end
