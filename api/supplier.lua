@@ -11,7 +11,7 @@ local function get_supplier_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.5,12]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 9.0, 0.3, ON_OFF_BUTTON, "Enable")..
+    logistica.ui.on_off_btn(isOn, 7.0, 0.3, ON_OFF_BUTTON, "Allow Storage from Network")..
     "label[0.6,1.0;Passive Supplier: Items become available to network requests.]"..
     "list["..posForm..";main;0.4,1.4;8,4;0]"..
     "list[current_player;main;0.4,7.0;8,4;0]"..
@@ -142,7 +142,7 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
 
 end
 
-logistica.register_supplier("Passive Supplier Chest", "simple", 32, {
+logistica.register_supplier("Passive Supplier Chest", "simple", 16, {
       "logistica_passive_supplier_top.png",
       "logistica_passive_supplier_bottom.png",
       "logistica_passive_supplier_side.png^[transformFX",

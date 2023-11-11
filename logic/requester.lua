@@ -139,11 +139,12 @@ function logistica.start_requester_timer(pos, duration)
 end
 
 function logistica.on_requester_timer(pos, elapsed)
-  if not logistica.is_machine_on(pos) then return false end
   local network = logistica.get_network_or_nil(pos)
   if not network then return false end
-  local node = minetest.get_node(pos)
-  if logistica.is_machine(node.name) then
+  local targetPos = logistica.get_requester_target(pos)
+  if not targetPos then return true end
+  local targetNode = minetest.get_node_or_nil(targetPos)
+  if not targetNode or logistica.is_machine(targetNode.name) then
     logistica.start_node_timer(pos, TIMER_DURATION_LONG)
     return false
   end

@@ -44,8 +44,7 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
   for hash, _ in pairs(validSupplers) do
     local supplierPos = minetest.get_position_from_hash(hash)
     local supplierInv = get_meta(supplierPos):get_inventory()
-    local machineIsOn = logistica.is_machine_on(supplierPos)
-    local supplyList = (machineIsOn and supplierInv:get_list(SUPPLIER_LIST_NAME)) or {}
+    local supplyList = supplierInv:get_list(SUPPLIER_LIST_NAME)
     for i, supplyStack in ipairs(supplyList) do
     if supplyStack:get_name() == stackName then
       table.insert(modifiedPos, supplierPos)
@@ -74,7 +73,7 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     end
     -- if we get there, we did not fulfil the request from this supplier
     -- but some items still may have been inserted
-    if machineIsOn then supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList) end
+    supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList)
   end
   updateSupplierCacheFor(modifiedPos)
   return false
@@ -153,7 +152,7 @@ end
 function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
   local node = minetest.get_node(pos)
   if not logistica.is_mass_storage(node.name) and not logistica.is_item_storage(node.name) then return 0 end
-  local isMassStorage = string.find(node.name, "mass")
+  local isMassStorage = logistica.is_mass_storage(node.name)
   logistica.load_position(pos)
   local inv = minetest.get_meta(pos):get_inventory()
   if isMassStorage then
@@ -192,7 +191,7 @@ function logistica.insert_item_in_network(itemstack, networkId)
   if itemstack:get_stack_max() <= 1 then
     storages = network.item_storage
   else
-    storages = network.mass_storage
+    storages = network.storage_cache[itemstack:get_name()] or {}
   end
   for hash, _ in pairs(storages) do
     local pos = minetest.get_position_from_hash(hash)
@@ -200,6 +199,16 @@ function logistica.insert_item_in_network(itemstack, networkId)
     local remain = logistica.try_to_add_item_to_storage(pos, workingStack)
     if remain <= 0 then return 0 end -- we took all items
     workingStack:set_count(remain)
+  end
+
+  -- finally try to add to passive suppliers that accept this
+  local suppliers = network.suppliers
+  for hash, _ in pairs(suppliers) do
+    local pos = minetest.get_position_from_hash(hash)
+    logistica.load_position(pos)
+    local leftover = logistica.put_item_in_supplier(pos, workingStack)
+    if leftover:is_empty() then return 0 end
+    workingStack = leftover
   end
 
   return workingStack:get_count()

@@ -1,10 +1,11 @@
 Missing Features:
-- Item Mover
+- Network Importer need to be able to target Passive Suppliers Chests
+- Passive Supplier Chests need to have configuration to accept from network
 - Storage Access Point
 - Crafting recipes
 
 High Priority:
-- Machine Upgrades
+- Storage Upgrades
 - Wirelss Network Extender
 - Mesecons compat
 

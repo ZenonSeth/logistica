@@ -181,7 +181,8 @@ end
 -- returns a timer that will not do anything is power is turned off
 function logistica.on_timer_powered(func)
   return function(pos, elapsed)
-    if logistica.is_machine_on(pos) then func(pos, elapsed) end
+    if logistica.is_machine_on(pos) then return func(pos, elapsed)
+		else return false end
   end
 end
 

@@ -2,6 +2,7 @@ local META_IMG_PIC = "logimgpick"
 local META_RES_VAL = "logresval"
 local VALID_RESERVE_VALUES = {}
 for i = 0,4096,128 do table.insert(VALID_RESERVE_VALUES, i) end
+local BASE_TRANSFER_RATE = 10
 
 local function mass_storage_room_for_item(pos, meta, stack)
   local stackName = stack:get_name()
@@ -46,6 +47,12 @@ function logistica.get_mass_storage_num_slots(pos)
     return def.logistica.numSlots
   end
   return 0
+end
+
+-- returns the transfer rate of given mass storage node
+function logistica.get_supplier_transfer_rate(meta)
+  -- TODO: account for speed upgrade
+  return BASE_TRANSFER_RATE
 end
 
 -- Returns a stack of how many items remain
@@ -100,7 +107,7 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
   if spaceForItems == 0 then return end
 
   local requestStack = ItemStack(filterStack)
-  requestStack:set_count(spaceForItems)
+  requestStack:set_count(math.min(spaceForItems, logistica.get_supplier_transfer_rate(meta)))
 
   local numTaken = 0
   for hash, _ in pairs(network.supplier_cache[requestStack:get_name()] or {}) do
@@ -117,8 +124,6 @@ function logistica.start_mass_storage_timer(pos)
 end
 
 function logistica.on_mass_storage_timer(pos, _)
-  if not logistica.is_machine_on(pos) then return false end
-  if not logistica.get_network_or_nil(pos) then return false end
   logistica.pull_items_from_network_into_mass_storage(pos)
   return true
 end

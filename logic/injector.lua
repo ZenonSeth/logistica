@@ -55,7 +55,6 @@ function logistica.start_injector_timer(pos)
 end
 
 function logistica.on_injector_timer(pos, elapsed)
-  if not logistica.is_machine_on(pos) then return false end
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then return false end
 

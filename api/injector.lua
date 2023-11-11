@@ -181,5 +181,5 @@ local function get_tiles(name) return {
   "logistica_"..name.."_injector_front.png",
 } end
 
-logistica.register_injector("Item Network Importer\nImports 1 item at a time", "item", 1, get_tiles("item"))
-logistica.register_injector("Stack Network Importer\nImports 1 stack at a time", "stack", 99, get_tiles("stack"))
+logistica.register_injector("Slow Network Importer\nImports 10 items at a time", "slow", 10, get_tiles("item"))
+logistica.register_injector("Fast Network Importer\nImports 99 items at a time", "fast", 99, get_tiles("stack"))

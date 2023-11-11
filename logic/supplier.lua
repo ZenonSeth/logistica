@@ -15,8 +15,21 @@ end
 -- returns an ItemStack of how many items were taken
 function logistica.take_item_from_supplier(pos, stack)
   logistica.load_position(pos)
-  if not logistica.is_machine_on(pos) then return ItemStack("") end
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
   return inv:remove_item(META_SUPPLIER_LIST, stack)
+end
+
+
+-- tries to put the given item in this supplier, returns what's leftover
+function logistica.put_item_in_supplier(pos, stack)
+  -- only insert if its enabled
+  if not logistica.is_machine_on(pos) then return stack end
+  local origCount = stack:get_count()
+  local inv = minetest.get_meta(pos):get_inventory()
+  local leftover = inv:add_item(META_SUPPLIER_LIST, stack)
+  if leftover:get_count() < origCount then
+    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  end
+  return leftover
 end
