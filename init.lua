@@ -7,6 +7,7 @@ logistica.MODPATH = minetest.get_modpath(logistica.MODNAME)
 dofile(logistica.MODPATH.."/util/util.lua")
 dofile(logistica.MODPATH.."/entity/entity.lua")
 dofile(logistica.MODPATH.."/logic/logic.lua")
+dofile(logistica.MODPATH.."/item/item.lua")
 dofile(logistica.MODPATH.."/tools/tools.lua")
 
 -- api should be below the other files except the registrations

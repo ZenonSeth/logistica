@@ -1,12 +1,12 @@
 local META_IMG_PIC = "logimgpick"
 local META_RES_VAL = "logresval"
+local META_UPGRADE_ADD = "logstorupgr"
 local VALID_RESERVE_VALUES = {}
-for i = 0,4096,128 do table.insert(VALID_RESERVE_VALUES, i) end
+for i = 0,5120,128 do VALID_RESERVE_VALUES[i/128 + 1] = i end
 local BASE_TRANSFER_RATE = 10
 
 local function mass_storage_room_for_item(pos, meta, stack)
   local stackName = stack:get_name()
-  local targetStackSize = stack:get_count()
   local maxNum = logistica.get_mass_storage_max_size(pos)
   local filterList = meta:get_inventory():get_list("filter")
   local storageList = meta:get_inventory():get_list("storage")
@@ -32,8 +32,9 @@ function logistica.get_mass_storage_max_size(pos)
   if not node then return 0 end
   local def = minetest.registered_nodes[node.name]
   if def and def.logistica and def.logistica.maxItems then
-    -- TODO: account for upgrades
-    return def.logistica.maxItems
+    local meta = minetest.get_meta(pos)
+    local storageUpgrade = meta:get_int(META_UPGRADE_ADD)
+    return def.logistica.maxItems + storageUpgrade
   end
   return 0
 end
@@ -233,4 +234,30 @@ function logistica.get_mass_storage_imgname_or_first_item(meta)
     if not v:is_empty() then return "\n(Has: "..v:get_description()..")" end
   end
   return "\n(Empty)"
+end
+
+function logistica.is_valid_storage_upgrade(stackName)
+  return logistica.craftitem.storage_upgrade[stackName] ~= nil
+end
+
+function logistica.on_mass_storage_upgrade_change(pos, upgradeName, wasAdded)
+  local upgradeDef = logistica.craftitem.storage_upgrade[upgradeName]
+  if not upgradeDef or not upgradeDef.storage_upgrade then return true end
+  local meta = minetest.get_meta(pos)
+  local storageUpgrade = meta:get_int(META_UPGRADE_ADD)
+  if wasAdded then storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
+  else storageUpgrade = storageUpgrade - upgradeDef.storage_upgrade end
+  meta:set_int(META_UPGRADE_ADD, storageUpgrade)
+end
+
+function logistica.can_remove_mass_storage_upgrade(pos, upgradeName)
+  local upgradeDef = logistica.craftitem.storage_upgrade[upgradeName]
+  if not upgradeDef or not upgradeDef.storage_upgrade then return true end
+  local inv = minetest.get_meta(pos):get_inventory()
+  local maxStored = 0
+  for _, st in ipairs(inv:get_list("storage") or {}) do
+    if st:get_count() > maxStored then maxStored = st:get_count() end
+  end
+  local currMax = logistica.get_mass_storage_max_size(pos)
+  return (currMax - upgradeDef.storage_upgrade) >= maxStored
 end

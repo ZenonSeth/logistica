@@ -1,6 +1,4 @@
 Missing Features:
-- Network Importer need to be able to target Passive Suppliers Chests
-- Passive Supplier Chests need to have configuration to accept from network
 - Storage Access Point
 - Crafting recipes
 

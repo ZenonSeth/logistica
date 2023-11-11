@@ -232,6 +232,13 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
       logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
       return 0
   end
+  if listname == "upgrade" then
+    if logistica.can_remove_mass_storage_upgrade(pos, stack:get_name()) then
+      return 1
+    else
+      return 0
+    end
+  end
   return stack:get_count()
 end
 
@@ -252,6 +259,12 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
     local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack("filter", index, copyStack)
     logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
+    return 0
+  end
+  if listname == "upgrade" then
+    local inv = minetest.get_meta(pos):get_inventory()
+    if not logistica.is_valid_storage_upgrade(stack:get_name()) then return 0 end
+    if inv:get_stack(listname, index):is_empty() then return 1 end
     return 0
   end
   return stack:get_count()
@@ -278,11 +291,17 @@ local function on_mass_storage_inv_put(pos, listname, index, stack, player)
       end
       inv:set_stack(listname, index, fullstack)
     end
+  elseif listname == "upgrade" then
+    local inv = minetest.get_meta(pos):get_inventory()
+    logistica.on_mass_storage_upgrade_change(pos, inv:get_stack(listname, index):get_name(), true)
   end
 end
 
 local function on_mass_storage_inv_take(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player) then return 0 end
+  if listname == "upgrade" then
+    logistica.on_mass_storage_upgrade_change(pos, stack:get_name(), false)
+  end
 end
 
 local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
@@ -372,4 +391,4 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
 
 end
 
-logistica.register_mass_storage("Basic", 8, 512, 2)
+logistica.register_mass_storage("Basic", 8, 1024, 4)
