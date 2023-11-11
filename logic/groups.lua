@@ -5,7 +5,7 @@ logistica.requesters = {}
 logistica.suppliers = {}
 logistica.mass_storage = {}
 logistica.item_storage = {}
--- logistica.request_and_supplier = {}
+logistica.misc_machines = {}
 logistica.tiers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
 logistica.GROUP_ALL = "group:" .. logistica.TIER_ALL
@@ -22,6 +22,7 @@ end
 function logistica.is_machine(name)
   return logistica.is_requester(name) or logistica.is_supplier(name) or logistica.is_mass_storage(name)
           or logistica.is_item_storage(name) or logistica.is_controller(name) or logistica.is_injector(name)
+          or logistica.is_misc(name)
 end
 
 function logistica.is_cable(name)
@@ -50,6 +51,10 @@ end
 
 function logistica.is_injector(name)
   return logistica.injectors[name] ~= nil
+end
+
+function logistica.is_misc(name)
+  return logistica.misc_machines[name] ~= nil
 end
 
 function logistica.get_item_tiers(name)

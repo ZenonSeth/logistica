@@ -40,9 +40,15 @@ local function after_controller_place(pos)
   logistica.start_controller_timer(pos)
 end
 
+----------------------------------------------------------------
 -- registration stuff
+----------------------------------------------------------------
 
 minetest.register_on_player_receive_fields(on_controller_receive_fields)
+
+----------------------------------------------------------------
+-- Public Registration API
+----------------------------------------------------------------
 
 --[[
   The definition table will get the fololwing fields overriden (and currently originals are not called):

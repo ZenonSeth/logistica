@@ -54,7 +54,8 @@ function logistica.remove_item_on_block_front(pos, optionalId)
   end
 end
 
-function logistica.display_item_on_block_front(pos, item)
+-- `newParam2` is optional, will override the lookup of node.param2 for rotation
+function logistica.display_item_on_block_front(pos, item, newParam2)
   if item == nil or item == "" then return logistica.remove_item_on_block_front(pos) end
   local node = minetest.get_node(pos)
   if not node then return end
@@ -62,7 +63,7 @@ function logistica.display_item_on_block_front(pos, item)
 
   logistica.remove_item_on_block_front(pos, id)
 
-  local adjust = logistica.get_front_face_object_info(node.param2)
+  local adjust = logistica.get_front_face_object_info(newParam2 or node.param2)
   if not adjust then return end
 
   pos.x = pos.x + adjust.x * ENTITY_DIST_ADJ

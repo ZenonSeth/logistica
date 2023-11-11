@@ -34,5 +34,4 @@ function logistica.show_popup(playerName, text, time)
     playerHud[playerName] = nil
   end)
   playerHud[playerName].job = job
-
 end

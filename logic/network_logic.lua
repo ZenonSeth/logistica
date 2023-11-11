@@ -63,8 +63,8 @@ function logistica.get_network_id_or_nil(pos)
   if not network then return nil else return network.controller end
 end
 
-local function notify_connected(pos, node, networkId)
-  local def = minetest.registered_nodes[node.name]
+local function notify_connected(pos, nodeName, networkId)
+  local def = minetest.registered_nodes[nodeName]
   if def and def.logistica and def.logistica.on_connect_to_network then
     def.logistica.on_connect_to_network(pos, networkId)
   end
@@ -120,7 +120,7 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
     for _, offset in pairs(adjecent) do
       local otherPos = vector.add(pos, offset)
       logistica.load_position(otherPos)
-      local otherNode = minetest.get_node(otherPos)
+      local otherName = minetest.get_node(otherPos).name
       local otherHash = p2h(otherPos)
       if network.controller ~= otherHash
           and not has_machine(network, otherHash)
@@ -136,29 +136,32 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
             return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
           end
           local valid = false
-          if logistica.is_cable(otherNode.name) then
+          if logistica.is_cable(otherName) then
             network.cables[otherHash] = true
             connections[otherHash] = true
             valid = true
-          elseif logistica.is_requester(otherNode.name) then
+          elseif logistica.is_requester(otherName) then
             network.requesters[otherHash] = true
             valid = true
-          elseif logistica.is_injector(otherNode.name) then
+          elseif logistica.is_injector(otherName) then
             network.injectors[otherHash] = true
             valid = true
-          elseif logistica.is_supplier(otherNode.name) then
+          elseif logistica.is_supplier(otherName) then
             network.suppliers[otherHash] = true
             valid = true
-          elseif logistica.is_mass_storage(otherNode.name) then
+          elseif logistica.is_mass_storage(otherName) then
             network.mass_storage[otherHash] = true
             valid = true
-          elseif logistica.is_item_storage(otherNode.name) then
+          elseif logistica.is_item_storage(otherName) then
             network.item_storage[otherHash] = true
+            valid = true
+          elseif logistica.is_misc(otherName) then
+            network.misc[otherHash] = true
             valid = true
           end
           if valid then
             newToScan = newToScan + 1
-            notify_connected(otherPos, otherNode, network.controller)
+            notify_connected(otherPos, otherName, network.controller)
           end
         end -- end if tiersMatch
       end -- end of general checks
@@ -192,6 +195,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
+  network.misc = {}
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)

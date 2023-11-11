@@ -9,12 +9,12 @@ local function get_supplier_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,12]" ..
+    "size[10.5,10]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 7.0, 0.3, ON_OFF_BUTTON, "Allow Storage from Network")..
+    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Allow Storing from Network")..
     "label[0.6,1.0;Passive Supplier: Items become available to network requests.]"..
-    "list["..posForm..";main;0.4,1.4;8,4;0]"..
-    "list[current_player;main;0.4,7.0;8,4;0]"..
+    "list["..posForm..";main;0.4,1.4;8,2;0]"..
+    "list[current_player;main;0.4,4.5;8,4;0]"..
     "listring[]"
 end
 
@@ -91,7 +91,7 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 -- Public Registration API
 ----------------------------------------------------------------
 -- `simpleName` is used for the description and for the name (can contain spaces)
--- `inventorySize` should be 32 at max (aka regular chest)
+-- `inventorySize` should be 16 at max
 function logistica.register_supplier(desc, name, inventorySize, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local supplier_name = "logistica:passive_supplier_"..lname

@@ -213,14 +213,15 @@ function logistica.get_mass_storage_reserve(meta, index)
   return meta:get_int(META_RES_VAL..tostring(index))
 end
 
-function logistica.update_mass_storage_front_image(origPos)
+-- `newParam2` is optional, will override the lookup of node.param2 for rotation
+function logistica.update_mass_storage_front_image(origPos, newParam2)
   local pos = vector.new(origPos)
   logistica.remove_item_on_block_front(pos)
   local meta = minetest.get_meta(pos)
   local slot = logistica.get_mass_storage_image_slot(meta)
   if slot > 0 then
     local item = meta:get_inventory():get_list("filter")[slot] or ItemStack("")
-    logistica.display_item_on_block_front(pos, item:get_name())
+    logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
   end
 end
 

@@ -1,4 +1,3 @@
-local S = logistica.TRANSLATOR
 local LANG_EN = "en"
 
 --------------------------------

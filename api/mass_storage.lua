@@ -315,8 +315,8 @@ local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointe
   show_mass_storage_formspec(pos, name)
 end
 
-local function on_mass_storage_rotate(pos, node, player, mode)
-  logistica.update_mass_storage_front_image(pos)
+local function on_mass_storage_rotate(pos, node, player, mode, newParam2)
+  logistica.update_mass_storage_front_image(pos, newParam2)
 end
 
 ----------------------------------------------------------------
@@ -329,7 +329,7 @@ minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 -- Public Registration API
 ----------------------------------------------------------------
 
-function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, numUpgradeSlots)
+function logistica.register_mass_storage(simpleName, description, numSlots, numItemsPerSlot, numUpgradeSlots, tiles)
   local lname = string.lower(string.gsub(simpleName, " ", "_"))
   local storageName = "logistica:mass_storage_"..lname
   local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1}
@@ -338,10 +338,8 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
   logistica.mass_storage[storageName] = true
 
   local def = {
-    description = simpleName.." Mass Storage\n(Empty)",
-    tiles = { "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage.png",
-              "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage.png",
-              "logistica_"..lname.."_mass_storage.png", "logistica_"..lname.."_mass_storage_front.png" },
+    description = description.."\n(Empty)",
+    tiles = tiles,
     groups = grps,
     sounds = logistica.node_sound_metallic(),
     after_place_node = function(pos, placer, itemstack)
@@ -352,7 +350,7 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
     on_timer = logistica.on_timer_powered(logistica.on_mass_storage_timer),
     paramtype2 = "facedir",
     logistica = {
-      baseName = simpleName.." Mass Storage",
+      baseName = description,
       maxItems = numItemsPerSlot,
       numSlots = numSlots,
       numUpgradeSlots = numUpgradeSlots,
@@ -391,4 +389,8 @@ function logistica.register_mass_storage(simpleName, numSlots, numItemsPerSlot, 
 
 end
 
-logistica.register_mass_storage("Basic", 8, 1024, 4)
+logistica.register_mass_storage("basic", "Mass Storage", 8, 1024, 4, { 
+  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
+  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
+  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage_front.png"
+})
