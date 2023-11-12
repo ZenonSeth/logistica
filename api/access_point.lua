@@ -107,12 +107,3 @@ function logistica.register_access_point(desc, name, tiles)
   minetest.register_node(access_point_name.."_disabled", def_disabled)
 
 end
-
-logistica.register_access_point("Access Point", "base", {
-      "logistica_access_point_top.png",
-      "logistica_access_point_bottom.png",
-      "logistica_access_point_side.png^[transformFX",
-      "logistica_access_point_side.png",
-      "logistica_access_point_back.png",
-      "logistica_access_point_front.png",
-})

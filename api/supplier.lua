@@ -142,12 +142,3 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
   minetest.register_node(supplier_name.."_disabled", def_disabled)
 
 end
-
-logistica.register_supplier("Passive Supplier Chest", "simple", 16, {
-      "logistica_passive_supplier_top.png",
-      "logistica_passive_supplier_bottom.png",
-      "logistica_passive_supplier_side.png^[transformFX",
-      "logistica_passive_supplier_side.png",
-      "logistica_passive_supplier_side.png",
-      "logistica_passive_supplier_front.png",
-}) -- default supplier

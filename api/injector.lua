@@ -172,15 +172,3 @@ function logistica.register_injector(description, name, transferRate, tiles)
   minetest.register_node(injectorName.."_disabled", def_disabled)
 
 end
-
-local function get_tiles(name) return {
-  "logistica_"..name.."_injector_side.png^[transformR270",
-  "logistica_"..name.."_injector_side.png^[transformR90",
-  "logistica_"..name.."_injector_side.png^[transformR180",
-  "logistica_"..name.."_injector_side.png",
-  "logistica_"..name.."_injector_back.png",
-  "logistica_"..name.."_injector_front.png",
-} end
-
-logistica.register_injector("Slow Network Importer\nImports 10 items at a time", "slow", 10, get_tiles("item"))
-logistica.register_injector("Fast Network Importer\nImports 99 items at a time", "fast", 99, get_tiles("stack"))

@@ -59,8 +59,3 @@ function logistica.register_cable(tier, size)
 
   minetest.register_node(cable_name .. "_disabled", def_broken)
 end
-
-local CABLE_SIZE = 1/16
-logistica.register_cable("Copper", CABLE_SIZE)
-logistica.register_cable("Silver", CABLE_SIZE)
-logistica.register_cable("Gold", CABLE_SIZE)

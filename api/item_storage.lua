@@ -144,12 +144,3 @@ function logistica.register_item_storage(desc, name, tiles)
   minetest.register_node(item_storage_name.."_disabled", def_disabled)
 
 end
-
-logistica.register_item_storage("Tool Box\nStores Tools Only", "simple", {
-      "logistica_tool_box_top.png",
-      "logistica_tool_box_bottom.png",
-      "logistica_tool_box_side.png^[transformFX",
-      "logistica_tool_box_side.png",
-      "logistica_tool_box_back.png",
-      "logistica_tool_box_front.png",
-})

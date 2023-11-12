@@ -12,3 +12,4 @@ dofile(logistica.MODPATH.."/tools/tools.lua")
 
 -- api should be below the other files except the registrations
 dofile(logistica.MODPATH.."/api/api.lua")
+dofile(logistica.MODPATH.."/registration/registration.lua")

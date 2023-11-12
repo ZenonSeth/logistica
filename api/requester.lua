@@ -173,15 +173,3 @@ function logistica.register_requester(description, name, transferRate, tiles)
   minetest.register_node(requester_name.."_disabled", def_disabled)
 
 end
-
-local function get_tiles(lname) return {
-  "logistica_"..lname.."_requester_side.png^[transformR270",
-  "logistica_"..lname.."_requester_side.png^[transformR90",
-  "logistica_"..lname.."_requester_side.png^[transformR180",
-  "logistica_"..lname.."_requester_side.png",
-  "logistica_"..lname.."_requester_back.png",
-  "logistica_"..lname.."_requester_front.png",
-} end
-
-logistica.register_requester("Item Request Inserter\nInserts 1 item at a time", "item", 1, get_tiles("item"))
-logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a time", "stack", 64, get_tiles("stack"))

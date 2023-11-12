@@ -388,9 +388,3 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   minetest.register_node(storageName.."_disabled", def_disabled)
 
 end
-
-logistica.register_mass_storage("basic", "Mass Storage", 8, 1024, 4, { 
-  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
-  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
-  "logistica_basic_mass_storage.png", "logistica_basic_mass_storage_front.png"
-})

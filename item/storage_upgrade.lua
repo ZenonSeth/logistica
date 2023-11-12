@@ -1,8 +1,8 @@
 local S = logistica.TRANSLATOR
 
 logistica.craftitem.storage_upgrade = {}
-
 local items = logistica.craftitem.storage_upgrade
+
 items["logistica:storage_upgrade_1"] = {
   description = S("Silverin Storage Upgrade\nAdds 512 Mass Storage Slot Capacity"),
   storage_upgrade = 512,
