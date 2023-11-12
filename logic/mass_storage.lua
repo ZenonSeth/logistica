@@ -241,6 +241,19 @@ function logistica.is_valid_storage_upgrade(stackName)
   return logistica.craftitem.storage_upgrade[stackName] ~= nil
 end
 
+function logistica.update_mass_storage_cap(pos, optMeta)
+  local meta = optMeta or minetest.get_meta(pos)
+  local storageUpgrade = 0
+  local list = meta:get_inventory():get_list("upgrade") or {}
+  for _, item in ipairs(list) do
+    local upgradeDef = logistica.craftitem.storage_upgrade[item:get_name()]
+    if upgradeDef and upgradeDef.storage_upgrade then
+      storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
+    end
+  end
+  meta:set_int(META_UPGRADE_ADD, storageUpgrade)
+end
+
 function logistica.on_mass_storage_upgrade_change(pos, upgradeName, wasAdded)
   local upgradeDef = logistica.craftitem.storage_upgrade[upgradeName]
   if not upgradeDef or not upgradeDef.storage_upgrade then return true end

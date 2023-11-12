@@ -192,6 +192,7 @@ local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpg
   logistica.set_mass_storage_image_slot(meta, selImgIndex)
   for i, v in ipairs(reserves) do logistica.set_mass_storage_reserve(meta, i, v) end
   logistica.update_mass_storage_front_image(pos)
+  logistica.update_mass_storage_cap(pos, meta)
   logistica.on_mass_storage_change(pos)
 end
 
