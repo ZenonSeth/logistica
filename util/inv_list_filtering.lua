@@ -31,25 +31,24 @@ end
 
 local function do_filter(stackList, filterMethod)
   local res = {}
-  local idx = 1
+  local idx = 0
   for _, stack in ipairs(stackList) do
     if filterMethod(stack:get_name()) then
-      res[idx] = stack
       idx = idx + 1
+      res[idx] = stack
     end
   end
-  return res
+  return res, idx
 end
 
 --------------------------------
 -- public funcs
 --------------------------------
 
--- returns a new list that cotains only matching items
+-- 1st return: a new list that cotains only matching items; 2nd return: filtered list size
 -- or return just the same list immediately for convenience if `filterMethod` is nil
 -- filterMethod should be one of LOG_FILTER_NODE, LOG_FILTER_CRAFTITEM, LOG_FILTER_TOOL, LOG_FILTER_LIGHT
 function logistica.filter_list_by(stackList, filterMethod)
-  if not filterMethod then return stackList end
   return do_filter(stackList, filterMethod)
 end
 

@@ -24,16 +24,34 @@ local FILTER_TOOLS = 4
 local FILTER_LIGHTS = 5
 
 local filterMethodMap = {
-  [FILTER_ALL] = function(list) return list end,
-  [FILTER_NODES] = function(list) return logistica.filter_list_by(list, LOG_FILTER_NODE) end,
-  [FILTER_ITEMS] = function(list) return logistica.filter_list_by(list, LOG_FILTER_CRAFTITEM) end,
-  [FILTER_TOOLS] = function(list) return logistica.filter_list_by(list, LOG_FILTER_TOOL) end,
-  [FILTER_LIGHTS] = function(list) return logistica.filter_list_by(list, LOG_FILTER_LIGHT) end,
+  [FILTER_ALL] = function(list,s) return list, s end,
+  [FILTER_NODES] = function(list,_) return logistica.filter_list_by(list, LOG_FILTER_NODE) end,
+  [FILTER_ITEMS] = function(list,_) return logistica.filter_list_by(list, LOG_FILTER_CRAFTITEM) end,
+  [FILTER_TOOLS] = function(list,_) return logistica.filter_list_by(list, LOG_FILTER_TOOL) end,
+  [FILTER_LIGHTS] = function(list,_) return logistica.filter_list_by(list, LOG_FILTER_LIGHT) end,
 }
 
 local h2p = minetest.get_position_from_hash
-local pth = minetest.hash_node_position
 local get_meta = minetest.get_meta
+
+local function do_search_for(stackList, term, stackListSize)
+  if not stackList or not term or term:gsub("%s+","") == "" then return stackList, stackListSize end
+  local match = function(stack) return string.find(stack:get_description(), term) ~= nil end
+  local grpS, grpE = term:find("group:")
+  if grpS and grpS == 1 then
+    local groupName = string.sub(term, grpE + 1)
+    match = function(stack) return minetest.get_item_group(stack:get_name(), groupName) > 0 end
+  end
+  local res = {}
+  local idx = 0
+  for _, stack in ipairs(stackList) do
+    if match(stack) then
+      idx = idx + 1
+      res[idx] = stack
+    end
+  end
+  return res, idx
+end
 
 local function get_curr_sort_method_int(meta)
   local curr = meta:get_int(META_SORT_TYPE)
@@ -95,11 +113,13 @@ local function build_stack_list(pos)
     listSize = listSize + 1
     itemList[listSize] = stack
   end
-  local filtered = filterMethodMap[get_curr_filter_method_int(meta)](itemList)
+  local searchList, searchSize = 
+    do_search_for(itemList, logistica.access_point_get_current_search_term(meta), listSize)
+  local filtered, filtSize = filterMethodMap[get_curr_filter_method_int(meta)](searchList, searchSize)
   local sorted = sortMethodMap[get_curr_sort_method_int(meta)](filtered)
   return {
     stackList = sorted,
-    stackListSize = listSize,
+    stackListSize = filtSize,
   }
 end
 
@@ -205,4 +225,18 @@ end
 
 function logistica.access_point_set_sort_method(pos, playerName, method)
   set_curr_sort_method_int(get_meta(pos), method)
+end
+
+function logistica.access_point_on_search_clear(pos)
+  local meta = get_meta(pos)
+  meta:set_string(META_CURR_SEARCH, "")
+end
+
+function logistica.access_point_on_search_change(pos, searchTerm)
+  local meta = get_meta(pos)
+  meta:set_string(META_CURR_SEARCH, searchTerm)
+end
+
+function logistica.access_point_get_current_search_term(meta)
+  return meta:get_string(META_CURR_SEARCH)
 end

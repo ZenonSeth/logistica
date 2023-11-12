@@ -58,6 +58,7 @@ local function get_access_point_formspec(pos, optMeta, playerName)
   local sortHighImg = logistica.access_point_get_sort_highlight_images(meta, IMG_HIGHLGIHT, IMG_BLANK)
   local pageInfo = logistica.access_point_get_current_page_info(pos, playerName, FAKE_INV_SIZE, meta)
   local usesMetadata = logistica.access_point_is_set_to_use_metadata(pos)
+  local searchTerm = minetest.formspec_escape(logistica.access_point_get_current_search_term(meta))
   local usesMetaStr = usesMetadata and S("Metadata: ON") or S("Metadata: OFF")
   return "formspec_version[4]"..
     "size[15.2,12.5]"..
@@ -67,9 +68,9 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "list["..posForm..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
     "listring[]"..
-    "label[1.4,12.2;"..S("Crafting").."]"..
-    "list["..posForm..";"..INV_CRAFT..";0.2,8.4;3,3;0]"..
-    "list["..posForm..";"..INV_CRAFT_OUTPUT..";3.9,8.4;1,1;0]"..
+    -- "label[1.4,12.2;"..S("Crafting").."]"..
+    -- "list["..posForm..";"..INV_CRAFT..";0.2,8.4;3,3;0]"..
+    -- "list["..posForm..";"..INV_CRAFT_OUTPUT..";3.9,8.4;1,1;0]"..
     "button[1.4,5.2;2.6,0.6;"..USE_META_BTN..";"..usesMetaStr.."]"..
     "label[4.3,5.5;"..S("Filter").."]"..
     "image[5.1,5;1,1;"..filterHighImg.all.."]"..
@@ -92,7 +93,8 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "image_button[12.9,5.1;0.8,0.8;"..IMG_SORT_COUNT..";"..SORT_COUNT_BTN..";;false;false;]"..
     "image_button[13.8,5.1;0.8,0.8;"..IMG_SORT_WEAR..";"..SORT_WEAR_BTN..";;false;false;]"..
     "label[5.3,6.3;"..S("Network: ")..currentNetwork.."]"..
-    "field[5.2,6.5;2.8,0.8;"..SEARCH_FIELD..";;]"..
+    "field[5.2,6.5;2.8,0.8;"..SEARCH_FIELD..";;"..searchTerm.."]"..
+    "field_close_on_enter["..SEARCH_FIELD..";false]"..
     "image_button[8.1,6.5;0.8,0.8;logistica_icon_search.png;"..SEARCH_BTN..";;false;false;]"..
     "image_button[9.2,6.5;0.8,0.8;logistica_icon_cancel.png;"..CLEAR_BTN..";;false;false;]"..
     "label[12.0,6.3;"..S("Page")..": "..pageInfo.curr.." / "..pageInfo.max.."]"..
@@ -157,6 +159,10 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     logistica.access_point_set_sort_method(pos, playerName, 3)
   elseif fields[SORT_WEAR_BTN] then
     logistica.access_point_set_sort_method(pos, playerName, 4)
+  elseif fields[CLEAR_BTN] then
+    logistica.access_point_on_search_clear(pos)
+  elseif fields[SEARCH_BTN] or fields.key_enter_field then
+    logistica.access_point_on_search_change(pos, fields[SEARCH_FIELD])
   end
   show_access_point_formspec(pos, playerName)
   return true

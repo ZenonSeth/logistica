@@ -5,7 +5,7 @@ local MAX_NETWORK_NAME_LENGTH = 20
 local controllerForms = {}
 
 local function get_controller_formspec(pos)
-  local name = logistica.get_network_name_or_nil(pos) or "<ERROR>"
+  local name = minetest.formspec_escape(logistica.get_network_name_or_nil(pos) or "<ERROR>")
   return "formspec_version[4]" ..
     "size[10.5,2]" ..
     logistica.ui.background..
