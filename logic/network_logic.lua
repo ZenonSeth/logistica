@@ -325,7 +325,7 @@ local ACCESS_POINT_OPS = {
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
-  return logistica.is_cable(node.name)
+  return logistica.is_cable(node.name) or logistica.is_controller(node.name)
 end
 
 ----------------------------------------------------------------
