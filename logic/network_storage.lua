@@ -18,15 +18,17 @@ end
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest)
+-- `isAutomatedRequest` is optional, assumed to be false if not set
+-- `useMetaData` is optional, assume false if not set - only applies to items with stack_max = 1
+function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
   if not network then return false end
   -- first check suppliers
-  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest) then
+  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata) then
     return
   end
   -- then check storages
   if stackToTake:get_stack_max() <= 1 then
-    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
+    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
   else
     logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
   end
@@ -35,7 +37,9 @@ end
 -- tries to take the given stack from the passive suppliers on the network
 -- calls the collectorFunc with the stack when necessary
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest)
+function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
+  local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
+  if stackToTake:get_stack_max() == 1 and useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
   local requestedAmount = stackToTake:get_count()
   local remaining = requestedAmount
   local stackName = stackToTake:get_name()
@@ -46,7 +50,7 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     local supplierInv = get_meta(supplierPos):get_inventory()
     local supplyList = supplierInv:get_list(SUPPLIER_LIST_NAME)
     for i, supplyStack in ipairs(supplyList) do
-    if supplyStack:get_name() == stackName then
+    if eq(supplyStack, stackToTake) then
       table.insert(modifiedPos, supplierPos)
       local supplyCount = supplyStack:get_count()
       if supplyCount >= remaining then -- enough to fulfil requested
@@ -82,15 +86,17 @@ end
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest)
-  local stackName = stack:get_name()
+function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest, useMetadata)
+  local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
+  if useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
+
   for storageHash, _ in pairs(network.item_storage) do
     local storagePos = minetest.get_position_from_hash(storageHash)
     local storageInv = get_meta(storagePos):get_inventory()
     if logistica.is_machine_on(storagePos) then
       local storageList = storageInv:get_list(ITEM_STORAGE_LIST_NAME) or {}
       for i, storedStack in ipairs(storageList) do
-        if storedStack:get_name() == stackName then
+        if (not storedStack:is_empty()) and eq(storedStack, stack) then
           local leftover = collectorFunc(storedStack)
           if leftover == 0 then -- stack max is 1, so just take the whole itemstack out
             storageList[i] = ItemStack("")

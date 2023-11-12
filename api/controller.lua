@@ -1,11 +1,12 @@
 local SET_BUTTON = "logsetbtn"
 local NAME_FIELD = "namef"
 local FORMSPEC_NAME = "logconren"
+local MAX_NETWORK_NAME_LENGTH = 20
 local controllerForms = {}
 
 local function get_controller_formspec(pos)
   local name = logistica.get_network_name_or_nil(pos) or "<ERROR>"
-  return "formspec_version[6]" ..
+  return "formspec_version[4]" ..
     "size[10.5,2]" ..
     logistica.ui.background..
     "field[2.5,0.6;3,0.8;"..NAME_FIELD..";Network Name;"..name.."]" ..
@@ -28,6 +29,9 @@ local function on_controller_receive_fields(player, formname, fields)
     controllerForms[playerName] = nil
   elseif (fields[SET_BUTTON] or fields.key_enter_field) and fields[NAME_FIELD] then
     local newNetworkName = fields[NAME_FIELD]
+    if #newNetworkName > MAX_NETWORK_NAME_LENGTH then
+      newNetworkName = string.sub(newNetworkName, 1, MAX_NETWORK_NAME_LENGTH)
+    end
     logistica.rename_network(minetest.hash_node_position(pos), newNetworkName)
     local meta = minetest.get_meta(pos)
     meta:set_string("infotext", "Controller of Network: "..newNetworkName)

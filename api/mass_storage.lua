@@ -272,12 +272,11 @@ end
 
 
 local function on_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player) then return 0 end
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return 0
 end
 
 local function on_mass_storage_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player) then return 0 end
   if listname == "main" then
     local remaining = logistica.try_to_add_item_to_storage(pos, stack)
     local taken = stack:get_count() - remaining
@@ -298,7 +297,6 @@ local function on_mass_storage_inv_put(pos, listname, index, stack, player)
 end
 
 local function on_mass_storage_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player) then return 0 end
   if listname == "upgrade" then
     logistica.on_mass_storage_upgrade_change(pos, stack:get_name(), false)
   end
@@ -306,13 +304,14 @@ end
 
 local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
   if not puncher and not puncher:is_player() then return end
-  if minetest.is_protected(pos, puncher) then return end
+  if minetest.is_protected(pos, puncher:get_player_name()) then return end
   logistica.try_to_add_player_wield_item_to_mass_storage(pos, puncher)
 end
 
 local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
-  local name = clicker:get_player_name()
-  show_mass_storage_formspec(pos, name)
+  if not clicker or not clicker:is_player() then return end
+  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  show_mass_storage_formspec(pos, clicker:get_player_name())
 end
 
 local function on_mass_storage_rotate(pos, node, player, mode, newParam2)

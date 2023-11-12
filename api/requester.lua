@@ -59,6 +59,7 @@ end
 
 local function on_requester_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
+  if minetest.is_protected(pos, clicker:get_player_name()) then return end
   show_requester_formspec(clicker:get_player_name(), pos)
 end
 

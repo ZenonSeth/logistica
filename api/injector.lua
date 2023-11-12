@@ -61,6 +61,7 @@ end
 
 local function on_injector_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
+  if minetest.is_protected(pos, clicker:get_player_name()) then return end
   show_injector_formspec(clicker:get_player_name(), pos)
 end
 

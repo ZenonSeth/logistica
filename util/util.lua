@@ -7,6 +7,7 @@ dofile(path.."/ui_logic.lua")
 dofile(path.."/ui.lua")
 dofile(path.."/sound.lua")
 dofile(path.."/inv_list_sorting.lua")
+dofile(path.."/inv_list_filtering.lua")
 
 -- bad debug
 d = {}

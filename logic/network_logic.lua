@@ -1,5 +1,5 @@
 local networks = {}
-local HARD_NETWORK_NODE_LIMIT = 1000 -- A network cannot consist of more than this many nodes
+local HARD_NETWORK_NODE_LIMIT = 4000 -- A network cannot consist of more than this many nodes
 local STATUS_OK = 0
 local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
@@ -10,12 +10,8 @@ local p2h = minetest.hash_node_position
 local h2p = minetest.get_position_from_hash
 
 local adjecent = {
-  vector.new( 1,  0,  0),
-  vector.new( 0,  1,  0),
-  vector.new( 0,  0,  1),
-  vector.new(-1,  0,  0),
-  vector.new( 0, -1,  0),
-  vector.new( 0,  0, -1),
+  vector.new( 1,  0,  0), vector.new( 0,  1,  0), vector.new( 0,  0,  1),
+  vector.new(-1,  0,  0), vector.new( 0, -1,  0), vector.new( 0,  0, -1),
 }
 
 local function has_machine(network, id)
@@ -25,6 +21,7 @@ local function has_machine(network, id)
     or network.mass_storage[id]
     or network.item_storage[id]
     or network.injectors[id]
+    or network.misc[id]
   then
     return true
   else
@@ -192,10 +189,10 @@ local function create_network(controllerPosition, oldNetworkName)
   network.suppliers = {}
   network.mass_storage = {}
   network.item_storage = {}
+  network.misc = {}
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
-  network.misc = {}
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
@@ -280,6 +277,15 @@ local function remove_from_network(pos, ops)
   ops.get_list(network)[hash] = nil
 end
 
+local function on_node_change(pos, oldNode, ops)
+  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
+  if placed == true then
+    try_to_add_to_network(pos, ops)
+  else
+    remove_from_network(pos, ops)
+  end
+end
+
 local MASS_STORAGE_OPS = {
   get_list = function(network) return network.mass_storage end,
   update_cache_node_added = function(pos) logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE) end,
@@ -304,9 +310,14 @@ local INJECTOR_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
-
 local ITEM_STORAGE_OPS = {
   get_list = function(network) return network.item_storage end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
+local ACCESS_POINT_OPS = {
+  get_list = function(network) return network.misc end,
   update_cache_node_added = function(_)  end,
   update_cache_node_removed = function(_) end,
 }
@@ -379,46 +390,25 @@ function logistica.on_controller_change(pos, oldNode)
 end
 
 function logistica.on_mass_storage_change(pos, oldNode)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
-  if placed == true then
-    try_to_add_to_network(pos, MASS_STORAGE_OPS)
-  else
-    remove_from_network(pos, MASS_STORAGE_OPS)
-  end
+  on_node_change(pos, oldNode, MASS_STORAGE_OPS)
 end
 
 function logistica.on_requester_change(pos, oldNode)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
-  if placed == true then
-    try_to_add_to_network(pos, REQUESTER_OPS)
-  else
-    remove_from_network(pos, REQUESTER_OPS)
-  end
+  on_node_change(pos, oldNode, REQUESTER_OPS)
 end
 
 function logistica.on_supplier_change(pos, oldNode)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
-  if placed == true then
-    try_to_add_to_network(pos, SUPPLIER_OPS)
-  else
-    remove_from_network(pos, SUPPLIER_OPS)
-  end
+  on_node_change(pos, oldNode, SUPPLIER_OPS)
 end
 
 function logistica.on_injector_change(pos, oldNode)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
-  if placed == true then
-    try_to_add_to_network(pos, INJECTOR_OPS)
-  else
-    remove_from_network(pos, INJECTOR_OPS)
-  end
+  on_node_change(pos, oldNode, INJECTOR_OPS)
 end
 
 function logistica.on_item_storage_change(pos, oldNode)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
-  if placed == true then
-    try_to_add_to_network(pos, ITEM_STORAGE_OPS)
-  else
-    remove_from_network(pos, ITEM_STORAGE_OPS)
-  end
+  on_node_change(pos, oldNode, ITEM_STORAGE_OPS)
+end
+
+function logistica.on_access_point_change(pos, oldNode)
+  on_node_change(pos, oldNode, ACCESS_POINT_OPS)
 end

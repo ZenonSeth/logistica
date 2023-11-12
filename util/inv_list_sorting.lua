@@ -5,7 +5,7 @@ local LANG_EN = "en"
 --------------------------------
 
 local function get_description(st) return minetest.get_translated_string(LANG_EN, st:get_short_description()) end
-local function get_name(st) d.log(st:get_name()) ; return st:get_name() end
+local function get_name(st) return st:get_name() end
 local function get_stack_size(st) return st:get_count() end
 local function get_wear(st) return st:get_wear() end
 
