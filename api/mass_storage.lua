@@ -331,7 +331,7 @@ minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 
 function logistica.register_mass_storage(simpleName, description, numSlots, numItemsPerSlot, numUpgradeSlots, tiles)
   local lname = string.lower(string.gsub(simpleName, " ", "_"))
-  local storageName = "logistica:mass_storage_"..lname
+  local storageName = "logistica:"..lname
   local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1}
   numUpgradeSlots = logistica.clamp(numUpgradeSlots, 0, 4)
   grps[logistica.TIER_ALL] = 1

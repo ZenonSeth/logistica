@@ -117,7 +117,7 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 -- transferRate is how many items per tick this requester can transfer, -1 for unlimited
 function logistica.register_requester(description, name, transferRate, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
-  local requester_name = "logistica:requester_"..lname
+  local requester_name = "logistica:"..lname
   logistica.requesters[requester_name] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
   grps[logistica.TIER_ALL] = 1

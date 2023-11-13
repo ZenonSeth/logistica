@@ -95,7 +95,7 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 -- `inventorySize` should be 16 at max
 function logistica.register_supplier(desc, name, inventorySize, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
-  local supplier_name = "logistica:passive_supplier_"..lname
+  local supplier_name = "logistica:"..lname
   logistica.suppliers[supplier_name] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
   grps[logistica.TIER_ALL] = 1

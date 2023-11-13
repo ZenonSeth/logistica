@@ -7,9 +7,10 @@ High Priority:
 - Mesecons compat
 
 Medium Priority
-- inv_plus compatibility
+- Lava Furnace inv_plus recpies
 - Autocrafter
 - Network Crafter
+- Enable translation for all strings
 - Add crafting grid to Access Point
 
 Low Priority:

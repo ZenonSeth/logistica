@@ -2,7 +2,7 @@
 -- Access Point
 --------------------------------
 
-logistica.register_access_point("Access Point", "base", {
+logistica.register_access_point("Access Point", "access_point", {
       "logistica_access_point_top.png",
       "logistica_access_point_bottom.png",
       "logistica_access_point_side.png^[transformFX",
@@ -16,8 +16,13 @@ logistica.register_access_point("Access Point", "base", {
 --------------------------------
 
 local CABLE_SIZE = 1/16
-logistica.register_cable("Silver", CABLE_SIZE)
-
+logistica.register_cable("Optic cable", "optic", CABLE_SIZE)
+-- TODO: plate + cable = masked cable
+-- logistica.register_cable("Optic cable", "optic_wall", CABLE_SIZE, {
+--   fixed = {
+--     { -CABLE_SIZE, -CABLE_SIZE, -CABLE_SIZE, CABLE_SIZE, CABLE_SIZE, CABLE_SIZE }
+--   }
+-- })
 --------------------------------
 -- Controller
 --------------------------------
@@ -73,14 +78,14 @@ local function imp_tiles(name) return {
   "logistica_"..name.."_injector_front.png",
 } end
 
-logistica.register_injector("Slow Network Importer\nImports 10 items at a time", "slow", 10, imp_tiles("item"))
-logistica.register_injector("Fast Network Importer\nImports 99 items at a time", "fast", 99, imp_tiles("stack"))
+logistica.register_injector("Slow Network Importer\nImports 10 items at a time", "injector_slow", 10, imp_tiles("item"))
+logistica.register_injector("Fast Network Importer\nImports 99 items at a time", "injector_fast", 99, imp_tiles("stack"))
 
 --------------------------------
 -- Item Storage
 --------------------------------
 
-logistica.register_item_storage("Tool Box\nStores Tools Only", "simple", {
+logistica.register_item_storage("Tool Box\nStores Tools Only", "item_storage", {
       "logistica_tool_box_top.png",
       "logistica_tool_box_bottom.png",
       "logistica_tool_box_side.png^[transformFX",
@@ -93,7 +98,7 @@ logistica.register_item_storage("Tool Box\nStores Tools Only", "simple", {
 -- Mass Storage
 --------------------------------
 
-logistica.register_mass_storage("basic", "Mass Storage", 8, 1024, 4, { 
+logistica.register_mass_storage("mass_storage_basic", "Mass Storage", 8, 1024, 4, { 
   "logistica_basic_mass_storage_top.png", "logistica_basic_mass_storage_top.png",
   "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
   "logistica_basic_mass_storage.png", "logistica_basic_mass_storage_front.png"
@@ -112,14 +117,14 @@ local function ins_tiles(lname) return {
   "logistica_"..lname.."_requester_front.png",
 } end
 
-logistica.register_requester("Item Request Inserter\nInserts 1 item at a time", "item", 1, ins_tiles("item"))
-logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a time", "stack", 64, ins_tiles("stack"))
+logistica.register_requester("Item Request Inserter\nInserts 1 item at a time", "requester_item", 1, ins_tiles("item"))
+logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a time", "requester_stack", 64, ins_tiles("stack"))
 
 --------------------------------
 -- Passive Supply Chest
 --------------------------------
 
-logistica.register_supplier("Passive Supplier Chest", "simple", 16, {
+logistica.register_supplier("Passive Supplier Chest", "passive_supplier", 16, {
       "logistica_passive_supplier_top.png",
       "logistica_passive_supplier_bottom.png",
       "logistica_passive_supplier_side.png^[transformFX",

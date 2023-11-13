@@ -62,7 +62,7 @@ minetest.register_on_player_receive_fields(logistica.on_receive_access_point_for
 -- `simpleName` is used for the description and for the name (can contain spaces)
 function logistica.register_access_point(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
-  local access_point_name = "logistica:access_point_"..lname
+  local access_point_name = "logistica:"..lname
   logistica.misc_machines[access_point_name] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
   grps[logistica.TIER_ALL] = 1

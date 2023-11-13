@@ -20,6 +20,7 @@ items["logistica:silverin"] = {
 	},
 	drawtype = "nodebox",
 	paramtype = "light",
+  paramtype2 = "facedir",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -34,12 +35,29 @@ items["logistica:silverin"] = {
   stack_max = 99,
 }
 
+items["logistica:silverin_plate"] = {
+  tiles = { "logistica_silverin_plate.png" },
+	drawtype = "nodebox",
+	paramtype = "light",
+  paramtype2 = "facedir",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.50, -0.50, -0.50, 0.50, -7/16, 0.50}
+		}
+	},
+  groups = { cracky = 2 },
+  sounds = logistica.node_sound_metallic(),
+  description = S("Silverin Plate"),
+  inventory_image = "logistica_silverin_plate_inv.png",
+  stack_max = 99,
+}
+
 -- items["logistica:silverin_block"] = {
 --   description = S("Silverin Block"),
---   inventory_image = "logistica_storage_upgrade_1.png",
+--   tiles = "logistica_silverin_plate.png",
 --   stack_max = 99,
 -- }
-
 
 for name, def in pairs(items) do
   minetest.register_node(name, def)

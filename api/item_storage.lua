@@ -100,7 +100,7 @@ minetest.register_on_player_receive_fields(on_player_receive_fields)
 -- `simpleName` is used for the description and for the name (can contain spaces)
 function logistica.register_item_storage(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
-  local item_storage_name = "logistica:item_storage_"..lname
+  local item_storage_name = "logistica:"..lname
   logistica.item_storage[item_storage_name] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
   grps[logistica.TIER_ALL] = 1
