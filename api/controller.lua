@@ -1,7 +1,7 @@
 local SET_BUTTON = "logsetbtn"
 local NAME_FIELD = "namef"
 local FORMSPEC_NAME = "logconren"
-local MAX_NETWORK_NAME_LENGTH = 20
+local MAX_NETWORK_NAME_LENGTH = 30
 local controllerForms = {}
 
 local function get_controller_formspec(pos)

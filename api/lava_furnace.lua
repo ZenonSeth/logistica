@@ -141,7 +141,7 @@ local function get_lava_img(currLava, lavaPercent)
   else
     img = "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png]"
   end
-  return img.."tooltip[0.4,1.4;1,3;"..S("Remaminig: ")..(currLava/1000)..S(" Buckets").."]"
+  return img.."tooltip[0.4,1.4;1,3;"..S("Remaining: ")..(currLava/1000)..S(" Buckets").."]"
 end
 
 local function common_formspec(pos, meta)
