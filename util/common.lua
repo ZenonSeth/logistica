@@ -191,3 +191,9 @@ end
 function logistica.table_is_empty(table)
   return table == nil or (next(table) == nil)
 end
+
+-- returns true a given percentage of the time
+function logistica.random_chance(percent)
+  return percent >= math.random(1, 100)
+end
+
