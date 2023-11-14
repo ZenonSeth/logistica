@@ -8,6 +8,7 @@ High Priority:
 
 Medium Priority
 - Lava Furnace inv_plus recpies
+- Vaccuum Supply Chest
 - Autocrafter
 - Network Crafter
 - Enable translation for all strings
