@@ -67,11 +67,19 @@ minetest.register_craft({
   }
 })
 
+minetest.register_craft({
+  output = L("storage_upgrade_1"),
+	recipe = {
+		{L("silverin_slice"), L("standing_wave_box"), L("silverin_slice")},
+		{L("silverin_slice"), L("silverin_circuit"),  L("silverin_slice")},
+	}
+})
 
--- minetest.register_craft({
---   output = L("network_tool"),
---   recipe = {
-    
---   }
--- })
-
+minetest.register_craft({
+  output = L("storage_upgrade_2"),
+	recipe = {
+		{L("standing_wave_box"), "default:diamond",      L("standing_wave_box")},
+		{L("silverin_slice"),    L("standing_wave_box"), L("silverin_slice")},
+		{L("silverin_slice"),    L("silverin_circuit"),  L("silverin_slice")},
+	}
+})
