@@ -150,6 +150,7 @@ local function common_formspec(pos, meta)
   local lavaPercent = math.round(currLava / lavaCap * 100)
   return "formspec_version[6]"..
       "size[10.5,11]"..
+      "background9[0,0;1,1;logistica_lava_furnace_bg.png;true;8]"..
       "list[current_player;main;0.4,5.9;8,4;0]"..
       "list[context;fuel;0.4,4.5;1,1;0]"..
       "list[context;src;2.2,2.3;1,1;0]"..
@@ -157,6 +158,12 @@ local function common_formspec(pos, meta)
       "list[context;input;4.3,0.9;2,1;0]"..
       "label[0.5,1.1;Lava]"..
       "label[4.7,0.5;Additives]"..
+      "listring[context;dst]"..
+      "listring[current_player;main]"..
+      "listring[context;src]"..
+      "listring[current_player;main]"..
+      "listring[context;fuel]"..
+      "listring[current_player;main]"..
       get_lava_img(currLava, lavaPercent)
 end
 
