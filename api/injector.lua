@@ -108,6 +108,12 @@ end
 
 minetest.register_on_player_receive_fields(on_player_receive_fields)
 
+minetest.register_on_leaveplayer(function(objRef, timed_out)
+  if objRef:is_player() then
+    injectorForms[objRef:get_player_name()] = nil
+  end
+end)
+
 ----------------------------------------------------------------
 -- Public Registration API
 ----------------------------------------------------------------

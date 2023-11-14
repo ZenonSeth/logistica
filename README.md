@@ -1,5 +1,4 @@
 # Logistica
-# WORK IN PROGRESS - PRE-ALPHA STATE
 
 Logistica is an item transport, distribution and storage mod.
 
@@ -7,9 +6,29 @@ The core principle behind this mod is that item transportation is demand-driven:
 
 # Machines
 
-All machines can connect to a network and can perform extra useful tasks when connected to an active network
+All machines, except the Lava Furnace can connect to a network and can perform extra useful tasks when connected to an active network
 
 Machines that have inputs or outputs can be sneak + punched to show their i/o.
+
+# Getting Started
+
+## Lava Furnace
+The Lava Furnace is a lava-powered furnace that can cook regular items at an increased speed, but more importantly, can make Logistica specific items. The Lava Furnace has a built-in recipe guide about the Logistica-specific items it can make.
+
+It is crafted in the regular crafting grid like this:
+```
+[Clay Block ] [Obsidian Brick] [Clay Block ]
+[Steel Ingot] [ Empty Bucket ] [Steel Ingot]
+[Steel Ingot] [ Empty Bucket ] [Steel Ingot]
+```
+
+The most useful item it can make, and the material required for all other machines is the `Silverin Crystal`
+
+## Silverin Crystal
+
+A crystal made from melting Silver Sand in the Lava Furnace and then rapidly cooling it with Ice (see Lava Furance in-game recipe guide). Silverin Crystals are the backbone of all Logistica machines due to their useful photonic properties.
+
+Silverin Crystals can be broken into 8 `Silverin Slice`s by simply putting them on the crafting grid. The slices are used as basis for many other materials, many made in the Lava Furnace, which are then used to build the rest of the machines.
 
 # Creating a Network
 

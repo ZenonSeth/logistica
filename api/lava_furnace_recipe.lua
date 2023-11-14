@@ -55,3 +55,8 @@ function logistica.get_lava_furnace_recipe_for(itemName)
   -- nothing found
   return nil
 end
+
+-- returns a copy_pointed_thing of internal the internal recipes - for reference
+function logistica.get_lava_furnace_internal_recipes()
+  return table.copy(lava_furance_recipes)
+end

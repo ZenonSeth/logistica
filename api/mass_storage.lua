@@ -325,6 +325,12 @@ end
 
 minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 
+minetest.register_on_leaveplayer(function(objRef, timed_out)
+  if objRef:is_player() then
+    storageForms[objRef:get_player_name()] = nil
+  end
+end)
+
 ----------------------------------------------------------------
 -- Public Registration API
 ----------------------------------------------------------------

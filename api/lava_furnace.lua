@@ -16,6 +16,8 @@ local INV_INPT = "src"
 local INV_OUTP = "dst"
 local INV_ADDI = "input"
 
+local GUIDE_BTN = "guide"
+
 local UPDATE_INTERVAL = 1.0
 
 -- returns the lava cap in milibuckets
@@ -148,9 +150,9 @@ local function common_formspec(pos, meta)
   local currLava = meta:get_int(META_LAVA_IN_TANK)
   local lavaCap = get_lava_capacity(pos) or 1
   local lavaPercent = math.round(currLava / lavaCap * 100)
-  return "formspec_version[6]"..
+  return "formspec_version[4]"..
       "size[10.5,11]"..
-      "background9[0,0;1,1;logistica_lava_furnace_bg.png;true;8]"..
+      logistica.ui.background_lava_furnace..
       "list[current_player;main;0.4,5.9;8,4;0]"..
       "list[context;fuel;0.4,4.5;1,1;0]"..
       "list[context;src;2.2,2.3;1,1;0]"..
@@ -164,6 +166,8 @@ local function common_formspec(pos, meta)
       "listring[current_player;main]"..
       "listring[context;fuel]"..
       "listring[current_player;main]"..
+      "button[9.2,0.4;0.8,0.8;"..GUIDE_BTN..";?]"..
+      "tooltip["..GUIDE_BTN..";"..S("Recipes").."]"..
       get_lava_img(currLava, lavaPercent)
 end
 
@@ -237,7 +241,7 @@ local function lava_furnace_node_timer(pos, elapsed)
       -- cook is ready
       inv:remove_item(INV_INPT, config.input)
       inv:add_item(INV_OUTP, config.output)
-      if config.additive 
+      if config.additive
         and config.additive_use_chance
         and logistica.random_chance(config.additive_use_chance) then
         inv:remove_item(INV_ADDI, config.additive)
@@ -317,11 +321,13 @@ local function lava_furnace_allow_metadata_inv_move(pos, from_list, from_index, 
 end
 
 local function lava_furnace_on_inv_change(pos)
-  -- local timer = minetest.get_node_timer(pos)
-  -- if not timer:is_started() and lava_furnace_node_timer(pos, 0) then
-  --   timer:start(UPDATE_INTERVAL)
-  -- end
   logistica.start_node_timer(pos, UPDATE_INTERVAL)
+end
+
+local function lava_furnace_receive_fields(pos, formname, fields, sender)
+  if fields[GUIDE_BTN] and sender and sender:is_player() then
+    logistica.lava_furnace_show_guide(sender:get_player_name())
+  end
 end
 
 --------------------------------
@@ -354,6 +360,7 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     allow_metadata_inventory_put = lava_furnace_allow_metadata_inv_put,
     allow_metadata_inventory_move = lava_furnace_allow_metadata_inv_move,
     allow_metadata_inventory_take = lava_furnace_allow_metadata_inv_take,
+    on_receive_fields = lava_furnace_receive_fields,
     logistica = {
       lava_capacity = lavaCapacity
     }

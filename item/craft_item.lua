@@ -16,8 +16,6 @@ items[L("silverin_slice")] = {
   stack_max = 99,
 }
 
-
-
 items[L("silverin_circuit")] = {
   description = S("Silverin Circuit"),
   inventory_image = "logistica_silverin_circuit.png",
