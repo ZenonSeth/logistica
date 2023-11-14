@@ -1,10 +1,10 @@
 Missing Features:
-- Crafting recipes
+- None! Base Features complete!
 
 High Priority:
+- In-game guide book
 - Wirelss Network Extender
 - Togglable Cable
-- Mesecons compat
 
 Medium Priority
 - Lava Furnace inv_plus recpies
@@ -12,14 +12,15 @@ Medium Priority
 - Network Crafter
 - Enable translation for all strings
 - Add crafting grid to Access Point
+- Mesecons compat
 
 Low Priority:
 - Liquid Storage
-- Improve node sounds
 - Direct pipeworks compatibility
 - Direct tubelib compatibility
 - Rework all UI icons to be.. 48x48? 64x64? something else?
 - Rework all node models and textures; make new textures? 32x32
+- Improve node sounds
 
 Maybe not needed, unless specific common usecase found to support:
 - Demander modes: AND/OR 
