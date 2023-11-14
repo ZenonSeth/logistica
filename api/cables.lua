@@ -24,9 +24,9 @@ function logistica.register_cable(desc, name, size, customNodeBox)
 
   local def = {
     description = desc,
-    tiles = { "logistica_" .. lname .. "_cable.png" },
-    inventory_image = "logistica_" .. lname .. "_cable_inv.png",
-    wield_image = "logistica_" .. lname .. "_cable_inv.png",
+    tiles = { "logistica_" .. lname .. ".png" },
+    inventory_image = "logistica_" .. lname .. "_inv.png",
+    wield_image = "logistica_" .. lname .. "_inv.png",
     groups = {
       cracky = 3,
       choppy = 3,
@@ -49,8 +49,8 @@ function logistica.register_cable(desc, name, size, customNodeBox)
 
   local def_broken = {}
   for k, v in pairs(def) do def_broken[k] = v end
-  def_broken.tiles = { "logistica_" .. lname .. "_cable.png^logistica_broken.png" }
-  def_broken.inventory_image = "logistica_" .. lname .. "_cable_inv.png^logistica_broken.png"
+  def_broken.tiles = { "logistica_" .. lname .. ".png^logistica_broken.png" }
+  def_broken.inventory_image = "logistica_" .. lname .. "_inv.png^logistica_broken.png"
   def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
   def_broken.description = "Broken " .. desc
   def_broken.node_box = { type = "fixed", fixed = { -0.5, -size, -size, 0.5, size, size } }

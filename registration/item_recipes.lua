@@ -4,19 +4,69 @@ local SILV = L("silverin")
 local SILV_SLICE = L("silverin_slice")
 
 minetest.register_craft({
-    output = SILV_SLICE.." 8",
-    type = "shapeless",
-    recipe = { SILV },
+  output = SILV_SLICE.." 8",
+  type = "shapeless",
+  recipe = { SILV },
 })
 
 minetest.register_craft({
-    output = SILV,
-    type = "shapeless",
-    recipe = {
-      SILV_SLICE, SILV_SLICE, SILV_SLICE, SILV_SLICE,
-      SILV_SLICE, SILV_SLICE, SILV_SLICE, SILV_SLICE
-    },
+  output = SILV,
+  type = "shapeless",
+  recipe = {
+    SILV_SLICE, SILV_SLICE, SILV_SLICE, SILV_SLICE,
+    SILV_SLICE, SILV_SLICE, SILV_SLICE, SILV_SLICE
+  },
 })
+
+minetest.register_craft({
+  output = L("optic_cable 8"),
+  recipe = {
+    {L("silverin_plate")},
+    {L("silverin_slice")},
+    {L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
+  output = L("hyperspanner"),
+  recipe = {
+    {"default:mese_crystal"},
+    {L("silverin_circuit")},
+    {"default:steel_ingot"},
+  }
+})
+
+minetest.register_craft({
+  output = L("photonizer"),
+  recipe = {
+    {"default:mese_crystal"},
+    {L("silverin_circuit")},
+    {L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
+  output = L("photonizer"),
+  type = "shapeless",
+  recipe = { L("hyperspanner"), L("photonizer_reversed")},
+  replacements = {{L("hyperspanner"), L("hyperspanner")}},
+})
+
+minetest.register_craft({
+  output = L("photonizer_reversed"),
+  type = "shapeless",
+  recipe = { L("hyperspanner"), L("photonizer")},
+  replacements = {{L("hyperspanner"), L("hyperspanner")}},
+})
+
+minetest.register_craft({
+  output = L("standing_wave_box"),
+  recipe = {
+    {L("silverin_mirror_box")},
+    {L("silverin_circuit")},
+  }
+})
+
 
 -- minetest.register_craft({
 --   output = L("network_tool"),

@@ -16,7 +16,7 @@ logistica.register_access_point("Access Point", "access_point", {
 --------------------------------
 
 local CABLE_SIZE = 1/16
-logistica.register_cable("Optic cable", "optic", CABLE_SIZE)
+logistica.register_cable("Optic cable", "optic_cable", CABLE_SIZE)
 -- TODO: plate + cable = masked cable
 -- logistica.register_cable("Optic cable", "optic_wall", CABLE_SIZE, {
 --   fixed = {

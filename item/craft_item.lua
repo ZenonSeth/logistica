@@ -19,7 +19,7 @@ items[L("silverin_slice")] = {
 
 
 items[L("silverin_circuit")] = {
-  description = S("A Silverin Circuit"),
+  description = S("Silverin Circuit"),
   inventory_image = "logistica_silverin_circuit.png",
   stack_max = 99,
 }
@@ -37,7 +37,7 @@ items[L("photonizer")] = {
 }
 
 items[L("photonizer_reversed")] = {
-  description = S("Photonizer (Inverted Polarity)\nM = E/C^2"),
+  description = S("Photonizer (Reversed Polarity)\nM = E/C^2"),
   inventory_image = "logistica_photonizer_reversed.png",
   stack_max = 99,
 }
