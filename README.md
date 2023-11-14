@@ -93,5 +93,5 @@ Note that how many items can be sent at one time to a Requester is still limited
 
 # Tools
 
-## Network Info Tool
-When used on a Logistica node it will show which network, if any, the node is part of.
+## Hyperspanner
+A multipurpose engineering tool. Use on nodes for network info. Can also reverse poliarity of Photonizers (a craft-item), which is required for crafting certain machines.
