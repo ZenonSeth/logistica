@@ -243,3 +243,7 @@ end
 function logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
   show_access_point_formspec(pos, clicker:get_player_name())
 end
+
+function logistica.access_point_can_dig(pos)
+  return minetest.get_meta(pos):get_inventory():is_empty(INV_INSERT)
+end

@@ -43,6 +43,10 @@ local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 
+local function can_dig_access_point(pos, _)
+  return logistica.access_point_can_dig(pos)
+end
+
 ----------------------------------------------------------------
 -- registration calls
 ----------------------------------------------------------------
@@ -76,6 +80,7 @@ function logistica.register_access_point(desc, name, tiles)
     groups = grps,
     drop = access_point_name,
     sounds = logistica.node_sound_metallic(),
+    can_dig = can_dig_access_point,
     connect_sides = {"top", "bottom", "left", "back", "right" },
     after_place_node = after_place_access_point,
     after_destruct = logistica.on_access_point_change,
