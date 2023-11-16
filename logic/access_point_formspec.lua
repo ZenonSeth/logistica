@@ -56,6 +56,68 @@ local accessPointForms = {}
 -- formspec
 ----------------------------------------------------------------
 
+local function get_listrings(posForm) return
+  "listring[current_player;main]"..
+  "listring["..posForm..";"..INV_INSERT.."]"..
+  "listring[current_player;main]"..
+  "listring["..posForm..";"..INV_FAKE.."]"..
+  "listring[current_player;main]"..
+  "listring[current_player;craft]"..
+  "listring[current_player;main]"..
+  "listring[current_player;craftpreview]"..
+  "listring[current_player;main]"
+end
+
+local function get_tooltips() return
+    "tooltip["..USE_META_BTN..";"..STR_METADATA_DESC.."]"..
+    "tooltip["..FILTER_ALL_BTN..";"..STR_ALL_DESC.."]"..
+    "tooltip["..FILTER_NODES_BTN..";"..STR_NODES_DESC.."]"..
+    "tooltip["..FILTER_CRFTITM_BTN..";"..STR_CRAFT_DESC.."]"..
+    "tooltip["..FILTER_TOOLS_BTN..";"..STR_TOOLS_DESC.."]"..
+    "tooltip["..FILTER_LIGHTS_BTN..";"..STR_LIGHT_DESC.."]"
+end
+
+local function get_filter_section(usesMetaStr, filterHighImg) return
+    "button[1.4,5.2;2.6,0.6;"..USE_META_BTN..";"..usesMetaStr.."]"..
+    "label[4.3,5.5;"..S("Filter").."]"..
+    "image[5.1,5;1,1;"..filterHighImg.all.."]"..
+    "image[6.0,5;1,1;"..filterHighImg.node.."]"..
+    "image[6.9,5;1,1;"..filterHighImg.craftitem.."]"..
+    "image[7.8,5;1,1;"..filterHighImg.tools.."]"..
+    "image[8.7,5;1,1;"..filterHighImg.lights.."]"..
+    "image_button[5.2,5.1;0.8,0.8;"..IMG_FILT_ALL..";"..FILTER_ALL_BTN..";;false;false;]"..
+    "image_button[6.1,5.1;0.8,0.8;"..IMG_FILT_NODE..";"..FILTER_NODES_BTN..";;false;false;]"..
+    "image_button[7.0,5.1;0.8,0.8;"..IMG_FILT_ITEM..";"..FILTER_CRFTITM_BTN..";;false;false;]"..
+    "image_button[7.9,5.1;0.8,0.8;"..IMG_FILT_TOOL..";"..FILTER_TOOLS_BTN..";;false;false;]"..
+    "image_button[8.8,5.1;0.8,0.8;"..IMG_FILT_LIGHT..";"..FILTER_LIGHTS_BTN..";;false;false;]"
+end
+
+local function get_sort_section(sortHighImg) return
+  "label[10.5,5.5;"..S("Sort").."]"..
+  "image[11.0,5;1,1;"..sortHighImg.name.."]"..
+  "image[11.9,5;1,1;"..sortHighImg.mod.."]"..
+  "image[12.8,5;1,1;"..sortHighImg.count.."]"..
+  "image[13.7,5;1,1;"..sortHighImg.wear.."]"..
+  "image_button[11.1,5.1;0.8,0.8;"..IMG_SORT_NAME..";"..SORT_NAME_BTN..";;false;false;]"..
+  "image_button[12.0,5.1;0.8,0.8;"..IMG_SORT_MOD..";"..SORT_MOD_BTN..";;false;false;]"..
+  "image_button[12.9,5.1;0.8,0.8;"..IMG_SORT_COUNT..";"..SORT_COUNT_BTN..";;false;false;]"..
+  "image_button[13.8,5.1;0.8,0.8;"..IMG_SORT_WEAR..";"..SORT_WEAR_BTN..";;false;false;]"
+end
+
+local function get_search_and_page_section(searchTerm, pageInfo) return
+  "field[5.2,6.5;2.8,0.8;"..SEARCH_FIELD..";;"..searchTerm.."]"..
+  "field_close_on_enter["..SEARCH_FIELD..";false]"..
+  "image_button[8.1,6.5;0.8,0.8;logistica_icon_search.png;"..SEARCH_BTN..";;false;false;]"..
+  "image_button[9.2,6.5;0.8,0.8;logistica_icon_cancel.png;"..CLEAR_BTN..";;false;false;]"..
+  "tooltip["..SEARCH_BTN..";"..STR_SERCH_DESC .."]"..
+  "tooltip["..CLEAR_BTN..";"..STR_CLEAR_DESC.."]"..
+  "label[12.0,6.3;"..S("Page")..": "..pageInfo.curr.." / "..pageInfo.max.."]"..
+  "image_button[10.6,6.5;0.8,0.8;logistica_icon_first.png;"..FRST_BTN..";;false;false;]"..
+  "image_button[11.7,6.5;0.8,0.8;logistica_icon_prev.png;"..PREV_BTN..";;false;false;]"..
+  "image_button[12.8,6.5;0.8,0.8;logistica_icon_next.png;"..NEXT_BTN..";;false;false;]"..
+  "image_button[13.9,6.5;0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
+end
+
 local function get_access_point_formspec(pos, optMeta, playerName)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or minetest.get_meta(pos)
@@ -73,53 +135,15 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "image[2.8,6.4;1,1;logistica_icon_input.png]"..
     "list["..posForm..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
-    "listring[]"..
     "label[1.4,12.2;"..S("Crafting").."]"..
     "list[current_player;craft;0.2,8.4;3,3;]"..
     "list[current_player;craftpreview;3.9,8.4;1,1;]"..
-    "listring[current_player;craft]"..
-    "listring[current_player;main]"..
-    "listring[current_player;craftpreview]"..
-    "listring[current_player;main]"..
-    "button[1.4,5.2;2.6,0.6;"..USE_META_BTN..";"..usesMetaStr.."]"..
-    "tooltip["..USE_META_BTN..";"..STR_METADATA_DESC.."]"..
-    "label[4.3,5.5;"..S("Filter").."]"..
-    "image[5.1,5;1,1;"..filterHighImg.all.."]"..
-    "image[6.0,5;1,1;"..filterHighImg.node.."]"..
-    "image[6.9,5;1,1;"..filterHighImg.craftitem.."]"..
-    "image[7.8,5;1,1;"..filterHighImg.tools.."]"..
-    "image[8.7,5;1,1;"..filterHighImg.lights.."]"..
-    "image_button[5.2,5.1;0.8,0.8;"..IMG_FILT_ALL..";"..FILTER_ALL_BTN..";;false;false;]"..
-    "image_button[6.1,5.1;0.8,0.8;"..IMG_FILT_NODE..";"..FILTER_NODES_BTN..";;false;false;]"..
-    "image_button[7.0,5.1;0.8,0.8;"..IMG_FILT_ITEM..";"..FILTER_CRFTITM_BTN..";;false;false;]"..
-    "image_button[7.9,5.1;0.8,0.8;"..IMG_FILT_TOOL..";"..FILTER_TOOLS_BTN..";;false;false;]"..
-    "image_button[8.8,5.1;0.8,0.8;"..IMG_FILT_LIGHT..";"..FILTER_LIGHTS_BTN..";;false;false;]"..
-    "tooltip["..FILTER_ALL_BTN..";"..STR_ALL_DESC.."]"..
-    "tooltip["..FILTER_NODES_BTN..";"..STR_NODES_DESC.."]"..
-    "tooltip["..FILTER_CRFTITM_BTN..";"..STR_CRAFT_DESC.."]"..
-    "tooltip["..FILTER_TOOLS_BTN..";"..STR_TOOLS_DESC.."]"..
-    "tooltip["..FILTER_LIGHTS_BTN..";"..STR_LIGHT_DESC.."]"..
-    "label[10.5,5.5;"..S("Sort").."]"..
-    "image[11.0,5;1,1;"..sortHighImg.name.."]"..
-    "image[11.9,5;1,1;"..sortHighImg.mod.."]"..
-    "image[12.8,5;1,1;"..sortHighImg.count.."]"..
-    "image[13.7,5;1,1;"..sortHighImg.wear.."]"..
-    "image_button[11.1,5.1;0.8,0.8;"..IMG_SORT_NAME..";"..SORT_NAME_BTN..";;false;false;]"..
-    "image_button[12.0,5.1;0.8,0.8;"..IMG_SORT_MOD..";"..SORT_MOD_BTN..";;false;false;]"..
-    "image_button[12.9,5.1;0.8,0.8;"..IMG_SORT_COUNT..";"..SORT_COUNT_BTN..";;false;false;]"..
-    "image_button[13.8,5.1;0.8,0.8;"..IMG_SORT_WEAR..";"..SORT_WEAR_BTN..";;false;false;]"..
+    get_listrings(posForm)..
+    get_filter_section(usesMetaStr, filterHighImg)..
+    get_tooltips()..
+    get_sort_section(sortHighImg)..
     "label[5.3,6.3;"..S("Network: ")..currentNetwork.."]"..
-    "field[5.2,6.5;2.8,0.8;"..SEARCH_FIELD..";;"..searchTerm.."]"..
-    "field_close_on_enter["..SEARCH_FIELD..";false]"..
-    "image_button[8.1,6.5;0.8,0.8;logistica_icon_search.png;"..SEARCH_BTN..";;false;false;]"..
-    "image_button[9.2,6.5;0.8,0.8;logistica_icon_cancel.png;"..CLEAR_BTN..";;false;false;]"..
-    "tooltip["..SEARCH_BTN..";"..STR_SERCH_DESC .."]"..
-    "tooltip["..CLEAR_BTN..";"..STR_CLEAR_DESC.."]"..
-    "label[12.0,6.3;"..S("Page")..": "..pageInfo.curr.." / "..pageInfo.max.."]"..
-    "image_button[10.6,6.5;0.8,0.8;logistica_icon_first.png;"..FRST_BTN..";;false;false;]"..
-    "image_button[11.7,6.5;0.8,0.8;logistica_icon_prev.png;"..PREV_BTN..";;false;false;]"..
-    "image_button[12.8,6.5;0.8,0.8;logistica_icon_next.png;"..NEXT_BTN..";;false;false;]"..
-    "image_button[13.9,6.5;0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
+    get_search_and_page_section(searchTerm, pageInfo)
 end
 
 local function show_access_point_formspec(pos, playerName, optMeta)
@@ -204,19 +228,23 @@ function logistica.access_point_allow_take(pos, listname, index, _stack, player)
       show_access_point_formspec(pos, player:get_player_name())
       return 0
     end
+    local stackMax = stack:get_stack_max()
     -- either way, only allow taking up to stack max
-    stack:set_count(math.min(stack:get_count(), stack:get_stack_max()))
-    if stack:get_stack_max() > 1 then
+    stack:set_count(math.min(stack:get_count(), stackMax))
+    -- remove the sometimes manually added count display
+    stack:get_meta():set_string("count_meta", nil)
+    if stackMax > 1 then
       local taken = nil
       local acceptTaken = function(st) taken = st; return 0 end
       logistica.take_stack_from_network(stack, network, acceptTaken)
       if not taken or taken:is_empty() then return 0 end
-      return math.min(taken:get_count(), stack:get_stack_max())
+      return math.min(taken:get_count(), stackMax)
     else -- individual items are trickier 
       -- we want to take the actual item, so place it in the slot before its taken
       local useMetadata = logistica.access_point_is_set_to_use_metadata(pos)
       local taken = nil
       local acceptTaken = function(st) taken = st; return 0 end
+      -- for the rare case where two items got stacked despite using metadata
       logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
       if not taken or taken:is_empty() then return 0 end
       local inv = minetest.get_meta(pos):get_inventory()
@@ -239,9 +267,11 @@ function logistica.access_point_on_put(pos, listname, index, stack, player)
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then show_access_point_formspec(pos, player:get_player_name()) ; return end
   if listname == INV_INSERT then
-    local leftover = logistica.insert_item_in_network(stack, networkId)
+    local inv = minetest.get_meta(pos):get_inventory()
+    local stackToAdd = inv:get_stack(listname, index)
+    local leftover = logistica.insert_item_in_network(stackToAdd, networkId)
     stack:set_count(leftover)
-    minetest.get_meta(pos):get_inventory():set_stack(listname, index, stack)
+    inv:set_stack(listname, index, stack)
     show_access_point_formspec(pos, player:get_player_name())
   end
 end
