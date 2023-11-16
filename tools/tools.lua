@@ -14,7 +14,7 @@ minetest.register_craftitem("logistica:hyperspanner",{
     local network = logistica.get_network_name_or_nil(pos) or S("<NONE>")
     logistica.show_popup(
       placer:get_player_name(), 
-      "("..pos.x..","..pos.y..","..pos.z..") .."..S("Network")..": "..network
+      "("..pos.x..","..pos.y..","..pos.z..") "..S("Network")..": "..network
     )
   end
 })
