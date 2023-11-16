@@ -21,8 +21,6 @@ local SEARCH_FIELD = "srch_fld"
 local USE_META_BTN = "tgl_meta"
 
 local INV_FAKE = "fake"
-local INV_CRAFT = "craft"
-local INV_CRAFT_OUTPUT = "output"
 local INV_INSERT = "isert"
 local FAKE_INV_W = 12
 local FAKE_INV_H = 4
@@ -42,9 +40,15 @@ local IMG_FILT_LIGHT = "logistica_icon_torch.png"
 
 local ACCESS_POINT_TIMER = 1
 
+local STR_METADATA_DESC = S("Toggle using metadata to display items:\nON = Differentiate items using metadata\nOFF = Group items only by name, ignore metadata")
+local STR_ALL_DESC = S("Show All items")
+local STR_NODES_DESC = S("Show Nodes only")
+local STR_CRAFT_DESC = S("Show Craft items only")
+local STR_TOOLS_DESC = S("Show Tools only")
+local STR_LIGHT_DESC = S("Show Light sources only")
+
+
 local accessPointForms = {}
-
-
 
 ----------------------------------------------------------------
 -- formspec
@@ -68,10 +72,15 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "list["..posForm..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
     "listring[]"..
-    -- "label[1.4,12.2;"..S("Crafting").."]"..
-    -- "list["..posForm..";"..INV_CRAFT..";0.2,8.4;3,3;0]"..
-    -- "list["..posForm..";"..INV_CRAFT_OUTPUT..";3.9,8.4;1,1;0]"..
+    "label[1.4,12.2;"..S("Crafting").."]"..
+    "list[current_player;craft;0.2,8.4;3,3;]"..
+    "list[current_player;craftpreview;3.9,8.4;1,1;]"..
+    "listring[current_player;craft]"..
+    "listring[current_player;main]"..
+    "listring[current_player;craftpreview]"..
+    "listring[current_player;main]"..
     "button[1.4,5.2;2.6,0.6;"..USE_META_BTN..";"..usesMetaStr.."]"..
+    "tooltip["..USE_META_BTN..";"..STR_METADATA_DESC.."]"..
     "label[4.3,5.5;"..S("Filter").."]"..
     "image[5.1,5;1,1;"..filterHighImg.all.."]"..
     "image[6.0,5;1,1;"..filterHighImg.node.."]"..
@@ -83,6 +92,11 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "image_button[7.0,5.1;0.8,0.8;"..IMG_FILT_ITEM..";"..FILTER_CRFTITM_BTN..";;false;false;]"..
     "image_button[7.9,5.1;0.8,0.8;"..IMG_FILT_TOOL..";"..FILTER_TOOLS_BTN..";;false;false;]"..
     "image_button[8.8,5.1;0.8,0.8;"..IMG_FILT_LIGHT..";"..FILTER_LIGHTS_BTN..";;false;false;]"..
+    "tooltip["..FILTER_ALL_BTN..";"..STR_ALL_DESC.."]"..
+    "tooltip["..FILTER_NODES_BTN..";"..STR_NODES_DESC.."]"..
+    "tooltip["..FILTER_CRFTITM_BTN..";"..STR_CRAFT_DESC.."]"..
+    "tooltip["..FILTER_TOOLS_BTN..";"..STR_TOOLS_DESC.."]"..
+    "tooltip["..FILTER_LIGHTS_BTN..";"..STR_LIGHT_DESC.."]"..
     "label[10.5,5.5;"..S("Sort").."]"..
     "image[11.0,5;1,1;"..sortHighImg.name.."]"..
     "image[11.9,5;1,1;"..sortHighImg.mod.."]"..
@@ -102,7 +116,6 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "image_button[11.7,6.5;0.8,0.8;logistica_icon_prev.png;"..PREV_BTN..";;false;false;]"..
     "image_button[12.8,6.5;0.8,0.8;logistica_icon_next.png;"..NEXT_BTN..";;false;false;]"..
     "image_button[13.9,6.5;0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
-    -- TODO tooltips
 end
 
 local function show_access_point_formspec(pos, playerName, optMeta)
@@ -171,14 +184,11 @@ end
 function logistica.access_point_after_place(pos, meta)
   local inv  = meta:get_inventory()
   inv:set_size(INV_FAKE, FAKE_INV_SIZE)
-  inv:set_size(INV_CRAFT, 9)
-  inv:set_width(INV_CRAFT, 3)
-  inv:set_size(INV_CRAFT_OUTPUT, 1)
   inv:set_size(INV_INSERT, 1)
 end
 
 function logistica.access_point_allow_put(pos, listname, index, stack, player)
-  if listname == INV_FAKE or listname == INV_CRAFT_OUTPUT then return 0 end
+  if listname == INV_FAKE then return 0 end
   return stack:get_count()
 end
 
@@ -214,12 +224,11 @@ function logistica.access_point_allow_take(pos, listname, index, _stack, player)
 end
 
 function logistica.access_point_allow_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if from_list == INV_FAKE or to_list == INV_FAKE or to_list == INV_CRAFT_OUTPUT then return 0 end
+  if from_list == INV_FAKE or to_list == INV_FAKE then return 0 end
   return count
 end
 
 function logistica.access_point_on_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-
 end
 
 function logistica.access_point_on_put(pos, listname, index, stack, player)
