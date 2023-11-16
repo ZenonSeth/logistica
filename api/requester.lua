@@ -1,3 +1,4 @@
+local S = logistica.TRANSLATOR
 
 local NUM_REQUEST_SLOTS = 4 -- maybe at some point make this a param, but why?
 local PUSH_LIST_PICKER = "push_pick"
@@ -12,12 +13,13 @@ local function get_requester_formspec(pos)
   local selectedList = logistica.get_requester_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size[10.6,7]" ..
+    "size[10.6,7.2]" ..
     logistica.ui.background..
-    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 0.7, pushPos, selectedList, "Put items in:")..
-    logistica.ui.on_off_btn(isOn, 9.3, 0.5, ON_OFF_BUTTON, "Enable")..
-    "list["..posForm..";filter;0.5,0.5;"..NUM_REQUEST_SLOTS..",1;0]"..
-    "list[current_player;main;0.5,2;8,4;0]"
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.2, pushPos, selectedList, S("Put items in:"))..
+    logistica.ui.on_off_btn(isOn, 9.3, 1.0, ON_OFF_BUTTON, S("Enable"))..
+    "label[0.5,0.4;"..S("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
+    "list["..posForm..";filter;0.5,0.7;"..NUM_REQUEST_SLOTS..",1;0]"..
+    "list[current_player;main;0.5,2.2;8,4;0]"
 end
 
 local function show_requester_formspec(playerName, pos)
