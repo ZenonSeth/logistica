@@ -40,12 +40,14 @@ local IMG_FILT_LIGHT = "logistica_icon_torch.png"
 
 local ACCESS_POINT_TIMER = 1
 
-local STR_METADATA_DESC = S("Toggle using metadata to display items:\nON = Differentiate items using metadata\nOFF = Group items only by name, ignore metadata")
+local STR_METADATA_DESC = S("Applies to Tools only:\nON = Differentiate items using metadata\nOFF = Group items only by name, ignore metadata")
 local STR_ALL_DESC = S("Show All items")
 local STR_NODES_DESC = S("Show Nodes only")
 local STR_CRAFT_DESC = S("Show Craft items only")
 local STR_TOOLS_DESC = S("Show Tools only")
 local STR_LIGHT_DESC = S("Show Light sources only")
+local STR_SERCH_DESC = S("Search by text\nUse group:some_group to find items belongong to some_group")
+local STR_CLEAR_DESC = S("Clear search")
 
 
 local accessPointForms = {}
@@ -111,6 +113,8 @@ local function get_access_point_formspec(pos, optMeta, playerName)
     "field_close_on_enter["..SEARCH_FIELD..";false]"..
     "image_button[8.1,6.5;0.8,0.8;logistica_icon_search.png;"..SEARCH_BTN..";;false;false;]"..
     "image_button[9.2,6.5;0.8,0.8;logistica_icon_cancel.png;"..CLEAR_BTN..";;false;false;]"..
+    "tooltip["..SEARCH_BTN..";"..STR_SERCH_DESC .."]"..
+    "tooltip["..CLEAR_BTN..";"..STR_CLEAR_DESC.."]"..
     "label[12.0,6.3;"..S("Page")..": "..pageInfo.curr.." / "..pageInfo.max.."]"..
     "image_button[10.6,6.5;0.8,0.8;logistica_icon_first.png;"..FRST_BTN..";;false;false;]"..
     "image_button[11.7,6.5;0.8,0.8;logistica_icon_prev.png;"..PREV_BTN..";;false;false;]"..

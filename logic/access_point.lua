@@ -75,7 +75,7 @@ local function add_list_to_itemmap(itemMap, list, useMetadata)
   for _, stack in ipairs(list) do
     if not stack:is_empty() then
       local stackName = stack:get_name()
-      if useMetadata then stackName = stack:to_string() end
+      if useMetadata and stack:get_stack_max() == 1 then stackName = stack:to_string() end
       if itemMap[stackName] == nil then itemMap[stackName] = 0 end
       itemMap[stackName] = itemMap[stackName] + stack:get_count()
     end
@@ -110,6 +110,9 @@ local function build_stack_list(pos)
   for item, count in pairs(itemMap) do
     local stack = ItemStack(item)
     stack:set_count(count)
+    if count > 1 and stack:get_stack_max() == 1 then
+      stack:get_meta():set_string("count_meta", tostring(count))
+    end
     listSize = listSize + 1
     itemList[listSize] = stack
   end
