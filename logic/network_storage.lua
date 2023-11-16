@@ -152,28 +152,21 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   return false
 end
 
--- try to insert the item into the storage, returning how many items remain
-function logistica.try_to_add_item_to_storage(pos, inputStack, dryRun)
-  local node = minetest.get_node(pos)
-  if not logistica.is_mass_storage(node.name) and not logistica.is_item_storage(node.name) then return 0 end
-  local isMassStorage = logistica.is_mass_storage(node.name)
-  logistica.load_position(pos)
-  local inv = minetest.get_meta(pos):get_inventory()
-  if isMassStorage then
-    local remainingStack = logistica.insert_item_into_mass_storage(pos, inv, inputStack, dryRun)
-    return remainingStack:get_count()
-  else -- it's not mass storage, must be tool storage
-    if logistica.is_machine_on(pos) and inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
-      -- tool storage only takes individual items
+-- try to insert the item into the item storage, returning a stack of remaining items
+function logistica.insert_item_into_item_storage(pos, inv, inputStack, dryRun)
+  if logistica.is_machine_on(pos) and inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
+    -- tool storage only takes individual items
+    if not dryRun then
       inv:add_item("main", inputStack)
-      return 0
     end
+    return ItemStack("")
+  else
+    return inputStack
   end
-  return inputStack:get_count()
 end
 
 -- attempts to insert the given itemstack in the network, returns how many items remain
-function logistica.insert_item_in_network(itemstack, networkId)
+function logistica.insert_item_in_network(itemstack, networkId, dryRun)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not itemstack or itemstack:is_empty() then return 0 end
   if not network then return itemstack:get_count() end
@@ -192,17 +185,20 @@ function logistica.insert_item_in_network(itemstack, networkId)
 
   -- check storages
   local storages = {}
+  local addFunc = nil
   if itemstack:get_stack_max() <= 1 then
     storages = network.item_storage
+    addFunc = logistica.insert_item_into_item_storage
   else
     storages = network.storage_cache[itemstack:get_name()] or {}
+    addFunc = logistica.insert_item_into_mass_storage
   end
   for hash, _ in pairs(storages) do
     local pos = minetest.get_position_from_hash(hash)
-    logistica.load_position(pos)
-    local remain = logistica.try_to_add_item_to_storage(pos, workingStack)
-    if remain <= 0 then return 0 end -- we took all items
-    workingStack:set_count(remain)
+    local inv = get_meta(pos):get_inventory()
+    local remainingStack = addFunc(pos, inv, workingStack, dryRun)
+    if remainingStack:is_empty() then return 0 end -- we took all items
+    workingStack = remainingStack
   end
 
   -- finally try to add to passive suppliers that accept this

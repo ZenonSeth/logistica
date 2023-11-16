@@ -58,7 +58,6 @@ end
 
 -- Returns a stack of how many items remain
 function logistica.insert_item_into_mass_storage(pos, inv, inputStack, dryRun)
-  if dryRun == nil then dryRun = false end
   local maxItems = logistica.get_mass_storage_max_size(pos)
   local numSlots = #(inv:get_list("filter"))
   local inputStackName = inputStack:get_name()
