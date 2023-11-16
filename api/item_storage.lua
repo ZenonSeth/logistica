@@ -67,18 +67,18 @@ local function after_place_item_storage(pos, _, _)
   logistica.on_item_storage_change(pos)
 end
 
-local function allow_item_storage_storage_inv_put(_, _, _, stack, player)
+local function allow_item_storage_storage_inv_put(pos, _, _, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if stack:get_stack_max() > 1 then return 0 end
   return stack:get_count()
 end
 
-local function allow_item_storage_inv_take(_, _, _, stack, player)
+local function allow_item_storage_inv_take(pos, _, _, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
-local function allow_item_storage_inv_move(_, _, _, _, _, count, player)
+local function allow_item_storage_inv_move(pos, _, _, _, _, count, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return count
 end
