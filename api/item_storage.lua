@@ -55,7 +55,7 @@ end
 
 local function on_item_storage_rightclick(pos, _, clicker, _, _)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return 0 end
+  if minetest.is_protected(pos, clicker:get_player_name()) then return end
   show_item_storage_formspec(clicker:get_player_name(), pos)
 end
 

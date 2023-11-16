@@ -39,7 +39,7 @@ local function on_access_point_inv_take(pos, listname, index, stack, player)
 end
 
 local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed_thing)
-  if minetest.is_protected(pos, clicker:get_player_name()) then return 0 end
+  if minetest.is_protected(pos, clicker:get_player_name()) then return end
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 

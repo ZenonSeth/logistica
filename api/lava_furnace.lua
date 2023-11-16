@@ -292,6 +292,7 @@ local function lava_furnace_can_dig(pos)
 end
 
 local function lava_furnace_allow_metadata_inv_put(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname == INV_INPT or listname == INV_ADDI then
     return stack:get_count()
   elseif listname == INV_FUEL
@@ -303,10 +304,12 @@ local function lava_furnace_allow_metadata_inv_put(pos, listname, index, stack, 
 end
 
 local function lava_furnace_allow_metadata_inv_take(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function lava_furnace_allow_metadata_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if to_list == INV_ADDI or to_list == INV_INPT then
     return count
   elseif to_list == INV_FUEL then
