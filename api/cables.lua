@@ -1,25 +1,24 @@
-
+local SIZE = 1/16
 
 
 -- Main function to register a new cable of certain tier
 -- customNodeBox  can specify any of the fixed/connect_DIR - values will be overwritten per-item basis
-function logistica.register_cable(desc, name, size, customNodeBox)
+function logistica.register_cable(desc, name, customNodeBox)
   local lname = string.lower(name)
   local cable_name = "logistica:" .. lname
-  local cable_group = logistica.get_cable_group(lname)
+  local cable_group = logistica.TIER_ALL
   logistica.cables[cable_name] = name
-  logistica.tiers[lname] = true
 	local cnb = customNodeBox or {}
 
   local node_box = {
     type           = "connected",
-    fixed          = cnb.fixed          or { -size, -size, -size, size, size, size },
-    connect_top    = cnb.connect_top    or { -size, -size, -size, size, 0.5, size }, -- y+
-    connect_bottom = cnb.connect_bottom or { -size, -0.5, -size, size, size, size }, -- y-
-    connect_front  = cnb.connect_front  or { -size, -size, -0.5, size, size, size }, -- z-
-    connect_back   = cnb.connect_back   or { -size, -size, size, size, size, 0.5 }, -- z+
-    connect_left   = cnb.connect_left   or { -0.5, -size, -size, size, size, size }, -- x-
-    connect_right  = cnb.connect_right  or { -size, -size, -size, 0.5, size, size }, -- x+
+    fixed          = cnb.fixed          or { -SIZE, -SIZE, -SIZE, SIZE, SIZE, SIZE },
+    connect_top    = cnb.connect_top    or { -SIZE, -SIZE, -SIZE, SIZE, 0.5,  SIZE }, -- y+
+    connect_bottom = cnb.connect_bottom or { -SIZE, -0.5,  -SIZE, SIZE, SIZE, SIZE }, -- y-
+    connect_front  = cnb.connect_front  or { -SIZE, -SIZE, -0.5,  SIZE, SIZE, SIZE }, -- z-
+    connect_back   = cnb.connect_back   or { -SIZE, -SIZE,  SIZE, SIZE, SIZE, 0.5  }, -- z+
+    connect_left   = cnb.connect_left   or { -0.5,  -SIZE, -SIZE, SIZE, SIZE, SIZE }, -- x-
+    connect_right  = cnb.connect_right  or { -SIZE, -SIZE, -SIZE, 0.5,  SIZE, SIZE }, -- x+
   }
 
   local def = {
@@ -40,7 +39,7 @@ function logistica.register_cable(desc, name, size, customNodeBox)
     sunlight_propagates = true,
     drawtype = "nodebox",
     node_box = node_box,
-    connects_to = { "group:" .. cable_group, "group:"..logistica.get_machine_group(lname), logistica.GROUP_ALL },
+    connects_to = { "group:" .. cable_group, logistica.GROUP_ALL },
     on_construct = function(pos) logistica.on_cable_change(pos, nil) end,
     after_destruct = function(pos, oldnode) logistica.on_cable_change(pos, oldnode) end,
   }
@@ -53,7 +52,7 @@ function logistica.register_cable(desc, name, size, customNodeBox)
   def_broken.inventory_image = "logistica_" .. lname .. "_inv.png^logistica_broken.png"
   def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
   def_broken.description = "Broken " .. desc
-  def_broken.node_box = { type = "fixed", fixed = { -0.5, -size, -size, 0.5, size, size } }
+  def_broken.node_box = { type = "fixed", fixed = { -0.5, -SIZE, -SIZE, 0.5, SIZE, SIZE } }
   def_broken.selection_box = def_broken.node_box
   def_broken.connects_to = nil
   def_broken.on_construct = nil

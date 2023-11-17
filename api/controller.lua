@@ -74,17 +74,10 @@ end)
 
   tier may be `nil` which will result in the controller connecting to everything
 ]]
-function logistica.register_controller(name, def, tier)
-  local controller_group = nil
-  if not tier then
-    tier = logistica.TIER_ALL
-    controller_group = logistica.TIER_ALL
-  else
-    local ltier = string.lower(tier)
-    logistica.tiers[ltier] = true
-    controller_group = logistica.get_machine_group(ltier)
-  end
-   local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
+function logistica.register_controller(name, def)
+  local controller_group = logistica.TIER_ALL
+  local tier = logistica.TIER_ALL
+  local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
   logistica.controllers[controller_name] = tier
 
   local on_construct = function(pos)

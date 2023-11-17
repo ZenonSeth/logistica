@@ -115,8 +115,6 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
     local pos = h2p(posHash)
     numScanned = numScanned + 1
     logistica.load_position(pos)
-    local tiers = logistica.get_item_tiers(minetest.get_node(pos).name)
-    local isAllTier = tiers[logistica.TIER_ALL] == true
     for _, offset in pairs(adjecent) do
       local otherPos = vector.add(pos, offset)
       logistica.load_position(otherPos)
@@ -125,51 +123,44 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
       if network.controller ~= otherHash
           and not has_machine(network, otherHash)
           and network.cables[otherHash] == nil then
-        local tiersMatch = isAllTier
-        if tiersMatch ~= true then
-          local otherTiers = logistica.get_item_tiers(minetest.get_node(otherPos).name)
-          tiersMatch = logistica.do_tiers_match(tiers, otherTiers)
+        local existingNetwork = logistica.get_network_id_or_nil(otherPos)
+        if existingNetwork ~= nil and existingNetwork ~= network then
+          return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
         end
-        if tiersMatch then
-          local existingNetwork = logistica.get_network_id_or_nil(otherPos)
-          if existingNetwork ~= nil and existingNetwork ~= network then
-            return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
-          end
-          local valid = false
-          if logistica.is_cable(otherName) then
-            network.cables[otherHash] = true
-            connections[otherHash] = true
-            valid = true
-          elseif logistica.is_requester(otherName) then
-            network.requesters[otherHash] = true
-            valid = true
-          elseif logistica.is_injector(otherName) then
-            network.injectors[otherHash] = true
-            valid = true
-          elseif logistica.is_supplier(otherName) then
-            network.suppliers[otherHash] = true
-            valid = true
-          elseif logistica.is_vaccuum_supplier(otherName) then
-            network.suppliers[otherHash] = true
-            valid = true
-          elseif logistica.is_mass_storage(otherName) then
-            network.mass_storage[otherHash] = true
-            valid = true
-          elseif logistica.is_item_storage(otherName) then
-            network.item_storage[otherHash] = true
-            valid = true
-          elseif logistica.is_misc(otherName) then
-            network.misc[otherHash] = true
-            valid = true
-          elseif logistica.is_trashcan(otherName) then
-            network.trashcans[otherHash] = true
-            valid = true
-          end
-          if valid then
-            newToScan = newToScan + 1
-            notify_connected(otherPos, otherName, network.controller)
-          end
-        end -- end if tiersMatch
+        local valid = false
+        if logistica.is_cable(otherName) then
+          network.cables[otherHash] = true
+          connections[otherHash] = true
+          valid = true
+        elseif logistica.is_requester(otherName) then
+          network.requesters[otherHash] = true
+          valid = true
+        elseif logistica.is_injector(otherName) then
+          network.injectors[otherHash] = true
+          valid = true
+        elseif logistica.is_supplier(otherName) then
+          network.suppliers[otherHash] = true
+          valid = true
+        elseif logistica.is_vaccuum_supplier(otherName) then
+          network.suppliers[otherHash] = true
+          valid = true
+        elseif logistica.is_mass_storage(otherName) then
+          network.mass_storage[otherHash] = true
+          valid = true
+        elseif logistica.is_item_storage(otherName) then
+          network.item_storage[otherHash] = true
+          valid = true
+        elseif logistica.is_misc(otherName) then
+          network.misc[otherHash] = true
+          valid = true
+        elseif logistica.is_trashcan(otherName) then
+          network.trashcans[otherHash] = true
+          valid = true
+        end
+        if valid then
+          newToScan = newToScan + 1
+          notify_connected(otherPos, otherName, network.controller)
+        end
       end -- end of general checks
     end -- end inner for loop
   end -- end outer for loop
@@ -239,23 +230,13 @@ local function rescan_network(networkId)
   create_network(controllerPosition, oldNetworkName)
 end
 
-local function find_cable_connections(pos, node)
+local function find_cable_connections(pos)
   local connections = {}
   for _, offset in pairs(adjecent) do
     local otherPos = vector.add(pos, offset)
     local otherNode = minetest.get_node_or_nil(otherPos)
-    if otherNode then
-      if otherNode.name == node.name then
-        table.insert(connections, otherPos)
-      elseif minetest.get_item_group(otherNode, logistica.GROUP_ALL) > 0 then
-        table.insert(connections, otherPos)
-      else -- check if adjecent node is a machine of same tier
-        local nodeTiers = logistica.get_item_tiers(node.name)
-        local otherTiers = logistica.get_item_tiers(otherNode.name)
-        if logistica.do_tiers_match(nodeTiers, otherTiers) then
-          table.insert(connections, otherPos)
-        end
-      end
+    if otherNode and minetest.get_item_group(otherNode.name, logistica.TIER_ALL) > 0 then
+      table.insert(connections, otherPos)
     end
   end
   return connections
@@ -349,12 +330,15 @@ end
 -- global namespaced functions
 ----------------------------------------------------------------
 
-function logistica.on_cable_change(pos, oldNode)
+function logistica.on_cable_change(pos, oldNode, wasPlacedOverride)
   local node = oldNode or minetest.get_node(pos)
   local meta = minetest.get_meta(pos)
-  local placed = (oldNode == nil) -- if oldNode is nil, we placed it
+  local placed = wasPlacedOverride
+  if placed == nil then
+    placed = (oldNode == nil) -- if oldNode is nil, we placed it
+  end
 
-  local connections = find_cable_connections(pos, node)
+  local connections = find_cable_connections(pos)
   if not connections or #connections < 1 then return end -- nothing to update
   local networkEnd = #connections == 1
 
@@ -362,7 +346,7 @@ function logistica.on_cable_change(pos, oldNode)
     if not placed then -- removed a network end
       local network = logistica.get_network_or_nil(pos)
       if network then network.cables[p2h(pos)] = nil end
-  elseif cable_can_extend_network_from(connections[1]) then
+    elseif cable_can_extend_network_from(connections[1]) then
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
         otherNetwork.cables[p2h(pos)] = true
@@ -375,7 +359,7 @@ function logistica.on_cable_change(pos, oldNode)
   local connectedNetworks = {}
   for _, connectedPos in pairs(connections) do
     local otherNetwork = logistica.get_network_id_or_nil(connectedPos)
-    if otherNetwork and cable_can_extend_network_from(connectedPos) then
+    if otherNetwork then
       connectedNetworks[otherNetwork] = true
     end
   end

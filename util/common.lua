@@ -197,3 +197,8 @@ function logistica.random_chance(percent)
   return percent >= math.random(1, 100)
 end
 
+function logistica.table_map(table, func)
+  local t = {}
+  for k,v in pairs(table) do t[k] = func(v) end
+  return t
+end

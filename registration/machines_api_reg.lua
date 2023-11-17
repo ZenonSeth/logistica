@@ -15,14 +15,21 @@ logistica.register_access_point("Access Point", "access_point", {
 -- Cables
 --------------------------------
 
-local CABLE_SIZE = 1/16
-logistica.register_cable("Optic cable", "optic_cable", CABLE_SIZE)
+-- regular
+logistica.register_cable("Optic cable", "optic_cable")
 -- TODO: plate + cable = masked cable
 -- logistica.register_cable("Optic cable", "optic_wall", CABLE_SIZE, {
 --   fixed = {
 --     { -CABLE_SIZE, -CABLE_SIZE, -CABLE_SIZE, CABLE_SIZE, CABLE_SIZE, CABLE_SIZE }
 --   }
 -- })
+
+-- toggleable
+logistica.register_cable_toggleable("Toggleable Cable", "toggleable_cable",
+  {"logistica_cable_toggleable_on.png"},
+  {"logistica_cable_toggleable_off.png"}
+)
+
 --------------------------------
 -- Controller
 --------------------------------
