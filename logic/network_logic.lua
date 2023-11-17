@@ -83,21 +83,23 @@ local function break_logistica_node(pos)
   logistica.swap_node(pos, node.name .. "_disabled")
 end
 
--- returns a naturally numbered list of networks on adjecent nodes
+-- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
 local function find_adjecent_networks(pos)
-  local connectedNetworks = {}
+  local currNetwork = nil
   for _, adj in pairs(adjecent) do
     local otherPos = vector.add(pos, adj)
-    local otherNetwork = logistica.get_network_id_or_nil(otherPos)
-    if otherNetwork then
-      connectedNetworks[otherNetwork] = true
+    local otherNodeName = minetest.get_node(otherPos).name
+    if logistica.is_cable(otherNodeName) or logistica.is_controller(otherNodeName) then
+      local otherNetwork = logistica.get_network_or_nil(otherPos)
+      if otherNetwork ~= nil then
+        if currNetwork == nil then currNetwork = otherNetwork
+        elseif currNetwork ~= otherNetwork then return 2, nil end
+      end
     end
   end
-  local retNetworks = {}
-  for k,_ in pairs(connectedNetworks) do
-    table.insert(retNetworks, networks[k])
-  end
-  return retNetworks
+  local numNetworks = 1
+  if currNetwork == nil then numNetworks = 0 end
+  return numNetworks, currNetwork
 end
 
 local function recursive_scan_for_nodes_for_controller(network, positionHashes, numScanned)
@@ -264,14 +266,15 @@ local function try_to_add_network(pos)
 end
 
 local function try_to_add_to_network(pos, ops)
-  local connectedNetworks = find_adjecent_networks(pos)
-  if #connectedNetworks <= 0 then return STATUS_OK end -- nothing to connect to
-  if #connectedNetworks >= 2 then
+  local networkCount, otherNetwork  = find_adjecent_networks(pos)
+  if networkCount <= 0 then return STATUS_OK end -- nothing to connect to
+  if networkCount >= 2 then
     break_logistica_node(pos) -- swap out storage node for disabled one 
     minetest.get_meta(pos):set_string("infotext", "ERROR: cannot connect to multiple networks!")
+    return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
   end
   -- else, we have 1 network, add us to it!
-  ops.get_list(connectedNetworks[1])[p2h(pos)] = true
+  ops.get_list(otherNetwork)[p2h(pos)] = true
   ops.update_cache_node_added(pos)
 end
 
