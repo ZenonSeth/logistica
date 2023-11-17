@@ -147,6 +147,9 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           elseif logistica.is_supplier(otherName) then
             network.suppliers[otherHash] = true
             valid = true
+          elseif logistica.is_vaccuum_supplier(otherName) then
+            network.suppliers[otherHash] = true
+            valid = true
           elseif logistica.is_mass_storage(otherName) then
             network.mass_storage[otherHash] = true
             valid = true

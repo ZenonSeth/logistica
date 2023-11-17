@@ -3,7 +3,6 @@ Missing Features:
 
 High Priority:
 - Vaccuum Supply Chest
-- Trash Can
 - Togglable Cable
 - Autocrafter
 

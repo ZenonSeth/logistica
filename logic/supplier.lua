@@ -23,6 +23,8 @@ end
 
 -- tries to put the given item in this supplier, returns what's leftover
 function logistica.put_item_in_supplier(pos, stack)
+  local nodeName = minetest.get_node(pos).name
+  if not logistica.is_supplier(nodeName) then return stack end
   -- only insert if its enabled
   if not logistica.is_machine_on(pos) then return stack end
   local origCount = stack:get_count()
