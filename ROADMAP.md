@@ -2,24 +2,22 @@ Missing Features:
 - None! Base Features complete!
 
 High Priority:
-- In-game guide book
-- Wirelss Network Extender
+- Vaccuum Supply Chest
+- Trash Can
 - Togglable Cable
+- Autocrafter
 
 Medium Priority
 - Lava Furnace inv_plus recpies
-- Vaccuum Supply Chest
-- Trash Can
-- Autocrafter
 - Network Crafter
 - Enable translation for all strings
-- Add crafting grid to Access Point
-- Mesecons compat
+- In-game guide book
+- Wirelss Network Extender
 
 Low Priority:
 - Liquid Storage
 - Rework old UI icons to be.. 48x48? 64x64? something else?
-- Rework all node models and textures; make new textures? 32x32
+- Mesecons compat
 - Improve node sounds
 
 Maybe not needed, unless specific common usecase found to support:
