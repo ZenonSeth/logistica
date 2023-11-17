@@ -2,7 +2,6 @@ Missing Features:
 - None! Base Features complete!
 
 High Priority:
-- Vaccuum Supply Chest
 - Togglable Cable
 - Autocrafter
 
