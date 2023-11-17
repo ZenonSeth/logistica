@@ -22,6 +22,7 @@ local function has_machine(network, id)
     or network.item_storage[id]
     or network.injectors[id]
     or network.misc[id]
+    or network.trashcans[id]
   then
     return true
   else
@@ -155,6 +156,9 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           elseif logistica.is_misc(otherName) then
             network.misc[otherHash] = true
             valid = true
+          elseif logistica.is_trashcan(otherName) then
+            network.trashcans[otherHash] = true
+            valid = true
           end
           if valid then
             newToScan = newToScan + 1
@@ -190,6 +194,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.mass_storage = {}
   network.item_storage = {}
   network.misc = {}
+  network.trashcans = {}
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
@@ -322,6 +327,12 @@ local ACCESS_POINT_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
+local TRASHCAN_OPS = {
+  get_list = function(network) return network.trashcans end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
@@ -411,4 +422,8 @@ end
 
 function logistica.on_access_point_change(pos, oldNode)
   on_node_change(pos, oldNode, ACCESS_POINT_OPS)
+end
+
+function logistica.on_trashcan_change(pos, oldNode)
+  on_node_change(pos, oldNode, TRASHCAN_OPS)
 end

@@ -95,6 +95,33 @@ logistica.register_item_storage("Tool Box\nStores Tools Only", "item_storage", {
 })
 
 --------------------------------
+-- Lava Furnace
+--------------------------------
+
+logistica.register_lava_furnace("Lava Furnace", "lava_furnace", 4, {
+  inactive = {
+    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
+    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
+    "logistica_lava_furnace_side.png", "logistica_lava_furnace_front_off.png"
+  },
+  active = {
+    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
+    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
+    "logistica_lava_furnace_side.png",
+    {
+      image = "logistica_lava_furnace_front_on_anim.png",
+      backface_culling = false,
+      animation = {
+        type = "vertical_frames",
+        aspect_w = 16,
+        aspect_h = 16,
+        length = 1.5
+      },
+    }
+  }
+})
+
+--------------------------------
 -- Mass Storage
 --------------------------------
 
@@ -134,28 +161,14 @@ logistica.register_supplier("Passive Supplier Chest", "passive_supplier", 16, {
 })
 
 --------------------------------
--- Lava Furnace
+-- Trashcan
 --------------------------------
 
-logistica.register_lava_furnace("Lava Furnace", "lava_furnace", 4, {
-  inactive = {
-    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
-    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
-    "logistica_lava_furnace_side.png", "logistica_lava_furnace_front_off.png"
-  },
-  active = {
-    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
-    "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
-    "logistica_lava_furnace_side.png",
-    {
-      image = "logistica_lava_furnace_front_on_anim.png",
-      backface_culling = false,
-      animation = {
-        type = "vertical_frames",
-        aspect_w = 16,
-        aspect_h = 16,
-        length = 1.5
-      },
-    }
-  }
+logistica.register_trashcan("Trashcan", "trashcan", {
+  "logistica_trashcan_top.png",
+  "logistica_trashcan_bottom.png",
+  "logistica_trashcan_side.png",
+  "logistica_trashcan_side.png",
+  "logistica_trashcan_side.png",
+  "logistica_trashcan_side.png",
 })

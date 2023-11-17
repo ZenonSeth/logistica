@@ -6,6 +6,7 @@ logistica.suppliers = {}
 logistica.mass_storage = {}
 logistica.item_storage = {}
 logistica.misc_machines = {}
+logistica.trashcans = {}
 logistica.tiers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
 logistica.GROUP_ALL = "group:" .. logistica.TIER_ALL
@@ -55,6 +56,10 @@ end
 
 function logistica.is_misc(name)
   return logistica.misc_machines[name] ~= nil
+end
+
+function logistica.is_trashcan(name)
+  return logistica.trashcans[name] ~= nil
 end
 
 function logistica.get_item_tiers(name)

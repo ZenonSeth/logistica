@@ -226,7 +226,6 @@ local function lava_furnace_node_timer(pos, elapsed)
       return false
     end
 
-
     local timeLeft = useLava(meta, config.lava, config.time, runningTime, elapsed, isNewItem)
     if timeLeft == nil then --not enough lava left
       reset_furnace(pos, meta)

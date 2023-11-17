@@ -211,5 +211,13 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
     workingStack = leftover
   end
 
+  local trashcans = network.trashcans or {}
+  for hash, _ in pairs(trashcans) do
+    local pos = minetest.get_position_from_hash(hash)
+    logistica.load_position(pos)
+    workingStack = logistica.trashcan_trash_item(pos, workingStack)
+    if workingStack:is_empty() then return 0 end
+  end
+
   return workingStack:get_count()
 end
