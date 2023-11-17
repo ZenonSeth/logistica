@@ -10,7 +10,7 @@ dofile(path.."/inv_list_sorting.lua")
 dofile(path.."/inv_list_filtering.lua")
 
 -- bad debug
-d = {}
+local d = {}
 d.ttos = logistica.ttos
 d.log = minetest.chat_send_all
 function d.table_map(self, f)
