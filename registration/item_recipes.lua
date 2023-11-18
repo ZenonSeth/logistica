@@ -28,6 +28,13 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("optic_cable_toggleable_off"),
+  recipe = {
+    {L("optic_cable"), "default:mese_crystal_fragment"}
+  }
+})
+
+minetest.register_craft({
   output = L("hyperspanner"),
   recipe = {
     {"default:mese_crystal"},

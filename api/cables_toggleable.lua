@@ -85,7 +85,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     -- def_broken.inventory_image = "logistica_" .. lname .. "_inv.png^logistica_broken.png"
     def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
     def_broken.description = "Broken " .. desc
-    def_broken.node_box = { type = "fixed", fixed = { -0.5, -SIZE, -SIZE, 0.5, SIZE, SIZE } }
+    def_broken.node_box = { type = "fixed", fixed = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25} }
     def_broken.selection_box = def_broken.node_box
     def_broken.connects_to = nil
     def_broken.on_construct = nil

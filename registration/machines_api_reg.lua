@@ -25,7 +25,7 @@ logistica.register_cable("Optic cable", "optic_cable")
 -- })
 
 -- toggleable
-logistica.register_cable_toggleable("Toggleable Cable", "toggleable_cable",
+logistica.register_cable_toggleable("Toggleable Cable", "optic_cable_toggleable",
   {"logistica_cable_toggleable_on.png"},
   {"logistica_cable_toggleable_off.png"}
 )
