@@ -132,28 +132,36 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           network.cables[otherHash] = true
           connections[otherHash] = true
           valid = true
-        elseif logistica.is_requester(otherName) then
+        end
+        if logistica.is_requester(otherName) then
           network.requesters[otherHash] = true
           valid = true
-        elseif logistica.is_injector(otherName) then
+        end
+        if logistica.is_injector(otherName) then
           network.injectors[otherHash] = true
           valid = true
-        elseif logistica.is_supplier(otherName) then
+        end
+        if logistica.is_supplier(otherName) then
           network.suppliers[otherHash] = true
           valid = true
-        elseif logistica.is_vaccuum_supplier(otherName) then
+        end
+        if logistica.is_vaccuum_supplier(otherName) then
           network.suppliers[otherHash] = true
           valid = true
-        elseif logistica.is_mass_storage(otherName) then
+        end
+        if logistica.is_mass_storage(otherName) then
           network.mass_storage[otherHash] = true
           valid = true
-        elseif logistica.is_item_storage(otherName) then
+        end
+        if logistica.is_item_storage(otherName) then
           network.item_storage[otherHash] = true
           valid = true
-        elseif logistica.is_misc(otherName) then
+        end
+        if logistica.is_misc(otherName) then
           network.misc[otherHash] = true
           valid = true
-        elseif logistica.is_trashcan(otherName) then
+        end
+        if logistica.is_trashcan(otherName) then
           network.trashcans[otherHash] = true
           valid = true
         end

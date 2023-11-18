@@ -20,24 +20,24 @@ end
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 -- `isAutomatedRequest` is optional, assumed to be false if not set
 -- `useMetaData` is optional, assume false if not set - only applies to items with stack_max = 1
-function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
+function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   if not network then return false end
   -- first check suppliers
-  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata) then
+  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun) then
     return
   end
   -- then check storages
   if stackToTake:get_stack_max() <= 1 then
-    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
+    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   else
-    logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
+    logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
   end
 end
 
 -- tries to take the given stack from the passive suppliers on the network
 -- calls the collectorFunc with the stack when necessary
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata)
+function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
   if stackToTake:get_stack_max() == 1 and useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
   local requestedAmount = stackToTake:get_count()
@@ -58,9 +58,11 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
         local leftover = collectorFunc(toSend)
         local newSupplyCount = supplyCount - remaining + leftover
         supplyStack:set_count(newSupplyCount)
-        supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
-        if newSupplyCount <= 0 then
-          updateSupplierCacheFor(modifiedPos)
+        if not dryRun then
+          supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
+          if newSupplyCount <= 0 then
+            updateSupplierCacheFor(modifiedPos)
+          end
         end
         return true
       else -- not enough to fulfil requested
@@ -69,7 +71,9 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
         remaining = remaining - (supplyCount - leftover)
         supplyStack:set_count(leftover)
         if leftover > 0 then -- for some reason we could not insert all - exit early
-          supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
+          if not dryRun then
+            supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
+          end
           return true
         end
       end
@@ -77,16 +81,20 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     end
     -- if we get there, we did not fulfil the request from this supplier
     -- but some items still may have been inserted
-    supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList)
+    if not dryRun then
+      supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList)
+    end
   end
-  updateSupplierCacheFor(modifiedPos)
+  if not dryRun then
+    updateSupplierCacheFor(modifiedPos)
+  end
   return false
 end
 
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest, useMetadata)
+function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
   if useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
 
@@ -99,7 +107,9 @@ function logistica.take_stack_from_item_storage(stack, network, collectorFunc, i
         local leftover = collectorFunc(storedStack)
         if leftover == 0 then -- stack max is 1, so just take the whole itemstack out
           storageList[i] = ItemStack("")
-          storageInv:set_list(ITEM_STORAGE_LIST_NAME, storageList)
+          if not dryRun then
+            storageInv:set_list(ITEM_STORAGE_LIST_NAME, storageList)
+          end
           return true
         else  -- otherwise, the insert failed, don't take stack
           return false
@@ -110,12 +120,12 @@ function logistica.take_stack_from_item_storage(stack, network, collectorFunc, i
   return false
 end
 
--- tries to take a stack from the given network
+-- tries to take a stack from the given network's mass storages
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 -- returns true if item successfully found and given to collector, false otherwise
-function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest)
+function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
   local stackToTakeName = stackToTake:get_name()
   local remainingRequest = stackToTake:get_count()
   local massLocations = network.storage_cache[stackToTake:get_name()]
@@ -141,13 +151,17 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
         storageStack:set_count(storageStack:get_count() - numTaken)
         remainingRequest = remainingRequest - numTaken
         if remainingRequest <= 0 then
-          storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
+          if not dryRun then
+            storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
+          end
           return true
         end
       end
       i = i - 1
     end
-    storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
+    if not dryRun then
+      storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
+    end
   end
   return false
 end
