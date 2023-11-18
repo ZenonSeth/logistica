@@ -82,7 +82,7 @@ end
 
 local function autocrafter_allow_metadata_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  if listname == INV_CRAFT_RES or listname == INV_DST then return 0 end
+  if listname == INV_CRAFT_RES then return 0 end
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
     local st = inv:get_stack(listname, index)
@@ -171,7 +171,3 @@ function logistica.register_autocrafter(desc, name, tiles)
   minetest.register_node("logistica:"..lname, def)
 
 end
-
-logistica.register_autocrafter("Autocrafter", "autocrafter", {
-  "logistica_autocrafter.png"
-})

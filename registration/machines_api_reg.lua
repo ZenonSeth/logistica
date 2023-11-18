@@ -12,6 +12,14 @@ logistica.register_access_point("Access Point", "access_point", {
 })
 
 --------------------------------
+-- Autocrafter
+--------------------------------
+
+logistica.register_autocrafter("Autocrafter", "autocrafter", {
+  "logistica_autocrafter.png"
+})
+
+--------------------------------
 -- Cables
 --------------------------------
 

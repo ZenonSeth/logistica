@@ -33,8 +33,8 @@ local function get_valid_requester_and_target_inventory(requesterPos)
   local targetPos = logistica.get_requester_target(requesterPos)
   if not targetPos then return end
 
-  -- exclude logistica nodes from this
-  if string.find(minetest.get_node(targetPos).name, "logistica:") then return end
+  -- exclude logistica machines from this
+  if logistica.is_machine(minetest.get_node(targetPos).name) then return end
 
   local targetInv = get_meta(targetPos):get_inventory()
   if not targetInv:get_list(targetList) then return end

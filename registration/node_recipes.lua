@@ -107,3 +107,12 @@ minetest.register_craft({
     {L("silverin_plate"), "default:mese_crystal", L("silverin_plate")},
   }
 })
+
+minetest.register_craft({
+  output = L("autocrafter"),
+  recipe = {
+    {L("silverin_plate"), "default:chest",        L("silverin_plate")},
+    {"",                  L("silverin_circuit"),  ""},
+    {L("silverin_plate"), "",                     L("silverin_plate")},
+  }
+})
