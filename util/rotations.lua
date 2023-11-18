@@ -83,3 +83,19 @@ function logistica.get_front_face_object_info(param2)
   rot.z = pos.forward.z
   return rot
 end
+
+-- given a direction tries to return a facedir int such that the bottom of block would be facing that direction
+function logistica.dir_to_facedir(dir)
+  local x,y,z = dir.x, dir.y, dir.z
+  local absX, absY, absZ = math.abs(x), math.abs(y), math.abs(z)
+
+  local mostlyX = absX > absY and absX > absZ
+  local mostlyZ = absZ > absX and absZ > absY
+  if mostlyX then
+    if x > 0 then return 15 else return 12 end
+  elseif mostlyZ then
+    if z > 0 then return 8 else return 4 end
+  else -- mostlyY
+    if y > 0 then return 20 else return 0 end
+  end
+end
