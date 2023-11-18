@@ -251,7 +251,9 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname == "storage" then return 0 end
   if listname == "main" then
-    return stack:get_count() - logistica.try_to_add_item_to_storage(pos, stack, true)
+    local inv = minetest.get_meta(pos):get_inventory()
+    local remain = logistica.insert_item_into_mass_storage(pos, inv, stack, true)
+    return stack:get_count() - remain:get_count()
   end
   if listname == "filter" then
     if stack:get_stack_max() == 1 then return 0 end
@@ -279,8 +281,9 @@ end
 
 local function on_mass_storage_inv_put(pos, listname, index, stack, player)
   if listname == "main" then
-    local remaining = logistica.try_to_add_item_to_storage(pos, stack)
-    local taken = stack:get_count() - remaining
+    local inv = minetest.get_meta(pos):get_inventory()
+    local remainingStack = logistica.insert_item_into_mass_storage(pos, inv, stack)
+    local taken = stack:get_count() - remainingStack:get_count()
     if taken > 0 then
       local inv = minetest.get_meta(pos):get_inventory()
       local fullstack = inv:get_stack(listname, index)
