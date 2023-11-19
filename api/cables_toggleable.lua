@@ -38,7 +38,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     }
 
     local cable_name = "logistica:"..lname.."_"..state
-    local connectsTo = { logistica.GROUP_ALL }
+    local connectsTo = { logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF }
     local tiles = tilesOn
     local onConst = function(p) logistica.on_cable_change(p, nil) end
     local onDest = function(p, oldnode) logistica.on_cable_change(p, oldnode) end
@@ -76,6 +76,9 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
       logistica.cables[cable_name] = name
       def.groups[logistica.TIER_ALL] = 1
       def.groups.not_in_creative_inventory = 1
+    else
+      def.node_box = { type = "fixed", fixed = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25} }
+      def.groups[logistica.TIER_CABLE_OFF] = 1
     end
 
     minetest.register_node(cable_name, def)

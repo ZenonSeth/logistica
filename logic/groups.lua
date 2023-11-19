@@ -11,7 +11,9 @@ logistica.trashcans = {}
 logistica.vaccuum_suppliers = {}
 logistica.TIER_ALL = "logistica_all_tiers"
 logistica.GROUP_ALL = "group:" .. logistica.TIER_ALL
-logistica.TIER_CONTROLLER = "controller"
+logistica.TIER_CONTROLLER = "logistica_controller"
+logistica.TIER_CABLE_OFF = "logistica_cable_off"
+logistica.GROUP_CABLE_OFF = "group:" .. logistica.TIER_CABLE_OFF
 
 function logistica.is_machine(name)
   return logistica.is_requester(name) or logistica.is_supplier(name) or logistica.is_mass_storage(name)

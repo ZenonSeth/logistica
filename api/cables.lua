@@ -39,7 +39,7 @@ function logistica.register_cable(desc, name, customNodeBox)
     sunlight_propagates = true,
     drawtype = "nodebox",
     node_box = node_box,
-    connects_to = { "group:" .. cable_group, logistica.GROUP_ALL },
+    connects_to = { "group:" .. cable_group, logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF },
     on_construct = function(pos) logistica.on_cable_change(pos, nil) end,
     after_destruct = function(pos, oldnode) logistica.on_cable_change(pos, oldnode) end,
   }
