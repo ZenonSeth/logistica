@@ -1,6 +1,5 @@
 local path = logistica.MODPATH .. "/logic"
 -- once again, order is important
-dofile(path.."/processing_queue.lua")
 dofile(path.."/groups.lua")
 dofile(path.."/network_cache.lua")
 dofile(path.."/network_logic.lua")
