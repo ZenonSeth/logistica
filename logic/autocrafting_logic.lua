@@ -37,7 +37,8 @@ end
 -- public functions
 
 -- returns true if something was crafted, false if nothing was crafted
-function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, sourceListName, outputListName)
+-- optSourceListName is optional: if nil, no checks will be made if enough materials exist
+function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optSourceListName, outputListName)
   local recipeList = inv:get_list(recipeList3x3Name) or {}
 
   local craftRes = get_combined_crafting_ouputs(recipeList)
@@ -48,23 +49,26 @@ function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, sour
   for _, st in ipairs(craftRes.extras) do
     if not inv:room_for_item(outputListName, st) then return false end
   end
-  -- check if source has enough materials
-  local recCounts = count_items(recipeList)
-  local srcCounts = count_items(inv:get_list(sourceListName) or {})
-  for name, count in pairs(recCounts) do
-    if srcCounts[name] == nil or srcCounts[name] < count then return false end
-  end
 
-  -- remove items from source
-  for name, _count in pairs(recCounts) do
-    local count = _count
-    repeat
-      local stack = ItemStack(name)
-      local take = math.min(count, stack:get_stack_max())
-      stack:set_count(take)
-      count = count - take
-      inv:remove_item(sourceListName, stack)
-    until (count == 0)
+  if optSourceListName ~= nil then
+    -- check if source has enough materials
+    local recCounts = count_items(recipeList)
+    local srcCounts = count_items(inv:get_list(optSourceListName) or {})
+    for name, count in pairs(recCounts) do
+      if srcCounts[name] == nil or srcCounts[name] < count then return false end
+    end
+
+    -- remove items from source
+    for name, _count in pairs(recCounts) do
+      local count = _count
+      repeat
+        local stack = ItemStack(name)
+        local take = math.min(count, stack:get_stack_max())
+        stack:set_count(take)
+        count = count - take
+        inv:remove_item(optSourceListName, stack)
+      until (count == 0)
+    end
   end
 
   -- add the output

@@ -234,8 +234,8 @@ function logistica.access_point_allow_take(pos, listname, index, _stack, player)
     -- remove the sometimes manually added count display
     stack:get_meta():set_string("count_meta", nil)
     if stackMax > 1 then
-      local taken = nil
-      local acceptTaken = function(st) taken = st; return 0 end
+      local taken = ItemStack("")
+      local acceptTaken = function(st) taken:add_item(st); return 0 end
       logistica.take_stack_from_network(stack, network, acceptTaken)
       if not taken or taken:is_empty() then return 0 end
       return math.min(taken:get_count(), stackMax)

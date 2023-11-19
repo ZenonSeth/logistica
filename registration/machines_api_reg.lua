@@ -81,6 +81,16 @@ logistica.register_controller("simple_controller", {
 })
 
 --------------------------------
+-- Crafting Supplier
+--------------------------------
+
+logistica.register_crafting_supplier("Crafting Supplier", "crafting_supplier", {
+  "logistica_crafting_supplier_top.png",
+  "logistica_crafting_supplier_bottom.png",
+  "logistica_crafting_supplier_side.png",
+})
+
+--------------------------------
 -- Network Importer
 --------------------------------
 

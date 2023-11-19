@@ -38,8 +38,9 @@ function logistica.put_item_in_supplier(pos, stack)
   return leftover
 end
 
--- returns the leftover stack that still needs to be fulfilled (or empty stack if entire request was fulfilled)
-function logistica.take_item_from_supplier(supplierPos, stackToTake, network, collectorFunc, useMetadata, dryRun)
+-- returns the number of items remaining to be fulfilled, or 0 if entire request was fulfilled
+function logistica.take_item_from_supplier(supplierPos, stackToTake, network, collectorFunc, useMetadata, dryRun, optIgnorePosition)
+  if optIgnorePosition == nil then optIgnorePosition = -1 end
   local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
   if stackToTake:get_stack_max() == 1 and useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
   logistica.load_position(supplierPos)
@@ -48,7 +49,7 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
   local supplierInv = minetest.get_meta(supplierPos):get_inventory()
   local supplyList = supplierInv:get_list(META_SUPPLIER_LIST)
   for i, supplyStack in ipairs(supplyList) do
-  if eq(supplyStack, stackToTake) then
+  if i ~= optIgnorePosition and eq(supplyStack, stackToTake) then
     local supplyCount = supplyStack:get_count()
     if supplyCount >= remaining then -- enough to fulfil requested
       local toSend = ItemStack(supplyStack) ; toSend:set_count(remaining)

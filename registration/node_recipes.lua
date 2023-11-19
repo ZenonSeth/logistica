@@ -116,3 +116,12 @@ minetest.register_craft({
     {L("silverin_plate"), "",                     L("silverin_plate")},
   }
 })
+
+minetest.register_craft({
+  output = L("crafting_supplier"),
+  recipe = {
+    {L("silverin_plate"),   "default:chest",  L("silverin_plate")},
+    {L("silverin_circuit"), L("photonizer"),  L("silverin_circuit")},
+    {L("silverin_plate"),   L("optic_cable"), L("silverin_plate")},
+  }
+})
