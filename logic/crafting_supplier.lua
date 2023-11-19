@@ -21,31 +21,32 @@ local function count_items_to_stack(list)
   return items
 end
 
-local function consume_from_network(craftItems, times, network)
+local function consume_from_network(craftItems, times, network, depth)
   if times <= 0 then return end
   local acceptItem = function (_) return 0 end
   for _, itemStack in ipairs(craftItems) do
     local consumeStack = ItemStack(itemStack) ; consumeStack:set_count(itemStack:get_count() * times)
-    logistica.take_stack_from_network(consumeStack, network, acceptItem, true, false, false)
+    logistica.take_stack_from_network(consumeStack, network, acceptItem, true, false, false, depth + 1)
   end
 end
 
 -- returns 0 if craftItems could not be taken from network, returns 1 if they could
-local function consume_for_craft(craftItems, network)
+local function consume_for_craft(craftItems, network, depth)
   local itemTaken = ItemStack("")
   local acceptItem = function(st) itemTaken:add_item(st) ; return 0 end
   for _, itemStack in ipairs(craftItems) do
     itemTaken:clear()
-    logistica.take_stack_from_network(itemStack, network, acceptItem, true, false, true)
+    logistica.take_stack_from_network(itemStack, network, acceptItem, true, false, true, depth + 1)
     if itemTaken:get_count() < itemStack:get_count() then
       return 0
     end
   end
-  consume_from_network(craftItems, 1, network)
+  consume_from_network(craftItems, 1, network, depth)
   return 1
 end
 
-function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, collectorFunc, useMetadata, dryRun)
+function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, collectorFunc, useMetadata, dryRun, _depth)
+  local depth = _depth or 0
   local takeStack = ItemStack(_takeStack)
   local remaining = takeStack:get_count()
   local takeStackName = takeStack:get_name()
@@ -74,7 +75,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
     logistica.autocrafting_produce_single_item(inv, INV_CRAFT, nil, INV_HOUT)
     -- if we can craft from network
     local items = count_items_to_stack(inv:get_list(INV_CRAFT))
-    local numCanCraft = consume_for_craft(items, network)
+    local numCanCraft = consume_for_craft(items, network, depth)
     numCrafted = numCrafted + numCanCraft
 
     isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
@@ -90,7 +91,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   -- now move any extras from the hidden to the main inventory - deleting extras (TODO: maybe drop them)
   local extraNotTaken = 0
   local toInsert = {}
-  for i, st in ipairs(inv:get_list(INV_HOUT)) do
+  for _, st in ipairs(inv:get_list(INV_HOUT)) do
     if st:get_name() == takeStackName then
       extraNotTaken = extraNotTaken + st:get_count()
     else

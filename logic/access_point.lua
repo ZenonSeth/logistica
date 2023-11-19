@@ -116,7 +116,7 @@ local function build_stack_list(pos)
     listSize = listSize + 1
     itemList[listSize] = stack
   end
-  local searchList, searchSize = 
+  local searchList, searchSize =
     do_search_for(itemList, logistica.access_point_get_current_search_term(meta), listSize)
   local filtered, filtSize = filterMethodMap[get_curr_filter_method_int(meta)](searchList, searchSize)
   local sorted = sortMethodMap[get_curr_sort_method_int(meta)](filtered)

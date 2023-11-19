@@ -1,6 +1,7 @@
 
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
+local MAX_NETWORK_DEPTH_SEARCH = 16 -- somewhat arbitrary but prevents stackoverflows
 
 local function get_meta(pos)
   logistica.load_position(pos)
@@ -13,10 +14,12 @@ end
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 -- `isAutomatedRequest` is optional, assumed to be false if not set
 -- `useMetaData` is optional, assume false if not set - only applies to items with stack_max = 1
-function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
+function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth)
+  if not depth then depth = 0 end
+  if depth > MAX_NETWORK_DEPTH_SEARCH then return false end
   if not network then return false end
   -- first check suppliers
-  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun) then
+  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth) then
     return
   end
   -- then check storages
@@ -30,7 +33,7 @@ end
 -- tries to take the given stack from the passive suppliers on the network
 -- calls the collectorFunc with the stack when necessary
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
+function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth)
   local takeStack = ItemStack(stackToTake)
   local requestedAmount = stackToTake:get_count()
   local remaining = requestedAmount
@@ -43,7 +46,7 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     if logistica.is_supplier(nodeName) or logistica.is_vaccuum_supplier(nodeName) then
       remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
     elseif logistica.is_crafting_supplier(nodeName) then
-      remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
+      remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
     end
     if remaining <= 0 then
       return true
