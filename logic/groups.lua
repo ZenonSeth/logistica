@@ -3,6 +3,7 @@ logistica.controllers = {}
 logistica.injectors = {}
 logistica.requesters = {}
 logistica.suppliers = {}
+logistica.craftsups = {}
 logistica.mass_storage = {}
 logistica.item_storage = {}
 logistica.misc_machines = {}
@@ -28,6 +29,10 @@ end
 
 function logistica.is_supplier(name)
   return logistica.suppliers[name] ~= nil
+end
+
+function logistica.is_crafting_supplier(name)
+  return logistica.craftsups[name] ~= nil
 end
 
 function logistica.is_mass_storage(name)

@@ -106,8 +106,8 @@ local function update_network_cache(network, cacheOps)
 end
 
 -- smartly tries to update the the cache for the given position
-local function update_network_cache_for_pos(pos, cacheOps)
-  local network = logistica.get_network_or_nil(pos)
+local function update_network_cache_for_pos(pos, cacheOps, optNetwork)
+  local network = optNetwork or logistica.get_network_or_nil(pos)
   if not network then return end
   local meta = get_meta(pos)
   local hash = minetest.hash_node_position(pos)
@@ -128,8 +128,8 @@ local function update_network_cache_for_pos(pos, cacheOps)
   save_prev_cache(meta, listName, currCacheItems)
 end
 
-local function remove_network_cache_for_pos(pos, cacheOps)
-  local network = logistica.get_network_or_nil(pos)
+local function remove_network_cache_for_pos(pos, cacheOps, optNetwork)
+  local network = optNetwork or logistica.get_network_or_nil(pos)
   if not network then return end
   local meta = get_meta(pos)
   local hash = minetest.hash_node_position(pos)
@@ -156,12 +156,13 @@ end
 
 -- updates the storage cache for the specific position
 -- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
-function logistica.update_cache_at_pos(pos, type)
-  update_network_cache_for_pos(pos, type)
+-- optNetwork is optional, the network it belongs to
+function logistica.update_cache_at_pos(pos, type, optNetwork)
+  update_network_cache_for_pos(pos, type, optNetwork)
 end
 
 -- removes the given pos's cache from the network
 -- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
-function logistica.update_cache_node_removed_at_pos(pos, type)
-  remove_network_cache_for_pos(pos, type)
+function logistica.update_cache_node_removed_at_pos(pos, type, optNetwork)
+  remove_network_cache_for_pos(pos, type, optNetwork)
 end

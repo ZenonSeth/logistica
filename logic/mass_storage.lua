@@ -111,7 +111,7 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
 
   local numTaken = 0
   for hash, _ in pairs(network.supplier_cache[requestStack:get_name()] or {}) do
-    local taken = logistica.take_item_from_supplier(minetest.get_position_from_hash(hash), requestStack)
+    local taken = logistica.take_item_from_supplier_simple(minetest.get_position_from_hash(hash), requestStack)
     numTaken = numTaken + taken:get_count()
     logistica.insert_item_into_mass_storage(pos, meta:get_inventory(), taken)
     if numTaken >= spaceForItems then return end -- everything isnerted, return

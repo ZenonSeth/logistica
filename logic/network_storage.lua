@@ -1,17 +1,10 @@
 
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
-local SUPPLIER_LIST_NAME = "main"
 
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
-end
-
-local function updateSupplierCacheFor(supplierPosList)
-  for _, pos in ipairs(supplierPosList) do
-    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
-  end
 end
 
 -- tries to take a stack from the network locations
@@ -38,55 +31,24 @@ end
 -- calls the collectorFunc with the stack when necessary
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
-  local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
-  if stackToTake:get_stack_max() == 1 and useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
+  local takeStack = ItemStack(stackToTake)
   local requestedAmount = stackToTake:get_count()
   local remaining = requestedAmount
   local stackName = stackToTake:get_name()
   local validSupplers = network.supplier_cache[stackName] or {}
-  local modifiedPos = {}
   for hash, _ in pairs(validSupplers) do
-    local supplierPos = minetest.get_position_from_hash(hash)
-    local supplierInv = get_meta(supplierPos):get_inventory()
-    local supplyList = supplierInv:get_list(SUPPLIER_LIST_NAME)
-    for i, supplyStack in ipairs(supplyList) do
-    if eq(supplyStack, stackToTake) then
-      table.insert(modifiedPos, supplierPos)
-      local supplyCount = supplyStack:get_count()
-      if supplyCount >= remaining then -- enough to fulfil requested
-        local toSend = ItemStack(supplyStack) ; toSend:set_count(remaining)
-        local leftover = collectorFunc(toSend)
-        local newSupplyCount = supplyCount - remaining + leftover
-        supplyStack:set_count(newSupplyCount)
-        if not dryRun then
-          supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
-          if newSupplyCount <= 0 then
-            updateSupplierCacheFor(modifiedPos)
-          end
-        end
-        return true
-      else -- not enough to fulfil requested
-        local toSend = ItemStack(supplyStack)
-        local leftover = collectorFunc(toSend)
-        remaining = remaining - (supplyCount - leftover)
-        supplyStack:set_count(leftover)
-        if leftover > 0 then -- for some reason we could not insert all - exit early
-          if not dryRun then
-            supplierInv:set_stack(SUPPLIER_LIST_NAME, i, supplyStack)
-          end
-          return true
-        end
-      end
+    local pos = minetest.get_position_from_hash(hash)
+    logistica.load_position(pos)
+    local nodeName = minetest.get_node(pos).name
+    if logistica.is_supplier(nodeName) or logistica.is_vaccuum_supplier(nodeName) then
+      remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
+    elseif logistica.is_crafting_supplier(nodeName) then
+      remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
     end
+    if remaining <= 0 then
+      return true
     end
-    -- if we get there, we did not fulfil the request from this supplier
-    -- but some items still may have been inserted
-    if not dryRun then
-      supplierInv:set_list(SUPPLIER_LIST_NAME, supplyList)
-    end
-  end
-  if not dryRun then
-    updateSupplierCacheFor(modifiedPos)
+    takeStack:set_count(remaining)
   end
   return false
 end
@@ -215,7 +177,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
     workingStack = remainingStack
   end
 
-  -- finally try to add to passive suppliers that accept this
+  -- try to add to passive suppliers that accept this
   local suppliers = network.suppliers
   for hash, _ in pairs(suppliers) do
     local pos = minetest.get_position_from_hash(hash)
@@ -225,6 +187,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
     workingStack = leftover
   end
 
+  -- [Keep this last] delete the item if any trashcan accepts it
   local trashcans = network.trashcans or {}
   for hash, _ in pairs(trashcans) do
     local pos = minetest.get_position_from_hash(hash)

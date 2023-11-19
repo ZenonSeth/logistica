@@ -141,11 +141,9 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           network.injectors[otherHash] = true
           valid = true
         end
-        if logistica.is_supplier(otherName) then
-          network.suppliers[otherHash] = true
-          valid = true
-        end
-        if logistica.is_vaccuum_supplier(otherName) then
+        if logistica.is_supplier(otherName) 
+            or logistica.is_crafting_supplier(otherName)
+            or logistica.is_vaccuum_supplier(otherName) then
           network.suppliers[otherHash] = true
           valid = true
         end
