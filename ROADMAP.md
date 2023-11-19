@@ -1,12 +1,11 @@
 
 High Priority:
-- Autocrafter
 
 Medium Priority
 - Lava Furnace inv_plus recpies
-- Network Crafter
 - Enable translation for all strings
 - In-game guide book
+- Cobble Generator
 
 Low Priority:
 - Liquid Storage
