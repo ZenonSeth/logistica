@@ -1,3 +1,5 @@
+local S = logistica.TRANSLATOR
+
 local SET_BUTTON = "logsetbtn"
 local NAME_FIELD = "namef"
 local FORMSPEC_NAME = "logconren"
@@ -9,8 +11,8 @@ local function get_controller_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.5,2]" ..
     logistica.ui.background..
-    "field[2.5,0.6;3,0.8;"..NAME_FIELD..";Network Name;"..name.."]" ..
-    "button[5.6,0.6;3,0.8;"..SET_BUTTON..";Set]"
+    "field[2.5,0.6;3,0.8;"..NAME_FIELD..";"..S("Network Name")..";"..name.."]" ..
+    "button[5.6,0.6;3,0.8;"..SET_BUTTON..";"..S("Set").."]"
 end
 
 local function show_controller_formspec(pos, playerName)
@@ -34,7 +36,7 @@ local function on_controller_receive_fields(player, formname, fields)
     end
     logistica.rename_network(minetest.hash_node_position(pos), newNetworkName)
     local meta = minetest.get_meta(pos)
-    meta:set_string("infotext", "Controller of Network: "..newNetworkName)
+    meta:set_string("infotext", S("Controller of Network: ")..newNetworkName)
     meta:set_string("name", newNetworkName)
   end
   return true

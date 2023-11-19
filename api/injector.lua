@@ -1,4 +1,6 @@
 
+local S = logistica.TRANSLATOR
+
 local PULL_LIST_PICKER = "pull_pick"
 local ON_OFF_BUTTON = "on_off_btn"
 local FORMSPEC_NAME = "logistica_storinject"
@@ -14,12 +16,12 @@ local function get_injector_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.7,8.5]" ..
     logistica.ui.background..
-    "label[0.5,0.3;Network Importer take items from target and add them to the network]"..
-    "label[0.5,0.8;Filter: Import only filtered. If empty, imports all items.]"..
+    "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
+    "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
     "list[current_player;main;0.5,3.3;8,4;0]" ..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, "Take items from:")..
-    logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, "Enable")
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, S("Take items from:"))..
+    logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, S("Enable"))
 end
 
 local function show_injector_formspec(playerName, pos)

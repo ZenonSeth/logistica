@@ -1,4 +1,6 @@
 
+local S = logistica.TRANSLATOR
+
 local FORMSPEC_NAME = "logistica_supplier"
 local ON_OFF_BUTTON = "on_off_btn"
 
@@ -11,8 +13,8 @@ local function get_supplier_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.5,10]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Allow Storing from Network")..
-    "label[0.6,1.0;Passive Supplier: Items become available to network requests.]"..
+    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, S("Allow Storing from Network"))..
+    "label[0.6,1.0;"..S("Passive Supplier: Items become available to network requests.").."]"..
     "list["..posForm..";main;0.4,1.4;8,2;0]"..
     "list[current_player;main;0.4,4.5;8,4;0]"..
     "listring[]"

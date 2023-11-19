@@ -1,4 +1,6 @@
 
+local S = logistica.TRANSLATOR
+
 local META_SERIALIZED_INV = "logserlist"
 local META_IMG_INDEX = "logimginxd"
 local META_SELECTED_RES = "logselres"
@@ -111,7 +113,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring[current_player;main]"..
-    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, "Pull Items")..
+    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, S("Pull Items"))..
     upgradeInvString..
     "tooltip[0.2,3.0;1,0.5;"..RESERVE_TOOLTIP.."]"..
     "tooltip[0.2,0.1;1,0.5;"..IMAGE_TOOLTIP.."]"

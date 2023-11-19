@@ -1,4 +1,6 @@
 
+local S = logistica.TRANSLATOR
+
 local FORMSPEC_NAME = "logistica_itemstor"
 local ON_OFF_BUTTON = "on_off_btn"
 local ITEM_STORAGE_SIZE_PER_PAGE = 128
@@ -17,10 +19,10 @@ local function get_item_storage_formspec(pos)
   return "formspec_version[4]" ..
     "size[20.5,16]" ..
     logistica.ui.background..
-    "label[5.3,10.6;Tool Box: Accepts only tools, no stackable items]"..
-    logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, "Allow Storing from Network")..
+    "label[5.3,10.6;"..S("Tool Box: Accepts only tools, no stackable items").."]"..
+    logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..
     "dropdown[16,12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
-    "button[18.5,12;1,0.8;"..SORT_BUTTON..";Sort]"..
+    "button[18.5,12;1,0.8;"..SORT_BUTTON..";"..S("Sort").."]"..
     "list["..posForm..";main;0.4,0.5;16,8;0]"..
     "list[current_player;main;5.35,11.0;8,4;0]"..
     "listring[]"
