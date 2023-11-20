@@ -39,6 +39,19 @@ logistica.register_cable_toggleable("Toggleable Cable", "optic_cable_toggleable"
 )
 
 --------------------------------
+-- Cobble Generator
+--------------------------------
+
+logistica.register_cobble_generator_supplier("Cobble Generator", "cobblegen_supplier", {
+  "logistica_cobblegen_top.png",
+  "logistica_cobblegen_bottom.png",
+  "logistica_cobblegen_side.png^[transformFX",
+  "logistica_cobblegen_side.png",
+  "logistica_cobblegen_back.png",
+  "logistica_cobblegen_front.png",
+})
+
+--------------------------------
 -- Controller
 --------------------------------
 

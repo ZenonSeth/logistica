@@ -96,3 +96,15 @@ minetest.register_craft({
   type = "shapeless",
   recipe = { L("lava_unit"), "bucket:bucket_empty" }
 })
+
+minetest.register_craft({
+  output = L("cobblegen_upgrade"),
+  recipe = {
+    {L("silverin_plate"), "bucket:bucket_lava", L("silverin_plate")},
+    {"",                  "bucket:bucket_water",  ""},
+  },
+  replacements = {
+    {"bucket:bucket_water", "bucket:bucket_empty"},
+    {"bucket:bucket_lava",  "bucket:bucket_empty"},
+  }
+})

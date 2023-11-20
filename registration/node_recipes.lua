@@ -125,3 +125,16 @@ minetest.register_craft({
     {L("silverin_plate"),   L("optic_cable"), L("silverin_plate")},
   }
 })
+
+minetest.register_craft({
+  output = L("cobblegen_supplier"),
+  recipe = {
+    {L("silverin_plate"), "bucket:bucket_lava",  L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),       L("silverin_circuit")},
+    {L("silverin_plate"), "bucket:bucket_water", L("silverin_plate")},
+  },
+  replacements = {
+    {"bucket:bucket_water", "bucket:bucket_empty"},
+    {"bucket:bucket_lava",  "bucket:bucket_empty"},
+  }
+})

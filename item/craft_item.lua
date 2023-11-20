@@ -46,6 +46,11 @@ items[L("standing_wave_box")] = {
   stack_max = 99,
 }
 
+items[L("cobblegen_upgrade")] = {
+  description = S("Cobble Generator Upgrade\nIncreases Cobble Generator Output"),
+  inventory_image = "logistica_cobblegen_upgrade.png",
+  stack_max = 4,
+}
 
 for name, info in pairs(items) do
   minetest.register_craftitem(name, {
