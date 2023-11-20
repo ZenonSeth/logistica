@@ -40,8 +40,8 @@ function logistica.register_cable(desc, name, customNodeBox)
     drawtype = "nodebox",
     node_box = node_box,
     connects_to = { "group:" .. cable_group, logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF },
-    on_construct = function(pos) logistica.on_cable_change(pos, nil) end,
-    after_destruct = function(pos, oldnode) logistica.on_cable_change(pos, oldnode) end,
+    on_construct = function(pos) logistica.on_cable_change(pos) end,
+    after_dig_node = function(pos, oldnode, oldmeta, _) logistica.on_cable_change(pos, oldnode, oldmeta) end,
   }
 
   minetest.register_node(cable_name, def)
@@ -56,7 +56,7 @@ function logistica.register_cable(desc, name, customNodeBox)
   def_broken.selection_box = def_broken.node_box
   def_broken.connects_to = nil
   def_broken.on_construct = nil
-  def_broken.after_destruct = nil
+  def_broken.after_dig_node = nil
 
   minetest.register_node(cable_name .. "_disabled", def_broken)
 end

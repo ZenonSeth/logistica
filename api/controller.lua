@@ -86,7 +86,6 @@ function logistica.register_controller(name, def)
       logistica.start_controller_timer(pos)
       logistica.on_controller_change(pos, nil)
   end
-  local after_destruct = logistica.on_controller_change
 
   if not def.groups then
     def.groups = {}
@@ -95,7 +94,7 @@ function logistica.register_controller(name, def)
   def.groups[logistica.TIER_CONTROLLER] = 1
   def.on_timer = logistica.on_controller_timer
   def.on_construct = on_construct
-  def.after_destruct = after_destruct
+  def.after_dig_node = logistica.on_controller_change
   def.after_place_node = after_controller_place
   def.drop = controller_name
   def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
@@ -111,7 +110,7 @@ function logistica.register_controller(name, def)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_destruct = nil
+  def_disabled.after_dig_node = nil
   def_disabled.on_timer = nil
   def_disabled.on_rightclick = nil
 

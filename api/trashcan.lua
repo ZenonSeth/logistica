@@ -86,7 +86,7 @@ function logistica.register_trashcan(desc, name, tiles)
     drop = trashcan_name,
     sounds = logistica.node_sound_metallic(),
     after_place_node = after_place_trashcan,
-    after_destruct = logistica.on_trashcan_change,
+    after_dig_node = logistica.on_trashcan_change,
     allow_metadata_inventory_put = allow_trashcan_inv_put,
     allow_metadata_inventory_take = allow_trashcan_inv_take,
     allow_metadata_inventory_move = allow_trashcan_inv_move,
@@ -103,7 +103,7 @@ function logistica.register_trashcan(desc, name, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_destruct = nil
+  def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

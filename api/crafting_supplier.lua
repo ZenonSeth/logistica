@@ -163,7 +163,7 @@ function logistica.register_crafting_supplier(desc, name, tiles)
     drop = supplier_name,
     sounds = logistica.node_sound_metallic(),
     after_place_node = after_place_craftsup,
-    after_destruct = logistica.on_supplier_change,
+    after_dig_node = logistica.on_supplier_change,
     on_rightclick = on_craftsup_rightclick,
     allow_metadata_inventory_put = allow_craftsup_storage_inv_put,
     allow_metadata_inventory_take = allow_craftsup_inv_take,
@@ -185,7 +185,7 @@ function logistica.register_crafting_supplier(desc, name, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_destruct = nil
+  def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

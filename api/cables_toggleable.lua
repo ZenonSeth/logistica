@@ -11,11 +11,11 @@ local function toggle_cable(pos, node, clicker, itemstack, pointed_thing)
   if ends_with(nodeName, "_on") then
     nodeName = nodeName:sub(1, #nodeName - 3).."_off"
     logistica.swap_node(pos, nodeName)
-    logistica.on_cable_change(pos, nil, false)
+    logistica.on_cable_change(pos, nil, minetest.get_meta(pos), false)
   elseif ends_with(nodeName, "_off") then
     nodeName = nodeName:sub(1, #nodeName - 4).."_on"
     logistica.swap_node(pos, nodeName)
-    logistica.on_cable_change(pos, nil, true)
+    logistica.on_cable_change(pos, nil, minetest.get_meta(pos), true)
   end
 end
 
@@ -40,13 +40,13 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     local cable_name = "logistica:"..lname.."_"..state
     local connectsTo = { logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF }
     local tiles = tilesOn
-    local onConst = function(p) logistica.on_cable_change(p, nil) end
-    local onDest = function(p, oldnode) logistica.on_cable_change(p, oldnode) end
+    local onConst = function(p) logistica.on_cable_change(p) end
+    local afterDig = function(p, oldnode, oldmeta) logistica.on_cable_change(p, oldnode, oldmeta) end
     if state == "off" then
       tiles = tilesOff
       connectsTo = {}
       onConst = nil
-      onDest = nil
+      afterDig = nil
     end
 
     local def = {
@@ -68,7 +68,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
       node_box = node_box,
       connects_to = connectsTo,
       on_construct = onConst,
-      after_destruct = onDest,
+      after_dig_node = afterDig,
       on_rightclick = toggle_cable,
     }
 
@@ -92,7 +92,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     def_broken.selection_box = def_broken.node_box
     def_broken.connects_to = nil
     def_broken.on_construct = nil
-    def_broken.after_destruct = nil
+    def_broken.after_dig_node = nil
     def_broken.on_rightclick = nil
 
     minetest.register_node(cable_name .. "_disabled", def_broken)

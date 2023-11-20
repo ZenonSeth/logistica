@@ -83,7 +83,7 @@ function logistica.register_access_point(desc, name, tiles)
     can_dig = can_dig_access_point,
     connect_sides = {"top", "bottom", "left", "back", "right" },
     after_place_node = after_place_access_point,
-    after_destruct = logistica.on_access_point_change,
+    after_dig_node = logistica.on_access_point_change,
     on_rightclick = on_access_point_rightclick,
     on_metadata_inventory_move = on_access_point_inv_move,
     on_metadata_inventory_put = on_access_point_inv_put,
@@ -103,7 +103,7 @@ function logistica.register_access_point(desc, name, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_destruct = nil
+  def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

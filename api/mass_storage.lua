@@ -198,9 +198,9 @@ local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpg
   logistica.on_mass_storage_change(pos)
 end
 
-local function after_mass_storage_destruct(pos, oldNode)
+local function after_mass_storage_destruct(pos, oldNode, oldmeta)
   logistica.remove_item_on_block_front(pos)
-  logistica.on_mass_storage_change(pos, oldNode)
+  logistica.on_mass_storage_change(pos, oldNode, oldmeta)
 end
 
 local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
@@ -356,7 +356,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
     after_place_node = function(pos, placer, itemstack)
       after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
     end,
-    after_destruct = after_mass_storage_destruct,
+    after_dig_node = after_mass_storage_destruct,
     drop = storageName,
     on_timer = logistica.on_timer_powered(logistica.on_mass_storage_timer),
     paramtype2 = "facedir",
@@ -394,7 +394,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1 }
-  def_disabled.after_destruct = function(pos, _) logistica.remove_item_on_block_front(pos) end
+  def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
 
   minetest.register_node(storageName.."_disabled", def_disabled)
 

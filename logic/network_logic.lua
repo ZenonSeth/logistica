@@ -4,7 +4,7 @@ local STATUS_OK = 0
 local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
 
--- logistica.networks = networks
+local META_STORED_NETWORK = "logisticanet"
 
 local p2h = minetest.hash_node_position
 local h2p = minetest.get_position_from_hash
@@ -30,16 +30,54 @@ local function has_machine(network, id)
   end
 end
 
+local function network_contains_hash(network, hash)
+  if hash == network.controller then return true end
+  if network.cables[hash] then return true end
+  if has_machine(network, hash) then return true end
+  return false
+end
+
+-- we need this because default tostring(number) function returns scientific representation which loses accuracy
+local str = function(anInt) return string.format("%.0f", anInt) end
+
+local function set_cache_network_id(metaForPos, networkId)
+  metaForPos:set_string(META_STORED_NETWORK, str(networkId))
+end
+
+local function get_cached_network_or_nil(posHash, metaForPos)
+  local cachedId = ""
+  -- if metaForPos comes from after_dig_node, then it's just a table, not a MetaDataRef
+  if type(metaForPos) == "table" then
+    if metaForPos.fields and metaForPos.fields[META_STORED_NETWORK] then
+      cachedId = metaForPos.fields[META_STORED_NETWORK]
+    end
+  else
+    cachedId = (metaForPos:contains(META_STORED_NETWORK) and metaForPos:get_string(META_STORED_NETWORK)) or ""
+  end
+  local network = networks[tonumber(cachedId)]
+  if network and network_contains_hash(network, posHash) then
+    return network
+  end
+  return nil
+end
+
 function logistica.get_network_by_id_or_nil(networkId)
   return networks[networkId]
 end
 
-function logistica.get_network_or_nil(pos)
+function logistica.get_network_or_nil(pos, optMeta)
   local hash = p2h(pos)
-  for nHash, network in pairs(networks) do
-    if hash == nHash then return network end
-    if network.cables[hash] then return network end
-    if has_machine(network, hash) then return network end
+  local meta = minetest.get_meta(pos) -- optMeta or minetest.get_meta(pos)
+  local possibleNetwork = get_cached_network_or_nil(hash, optMeta or meta)
+  if possibleNetwork then
+    return possibleNetwork
+  end
+  -- otherwise, serach all networks, save it if we find one
+  for netHash, network in pairs(networks) do
+    if network_contains_hash(network, hash) then
+      set_cache_network_id(meta, netHash)
+      return network
+    end
   end
   return nil
 end
@@ -165,6 +203,7 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
         end
         if valid then
           newToScan = newToScan + 1
+          set_cache_network_id(minetest.get_meta(otherPos), network.controller)
           notify_connected(otherPos, otherName, network.controller)
         end
       end -- end of general checks
@@ -255,19 +294,20 @@ end
 local function try_to_add_to_network(pos, ops)
   local networkCount, otherNetwork  = find_adjecent_networks(pos)
   if networkCount <= 0 then return STATUS_OK end -- nothing to connect to
-  if networkCount >= 2 then
+  if otherNetwork == nil or networkCount >= 2 then
     break_logistica_node(pos) -- swap out storage node for disabled one 
     minetest.get_meta(pos):set_string("infotext", "ERROR: cannot connect to multiple networks!")
     return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
   end
   -- else, we have 1 network, add us to it!
   ops.get_list(otherNetwork)[p2h(pos)] = true
+  set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
   ops.update_cache_node_added(pos)
 end
 
-local function remove_from_network(pos, ops)
+local function remove_from_network(pos, oldMeta, ops)
   local hash = p2h(pos)
-  local network = logistica.get_network_or_nil(pos)
+  local network = logistica.get_network_or_nil(pos, oldMeta)
   if not network then return end
   -- first clear the cache while the position is still counted as being "in-network"
   ops.update_cache_node_removed(pos)
@@ -275,12 +315,12 @@ local function remove_from_network(pos, ops)
   ops.get_list(network)[hash] = nil
 end
 
-local function on_node_change(pos, oldNode, ops)
+local function on_node_change(pos, oldNode, oldMeta, ops)
   local placed = (oldNode == nil) -- if oldNode is nil, we placed a new one
   if placed == true then
     try_to_add_to_network(pos, ops)
   else
-    remove_from_network(pos, ops)
+    remove_from_network(pos, oldMeta, ops)
   end
 end
 
@@ -336,9 +376,7 @@ end
 -- global namespaced functions
 ----------------------------------------------------------------
 
-function logistica.on_cable_change(pos, oldNode, wasPlacedOverride)
-  local node = oldNode or minetest.get_node(pos)
-  local meta = minetest.get_meta(pos)
+function logistica.on_cable_change(pos, oldNode, optMeta, wasPlacedOverride)
   local placed = wasPlacedOverride
   if placed == nil then
     placed = (oldNode == nil) -- if oldNode is nil, we placed it
@@ -350,37 +388,49 @@ function logistica.on_cable_change(pos, oldNode, wasPlacedOverride)
 
   if networkEnd then
     if not placed then -- removed a network end
-      local network = logistica.get_network_or_nil(pos)
+      local network = logistica.get_network_or_nil(pos, optMeta)
       if network then network.cables[p2h(pos)] = nil end
     elseif cable_can_extend_network_from(connections[1]) then
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
         otherNetwork.cables[p2h(pos)] = true
+        set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
       end
     end
     return -- was a network end, no need to do anything else
   end
 
   -- We have more than 1 connected nodes - either cables or machines, something needs recalculating
-  local connectedNetworks = {}
+  local connectedNetworksId = {}
+  local tmpNetworkId = "INVALID"
+  local allConnectionsHaveSameNetwork = true
   for _, connectedPos in pairs(connections) do
-    local otherNetwork = logistica.get_network_id_or_nil(connectedPos)
-    if otherNetwork then
-      connectedNetworks[otherNetwork] = true
-    end
+    local otherNetworkId = logistica.get_network_id_or_nil(connectedPos)
+    if otherNetworkId then connectedNetworksId[otherNetworkId] = true end
+    if tmpNetworkId == "INVALID" then tmpNetworkId = otherNetworkId
+    elseif otherNetworkId ~= tmpNetworkId then allConnectionsHaveSameNetwork = false end
   end
-  local firstNetwork = nil
+  local firstNetworkId = nil
   local numNetworks = 0
-  for k,_ in pairs(connectedNetworks) do
+  for networkId,_ in pairs(connectedNetworksId) do
     numNetworks = numNetworks + 1
-    if firstNetwork == nil then firstNetwork = k end
+    if firstNetworkId == nil then firstNetworkId = networkId end
   end
   if numNetworks <= 0 then return end -- still nothing to update
   if numNetworks == 1 then
-    rescan_network(firstNetwork)
+    if placed and allConnectionsHaveSameNetwork then
+      local addToNetwork = logistica.get_network_by_id_or_nil(firstNetworkId)
+      if addToNetwork then
+        addToNetwork.cables[p2h(pos)] = true
+        set_cache_network_id(minetest.get_meta(pos), addToNetwork.controller)
+      end
+    else
+      rescan_network(firstNetworkId)
+    end
   else
     -- two or more connected networks (should only happen on place)
     -- this cable can't work here, break it, and nothing to update
+    local meta = minetest.get_meta(pos)
     break_logistica_node(pos)
     meta:set_string("infotext", "ERROR: cannot connect to multiple networks!")
   end
@@ -396,30 +446,30 @@ function logistica.on_controller_change(pos, oldNode)
   end
 end
 
-function logistica.on_mass_storage_change(pos, oldNode)
-  on_node_change(pos, oldNode, MASS_STORAGE_OPS)
+function logistica.on_mass_storage_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, MASS_STORAGE_OPS)
 end
 
-function logistica.on_requester_change(pos, oldNode)
-  on_node_change(pos, oldNode, REQUESTER_OPS)
+function logistica.on_requester_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, REQUESTER_OPS)
 end
 
-function logistica.on_supplier_change(pos, oldNode)
-  on_node_change(pos, oldNode, SUPPLIER_OPS)
+function logistica.on_supplier_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, SUPPLIER_OPS)
 end
 
-function logistica.on_injector_change(pos, oldNode)
-  on_node_change(pos, oldNode, INJECTOR_OPS)
+function logistica.on_injector_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, INJECTOR_OPS)
 end
 
-function logistica.on_item_storage_change(pos, oldNode)
-  on_node_change(pos, oldNode, ITEM_STORAGE_OPS)
+function logistica.on_item_storage_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, ITEM_STORAGE_OPS)
 end
 
-function logistica.on_access_point_change(pos, oldNode)
-  on_node_change(pos, oldNode, ACCESS_POINT_OPS)
+function logistica.on_access_point_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, ACCESS_POINT_OPS)
 end
 
-function logistica.on_trashcan_change(pos, oldNode)
-  on_node_change(pos, oldNode, TRASHCAN_OPS)
+function logistica.on_trashcan_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, TRASHCAN_OPS)
 end

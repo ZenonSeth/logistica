@@ -142,7 +142,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
     after_place_node = function (pos, placer, itemstack)
       after_place_injector(pos, placer, itemstack)
     end,
-    after_destruct = logistica.on_injector_change,
+    after_dig_node = logistica.on_injector_change,
     on_punch = on_injector_punch,
     on_rightclick = on_injector_rightclick,
     allow_metadata_inventory_put = allow_injector_storage_inv_put,
@@ -171,7 +171,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_destruct = nil
+  def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil
