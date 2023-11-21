@@ -18,6 +18,7 @@ logistica.GROUP_CABLE_OFF = "group:" .. logistica.TIER_CABLE_OFF
 function logistica.is_machine(name)
   return logistica.is_requester(name) or logistica.is_supplier(name) or logistica.is_mass_storage(name)
           or logistica.is_item_storage(name) or logistica.is_controller(name) or logistica.is_injector(name)
+          or logistica.is_crafting_supplier(name) or logistica.is_trashcan(name) or logistica.is_vaccuum_supplier(name)
           or logistica.is_misc(name)
 end
 
