@@ -52,15 +52,41 @@ local STR_CLEAR_DESC = S("Clear search")
 
 local accessPointForms = {}
 
+-- creates the inv and returns the inv name
+local function get_or_create_detached_inventory(pos, playerName)
+  if accessPointForms[playerName] and accessPointForms[playerName].invName then
+    return accessPointForms[playerName].invName
+  end
+  local invName = playerName.."_LAP_"..logistica.get_rand_string_for(pos)
+  local inv = minetest.create_detached_inventory(invName, {
+    allow_move = logistica.access_point_allow_move,
+    allow_put = logistica.access_point_allow_put,
+    allow_take = logistica.access_point_allow_take,
+    on_move = logistica.access_point_on_inv_move,
+    on_put = logistica.access_point_on_put,
+    on_take = logistica.access_point_on_take,
+  }, playerName)
+  inv:set_size(INV_FAKE, FAKE_INV_SIZE)
+  inv:set_size(INV_INSERT, 1)
+  return invName
+end
+
+local function get_curr_pos(player)
+    if not player or not player:is_player() then return end
+  local playerName = player:get_player_name()
+  if not accessPointForms[playerName] or not accessPointForms[playerName].position then return end
+  return accessPointForms[playerName].position
+end
+
 ----------------------------------------------------------------
 -- formspec
 ----------------------------------------------------------------
 
-local function get_listrings(posForm) return
+local function get_listrings(invName) return
   "listring[current_player;main]"..
-  "listring["..posForm..";"..INV_INSERT.."]"..
+  "listring[detached:"..invName..";"..INV_INSERT.."]"..
   "listring[current_player;main]"..
-  "listring["..posForm..";"..INV_FAKE.."]"..
+  "listring[detached:"..invName..";"..INV_FAKE.."]"..
   "listring[current_player;main]"..
   "listring[current_player;craft]"..
   "listring[current_player;main]"..
@@ -118,8 +144,8 @@ local function get_search_and_page_section(searchTerm, pageInfo) return
   "image_button[13.9,6.5;0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
 end
 
-local function get_access_point_formspec(pos, optMeta, playerName)
-  local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
+local function get_access_point_formspec(pos, invName, optMeta, playerName)
+  --local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or minetest.get_meta(pos)
   local currentNetwork = logistica.get_network_name_or_nil(pos) or S("<NONE>")
   local filterHighImg = logistica.access_point_get_filter_highlight_images(meta, IMG_HIGHLGIHT, IMG_BLANK)
@@ -131,14 +157,14 @@ local function get_access_point_formspec(pos, optMeta, playerName)
   return "formspec_version[4]"..
     "size[15.2,12.5]"..
     logistica.ui.background..
-    "list["..posForm..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
+    "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
     "image[2.8,6.4;1,1;logistica_icon_input.png]"..
-    "list["..posForm..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
+    "list[detached:"..invName..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
     "label[1.4,12.2;"..S("Crafting").."]"..
     "list[current_player;craft;0.2,8.4;3,3;]"..
     "list[current_player;craftpreview;3.9,8.4;1,1;]"..
-    get_listrings(posForm)..
+    get_listrings(invName)..
     get_filter_section(usesMetaStr, filterHighImg)..
     get_tooltips()..
     get_sort_section(sortHighImg)..
@@ -148,12 +174,16 @@ end
 
 local function show_access_point_formspec(pos, playerName, optMeta)
   local meta = optMeta or minetest.get_meta(pos)
-  accessPointForms[playerName] = { position = pos }
-  logistica.access_point_refresh_fake_inv(pos, INV_FAKE, FAKE_INV_SIZE, playerName)
+  local invName = get_or_create_detached_inventory(pos, playerName)
+  accessPointForms[playerName] = {
+    position = pos,
+    invName = invName,
+  }
+  logistica.access_point_refresh_fake_inv(pos, invName, INV_FAKE, FAKE_INV_SIZE, playerName)
   minetest.show_formspec(
     playerName,
     FORMSPEC_NAME,
-    get_access_point_formspec(pos, meta, playerName)
+    get_access_point_formspec(pos, invName, meta, playerName)
   )
 end
 
@@ -211,17 +241,19 @@ end
 
 function logistica.access_point_after_place(pos, meta)
   local inv  = meta:get_inventory()
-  inv:set_size(INV_FAKE, FAKE_INV_SIZE)
-  inv:set_size(INV_INSERT, 1)
 end
 
-function logistica.access_point_allow_put(pos, listname, index, stack, player)
+function logistica.access_point_allow_put(inv, listname, index, stack, player)
   if listname == INV_FAKE then return 0 end
   return stack:get_count()
 end
 
-function logistica.access_point_allow_take(pos, listname, index, _stack, player)
+function logistica.access_point_allow_take(inv, listname, index, _stack, player)
   local stack = ItemStack(_stack)
+  local pos = get_curr_pos(player)
+  if not pos then return 0 end
+
+  logistica.load_position(pos)
   if listname == INV_FAKE then
     local network = logistica.get_network_or_nil(pos)
     if not network then
@@ -255,19 +287,21 @@ function logistica.access_point_allow_take(pos, listname, index, _stack, player)
   return stack:get_count()
 end
 
-function logistica.access_point_allow_move(pos, from_list, from_index, to_list, to_index, count, player)
+function logistica.access_point_allow_move(inv, from_list, from_index, to_list, to_index, count, player)
   if from_list == INV_FAKE or to_list == INV_FAKE then return 0 end
   return count
 end
 
-function logistica.access_point_on_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+function logistica.access_point_on_inv_move(inv, from_list, from_index, to_list, to_index, count, player)
 end
 
-function logistica.access_point_on_put(pos, listname, index, stack, player)
+function logistica.access_point_on_put(inv, listname, index, stack, player)
+  local pos = get_curr_pos(player)
+  if not pos then return 0 end
+  logistica.load_position(pos)
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then show_access_point_formspec(pos, player:get_player_name()) ; return end
   if listname == INV_INSERT then
-    local inv = minetest.get_meta(pos):get_inventory()
     local stackToAdd = inv:get_stack(listname, index)
     local leftover = logistica.insert_item_in_network(stackToAdd, networkId)
     stack:set_count(leftover)
@@ -276,10 +310,16 @@ function logistica.access_point_on_put(pos, listname, index, stack, player)
   end
 end
 
-function logistica.access_point_on_take(pos, listname, index, stack, player)
+function logistica.access_point_on_take(inv, listname, index, stack, player)
   if listname == INV_FAKE then
+    local pos = get_curr_pos(player)
+    if not pos then return 0 end
+    local invName = accessPointForms[player:get_player_name()].invName
+    if not invName then return 0 end
+
+    logistica.load_position(pos)
     -- refresh the page in case we had to swap out a fake item or a stack is gone
-    logistica.access_point_refresh_fake_inv(pos, listname, FAKE_INV_SIZE, player:get_player_name())
+    logistica.access_point_refresh_fake_inv(pos, invName, listname, FAKE_INV_SIZE, player:get_player_name())
   end
 end
 

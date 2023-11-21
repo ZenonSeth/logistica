@@ -135,9 +135,9 @@ function logistica.access_point_on_player_close(playerName)
   fakeInvMap[playerName] = nil
 end
 
-function logistica.update_fake_inv(pos, listName, listSize, playerName)
+function logistica.update_fake_inv(pos, invName, listName, listSize, playerName)
   local meta = get_meta(pos)
-  local inv = meta:get_inventory()
+  local inv = minetest.get_inventory({type = "detached", name = invName})
   local pageInfo = logistica.access_point_get_current_page_info(pos, playerName, listSize, meta)
   if pageInfo.max == 0 then inv:set_list(listName, {}) ; return end
   local startingPos = (pageInfo.curr - 1) * listSize + 1
@@ -216,10 +216,10 @@ function logistica.access_point_get_sort_highlight_images(meta, highlightImg, bl
   }
 end
 
-function logistica.access_point_refresh_fake_inv(pos, listName, listSize, playerName)
+function logistica.access_point_refresh_fake_inv(pos, invName, listName, listSize, playerName)
   local listInfo = build_stack_list(pos)
   fakeInvMap[playerName] = listInfo
-  logistica.update_fake_inv(pos, listName, listSize, playerName)
+  logistica.update_fake_inv(pos, invName, listName, listSize, playerName)
 end
 
 function logistica.access_point_set_filter_method(pos, playerName, method)

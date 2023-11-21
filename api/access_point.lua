@@ -68,7 +68,7 @@ function logistica.register_access_point(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local access_point_name = "logistica:"..lname
   logistica.misc_machines[access_point_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, [logistica.TIER_ACCESS_POINT] = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -85,12 +85,12 @@ function logistica.register_access_point(desc, name, tiles)
     after_place_node = after_place_access_point,
     after_dig_node = logistica.on_access_point_change,
     on_rightclick = on_access_point_rightclick,
-    on_metadata_inventory_move = on_access_point_inv_move,
-    on_metadata_inventory_put = on_access_point_inv_put,
-    on_metadata_inventory_take = on_access_point_inv_take,
-    allow_metadata_inventory_put = allow_access_point_inv_put,
-    allow_metadata_inventory_take = allow_access_point_inv_take,
-    allow_metadata_inventory_move = allow_access_point_inv_move,
+    -- on_metadata_inventory_move = on_access_point_inv_move,
+    -- on_metadata_inventory_put = on_access_point_inv_put,
+    -- on_metadata_inventory_take = on_access_point_inv_take,
+    -- allow_metadata_inventory_put = allow_access_point_inv_put,
+    -- allow_metadata_inventory_take = allow_access_point_inv_take,
+    -- allow_metadata_inventory_move = allow_access_point_inv_move,
     logistica = {}
   }
 
