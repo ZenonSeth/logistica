@@ -44,16 +44,19 @@ local function set_cache_network_id(metaForPos, networkId)
   metaForPos:set_string(META_STORED_NETWORK, str(networkId))
 end
 
-local function get_cached_network_or_nil(posHash, metaForPos)
-  local cachedId = ""
+local function get_unchecked_cached_network_id(metaForPos)
   -- if metaForPos comes from after_dig_node, then it's just a table, not a MetaDataRef
   if type(metaForPos) == "table" then
     if metaForPos.fields and metaForPos.fields[META_STORED_NETWORK] then
-      cachedId = metaForPos.fields[META_STORED_NETWORK]
+      return metaForPos.fields[META_STORED_NETWORK]
     end
   else
-    cachedId = (metaForPos:contains(META_STORED_NETWORK) and metaForPos:get_string(META_STORED_NETWORK)) or ""
+    return (metaForPos.get_string and metaForPos:get_string(META_STORED_NETWORK)) or ""
   end
+end
+
+local function get_cached_network_or_nil(posHash, metaForPos)
+  local cachedId = get_unchecked_cached_network_id(metaForPos)
   local network = networks[tonumber(cachedId)]
   if network and network_contains_hash(network, posHash) then
     return network
@@ -375,6 +378,24 @@ end
 ----------------------------------------------------------------
 -- global namespaced functions
 ----------------------------------------------------------------
+
+-- attempts to 'wake up' - aka load the controller that was last assigned to this position
+function logistica.try_to_wake_up_network(pos)
+  logistica.load_position(pos)
+  if logistica.get_network_or_nil(pos) then return end -- it's already awake
+  local cachedId = get_unchecked_cached_network_id(minetest.get_meta(pos))
+  if not cachedId or cachedId == "" then return end
+  local conPos = minetest.get_position_from_hash(cachedId)
+
+  logistica.load_position(conPos)
+  local node = minetest.get_node(conPos)
+  if logistica.is_controller(node.name) then
+    local nodeDef = minetest.registered_nodes[node.name]
+    if nodeDef.on_timer then
+      nodeDef.on_timer(conPos, 1)
+    end
+  end
+end
 
 function logistica.on_cable_change(pos, oldNode, optMeta, wasPlacedOverride)
   local placed = wasPlacedOverride

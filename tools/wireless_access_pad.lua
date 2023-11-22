@@ -6,8 +6,6 @@ local WAP_MAX_DIST_DEF = 200 -- in nodes
 -- we need this because default tostring(number) function returns scientific representation which loses accuracy
 local str = function(anInt) return string.format("%.0f", anInt) end
 
--- local forms = {}
-
 local function on_wireless_pad_primary(itemstack, user, pointed_thing)
   local pos = pointed_thing.under
   if not pos or not user or not user:is_player() or not user:get_player_control().sneak then return end
@@ -44,6 +42,8 @@ local function on_wireless_pad_secondary(itemstack, placer, pointed_thing)
 
   local targetPos = minetest.get_position_from_hash(tonumber(posHashStr))
   logistica.load_position(targetPos)
+  logistica.try_to_wake_up_network(targetPos)
+
   local node = minetest.get_node(targetPos)
 
   if minetest.get_item_group(node.name, logistica.TIER_ACCESS_POINT) <= 0 then
