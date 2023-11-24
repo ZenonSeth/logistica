@@ -202,3 +202,10 @@ function logistica.table_map(table, func)
   for k,v in pairs(table) do t[k] = func(v) end
   return t
 end
+
+function logistica.table_to_list_indexed(table, func)
+  local t = {}
+  local index = 0
+  for k,v in pairs(table) do index = index + 1; t[index] = func(k, v) end
+  return t
+end

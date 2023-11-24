@@ -31,3 +31,11 @@ logistica.register_lava_furnace_recipe("default:glass", {
   additive_use_chance = 100,
   time = 4
 })
+
+logistica.register_lava_furnace_recipe(L("silverin"), {
+  output = L("wireless_crystal"),
+  lava = 120,
+  additive = "default:mese_crystal",
+  additive_use_chance = 100,
+  time = 6
+})

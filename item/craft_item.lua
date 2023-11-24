@@ -52,6 +52,12 @@ items[L("cobblegen_upgrade")] = {
   stack_max = 4,
 }
 
+items[L("wireless_crystal")] = {
+  description = S("Wireless Crystal\nUsed for upgrading the Wireless Access Pad"),
+  inventory_image = "logistica_wireless_crystal.png",
+  stack_max = 99,
+}
+
 for name, info in pairs(items) do
   minetest.register_craftitem(name, {
     description = info.description,
