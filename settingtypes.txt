@@ -1,0 +1,4 @@
+
+logistica_wap_max_range (Max range for the Wirless Access Pad, in nodes.) int 64000 1 64000
+logistica_wap_upgrade_step (How much distance each upgrade to the WAP adds) int 250 10 5000
+logistica_wifi_upgrader_hard_mode (Make Wireless Upgrader's minigame much harder) bool false
