@@ -173,6 +173,7 @@ local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpg
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
+  meta:set_string("infotext", S("Mass Storage"))
   local nodeName = minetest.get_node(pos).name
   local inv = meta:get_inventory()
   inv:set_size("main", 1)

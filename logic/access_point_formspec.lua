@@ -240,7 +240,7 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
 end
 
 function logistica.access_point_after_place(pos, meta)
-  local inv  = meta:get_inventory()
+  meta:set_string("infotext", S("Access Point"))
 end
 
 function logistica.access_point_allow_put(inv, listname, index, stack, player)

@@ -93,10 +93,8 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
   local network = logistica.get_network_or_nil(pos)
   if not network then
     logistica.toggle_machine_on_off(pos)
-    logistica.set_node_tooltip_from_state(pos)
     return
   end
-  logistica.set_node_tooltip_from_state(pos)
   local meta = minetest.get_meta(pos)
   local stackPos = logistica.get_next_filled_item_slot(meta, "filter")
   if stackPos <= 0 then return end
