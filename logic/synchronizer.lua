@@ -2,7 +2,7 @@ local S = logistica.TRANSLATOR
 
 local FORMSPEC_NAME = "logistica_sync"
 
-local META_LAVA = "loglav"
+-- local META_LAVA = "loglav"
 local META_F1 = "crf1"
 local META_S1 = "crs1"
 local META_F2 = "crf2"
@@ -12,7 +12,7 @@ local META_TS1 = "tars1"
 local META_TF2 = "tarf2"
 local META_TS2 = "tars2"
 
-local MAX_LAVA_AMOUNT = 2000 -- in millibuckets
+-- local MAX_LAVA_AMOUNT = 2000 -- in millibuckets
 
 local FUP1_BTN = "FUP1"
 local FDN1_BTN = "FDN1"
@@ -50,14 +50,16 @@ local BOX_W = BOX_SIZE * 2
 local ITEM_WIRELESS_CRYSTAL = "logistica:wireless_crystal"
 local ITEM_WAP = "logistica:wireless_access_pad"
 
-local WAP_RANGE_INCREASE_STEP = 200
-
 local COLOR_TARGET = "#6BA1FFFF"
 local COLOR_PTS_NO_MATCH = "#FFB300FF"
 local COLOR_PTS_MATCH = "#CCFF00FF"
 
 local forms = {}
 local get_meta = minetest.get_meta
+
+local HARD_MODE = logistica.settings.wifi_upgrader_hard_mode
+local WAP_RANGE_UPGRADE = logistica.settings.wap_upgrade_step
+local WAP_MAX_RANGE = logistica.settings.wap_max_range
 
 ----------------------------------------------------------------
 -- local funcs
@@ -110,17 +112,17 @@ end
 local function waves_match(meta)
   local freq1 = meta:get_int(META_F1)
   local freq2 = meta:get_int(META_F2)
-  local shft1 = meta:get_int(META_S1)
-  local shft2 = meta:get_int(META_S2)
+  local shft1 = (HARD_MODE and meta:get_int(META_S1)) or 0
+  local shft2 = (HARD_MODE and meta:get_int(META_S2)) or 0
   local freqT1 = meta:get_int(META_TF1)
-  local shftT1 = meta:get_int(META_TS1)
+  local shftT1 = (HARD_MODE and meta:get_int(META_TS1)) or 0
   local freqT2 = meta:get_int(META_TF2)
-  local shftT2 = meta:get_int(META_TS2)
+  local shftT2 = (HARD_MODE and meta:get_int(META_TS2)) or 0
   return (freq1 == freqT1 and shft1 == shftT1 and freq2 == freqT2 and shft2 == shftT2) or
          (freq2 == freqT1 and shft2 == shftT1 and freq1 == freqT2 and shft1 == shftT2)
 end
 
-local function apply_to_wap(pos, info)
+local function apply_to_wap(pos, playerName)
   local meta = get_meta(pos)
   local inv = meta:get_inventory()
   if inv:is_empty(INV_UPGRADE) then return end
@@ -131,8 +133,13 @@ local function apply_to_wap(pos, info)
   local itemMeta = item:get_meta()
   if item:get_name() == ITEM_WAP then
     local currRange = itemMeta:get_int(logistica.tools.wap.meta_range_key)
-    local newRange = currRange + WAP_RANGE_INCREASE_STEP
-    -- TODO: check max range against server-configurable range
+    if currRange >= WAP_MAX_RANGE then
+      minetest.chat_send_player(
+        playerName, S("Max range of @1 reached, cannot upgrade WAP further", WAP_MAX_RANGE))
+      return
+    end
+    local newRange = currRange + WAP_RANGE_UPGRADE
+    if newRange > WAP_MAX_RANGE then newRange = WAP_MAX_RANGE end
     itemMeta:set_int(logistica.tools.wap.meta_range_key, newRange)
     itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(newRange))
     inv:set_stack(INV_UPGRADE, 1, item)
@@ -172,11 +179,7 @@ end
 local function box(xy, color)
   return string.format(
     "box[%s,%s;%s,%s;%s]",
-    tostring(xy.x - BOX_SIZE),
-    tostring(xy.y - BOX_SIZE),
-    tostring(BOX_W),
-    tostring(BOX_W),
-    color
+    tostring(xy.x - BOX_SIZE), tostring(xy.y - BOX_SIZE), tostring(BOX_W), tostring(BOX_W), color
   )
 end
 
@@ -204,17 +207,56 @@ local function get_point_boxes(x, y, w, h, f1, s1, f2, s2, color)
   )
 end
 
+local function get_adjust_buttons()
+  local btns = ""
+  if HARD_MODE then btns =
+    "image_button[2.1,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP1_BTN..";]"..
+    "image_button[2.1,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
+    "image_button[3.9,0.8;0.8,0.8;logistica_icon_sr.png;"..SR1_BTN..";]"..
+    "image_button[3.9,1.6;0.8,0.8;logistica_icon_sl.png;"..SL1_BTN..";]"..
+    "image_button[5.8,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP2_BTN..";]"..
+    "image_button[5.8,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"..
+    "image_button[7.6,0.8;0.8,0.8;logistica_icon_sr.png;"..SR2_BTN..";]"..
+    "image_button[7.6,1.6;0.8,0.8;logistica_icon_sl.png;"..SL2_BTN..";]"
+  else btns =
+    "image_button[2.1,1.2;0.8,0.8;logistica_icon_fup.png;"..FUP1_BTN..";]"..
+    "image_button[3.9,1.2;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
+    "image_button[5.8,1.2;0.8,0.8;logistica_icon_fup.png;"..FUP2_BTN..";]"..
+    "image_button[7.6,1.2;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"
+  end
+  local tips =
+    "tooltip["..FUP1_BTN..";"..S("Increase Frequency").."]"..
+    "tooltip["..FDN1_BTN..";"..S("Decrease Frequency").."]"..
+    "tooltip["..FUP2_BTN..";"..S("Increase Frequency").."]"..
+    "tooltip["..FDN2_BTN..";"..S("Decrease Frequency").."]"
+  if HARD_MODE then
+    tips = tips..
+    "tooltip["..SR1_BTN..";"..S("Shift Right").."]"..
+    "tooltip["..SL1_BTN..";"..S("Shift Left").."]"..
+    "tooltip["..SR2_BTN..";"..S("Shift Right").."]"..
+    "tooltip["..SL2_BTN..";"..S("Shift Left").."]"
+  end
+  return btns..tips
+end
+
+local function get_guide_labels() return
+  "label[0.8,6.9;"..S("Target Wave").."]" ..
+  "label[0.8,7.4;"..S("Crsyals' Wave").."]" ..
+  "box[0.4,6.8;0.3,0.2;"..COLOR_TARGET.."]" ..
+  "box[0.4,7.3;0.3,0.2;"..COLOR_PTS_NO_MATCH.."]"
+end
+
 local function get_formspec_sync(pos, playerName, optMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or get_meta(pos)
   local tf1 = meta:get_int(META_TF1) / DISPLAY_FACTOR
-  local ts1 = meta:get_int(META_TS1) / DISPLAY_FACTOR
+  local ts1 = (HARD_MODE and meta:get_int(META_TS1) / DISPLAY_FACTOR) or 0
   local tf2 = meta:get_int(META_TF2) / DISPLAY_FACTOR
-  local ts2 = meta:get_int(META_TS2) / DISPLAY_FACTOR
+  local ts2 = (HARD_MODE and meta:get_int(META_TS2) / DISPLAY_FACTOR) or 0
   local f1 = meta:get_int(META_F1) / DISPLAY_FACTOR
   local f2 = meta:get_int(META_F2) / DISPLAY_FACTOR
-  local s1 = meta:get_int(META_S1) / DISPLAY_FACTOR
-  local s2 = meta:get_int(META_S2) / DISPLAY_FACTOR
+  local s1 = (HARD_MODE and meta:get_int(META_S1) / DISPLAY_FACTOR) or 0
+  local s2 = (HARD_MODE and meta:get_int(META_S2) / DISPLAY_FACTOR) or 0
   local valid = both_crystals_present(meta:get_inventory())
   local matching = waves_match(meta)
   local ptsColor = nil
@@ -239,19 +281,13 @@ local function get_formspec_sync(pos, playerName, optMeta)
     "list[current_player;main;0.4,8;8,4;0]"..
     "list["..posForm..";"..INV_C1..";2.9,1.1;1,1;0]"..
     "list["..posForm..";"..INV_C2..";6.6,1.1;1,1;0]"..
-    "image_button[2.1,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP1_BTN..";]"..
-    "image_button[2.1,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
-    "image_button[3.9,0.8;0.8,0.8;logistica_icon_sr.png;"..SR1_BTN..";]"..
-    "image_button[3.9,1.6;0.8,0.8;logistica_icon_sl.png;"..SL1_BTN..";]"..
-    "image_button[5.8,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP2_BTN..";]"..
-    "image_button[5.8,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"..
-    "image_button[7.6,0.8;0.8,0.8;logistica_icon_sr.png;"..SR2_BTN..";]"..
-    "image_button[7.6,1.6;0.8,0.8;logistica_icon_sl.png;"..SL2_BTN..";]"..
+    get_adjust_buttons()..
     "image[4.75,0.6;1,2;logistica_icon_combine.png]"..
     "image[0.3,2.6;10,4;logistica_icon_graph_back.png]"..
     targBoxes..
     currBoxes..
     applyBtn..
+    get_guide_labels()..
     "list["..posForm..";"..INV_UPGRADE..";5.3,6.7;1,1;0]"..
     "label[3.0,0.5;Crystal 1]"..
     "label[6.6,0.5;Crystal 2]"..
@@ -286,7 +322,7 @@ function logistica.sync_on_player_receive_fields(player, formname, fields)
   elseif fields[FDN2_BTN] then change_freq(meta, 2, -1)
   elseif fields[SR2_BTN] then change_shift(meta, 2, -1)
   elseif fields[SL2_BTN] then change_shift(meta, 2,  1)
-  elseif fields[APPLY_BUTTON] then apply_to_wap(pos, info)
+  elseif fields[APPLY_BUTTON] then apply_to_wap(pos, playerName)
   end
   show_formspec_sync(playerName, pos, meta)
   return true

@@ -3,16 +3,15 @@ local S = logistica.TRANSLATOR
 local META_ACCESS_POINT_POSITION = "logacptps"
 local META_RANGE = "log_range"
 
-local STR_INIT_TIP = S("Put in a Wireless Upgrader to initialize")
+local STR_INIT_TIP = S("Use in a Wireless Upgrader to initialize")
 
 logistica.tools.wap = {
   meta_range_key = META_RANGE,
   description_default = S("Wireless Access Pad").."\n"..STR_INIT_TIP,
-  get_description_with_range = function (range)
-    return S("Wireless Access Pad\nSneak+Punch an Access Point to Sync\nMax range: @1", range)
+  get_description_with_range = function (range, isMax)
+    return S("Wireless Access Pad\nSneak+Punch an Access Point to Sync\nRange: @1", range)
   end
 }
-
 
 -- we need this because default tostring(number) function returns scientific representation which loses accuracy
 local str = function(anInt) return string.format("%.0f", anInt) end
