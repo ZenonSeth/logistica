@@ -77,25 +77,26 @@ end
 -- `{input = ItemStack, output = ItemStack, lava = #, additive = ItemStack, additive_use_chance = #, time = #}`
 local function get_valid_config(meta, currItemStack)
   local inv = meta:get_inventory()
-  local outputDef = logistica.get_lava_furnace_recipe_for(currItemStack:get_name())
-  if not outputDef then return nil end
-  local inputStack = ItemStack(currItemStack) ; inputStack:set_count(outputDef.input_count)
-  local outputStack = ItemStack(outputDef.output)
-  local additiveStack = ItemStack(outputDef.additive or "")
-  if inv:contains_item(INV_INPT, inputStack)
-    and inv:contains_item(INV_ADDI, additiveStack)
-    and inv:room_for_item(INV_OUTP, outputStack) then
-    return {
-      input = inputStack,
-      output = outputStack,
-      lava = outputDef.lava,
-      additive = additiveStack,
-      additive_use_chance = outputDef.additive_use_chance,
-      time = outputDef.time
-    }
-  else
-    return nil
+  local outputDefs = logistica.get_lava_furnace_recipes_for(currItemStack:get_name())
+  if not outputDefs then return nil end
+  for _, outputDef in ipairs(outputDefs) do
+    local inputStack = ItemStack(currItemStack) ; inputStack:set_count(outputDef.input_count)
+    local outputStack = ItemStack(outputDef.output)
+    local additiveStack = ItemStack(outputDef.additive or "")
+    if inv:contains_item(INV_INPT, inputStack)
+      and inv:contains_item(INV_ADDI, additiveStack)
+      and inv:room_for_item(INV_OUTP, outputStack) then
+      return {
+        input = inputStack,
+        output = outputStack,
+        lava = outputDef.lava,
+        additive = additiveStack,
+        additive_use_chance = outputDef.additive_use_chance,
+        time = outputDef.time
+      }
+    end
   end
+  return nil
 end
 
 local function save_lava_used(meta, amount)
@@ -159,7 +160,7 @@ local function common_formspec(pos, meta)
       "list[context;dst;7.8,2.3;2,2;0]"..
       "list[context;input;4.3,0.9;2,1;0]"..
       "label[0.5,1.1;Lava]"..
-      "label[4.7,0.5;Additives]"..
+      "label[4.2,0.5;Additives]"..
       "listring[context;dst]"..
       "listring[current_player;main]"..
       "listring[context;src]"..
@@ -264,7 +265,7 @@ local function lava_furnace_on_construct(pos)
 		inv:set_size(INV_INPT, 1)
 		inv:set_size(INV_FUEL, 1)
 		inv:set_size(INV_OUTP, 4)
-		inv:set_size(INV_ADDI, 2)
+		inv:set_size(INV_ADDI, 1)
     meta:set_string("formspec", get_inactive_formspec(pos, meta))
 		lava_furnace_node_timer(pos, 0)
 end

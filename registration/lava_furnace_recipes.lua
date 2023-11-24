@@ -37,5 +37,5 @@ logistica.register_lava_furnace_recipe(L("silverin"), {
   lava = 120,
   additive = "default:mese_crystal",
   additive_use_chance = 100,
-  time = 6
+  time = 12
 })

@@ -23,19 +23,20 @@ function logistica.register_lava_furnace_recipe(name, def)
   end
 
   local useChance = (def.additive_use_chance ~= nil and logistica.clamp(def.additive_use_chance, 0, 100)) or 100
-  lava_furance_recipes[name] = {
+  lava_furance_recipes[name] = lava_furance_recipes[name] or {}
+  table.insert(lava_furance_recipes[name], {
     input_count = def.input_count or 1,
     output = def.output,
     lava = math.max(1, def.lava),
     additive = def.additive,
     additive_use_chance = useChance,
     time = math.max(MIN_TIME, def.time or 1),
-  }
+  })
 end
 
-function logistica.get_lava_furnace_recipe_for(itemName)
-  local preset = lava_furance_recipes[itemName]
-  if preset then return preset end
+function logistica.get_lava_furnace_recipes_for(itemName)
+  local presets = lava_furance_recipes[itemName]
+  if presets then return presets end
 
   -- else, try to adopt the real one
   local output, decrOut = minetest.get_craft_result({
@@ -44,12 +45,12 @@ function logistica.get_lava_furnace_recipe_for(itemName)
 
   if output.time > 0 and decrOut.items[1]:is_empty() then
     local lavaTime = math.max(MIN_TIME, output.time / NORMAL_COOK_REDUCTION_FACTOR)
-    return {
+    return {{
       input_count = 1,
       output = output.item:to_string(),
       lava = lavaTime * NORMAL_COOK_LAVA_USAGE_PER_SEC,
       time = lavaTime
-    }
+    }}
   end
 
   -- nothing found

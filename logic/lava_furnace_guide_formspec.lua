@@ -13,9 +13,11 @@ local numInternalRecipes = 0
 local function on_mods_loaded()
    local rec = logistica.get_lava_furnace_internal_recipes()
    local count = 0
-   for k, v in pairs(rec) do
-    count = count + 1
-    internalRecipes[count] = {name = k, recipe = v}
+   for k, defs in pairs(rec) do
+    for _, v in ipairs(defs) do
+      count = count + 1
+      internalRecipes[count] = {name = k, recipe = v}
+    end
    end
    numInternalRecipes = count
 end
