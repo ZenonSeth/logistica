@@ -53,7 +53,7 @@ items[L("cobblegen_upgrade")] = {
 }
 
 items[L("wireless_crystal")] = {
-  description = S("Wireless Crystal\nUsed for upgrading the Wireless Access Pad"),
+  description = S("Wireless Crystal\nFor use in a Wireless Upgrader"),
   inventory_image = "logistica_wireless_crystal.png",
   stack_max = 99,
 }

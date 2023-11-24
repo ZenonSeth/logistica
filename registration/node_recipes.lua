@@ -138,3 +138,12 @@ minetest.register_craft({
     {"bucket:bucket_lava",  "bucket:bucket_empty"},
   }
 })
+
+minetest.register_craft({
+  output = L("wireless_synchronizer"),
+  recipe = {
+    {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
+    {L("wireless_crystal"), L("silverin_circuit"), L("wireless_crystal")},
+    {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
+  }
+})

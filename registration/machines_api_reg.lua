@@ -211,6 +211,10 @@ logistica.register_trashcan("Trashcan", "trashcan", {
   "logistica_trashcan_side.png",
 })
 
+--------------------------------
+-- Vaccuum Supply Chest
+--------------------------------
+
 logistica.register_vaccuum_chest("Vaccuum Supplier Chest", "vaccuum_chest", 16, {
   "logistica_vaccuum_top.png",
   "logistica_vaccuum_bottom.png",
@@ -218,4 +222,12 @@ logistica.register_vaccuum_chest("Vaccuum Supplier Chest", "vaccuum_chest", 16, 
   "logistica_vaccuum_side.png",
   "logistica_vaccuum_side.png",
   "logistica_vaccuum_front.png",
+})
+
+--------------------------------
+-- Wireless Upgrader
+--------------------------------
+
+logistica.register_synchronizer("Wireless Upgrader", "wireless_synchronizer", {
+  "logistica_synchronizer_side.png"
 })

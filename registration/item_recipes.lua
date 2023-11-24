@@ -108,3 +108,12 @@ minetest.register_craft({
     {"bucket:bucket_lava",  "bucket:bucket_empty"},
   }
 })
+
+minetest.register_craft({
+  output = L("wireless_access_pad"),
+  recipe = {
+    {L("standing_wave_box"), "default:diamond",     L("standing_wave_box")},
+    {L("wireless_crystal"),  L("silverin_circuit"), L("wireless_crystal")},
+    {L("silverin_slice"),    L("silverin_circuit"), L("silverin_slice")},
+  }
+})

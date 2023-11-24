@@ -61,7 +61,3 @@ function logistica.register_synchronizer(description, name, tiles)
 
   minetest.register_node(syncName, def)
 end
-
-logistica.register_synchronizer("Wireless Upgrader", "wireless_synchronizer", {
-  "logistica_synchronizer_side.png"
-})
