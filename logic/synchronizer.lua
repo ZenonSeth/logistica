@@ -2,7 +2,6 @@ local S = logistica.TRANSLATOR
 
 local FORMSPEC_NAME = "logistica_sync"
 
--- local META_LAVA = "loglav"
 local META_F1 = "crf1"
 local META_S1 = "crs1"
 local META_F2 = "crf2"
@@ -11,8 +10,6 @@ local META_TF1 = "tarf1"
 local META_TS1 = "tars1"
 local META_TF2 = "tarf2"
 local META_TS2 = "tars2"
-
--- local MAX_LAVA_AMOUNT = 2000 -- in millibuckets
 
 local FUP1_BTN = "FUP1"
 local FDN1_BTN = "FDN1"

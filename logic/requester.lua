@@ -7,6 +7,13 @@ TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve0"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve1"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve2"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta2_grinder_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta3_grinder_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta4_grinder_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta2_gravelsieve_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta3_gravelsieve_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["techachge:ta4_gravelsieve_pas"] = true
+TARGET_NODES_REQUIRING_TIMER["tubelub_addons1:grinder"] = true
 
 local function get_meta(pos)
   logistica.load_position(pos)

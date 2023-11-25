@@ -15,7 +15,6 @@ logistica.TIER_CONTROLLER = "logistica_controller"
 logistica.TIER_CABLE_OFF = "logistica_cable_off"
 logistica.GROUP_CABLE_OFF = "group:" .. logistica.TIER_CABLE_OFF
 logistica.TIER_ACCESS_POINT = "logistica_acspt"
-logistica.GROUP_ACCESS_POINT = "group:" .. logistica.TIER_ACCESS_POINT
 
 function logistica.is_machine(name)
   return logistica.is_requester(name) or logistica.is_supplier(name) or logistica.is_mass_storage(name)
