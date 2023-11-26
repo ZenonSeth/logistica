@@ -186,6 +186,14 @@ logistica.register_requester("Item Request Inserter\nInserts 1 item at a time", 
 logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a time", "requester_stack", 64, ins_tiles("stack"))
 
 --------------------------------
+-- Reservoirs
+--------------------------------
+
+logistica.register_reservoir("lava", "Lava", "bucket:bucket_lava", "default_lava.png", 8)
+logistica.register_reservoir("water", "Water", "bucket:bucket_water", "default_water.png")
+logistica.register_reservoir("river_water", "River Water", "bucket:bucket_river_water", "default_river_water.png")
+
+--------------------------------
 -- Passive Supply Chest
 --------------------------------
 

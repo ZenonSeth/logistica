@@ -32,3 +32,5 @@ logistica.settings.wap_upgrade_step = get_int("wap_upgrade_step", 250)
 logistica.settings.wifi_upgrader_hard_mode = get_bool("wifi_upgrader_hard_mode", false)
 
 logistica.settings.cable_size = get_cable_size_from_settings()
+
+logistica.settings.large_liquid_tank_enabled = get_bool("enable_large_liquid_tank", true)

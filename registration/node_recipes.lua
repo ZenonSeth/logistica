@@ -147,3 +147,21 @@ minetest.register_craft({
     {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
   }
 })
+
+minetest.register_craft({
+  output = L("reservoir_silverin_empty"),
+  recipe = {
+    {L("silverin_plate"), "",                    L("silverin_plate")},
+    {L("optic_cable"),    "bucket:bucket_empty", L("photonizer")},
+    {L("silverin_plate"), "",                    L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
+  output = L("reservoir_obsidian_empty"),
+  recipe = {
+    {"default:obsidianbrick", L("silverin_plate"),   "default:obsidianbrick"},
+    {L("optic_cable"),        "bucket:bucket_empty", L("photonizer")},
+    {"default:obsidianbrick", L("silverin_plate"),   "default:obsidianbrick"},
+  }
+})
