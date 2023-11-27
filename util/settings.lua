@@ -9,11 +9,8 @@ local function get_bool (key, default)
 end
 
 local function get_int (key, default)
-  if minetest.settings:has(L(key)) then
-    return tonumber(minetest.settings:get(L(key)))
-  else
-    return default
-  end
+  local val = minetest.settings:get(L(key)) or default
+  return tonumber(val)
 end
 
 --------------------------------
