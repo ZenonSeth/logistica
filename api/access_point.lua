@@ -43,8 +43,8 @@ local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 
-local function can_dig_access_point(pos, _)
-  return logistica.access_point_can_dig(pos)
+local function can_dig_access_point(pos, player)
+  return true
 end
 
 ----------------------------------------------------------------
@@ -53,7 +53,7 @@ end
 
 minetest.register_on_leaveplayer(function(objRef, timed_out)
   if objRef:is_player() then
-    logistica.access_point_on_player_close(objRef:get_player_name())
+    logistica.access_point_on_player_leave(objRef:get_player_name())
   end
 end)
 

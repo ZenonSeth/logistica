@@ -187,6 +187,14 @@ local function show_access_point_formspec(pos, playerName, optMeta)
   )
 end
 
+local function give_to_player(player, stack)
+  local inv = player:get_inventory()
+  local leftover = inv:add_item("main", stack)
+  if leftover and not leftover:is_empty() then
+    minetest.item_drop(leftover, player, player:get_pos())
+  end
+end
+
 ----------------------------------------------------------------
 -- callbacks
 ----------------------------------------------------------------
@@ -199,8 +207,7 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
   if minetest.is_protected(pos, playerName) or not pos then return true end
 
   if fields.quit and not fields.key_enter_field then
-    accessPointForms[playerName] = nil
-    logistica.access_point_on_player_close(playerName)
+    logistica.access_point_on_player_leave(playerName)
     return true
   elseif fields[FRST_BTN] then
     if not logistica.access_point_change_page(pos, -2, playerName, FAKE_INV_SIZE) then return true end
@@ -245,6 +252,9 @@ end
 
 function logistica.access_point_allow_put(inv, listname, index, stack, player)
   if listname == INV_FAKE then return 0 end
+  local pos = get_curr_pos(player)
+  if not pos then return 0 end
+  if not logistica.get_network_or_nil(pos) then return 0 end
   return stack:get_count()
 end
 
@@ -279,7 +289,6 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       -- for the rare case where two items got stacked despite using metadata
       logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
       if not taken or taken:is_empty() then return 0 end
-      local inv = minetest.get_meta(pos):get_inventory()
       inv:set_stack(listname, index, taken)
       return taken:get_count()
     end
@@ -305,7 +314,10 @@ function logistica.access_point_on_put(inv, listname, index, stack, player)
     local stackToAdd = inv:get_stack(listname, index)
     local leftover = logistica.insert_item_in_network(stackToAdd, networkId)
     stack:set_count(leftover)
-    inv:set_stack(listname, index, stack)
+    if not stack:is_empty() then
+      give_to_player(player, stack)
+    end
+    inv:set_stack(listname, index, ItemStack(""))
     show_access_point_formspec(pos, player:get_player_name())
   end
 end
@@ -327,6 +339,11 @@ function logistica.access_point_on_rightclick(pos, node, clicker, itemstack, poi
   show_access_point_formspec(pos, clicker:get_player_name())
 end
 
-function logistica.access_point_can_dig(pos)
-  return minetest.get_meta(pos):get_inventory():is_empty(INV_INSERT)
+function logistica.access_point_on_player_leave(playerName)
+  local info = accessPointForms[playerName]
+  if info and info.invName then
+    minetest.remove_detached_inventory(info.invName)
+  end
+  accessPointForms[playerName] = nil
+  logistica.access_point_on_player_close(playerName)
 end
