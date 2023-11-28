@@ -122,7 +122,7 @@ local function useLava(meta, totalLavaUse, totalTime, runningTime, elapsed, isNe
   if remainigTime <= 0 then
     lavaUse = math.max(0, totalLavaUse - lavaUsedSoFar) -- use up all that's left
   else
-    lavaUse = math.round(totalLavaUse * elapsed / totalTime)
+    lavaUse = logistica.round(totalLavaUse * elapsed / totalTime)
   end
   if currAmount - lavaUse < 0 then
     return nil -- not enough lava in tank
@@ -150,7 +150,7 @@ end
 local function common_formspec(pos, meta)
   local currLava = meta:get_int(META_LAVA_IN_TANK)
   local lavaCap = get_lava_capacity(pos) or 1
-  local lavaPercent = math.round(currLava / lavaCap * 100)
+  local lavaPercent = logistica.round(currLava / lavaCap * 100)
   return "formspec_version[4]"..
       "size[10.5,11]"..
       logistica.ui.background_lava_furnace..
@@ -178,7 +178,7 @@ local function get_inactive_formspec(pos, meta)
 end
 
 local function get_active_formspec(pos, meta, runningTime, totalTime)
-  local timePercent = math.round(runningTime / totalTime * 100)
+  local timePercent = logistica.round(runningTime / totalTime * 100)
   local progressImg = ""
   if timePercent > 0 then
     progressImg = "image[4,2.3;3,1;logistica_lava_furnace_arrow_bg.png^[lowpart:"..timePercent..

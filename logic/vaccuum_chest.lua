@@ -14,7 +14,7 @@ local function add_particle_effect_for_item_taken(itemPos, vaccuumPos)
   for _ = 1, NUM_PARTICLES_PER_COLLECT do
     local startPos = vector.add(itemPos, random_offset())
     local endPos = vector.add(vaccuumPos, vector.new(0, -0.45, 0))
-    local vel = vector.normalize(vector.subtract(endPos, startPos)) * 2
+    local vel = vector.multiply(vector.normalize(vector.subtract(endPos, startPos)), 2)
     minetest.add_particle({
       pos = startPos,
       velocity = vel,

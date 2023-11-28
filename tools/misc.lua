@@ -10,7 +10,7 @@ minetest.register_craftitem("logistica:hyperspanner",{
     local pos = pointed_thing.under
     if not placer or not pos then return end
     local node = minetest.get_node_or_nil(pos)
-    if not node or not logistica.is_machine(node.name) then return end
+    if not node or not (logistica.is_machine(node.name) or logistica.is_cable(node.name)) then return end
     local network = logistica.get_network_name_or_nil(pos) or S("<NONE>")
     logistica.show_popup(
       placer:get_player_name(), 

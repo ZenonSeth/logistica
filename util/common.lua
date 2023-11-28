@@ -209,3 +209,10 @@ function logistica.table_to_list_indexed(table, func)
   for k,v in pairs(table) do index = index + 1; t[index] = func(k, v) end
   return t
 end
+
+function logistica.round(x)
+	if x >= 0 then
+		return math.floor(x + 0.5)
+	end
+	return math.ceil(x - 0.5)
+end
