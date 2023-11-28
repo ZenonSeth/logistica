@@ -1,5 +1,5 @@
 
-local SIZE = 1/16
+local SIZE = logistica.settings.cable_size
 
 local function ends_with(str, ending)
   return str:sub(-#ending) == ending

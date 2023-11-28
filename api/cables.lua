@@ -1,5 +1,5 @@
-local SIZE = 1/16
 
+local SIZE = logistica.settings.cable_size
 
 -- Main function to register a new cable of certain tier
 -- customNodeBox  can specify any of the fixed/connect_DIR - values will be overwritten per-item basis
