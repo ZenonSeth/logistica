@@ -18,7 +18,7 @@ local function get_cable_size_from_settings()
   if val == "medium" then return 1/12
   elseif val == "large" then return 1/8
   elseif val =="xlarge" then return 1/4
-  else return 1/16 end -- the "Small" is default
+  else return 1/16 end
 end
 
 --------------------------------
