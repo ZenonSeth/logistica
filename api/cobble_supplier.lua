@@ -198,7 +198,8 @@ function logistica.register_cobble_generator_supplier(desc, name, tiles)
     on_timer = logistica.on_timer_powered(on_cobblegen_timer),
     can_dig = can_dig_cobblegen,
     logistica = {
-      on_power = on_cobblegen_power
+      on_power = on_cobblegen_power,
+      supplierMayAccept = false,
     }
   }
 

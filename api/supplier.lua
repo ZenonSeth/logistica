@@ -128,7 +128,8 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
     can_dig = can_dig_supplier,
     logistica = {
       inventory_size = inventorySize,
-      on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end
+      on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end,
+      supplierMayAccept = true,
     }
   }
 

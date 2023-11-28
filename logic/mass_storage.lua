@@ -91,30 +91,29 @@ end
 
 function logistica.pull_items_from_network_into_mass_storage(pos)
   local network = logistica.get_network_or_nil(pos)
-  if not network then
-    logistica.toggle_machine_on_off(pos)
-    return
-  end
+  if not network then return false end -- don't run timer when no nework - connecting to network will start it
   local meta = minetest.get_meta(pos)
   local stackPos = logistica.get_next_filled_item_slot(meta, "filter")
-  if stackPos <= 0 then return end
+  if stackPos <= 0 then return true end
 
   local filterStack = meta:get_inventory():get_stack("filter", stackPos)
   local spaceForItems = mass_storage_room_for_item(pos, meta, filterStack)
 
-  if spaceForItems == 0 then return end
+  if spaceForItems == 0 then return true end
 
+  spaceForItems = math.min(spaceForItems, logistica.get_supplier_transfer_rate(meta))
   local requestStack = ItemStack(filterStack)
-  requestStack:set_count(math.min(spaceForItems, logistica.get_supplier_transfer_rate(meta)))
+  requestStack:set_count(spaceForItems)
 
   local numTaken = 0
   for hash, _ in pairs(network.supplier_cache[requestStack:get_name()] or {}) do
     local taken = logistica.take_item_from_supplier_simple(minetest.get_position_from_hash(hash), requestStack)
     numTaken = numTaken + taken:get_count()
     logistica.insert_item_into_mass_storage(pos, meta:get_inventory(), taken)
-    if numTaken >= spaceForItems then return end -- everything isnerted, return
+    if numTaken >= spaceForItems then return true end -- everything isnerted, return
     requestStack:set_count(spaceForItems - numTaken)
   end
+  return true
 end
 
 function logistica.start_mass_storage_timer(pos)
@@ -122,8 +121,7 @@ function logistica.start_mass_storage_timer(pos)
 end
 
 function logistica.on_mass_storage_timer(pos, _)
-  logistica.pull_items_from_network_into_mass_storage(pos)
-  return true
+  return logistica.pull_items_from_network_into_mass_storage(pos)
 end
 
 function logistica.try_to_add_player_wield_item_to_mass_storage(pos, player)
