@@ -43,6 +43,11 @@ local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 
+local function after_dig_access_point(pos, oldnode, oldmeta, digger)
+  logistica.on_access_point_change(pos, oldnode, oldmeta)
+  logistica.access_point_on_dug(pos)
+end
+
 local function can_dig_access_point(pos, player)
   return true
 end
@@ -83,7 +88,7 @@ function logistica.register_access_point(desc, name, tiles)
     can_dig = can_dig_access_point,
     connect_sides = {"top", "bottom", "left", "back", "right" },
     after_place_node = after_place_access_point,
-    after_dig_node = logistica.on_access_point_change,
+    after_dig_node = after_dig_access_point,
     on_rightclick = on_access_point_rightclick,
     -- on_metadata_inventory_move = on_access_point_inv_move,
     -- on_metadata_inventory_put = on_access_point_inv_put,

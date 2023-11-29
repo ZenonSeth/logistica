@@ -3,10 +3,74 @@ local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
 local MAX_NETWORK_DEPTH_SEARCH = 16 -- somewhat arbitrary but prevents stackoverflows
 
+local h2p = minetest.get_position_from_hash
+
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
 end
+
+local function fill_bucket_from_network(network, bucketItemStack, liquidName)
+  local lowestReservoirPos = nil
+  local lowestReservoirLvl = 999999
+  for hash, _ in pairs(network.reservoirs or {}) do
+    local pos = h2p(hash)
+    logistica.load_position(pos)
+    if logistica.reservoir_get_liquid_name(pos) == liquidName then
+      local levels = logistica.reservoir_get_liquid_level(pos)
+      if levels and levels[1] < lowestReservoirLvl then
+        lowestReservoirPos = pos
+        lowestReservoirLvl = levels[1]
+      end
+    end
+  end
+
+  if lowestReservoirPos then
+    return logistica.reservoir_use_item_on(lowestReservoirPos, bucketItemStack)
+  else
+    return nil
+  end
+end
+
+local function empty_bucket_into_network(network, bucketItemStack)
+  local bucketName = bucketItemStack:get_name()
+  local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketName)
+
+  local highestReservoirPos = nil
+  local emptyReservoirPos = nil
+  local emptyResrvoirMinCap = 999999
+  local highestReservoirLvl = 0
+  for hash, _ in pairs(network.reservoirs or {}) do
+    local pos = h2p(hash)
+    logistica.load_position(pos)
+    local liquidInReservoir = logistica.reservoir_get_liquid_name(pos)
+    if liquidInReservoir == liquidName then
+      local levels = logistica.reservoir_get_liquid_level(pos)
+      if levels and levels[1] < levels[2] and levels[1] > highestReservoirLvl then
+        highestReservoirPos = pos
+        highestReservoirLvl = levels[1]
+      end
+    elseif liquidInReservoir == "" then
+      local levels = logistica.reservoir_get_liquid_level(pos)
+      if levels and levels[2] < emptyResrvoirMinCap then
+        emptyResrvoirMinCap = levels[2]
+        emptyReservoirPos = pos
+      end
+    end
+  end
+
+  if highestReservoirPos then
+    return logistica.reservoir_use_item_on(highestReservoirPos, bucketItemStack)
+  elseif emptyReservoirPos then
+    return logistica.reservoir_use_item_on(emptyReservoirPos, bucketItemStack)
+  else
+    return nil
+  end
+end
+
+--------------------------------
+-- public functions
+--------------------------------
 
 -- tries to take a stack from the network locations
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
@@ -40,7 +104,7 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
   local stackName = stackToTake:get_name()
   local validSupplers = network.supplier_cache[stackName] or {}
   for hash, _ in pairs(validSupplers) do
-    local pos = minetest.get_position_from_hash(hash)
+    local pos = h2p(hash)
     logistica.load_position(pos)
     local nodeName = minetest.get_node(pos).name
     if logistica.is_supplier(nodeName) or logistica.is_vaccuum_supplier(nodeName) then
@@ -64,7 +128,7 @@ function logistica.take_stack_from_item_storage(stack, network, collectorFunc, i
   if useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
 
   for storageHash, _ in pairs(network.item_storage) do
-    local storagePos = minetest.get_position_from_hash(storageHash)
+    local storagePos = h2p(storageHash)
     local storageInv = get_meta(storagePos):get_inventory()
     local storageList = storageInv:get_list(ITEM_STORAGE_LIST_NAME) or {}
     for i, storedStack in ipairs(storageList) do
@@ -97,7 +161,7 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
   if stackToTake:get_count() == 0 then return end
   if massLocations == nil then return end
   for storageHash, _ in pairs(massLocations) do
-    local storagePos = minetest.get_position_from_hash(storageHash)
+    local storagePos = h2p(storageHash)
     local meta = get_meta(storagePos)
     local storageInv = meta:get_inventory()
     local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME) or {}
@@ -155,7 +219,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
   -- check requesters first
   local listOfRequestersInNeedOfItem = network.requester_cache[itemstack:get_name()] or {}
   for hash, _ in pairs(listOfRequestersInNeedOfItem) do
-    local pos = minetest.get_position_from_hash(hash)
+    local pos = h2p(hash)
     logistica.load_position(pos)
     local leftover = logistica.insert_itemstack_for_requester(pos, workingStack, true)
     if leftover <= 0 then return 0 end -- we took all items
@@ -173,7 +237,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
     addFunc = logistica.insert_item_into_mass_storage
   end
   for hash, _ in pairs(storages) do
-    local pos = minetest.get_position_from_hash(hash)
+    local pos = h2p(hash)
     local inv = get_meta(pos):get_inventory()
     local remainingStack = addFunc(pos, inv, workingStack, dryRun)
     if remainingStack:is_empty() then return 0 end -- we took all items
@@ -183,7 +247,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
   -- try to add to passive suppliers that accept this
   local suppliers = network.suppliers
   for hash, _ in pairs(suppliers) do
-    local pos = minetest.get_position_from_hash(hash)
+    local pos = h2p(hash)
     logistica.load_position(pos)
     local leftover = logistica.put_item_in_supplier(pos, workingStack)
     if leftover:is_empty() then return 0 end
@@ -193,11 +257,67 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
   -- [Keep this last] delete the item if any trashcan accepts it
   local trashcans = network.trashcans or {}
   for hash, _ in pairs(trashcans) do
-    local pos = minetest.get_position_from_hash(hash)
+    local pos = h2p(hash)
     logistica.load_position(pos)
     workingStack = logistica.trashcan_trash_item(pos, workingStack)
     if workingStack:is_empty() then return 0 end
   end
 
   return workingStack:get_count()
+end
+
+--[[ returns a natural-indexed list of tables - or empty table if there's no network or no liquids: 
+  ```
+  [1] = {
+    name = "liquid_name", -- name of the liquid or "" if for empty reservoirs
+    curr = 0 -- amount of liquid stored in network
+    max = 32 -- combined max capacity of the reservoirs occupied by liquid
+  },
+  [2] = {...}
+  ```
+]]
+function logistica.get_available_liquids_in_network(pos)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return {} end
+  local liquidInfo = {}
+  for hash, _ in pairs(network.reservoirs or {}) do
+    local resPos = h2p(hash)
+    local liquidName = logistica.reservoir_get_liquid_name(resPos)
+    local liquidLevels = logistica.reservoir_get_liquid_level(resPos)
+    if liquidName and liquidLevels then
+      local info = liquidInfo[liquidName] or {curr = 0, max = 0}
+      info.curr = info.curr + liquidLevels[1]
+      info.max = info.max + liquidLevels[2]
+      liquidInfo[liquidName] = info
+    end
+  end
+  return
+    logistica.table_to_list_indexed(liquidInfo, function(lName, lInfo)
+      return {
+        name = lName,
+        curr = lInfo.curr,
+        max = lInfo.max,
+      }
+    end)
+end
+
+-- attempts to use, either fill or empty, the given bucket in/from liquid storage on
+-- the network.<br>
+-- `liquidName` is only used if the bucketItem is a type of empty bucket<br>
+-- Otherwise a full bucket will attempt to fill any applicable reservoir on the network.
+-- This function attempts to take from the lowest filled reservoir, and insert into the highest filled reservoir first.<br>
+-- returns new itemstack to replace the old one, or `nil` if it wasn't changed
+function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquidName)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return nil end
+
+  local bucketName = bucketItemStack:get_name()
+  local isEmptyBucket = logistica.reservoir_is_empty_bucket(bucketName)
+  local isFullBucket = logistica.reservoir_is_full_bucket(bucketName)
+  if isEmptyBucket then
+    if not liquidName then return nil end
+    return fill_bucket_from_network(network, bucketItemStack, liquidName)
+  elseif isFullBucket then
+    return empty_bucket_into_network(network, bucketItemStack)
+  end
 end

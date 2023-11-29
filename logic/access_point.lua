@@ -1,10 +1,19 @@
+local S = logistica.TRANSLATOR
+
 local META_CURR_PAGE = "ap_curr_p"
 local META_SORT_TYPE = "ap_sort"
 local META_FILTER_TYPE = "ap_fltr"
 local META_CURR_SEARCH = "ap_curr_s"
 local META_IGNORE_METADATA = "ap_usemd"
+local META_CURR_LIQUID_INDEX = "ap_curr_l"
+
+local STR_NO_LIQUID = S("No Liquid Storage")
+local STR_EMPTY_RESERVOIRS = S("Free Capacity:")
 
 local fakeInvMap = {}
+local liquidsMap = {}
+
+local LIQUID_NONE = -1
 
 local SORT_NAME = 1
 local SORT_MOD = 2
@@ -126,6 +135,26 @@ local function build_stack_list(pos)
   }
 end
 
+-- { description = "description here", capacity = "3/32", texture = "texture_name.png"}
+local function make_display_info(name, currBuckets, maxBuckets)
+  if not currBuckets or not maxBuckets then return { description = name, capacity = "", texture = ""} end
+
+  local desc, cap
+  if name == "" then
+    desc = STR_EMPTY_RESERVOIRS
+    cap = tostring(maxBuckets)
+  else
+    desc = logistica.reservoir_get_description_of_liquid(name)
+    cap = tostring(currBuckets).." / "..tostring(maxBuckets)
+  end
+
+  local texture = logistica.reservoir_get_texture_of_liquid(name)
+  return {
+    description = desc,
+    capacity = cap,
+    texture = texture,
+  }
+end
 
 --------------------------------
 -- public functions
@@ -133,6 +162,7 @@ end
 
 function logistica.access_point_on_player_close(playerName)
   fakeInvMap[playerName] = nil
+  liquidsMap[playerName] = nil
 end
 
 function logistica.update_fake_inv(pos, invName, listName, listSize, playerName)
@@ -242,4 +272,62 @@ end
 
 function logistica.access_point_get_current_search_term(meta)
   return meta:get_string(META_CURR_SEARCH)
+end
+
+function logistica.access_point_change_liquid(meta, dir, playerName)
+  local liquidsInfo = liquidsMap[playerName]
+  if not liquidsInfo then return end
+  local currLiquidIndex = meta:get_int(META_CURR_LIQUID_INDEX)
+  if currLiquidIndex == LIQUID_NONE then return end
+  local numLiquids = #liquidsInfo
+  if numLiquids <= 0 then return end
+  local next = currLiquidIndex + dir
+
+  if next > numLiquids then next = 1 end
+  if next < 1 then next = numLiquids end
+
+  meta:set_int(META_CURR_LIQUID_INDEX, next)
+  return true
+end
+
+function logistica.access_point_refresh_liquids(pos, playerName)
+  local liquidsInfo = logistica.get_available_liquids_in_network(pos)
+  liquidsMap[playerName] = liquidsInfo
+
+  local meta = minetest.get_meta(pos)
+  if #liquidsInfo <= 0 then
+    meta:set_int(META_CURR_LIQUID_INDEX, LIQUID_NONE)
+    return
+  end
+
+  local currLiquid = meta:get_int(META_CURR_LIQUID_INDEX)
+  local validSelected = currLiquid >= 1 and currLiquid <= #liquidsInfo
+  if not validSelected then
+    meta:set_int(META_CURR_LIQUID_INDEX, 1)
+  end
+end
+
+-- returns a table: { description = "description here", capacity = "3/32", texture = "texture_name.png"}
+function logistica.access_point_get_current_liquid_display_info(meta, playerName)
+  local liquidsInfo = liquidsMap[playerName]
+  if not liquidsInfo then return make_display_info(STR_NO_LIQUID, nil, nil) end
+  local currLiquid = meta:get_int(META_CURR_LIQUID_INDEX)
+  local liquidInfo = liquidsInfo[currLiquid]
+
+  if currLiquid == LIQUID_NONE or not liquidInfo then return make_display_info(STR_NO_LIQUID, nil, nil) end
+
+  return make_display_info(liquidInfo.name, liquidInfo.curr, liquidInfo.max)
+end
+
+-- returns the current liquid name (which may be "" for the empty reservoirs) or nil if invalid/no reservoirs
+function logistica.access_point_get_current_liquid_name(meta, playerName)
+  local liquidsInfo = liquidsMap[playerName]
+  if not liquidsInfo then return nil end
+
+  local currLiquid = meta:get_int(META_CURR_LIQUID_INDEX)
+  if currLiquid == LIQUID_NONE then return "" end
+
+  local liquidInfo = liquidsInfo[currLiquid]
+  if not liquidInfo then return nil
+  else return liquidInfo.name end
 end

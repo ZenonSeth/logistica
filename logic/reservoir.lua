@@ -3,6 +3,9 @@ local S = logistica.TRANSLATOR
 local BUCKET_TO_NAME = {}
 local NAME_TO_BUCKET = {}
 local NAME_TO_EMPTY_BUCKET = {}
+local NAME_TO_DESC = {}
+local NAME_TO_TEXTURE = {}
+
 local EMPTY_BUCKET = "bucket:bucket_empty"
 local EMPTY_SUFFIX = "_empty"
 
@@ -54,6 +57,14 @@ end
 -- public functions
 --------------------------------
 
+function logistica.reservoir_get_description_of_liquid(liquidName)
+  return NAME_TO_DESC[liquidName] or LIQUID_NONE
+end
+
+function logistica.reservoir_get_texture_of_liquid(liquidName)
+  return NAME_TO_TEXTURE[liquidName] or ""
+end
+
 function logistica.reservoir_make_param2(val, max)
   local ret = math.floor(63*(val/max))
   if val > 0 and ret == 0 then
@@ -66,12 +77,14 @@ function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName
   return strDescription.."\n"..getStrContains(currBuckets, maxBuckets, liquidName)
 end
 
-function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName)
+function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture)
   BUCKET_TO_NAME[bucketName] = liquidName
   NAME_TO_BUCKET[liquidName] = bucketName
   if emptyBucketName then
     NAME_TO_EMPTY_BUCKET[liquidName] = emptyBucketName
   end
+  NAME_TO_DESC[liquidName] = liquidDesc
+  NAME_TO_TEXTURE[liquidName] = liquidTexture
 end
 
 -- returns nil if item had no effect<br>
@@ -86,7 +99,7 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode)
   local nodeLiquidLevel = meta:get_int(META_LIQUID_LEVEL)
   local liquidName = nodeDef.logistica.liquidName
   local maxBuckets = nodeDef.logistica.maxBuckets
-  local liquidDesc = nodeDef.logistica.liquidDesc
+  local liquidDesc = logistica.reservoir_get_description_of_liquid(liquidName)
 
   local emptyBucket = get_empty_bucket_needed_for(liquidName)
   local fullBucket = get_full_bucket_needed_for(liquidName)
@@ -127,14 +140,57 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode)
     minetest.swap_node(pos, node)
     local newNodeName = get_liquid_reservoir_name_for(node.name, newLiquidName)
 
-    if not minetest.registered_nodes[newNodeName] then return nil end
+    local nodeDef = minetest.registered_nodes[newNodeName]
+    if not nodeDef or not nodeDef.logistica then return nil end
     if nodeLiquidLevel == 1 then -- first bucket we added, swap to that reservoir type
       logistica.swap_node(pos, newNodeName)
     end
-    local newLiquidDesc = minetest.registered_nodes[newNodeName].logistica.liquidDesc
+    local newLiquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
     meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
     meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
     return ItemStack(newEmptyBucket)
   end
   return nil
+end
+
+-- returns the liquid name for the reservoir; or "" if there's no liquid stored, or nil if its not a reservoir
+function logistica.reservoir_get_liquid_name(pos)
+  local node = minetest.get_node(pos)
+  if not logistica.is_reservoir(node.name) then return nil end
+  local def = minetest.registered_nodes[node.name]
+  if not def or not def.logistica or not def.logistica.liquidName then return nil end
+  return def.logistica.liquidName
+end
+
+-- return {currentLevel, maxLevel} measured in buckets; or nil if its not a reservoir
+function logistica.reservoir_get_liquid_level(pos)
+  local node = minetest.get_node(pos)
+  if not logistica.is_reservoir(node.name) then return nil end
+  local def = minetest.registered_nodes[node.name]
+  if not def or not def.logistica or not def.logistica.maxBuckets then return nil end
+  local meta = minetest.get_meta(pos)
+  return { meta:get_int(META_LIQUID_LEVEL), def.logistica.maxBuckets }
+end
+
+function logistica.reservoir_is_empty_bucket(bucketName)
+  if bucketName == EMPTY_BUCKET then return true end
+  for _, bucket in pairs(NAME_TO_EMPTY_BUCKET) do
+    if bucket == bucketName then return true end
+  end
+  return false
+end
+
+function logistica.reservoir_is_full_bucket(bucketName)
+  if BUCKET_TO_NAME[bucketName] ~= nil then return true end
+  return false
+end
+
+-- returns true if the itemname is a known empty or filled bucket that can be used in a reservoir
+function logistica.reservoir_is_known_bucket(bucketName)
+  return logistica.reservoir_is_empty_bucket(bucketName) or logistica.reservoir_is_full_bucket(bucketName)
+end
+
+-- return the liquid name for the given bucket name, or nil if there's none registered
+function logistica.reservoir_get_liquid_name_for_bucket(bucketName)
+  return BUCKET_TO_NAME[bucketName]
 end

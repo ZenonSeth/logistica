@@ -19,9 +19,12 @@ local SORT_COUNT_BTN = "sort_cnt"
 local SORT_WEAR_BTN = "sort_wer"
 local SEARCH_FIELD = "srch_fld"
 local USE_META_BTN = "tgl_meta"
+local LIQUID_NEXT_BTN = "liq_nxt"
+local LIQUID_PREV_BTN = "liq_prv"
 
 local INV_FAKE = "fake"
 local INV_INSERT = "isert"
+local INV_LIQUID = "liqd"
 local FAKE_INV_W = 12
 local FAKE_INV_H = 4
 local FAKE_INV_SIZE = FAKE_INV_W * FAKE_INV_H
@@ -49,15 +52,16 @@ local STR_LIGHT_DESC = S("Show Light sources only")
 local STR_SERCH_DESC = S("Search by text\nUse group:some_group to find items belongong to some_group")
 local STR_CLEAR_DESC = S("Clear search")
 
-
+local detachedInventories = {}
 local accessPointForms = {}
 
 -- creates the inv and returns the inv name
 local function get_or_create_detached_inventory(pos, playerName)
-  if accessPointForms[playerName] and accessPointForms[playerName].invName then
-    return accessPointForms[playerName].invName
+  local hash = minetest.hash_node_position(pos)
+  if detachedInventories[hash] then
+    return detachedInventories[hash]
   end
-  local invName = playerName.."_LAP_"..logistica.get_rand_string_for(pos)
+  local invName = "Logistica_AP_"..logistica.get_rand_string_for(pos)
   local inv = minetest.create_detached_inventory(invName, {
     allow_move = logistica.access_point_allow_move,
     allow_put = logistica.access_point_allow_put,
@@ -68,6 +72,8 @@ local function get_or_create_detached_inventory(pos, playerName)
   }, playerName)
   inv:set_size(INV_FAKE, FAKE_INV_SIZE)
   inv:set_size(INV_INSERT, 1)
+  inv:set_size(INV_LIQUID, 1)
+  detachedInventories[hash] = invName
   return invName
 end
 
@@ -144,6 +150,17 @@ local function get_search_and_page_section(searchTerm, pageInfo) return
   "image_button[13.9,6.5;0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
 end
 
+local function get_liquid_section(invName, meta, playerName)
+  local currInfo = logistica.access_point_get_current_liquid_display_info(meta, playerName)
+
+  return
+    "list[detached:"..invName..";"..INV_LIQUID..";1.2,7.3;1,1;0]"..
+    "image[1.3,6;0.8,0.8;"..currInfo.texture.."]"..
+    "label[1.0,7.1;"..currInfo.description.." "..currInfo.capacity.."]"..
+    "image_button[0.7,6;0.6,0.8;logistica_icon_prev.png;"..LIQUID_PREV_BTN..";;false;false]"..
+    "image_button[2.1,6;0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"
+end
+
 local function get_access_point_formspec(pos, invName, optMeta, playerName)
   --local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or minetest.get_meta(pos)
@@ -158,12 +175,13 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
     "size[15.2,12.5]"..
     logistica.ui.background..
     "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
-    "image[2.8,6.4;1,1;logistica_icon_input.png]"..
-    "list[detached:"..invName..";"..INV_INSERT..";3.8,6.4;1,1;0]"..
+    "image[3.2,6.5;0.8,0.8;logistica_icon_input.png]"..
+    "list[detached:"..invName..";"..INV_INSERT..";4.0,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
     "label[1.4,12.2;"..S("Crafting").."]"..
     "list[current_player;craft;0.2,8.4;3,3;]"..
     "list[current_player;craftpreview;3.9,8.4;1,1;]"..
+    get_liquid_section(invName, meta, playerName)..
     get_listrings(invName)..
     get_filter_section(usesMetaStr, filterHighImg)..
     get_tooltips()..
@@ -180,6 +198,7 @@ local function show_access_point_formspec(pos, playerName, optMeta)
     invName = invName,
   }
   logistica.access_point_refresh_fake_inv(pos, invName, INV_FAKE, FAKE_INV_SIZE, playerName)
+  logistica.access_point_refresh_liquids(pos, playerName)
   minetest.show_formspec(
     playerName,
     FORMSPEC_NAME,
@@ -207,7 +226,6 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
   if minetest.is_protected(pos, playerName) or not pos then return true end
 
   if fields.quit and not fields.key_enter_field then
-    logistica.access_point_on_player_leave(playerName)
     return true
   elseif fields[FRST_BTN] then
     if not logistica.access_point_change_page(pos, -2, playerName, FAKE_INV_SIZE) then return true end
@@ -241,6 +259,10 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     logistica.access_point_on_search_clear(pos)
   elseif fields[SEARCH_BTN] or fields.key_enter_field then
     logistica.access_point_on_search_change(pos, fields[SEARCH_FIELD])
+  elseif fields[LIQUID_PREV_BTN] then
+    if not logistica.access_point_change_liquid(minetest.get_meta(pos),-1, playerName) then return true end
+  elseif fields[LIQUID_NEXT_BTN] then
+    if not logistica.access_point_change_liquid(minetest.get_meta(pos), 1, playerName) then return true end
   end
   show_access_point_formspec(pos, playerName)
   return true
@@ -252,9 +274,18 @@ end
 
 function logistica.access_point_allow_put(inv, listname, index, stack, player)
   if listname == INV_FAKE then return 0 end
+
   local pos = get_curr_pos(player)
   if not pos then return 0 end
   if not logistica.get_network_or_nil(pos) then return 0 end
+
+  if listname == INV_LIQUID then
+    if logistica.reservoir_is_known_bucket(stack:get_name()) then
+      local currStack = inv:get_stack(listname, index)
+      if currStack:is_empty() then return 1 else return 0 end
+    else return 0 end
+  end
+
   return stack:get_count()
 end
 
@@ -298,6 +329,7 @@ end
 
 function logistica.access_point_allow_move(inv, from_list, from_index, to_list, to_index, count, player)
   if from_list == INV_FAKE or to_list == INV_FAKE then return 0 end
+  if to_list == INV_LIQUID then return 0 end
   return count
 end
 
@@ -319,6 +351,13 @@ function logistica.access_point_on_put(inv, listname, index, stack, player)
     end
     inv:set_stack(listname, index, ItemStack(""))
     show_access_point_formspec(pos, player:get_player_name())
+  elseif listname == INV_LIQUID then
+    local currLiquid = logistica.access_point_get_current_liquid_name(minetest.get_meta(pos), player:get_player_name())
+    local newStack = logistica.use_bucket_for_liquid_in_network(pos, stack, currLiquid)
+    if newStack then
+      inv:set_stack(listname, index, newStack)
+      show_access_point_formspec(pos, player:get_player_name())
+    end
   end
 end
 
@@ -342,8 +381,28 @@ end
 function logistica.access_point_on_player_leave(playerName)
   local info = accessPointForms[playerName]
   if info and info.invName then
-    minetest.remove_detached_inventory(info.invName)
+    local onlyRef = true
+    for _, otherInfo in pairs(accessPointForms) do
+      if otherInfo.invName == info.invName then onlyRef = false end
+    end
+    if onlyRef then
+      minetest.remove_detached_inventory(info.invName)
+    end
   end
   accessPointForms[playerName] = nil
   logistica.access_point_on_player_close(playerName)
+end
+
+function logistica.access_point_on_dug(pos)
+  local removeForPlayers = {}
+  local i =0
+  for playerName, info in pairs(accessPointForms) do
+    if info.position and vector.equals(pos, info.position) then
+      i = i + 1
+      removeForPlayers[i] = playerName
+    end
+  end
+  for _, playerName in ipairs(removeForPlayers) do
+    logistica.access_point_on_player_leave(playerName)
+  end
 end

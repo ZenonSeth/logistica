@@ -66,13 +66,14 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
   if not nodeDef or not nodeDef.logistica then return end
 
   local liquidLevel = stackMeta:get_int(META_LIQUID_LEVEL)
-  local liquidDesc = nodeDef.logistica.liquidDesc
+  local liquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
   local maxBuckets = nodeDef.logistica.maxBuckets
 
   nodeMeta:set_int(META_LIQUID_LEVEL, liquidLevel)
   node.param2 = logistica.reservoir_make_param2(liquidLevel, maxBuckets)
   minetest.swap_node(pos, node)
   nodeMeta:set_string("infotext", logistica.reservoir_get_description(liquidLevel, maxBuckets, liquidDesc))
+  logistica.on_reservoir_change(pos)
 end
 
 
@@ -84,7 +85,7 @@ local function preserve_metadata(pos, oldnode, oldmeta, drops)
   local meta = minetest.get_meta(pos)
   local drop = drops[1]
   local dropMeta = drop:get_meta()
-  local liquidDesc = nodeDef.logistica.liquidDesc
+  local liquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
   local maxBuckets = nodeDef.logistica.maxBuckets
   local liquidLevel = meta:get_int(META_LIQUID_LEVEL)
 
@@ -118,9 +119,10 @@ local commonDef = {
   paramtype2 = "glasslikeliquidlevel",
   is_ground_content = false,
   sunlight_propagates = false,
-  groups = {cracky = 3, level = 1},
+  groups = {cracky = 3, level = 1, [logistica.TIER_ALL] = 1},
   preserve_metadata = preserve_metadata,
   after_place_node = after_place_node,
+  after_dig_node = logistica.on_reservoir_change,
   on_rightclick = on_rightclick,
   stack_max = 1,
   backface_culling = false,
@@ -144,8 +146,8 @@ for _, variantName in ipairs(variants) do
   local nodeName = L("reservoir_"..variantName..EMPTY_SUFFIX)
   def.drops = nodeName
   def.logistica.liquidName = LIQUID_NONE
-  def.logistica.liquidDesc = LIQUID_NONE
   minetest.register_node(nodeName, def)
+  logistica.reservoirs[nodeName] = true
 end
 
 --[[
@@ -165,12 +167,12 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
     def.drops = nodeName
     def.special_tiles = {liquidTexture}
     def.logistica.liquidName = lname
-    def.logistica.liquidDesc = liquidDesc
     def.groups.not_in_creative_inventory = 1
     def.light_source = optLight
 
     minetest.register_node(nodeName, def)
+    logistica.reservoirs[nodeName] = true
 
-    logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName)
+    logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture)
   end
 end

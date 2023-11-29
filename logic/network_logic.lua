@@ -23,6 +23,7 @@ local function has_machine(network, id)
     or network.injectors[id]
     or network.misc[id]
     or network.trashcans[id]
+    or network.reservoirs[id]
   then
     return true
   else
@@ -204,6 +205,10 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           network.trashcans[otherHash] = true
           valid = true
         end
+        if logistica.is_reservoir(otherName) then
+          network.reservoirs[otherHash] = true
+          valid = true
+        end
         if valid then
           newToScan = newToScan + 1
           set_cache_network_id(minetest.get_meta(otherPos), network.controller)
@@ -242,6 +247,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
+  network.reservoirs = {}
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
@@ -365,6 +371,12 @@ local ACCESS_POINT_OPS = {
 
 local TRASHCAN_OPS = {
   get_list = function(network) return network.trashcans end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
+local RESERVOIR_OPS = {
+  get_list = function(network) return network.reservoirs end,
   update_cache_node_added = function(_)  end,
   update_cache_node_removed = function(_) end,
 }
@@ -493,4 +505,8 @@ end
 
 function logistica.on_trashcan_change(pos, oldNode, oldMeta)
   on_node_change(pos, oldNode, oldMeta, TRASHCAN_OPS)
+end
+
+function logistica.on_reservoir_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, RESERVOIR_OPS)
 end
