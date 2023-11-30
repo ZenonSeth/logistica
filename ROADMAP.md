@@ -2,7 +2,6 @@
 High Priority:
 
 Medium Priority
-- Liquid Storage
 - In-game guide book
 
 Low Priority:
