@@ -140,7 +140,7 @@ local commonDef = {
 
 local function get_variant_def(variantName)
   if not variantSpecificDefs[variantName] then return nil end
-  local vDef = variantSpecificDefs[variantName]
+  local vDef = table.copy(variantSpecificDefs[variantName])
   local def = table.copy(commonDef)
   for k,v in pairs(vDef) do def[k] = v end
   return def
@@ -152,7 +152,7 @@ end
 
 -- register empty tanks, always
 for _, variantName in ipairs(variants) do
-  local def = table.copy(get_variant_def(variantName))
+  local def = get_variant_def(variantName)
   local nodeName = L("reservoir_"..variantName..EMPTY_SUFFIX)
   def.drops = nodeName
   def.logistica.liquidName = LIQUID_NONE
@@ -173,7 +173,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
 
   for _, variantName in ipairs(variants) do
     local nodeName = L("reservoir_"..variantName.."_"..lname)
-    local def = table.copy(get_variant_def(variantName))
+    local def = get_variant_def(variantName)
     def.drops = nodeName
     def.special_tiles = {liquidTexture}
     def.logistica.liquidName = lname
