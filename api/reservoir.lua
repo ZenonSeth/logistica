@@ -53,10 +53,21 @@ local function give_item_to_player(pos, player, stack)
   end
 end
 
+local function make_inv_image(variant, liquidTexture)
+  local liquidMask = "^[mask:logistica_reservoir_liquid_mask.png"
+  local resize = "^[resize:83x83" -- this needs to match the size of the mask png
+  if variant == VAR_SMALL then
+    return liquidTexture..resize..liquidMask.."^logistica_reservoir_silverin_inv.png"
+  elseif variant == VAR_LARGE then
+    return liquidTexture..resize..liquidMask.."^logistica_reservoir_obsidian_inv.png"
+  else
+    return nil
+  end
+end
+
 ----------------------------------------------------------------
 -- callbacks
 ----------------------------------------------------------------
-
 
 local function after_place_node(pos, placer, itemstack, pointed_thing)
   local nodeMeta = minetest.get_meta(pos)
@@ -75,7 +86,6 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
   nodeMeta:set_string("infotext", logistica.reservoir_get_description(liquidLevel, maxBuckets, liquidDesc))
   logistica.on_reservoir_change(pos)
 end
-
 
 local function preserve_metadata(pos, oldnode, oldmeta, drops)
   if not drops or not drops[1] then return end
@@ -169,6 +179,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
     def.logistica.liquidName = lname
     def.groups.not_in_creative_inventory = 1
     def.light_source = optLight
+    def.inventory_image = make_inv_image(variantName, liquidTexture)
 
     minetest.register_node(nodeName, def)
     logistica.reservoirs[nodeName] = true
