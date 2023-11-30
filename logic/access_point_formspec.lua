@@ -41,8 +41,6 @@ local IMG_FILT_ITEM = "logistica_icon_craftitem.png"
 local IMG_FILT_TOOL = "logistica_icon_tool.png"
 local IMG_FILT_LIGHT = "logistica_icon_torch.png"
 
-local ACCESS_POINT_TIMER = 1
-
 local STR_METADATA_DESC = S("Applies to Tools only:\nON = Differentiate items using metadata\nOFF = Group items only by name, ignore metadata")
 local STR_ALL_DESC = S("Show All items")
 local STR_NODES_DESC = S("Show Nodes only")
@@ -125,7 +123,7 @@ local function get_filter_section(usesMetaStr, filterHighImg) return
 end
 
 local function get_sort_section(sortHighImg) return
-  "label[10.5,5.5;"..S("Sort").."]"..
+  "label[10.4,5.5;"..S("Sort").."]"..
   "image[11.0,5;1,1;"..sortHighImg.name.."]"..
   "image[11.9,5;1,1;"..sortHighImg.mod.."]"..
   "image[12.8,5;1,1;"..sortHighImg.count.."]"..
@@ -154,11 +152,11 @@ local function get_liquid_section(invName, meta, playerName)
   local currInfo = logistica.access_point_get_current_liquid_display_info(meta, playerName)
 
   return
-    "list[detached:"..invName..";"..INV_LIQUID..";1.2,7.3;1,1;0]"..
-    "image[1.3,6;0.8,0.8;"..currInfo.texture.."]"..
-    "label[1.0,7.1;"..currInfo.description.." "..currInfo.capacity.."]"..
-    "image_button[0.7,6;0.6,0.8;logistica_icon_prev.png;"..LIQUID_PREV_BTN..";;false;false]"..
-    "image_button[2.1,6;0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"
+    "list[detached:"..invName..";"..INV_LIQUID..";0.95,7.1;1,1;0]"..
+    "image[1.05,5.8;0.8,0.8;"..currInfo.texture.."]"..
+    "label[0.75,6.9;"..currInfo.description.." "..currInfo.capacity.."]"..
+    "image_button[0.45,5.8;0.6,0.8;logistica_icon_prev.png;"..LIQUID_PREV_BTN..";;false;false]"..
+    "image_button[1.85,5.8;0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"
 end
 
 local function get_access_point_formspec(pos, invName, optMeta, playerName)
@@ -179,8 +177,8 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
     "list[detached:"..invName..";"..INV_INSERT..";4.0,6.4;1,1;0]"..
     "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
     "label[1.4,12.2;"..S("Crafting").."]"..
-    "list[current_player;craft;0.2,8.4;3,3;]"..
-    "list[current_player;craftpreview;3.9,8.4;1,1;]"..
+    "list[current_player;craft;0.2,8.5;3,3;]"..
+    "list[current_player;craftpreview;3.9,8.5;1,1;]"..
     get_liquid_section(invName, meta, playerName)..
     get_listrings(invName)..
     get_filter_section(usesMetaStr, filterHighImg)..
