@@ -155,7 +155,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
         logistica.start_requester_timer(pos)
       end,
       on_power = function(pos, isPoweredOn)
-
+        logistica.set_node_tooltip_from_state(pos, nil, isPoweredOn)
         if isPoweredOn then
           logistica.start_requester_timer(pos)
         end
