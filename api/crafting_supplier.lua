@@ -32,7 +32,7 @@ local function get_craftsup_formspec(pos)
     "list["..posForm..";"..INV_MAIN..";7.1,2.75;1,1;0]"..
     "label[4.6,1.2;Recipe]"..
     "label[0.5,5.6;"..S("Excess items, provided as supply. If full\\, excess will be thrown out.").."]"..
-    "list["..posForm..";main;0.4,5.9;8,1;1]"..
+    "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
     "list[current_player;main;0.4,7.8;8,4;0]"..
     "listring["..posForm..";"..INV_MAIN.."]"..
     "listring[current_player;main]"

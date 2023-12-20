@@ -31,17 +31,25 @@ local function consume_from_network(craftItems, times, network, depth)
 end
 
 -- returns 0 if craftItems could not be taken from network, returns 1 if they could
-local function consume_for_craft(craftItems, network, depth)
+local function consume_for_craft(craftItems, craftItemsMult, network, depth, dryRun)
   local itemTaken = ItemStack("")
   local acceptItem = function(st) itemTaken:add_item(st) ; return 0 end
-  for _, itemStack in ipairs(craftItems) do
+  for _, _itemStack in ipairs(craftItems) do
     itemTaken:clear()
+    local itemStack = ItemStack(_itemStack)
+    if dryRun then
+      -- when doing a dryRun the actual items are not removed from the network, so we need to make sure
+      -- we have enough in the network by accounting for how many have been "crafted" so far
+      itemStack:set_count(itemStack:get_count() * craftItemsMult)
+    end
     logistica.take_stack_from_network(itemStack, network, acceptItem, true, false, true, depth + 1)
     if itemTaken:get_count() < itemStack:get_count() then
       return 0
     end
   end
-  consume_from_network(craftItems, 1, network, depth)
+  if not dryRun then
+    consume_from_network(craftItems, 1, network, depth)
+  end
   return 1
 end
 
@@ -71,11 +79,14 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   inv:set_list(INV_HOUT, {})
   local numCrafted = 0
   local isEnough = false
+
+  local craftItemMult = 0
   repeat
     logistica.autocrafting_produce_single_item(inv, INV_CRAFT, nil, INV_HOUT)
+    craftItemMult = craftItemMult + 1
     -- if we can craft from network
     local items = count_items_to_stack(inv:get_list(INV_CRAFT))
-    local numCanCraft = consume_for_craft(items, network, depth)
+    local numCanCraft = consume_for_craft(items, craftItemMult, network, depth, dryRun)
     numCrafted = numCrafted + numCanCraft
 
     isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
