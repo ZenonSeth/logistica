@@ -165,3 +165,12 @@ minetest.register_craft({
     {"default:obsidianbrick", L("silverin_plate"),   "default:obsidianbrick"},
   }
 })
+
+minetest.register_craft({
+  output = L("lava_furnace_fueler"),
+  recipe = {
+    {L("silverin_plate"), "default:clay",  L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"), ""},
+    {L("silverin_plate"), "default:clay",  L("silverin_plate")},
+  }
+})
