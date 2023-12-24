@@ -159,6 +159,17 @@ logistica.register_lava_furnace("Lava Furnace", "lava_furnace", 4, {
   }
 })
 
+-- Lava Furnace Fueler
+
+logistica.register_lava_furnace_fueler("Lava Furnace Fueler", "lava_furnace_fueler", {
+  "logistica_fueler_side.png^[transformR270",
+  "logistica_fueler_side.png^[transformR90",
+  "logistica_fueler_side.png^[transformR180",
+  "logistica_fueler_side.png",
+  "logistica_fueler_back.png",
+  "logistica_fueler_front.png",
+})
+
 --------------------------------
 -- Mass Storage
 --------------------------------

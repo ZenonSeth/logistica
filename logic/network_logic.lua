@@ -381,6 +381,12 @@ local RESERVOIR_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
+local LAVA_FURNACE_FUELER_OPS = {
+  get_list = function(network) return network.misc end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
@@ -509,4 +515,8 @@ end
 
 function logistica.on_reservoir_change(pos, oldNode, oldMeta)
   on_node_change(pos, oldNode, oldMeta, RESERVOIR_OPS)
+end
+
+function logistica.on_lava_furnace_fueler_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, LAVA_FURNACE_FUELER_OPS)
 end

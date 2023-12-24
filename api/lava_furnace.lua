@@ -20,16 +20,6 @@ local GUIDE_BTN = "guide"
 
 local UPDATE_INTERVAL = 1.0
 
--- returns the lava cap in milibuckets
-local function get_lava_capacity(pos)
-  local nodeName = minetest.get_node(pos).name
-  local nodeDef = minetest.registered_nodes[nodeName]
-  if not nodeDef or not nodeDef.logistica or not nodeDef.logistica.lava_capacity then
-    return nil
-  end
-  return nodeDef.logistica.lava_capacity * 1000
-end
-
 local function fill_lava_tank_from_fuel(pos, meta, inv)
   local itemstackName = inv:get_stack(INV_FUEL, 1):get_name()
   if itemstackName ~= BUCKET_LAVA and itemstackName ~= LAVA_UNIT then return end
@@ -39,7 +29,7 @@ local function fill_lava_tank_from_fuel(pos, meta, inv)
     returnStack = ItemStack(BUCKET_EMPTY)
   end
   local currLevel = meta:get_int(META_LAVA_IN_TANK)
-  local cap = get_lava_capacity(pos)
+  local cap = logistica.lava_furnace_get_lava_capacity(pos)
   if cap - currLevel < 1000 then return end
   currLevel = currLevel + 1000
   meta:set_int(META_LAVA_IN_TANK, currLevel)
@@ -149,7 +139,7 @@ end
 
 local function common_formspec(pos, meta)
   local currLava = meta:get_int(META_LAVA_IN_TANK)
-  local lavaCap = get_lava_capacity(pos) or 1
+  local lavaCap = logistica.lava_furnace_get_lava_capacity(pos) or 1
   local lavaPercent = logistica.round(currLava / lavaCap * 100)
   return "formspec_version[4]"..
       "size[10.5,11]"..
@@ -365,7 +355,8 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     allow_metadata_inventory_take = lava_furnace_allow_metadata_inv_take,
     on_receive_fields = lava_furnace_receive_fields,
     logistica = {
-      lava_capacity = lavaCapacity
+      lava_capacity = lavaCapacity,
+      lava_furnace = true,
     }
   }
 
