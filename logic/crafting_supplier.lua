@@ -58,6 +58,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local takeStack = ItemStack(_takeStack)
   local remaining = takeStack:get_count()
   local takeStackName = takeStack:get_name()
+  local inv = minetest.get_meta(pos):get_inventory()
 
   -- first check existing supply, ignore the 1st slot (which is for the crafted item)
   remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, 1)
@@ -68,7 +69,6 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
 
   -- if we still have a number of requested itsm to fulfil, try crafting them
   takeStack:set_count(remaining)
-  local inv = minetest.get_meta(pos):get_inventory()
   local craftStack = inv:get_stack(INV_MAIN, 1)
 
   -- if names are different, we can't craft this request
@@ -100,27 +100,30 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local leftover = collectorFunc(taken)
 
   -- now move any extras from the hidden to the main inventory - deleting extras (TODO: maybe drop them)
-  local extraNotTaken = 0
-  local toInsert = {}
-  for _, st in ipairs(inv:get_list(INV_HOUT)) do
-    if st:get_name() == takeStackName then
-      extraNotTaken = extraNotTaken + st:get_count()
-    else
-      table.insert(toInsert, st)
+  if not dryRun then
+    local extraNotTaken = 0
+    local toInsert = {}
+    for _, st in ipairs(inv:get_list(INV_HOUT)) do
+      if st:get_name() == takeStackName then
+        extraNotTaken = extraNotTaken + st:get_count()
+      else
+        table.insert(toInsert, st)
+      end
     end
-  end
-  taken:set_count(leftover + extraNotTaken)
+    taken:set_count(leftover + extraNotTaken)
 
-  if not taken:is_empty() then
-    local main = inv:get_list(INV_MAIN) or {}
-    for i = 2, #main do
-      taken = main[i]:add_item(taken)
+    if not taken:is_empty() then
+      local main = inv:get_list(INV_MAIN) or {}
+      for i = 2, #main do
+        taken = main[i]:add_item(taken)
+      end
+      inv:set_list(INV_MAIN, main)
     end
-    inv:set_list(INV_MAIN, main)
-  end
 
-  for _, insertStack in ipairs(toInsert) do
-    inv:add_item(INV_MAIN, insertStack)
+    for _, insertStack in ipairs(toInsert) do
+      inv:add_item(INV_MAIN, insertStack)
+    end
+    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER, network)
   end
 
   return remaining
