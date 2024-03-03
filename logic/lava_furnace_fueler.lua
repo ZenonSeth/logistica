@@ -50,6 +50,7 @@ function logistica.lava_furnace_fueler_on_timer(pos, elapsed)
   if not logistica.get_network_or_nil(pos) then return true end
 
   local targetPos = logistica.lava_furnace_fueler_target_pos(pos)
+  if not targetPos then return true end -- targetPos may be nil if trying to refuel an unloaded block
   local targetNode = minetest.get_node(targetPos)
   local targetDef = minetest.registered_nodes[targetNode.name]
 
