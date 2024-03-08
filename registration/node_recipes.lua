@@ -13,9 +13,9 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("mass_storage_basic"),
   recipe = {
-    {L("silverin_plate"),      L("optic_cable"),          L("silverin_plate")},
-    {L("silverin_mirror_box"), L("silverin_mirror_box"),  L("silverin_mirror_box")},
-    {L("silverin_plate"),      L("silverin_circuit"),     L("silverin_plate")},
+    {L("silverin_plate"),      L("optic_cable"),         L("silverin_plate")},
+    {L("silverin_mirror_box"), L("silverin_mirror_box"), L("silverin_mirror_box")},
+    {L("silverin_plate"),      L("silverin_circuit"),    L("silverin_plate")},
   }
 })
 
@@ -31,27 +31,27 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("passive_supplier"),
   recipe = {
-    {L("silverin_plate"), itemstrings.chest,          L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),  L("silverin_circuit")},
-    {L("silverin_plate"), "",               L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.chest, L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),   L("silverin_circuit")},
+    {L("silverin_plate"), "",                L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("requester_item"),
   recipe = {
-    {L("silverin_plate"), "",               L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),  L("silverin_circuit")},
-    {L("silverin_plate"), "",               L("silverin_plate")},
+    {L("silverin_plate"), "",              L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"), L("silverin_circuit")},
+    {L("silverin_plate"), "",              L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("requester_stack"),
   recipe = {
-    {L("silverin_plate"), L("silverin_circuit"),  L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),        L("silverin_circuit")},
-    {L("silverin_plate"), L("silverin_circuit"),  L("silverin_plate")},
+    {L("silverin_plate"), L("silverin_circuit"), L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),       L("silverin_circuit")},
+    {L("silverin_plate"), L("silverin_circuit"), L("silverin_plate")},
   }
 })
 
@@ -76,63 +76,63 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("simple_controller"),
   recipe = {
-    {L("silverin_plate"),   L("silverin_circuit"),  L("silverin_plate")},
-    {L("silverin_circuit"), L("optic_cable"),       L("silverin_circuit")},
-    {L("silverin_plate"),   L("silverin_circuit"),  L("silverin_plate")},
+    {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
+    {L("silverin_circuit"), L("optic_cable"),      L("silverin_circuit")},
+    {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("access_point"),
   recipe = {
-    {L("silverin_plate"),   L("silverin_circuit"),  L("silverin_plate")},
-    {L("photonizer"),       L("optic_cable"),       L("photonizer_reversed")},
-    {L("silverin_plate"),   L("silverin_circuit"),  L("silverin_plate")},
+    {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
+    {L("photonizer"),       L("optic_cable"),      L("photonizer_reversed")},
+    {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("trashcan"),
   recipe = {
-    {L("silverin_plate"), L("optic_cable"), L("silverin_plate")},
-    {"",                  "",               ""},
-    {L("silverin_plate"), itemstrings.cactus,         L("silverin_plate")},
+    {L("silverin_plate"), L("optic_cable"),   L("silverin_plate")},
+    {"",                  "",                 ""},
+    {L("silverin_plate"), itemstrings.cactus, L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("vaccuum_chest"),
   recipe = {
-    {L("silverin_plate"), itemstrings.chest,          L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),  L("silverin_circuit")},
-    {L("silverin_plate"), itemstrings.crystal,        L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.chest,   L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),     L("silverin_circuit")},
+    {L("silverin_plate"), itemstrings.crystal, L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("autocrafter"),
   recipe = {
-    {L("silverin_plate"), itemstrings.chest,                L("silverin_plate")},
-    {"",                  L("silverin_circuit"),  ""},
-    {L("silverin_plate"), "",                     L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.chest,     L("silverin_plate")},
+    {"",                  L("silverin_circuit"), ""},
+    {L("silverin_plate"), "",                    L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("crafting_supplier"),
   recipe = {
-    {L("silverin_plate"),   itemstrings.chest,          L("silverin_plate")},
-    {L("silverin_circuit"), L("photonizer"),  L("silverin_circuit")},
-    {L("silverin_plate"),   L("optic_cable"), L("silverin_plate")},
+    {L("silverin_plate"),   itemstrings.chest, L("silverin_plate")},
+    {L("silverin_circuit"), L("photonizer"),   L("silverin_circuit")},
+    {L("silverin_plate"),   L("optic_cable"),  L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("cobblegen_supplier"),
   recipe = {
-    {L("silverin_plate"), itemstrings.lava_bucket,    L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),  L("silverin_circuit")},
-    {L("silverin_plate"), itemstrings.water_bucket,   L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),          L("silverin_circuit")},
+    {L("silverin_plate"), itemstrings.water_bucket, L("silverin_plate")},
   },
   replacements = {
     {itemstrings.water_bucket, itemstrings.empty_bucket},
@@ -152,26 +152,26 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("reservoir_silverin_empty"),
   recipe = {
-    {L("silverin_plate"), "",             L("silverin_plate")},
+    {L("silverin_plate"), "",                       L("silverin_plate")},
     {L("optic_cable"),    itemstrings.empty_bucket, L("photonizer")},
-    {L("silverin_plate"), "",             L("silverin_plate")},
+    {L("silverin_plate"), "",                       L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("reservoir_obsidian_empty"),
   recipe = {
-    {itemstrings.obsidian,        L("silverin_plate"),  itemstrings.obsidian},
-    {L("optic_cable"),  itemstrings.empty_bucket,       L("photonizer")},
-    {itemstrings.obsidian,        L("silverin_plate"),  itemstrings.obsidian},
+    {itemstrings.obsidian, L("silverin_plate"),      itemstrings.obsidian},
+    {L("optic_cable"),     itemstrings.empty_bucket, L("photonizer")},
+    {itemstrings.obsidian, L("silverin_plate"),      itemstrings.obsidian},
   }
 })
 
 minetest.register_craft({
   output = L("lava_furnace_fueler"),
   recipe = {
-    {L("silverin_plate"), itemstrings.clay,           L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.clay, L("silverin_plate")},
     {L("optic_cable"),    L("photonizer"),  ""},
-    {L("silverin_plate"), itemstrings.clay,           L("silverin_plate")},
+    {L("silverin_plate"), itemstrings.clay, L("silverin_plate")},
   }
 })
