@@ -39,7 +39,7 @@ local function get_cobblegen_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size["..(logistica.inv_width + 2.5)..",10]" ..
+    "size["..(logistica.inv_width + 2.5)..",8.75]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 0.4, 1.3, ON_OFF_BUTTON, S("Enable"))..
     logistica.inventory_formspec(0.4, 2.9)..

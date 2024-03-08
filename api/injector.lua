@@ -14,7 +14,7 @@ local function get_injector_formspec(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size["..(logistica.inv_width + 2.7)..",9]" ..
+    "size["..(logistica.inv_width + 2.7)..",8.75]" ..
     logistica.ui.background..
     "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
     "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..

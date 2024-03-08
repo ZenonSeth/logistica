@@ -144,7 +144,7 @@ local function common_formspec(pos, meta)
   local lavaCap = logistica.lava_furnace_get_lava_capacity(pos) or 1
   local lavaPercent = logistica.round(currLava / lavaCap * 100)
   return "formspec_version[4]"..
-      "size["..(logistica.inv_width + 2.5)..",11.5]" ..
+      "size["..(logistica.inv_width + 2.5)..",11.25]" ..
       logistica.ui.background_lava_furnace..
       "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
       logistica.inventory_formspec(0.5, 5.9)..

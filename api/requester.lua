@@ -13,7 +13,7 @@ local function get_requester_formspec(pos)
   local selectedList = logistica.get_requester_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size["..(logistica.inv_width + 2.6)..",7.7]" ..
+    "size["..(logistica.inv_width + 2.6)..",7.45]" ..
     logistica.ui.background..
     logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.2, pushPos, selectedList, S("Put items in:"))..
     logistica.ui.on_off_btn(isOn, 9.3, 1.0, ON_OFF_BUTTON, S("Enable"))..

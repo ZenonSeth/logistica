@@ -30,7 +30,7 @@ local function get_formspec(pos, _isOn)
   local isOn = _isOn
   if isOn == nil then isOn = logistica.is_machine_on(pos) end
   return "formspec_version[4]"..
-    "size["..(logistica.inv_width + 2.5)..",13.5]" ..
+    "size["..(logistica.inv_width + 2.5)..",13.25]" ..
     "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
     logistica.ui.background_lava_furnace..
     "listring[context;INV_MAIN]"..
@@ -43,9 +43,9 @@ local function get_formspec(pos, _isOn)
     "listring[context;src]"..
     "listring[current_player;main]"..
     "listring[context;dst]"..
-    "label[1.4,0.3;Recipe]"..
-    "label[7.3,0.3;Output]"..
-    "label[4.9,4.7;Input]"..
+    "label[1.4,0.3;"..S("Recipe").."]"..
+    "label[7.3,0.3;"..S("Output").."]"..
+    "label[4.9,4.7;"..S("Input").."]"..
     logistica.ui.on_off_btn(isOn, 4, 3.3, ON_OFF_BTN, S("Enable"))
 end
 

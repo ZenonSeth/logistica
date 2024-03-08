@@ -112,7 +112,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local imgPickY = 0.1
   return "formspec_version[4]"..
     "size[12,10.5]" ..
-    "size["..(logistica.inv_width + 4)..",11]" ..
+    "size["..(logistica.inv_width + 4)..",11.25]" ..
     logistica.ui.background..
     logistica.inventory_formspec(1.5,5)..
     "list["..posForm..";storage;1.5,1.9;8,1;0]" ..
