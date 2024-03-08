@@ -197,7 +197,7 @@ end
 
 -- try to insert the item into the item storage, returning a stack of remaining items
 function logistica.insert_item_into_item_storage(pos, inv, inputStack, dryRun)
-  if logistica.is_machine_on(pos) and inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
+  if inputStack:get_stack_max() == 1 and inv:room_for_item("main", inputStack) then
     -- tool storage only takes individual items
     if not dryRun then
       inv:add_item("main", inputStack)

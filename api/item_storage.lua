@@ -20,7 +20,7 @@ local function get_item_storage_formspec(pos)
     "size[20.5,16]" ..
     logistica.ui.background..
     "label[5.3,10.6;"..S("Tool Box: Accepts only tools, no stackable items").."]"..
-    logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..
+    -- logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..
     "dropdown[16,12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
     "button[18.5,12;1,0.8;"..SORT_BUTTON..";"..S("Sort").."]"..
     "list["..posForm..";main;0.4,0.5;16,8;0]"..
