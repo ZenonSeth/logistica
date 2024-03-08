@@ -1,5 +1,5 @@
 
-local i = logistica.itemstrings
+local itemstrings = logistica.itemstrings
 --------------------------------
 -- Access Point
 --------------------------------
@@ -204,9 +204,9 @@ logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a
 -- Reservoirs
 --------------------------------
 
-logistica.register_reservoir("lava", "Lava", i.lava_bucket, "default_lava.png", 8)
-logistica.register_reservoir("water", "Water", i.water_bucket, "default_water.png")
-logistica.register_reservoir("river_water", "River Water", i.river_water_bucket, "default_river_water.png")
+logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, "default_lava.png", 8)
+logistica.register_reservoir("water", "Water", itemstrings.water_bucket, "default_water.png")
+logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, "default_river_water.png")
 
 --------------------------------
 -- Passive Supply Chest
