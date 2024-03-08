@@ -12,6 +12,8 @@ local DEFAULT_GEN_RATE = 1
 local DEFAULT_MULT_PER_UPGRADE = 2
 local COBBLESTONE = "default:cobble"
 
+local UPGRADE_TOOLTIP = S("Upgrade slots: The 2 slots to the right are for placing cobble generator upgrades.")
+
 local TIMER_SHORT = 2
 local TIMER_LONG = 4
 
@@ -46,7 +48,8 @@ local function get_cobblegen_formspec(pos)
     "listring[current_player;main]"..
     "list["..posForm..";"..INV_DST..";2.9,1.1;2,1;0]"..
     "label[0.4,0.5;"..S("Generates Cobblestone and passively supplies it to Network").."]"..
-    "image[6.6,1.1;1,1;logistica_icon_upgrade.png]"
+    "image[6.6,1.1;1,1;logistica_icon_upgrade.png]"..
+    "tooltip[6.6,1.1;1,1;"..UPGRADE_TOOLTIP.."]"
 end
 
 local function show_cobblegen_formspec(playerName, pos)

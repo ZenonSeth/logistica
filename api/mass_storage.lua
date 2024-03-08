@@ -12,8 +12,13 @@ local MASS_STORAGE_TIMER = 1
 
 local storageForms = {}
 
-local RESERVE_TOOLTIP = "How many items to reserve.\nReserved items won't be taken by other network machines"
-local IMAGE_TOOLTIP = "Pick which slot to use as front image.\nClick the selected slot again to disable the front image."
+local RESERVE_TOOLTIP = S("How many items to reserve.\nReserved items won't be taken by other network machines")
+local IMAGE_TOOLTIP = S("Pick which slot to use as front image.\nClick the selected slot again to disable the front image.")
+local FILTER_TOOLTIP = S("Place item to select what kind of item to store in each slot.")
+local UPGRADE_TOOLTIP = S("Upgrade slots: The 4 slots to the right are for placing mass storage upgrades.")
+local STORAGE_TOOLTIP = S("Storage slots: items can be taken from them. To add items, put them in the input slot below.")
+local INPUT_TOOLTIP = S("Input slot: Place items here (or shift+click items to send them here) to put them in storage")
+local PULL_TOOLTIP = S("If ON, this mass storage will try to take items from connected suppliers, if it can store them.")
 
 local function get_sel_index(vals, selectedValue)
   for i, v in ipairs(vals) do if v == selectedValue then return i end end
@@ -68,6 +73,32 @@ end
 -- formspec
 ----------------------------------------------------------------
 
+local function formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, meta)
+  return
+    image_picker(imgPickX, imgPickY, 1, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 2, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 3, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 4, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 5, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 6, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 7, selectedImgIndex, meta)..
+    image_picker(imgPickX, imgPickY, 8, selectedImgIndex, meta)..
+    "label[0.2,0.4;Front Img]"
+end
+
+local function formspec_get_reserve_dropdowns(vals, valsAsStr, meta)
+  return
+    reserve_dropdown( 1.40, 3, 1, vals, valsAsStr, get_sr(meta, 1))..
+    reserve_dropdown( 2.65, 3, 2, vals, valsAsStr, get_sr(meta, 2))..
+    reserve_dropdown( 3.90, 3, 3, vals, valsAsStr, get_sr(meta, 3))..
+    reserve_dropdown( 5.15, 3, 4, vals, valsAsStr, get_sr(meta, 4))..
+    reserve_dropdown( 6.40, 3, 5, vals, valsAsStr, get_sr(meta, 5))..
+    reserve_dropdown( 7.65, 3, 6, vals, valsAsStr, get_sr(meta, 6))..
+    reserve_dropdown( 8.90, 3, 7, vals, valsAsStr, get_sr(meta, 7))..
+    reserve_dropdown(10.15, 3, 8, vals, valsAsStr, get_sr(meta, 8))..
+    "label[0.2,3.3;Res (?)]"
+end
+
 -- `meta` is optional
 local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
@@ -89,24 +120,8 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "list["..posForm..";main;1.5,3.8;1,1;0]" ..
     "image[0.25,1.9;1,1;logistica_icon_mass_storage.png]" ..
     "image[0.2,3.8;1,1;logistica_icon_input.png]" ..
-    image_picker(imgPickX, imgPickY, 1, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 2, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 3, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 4, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 5, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 6, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 7, selectedImgIndex, meta)..
-    image_picker(imgPickX, imgPickY, 8, selectedImgIndex, meta)..
-    "label[0.2,0.4;Front Img]"..
-    reserve_dropdown( 1.40, 3, 1, vals, valsAsStr, get_sr(meta, 1))..
-    reserve_dropdown( 2.65, 3, 2, vals, valsAsStr, get_sr(meta, 2))..
-    reserve_dropdown( 3.90, 3, 3, vals, valsAsStr, get_sr(meta, 3))..
-    reserve_dropdown( 5.15, 3, 4, vals, valsAsStr, get_sr(meta, 4))..
-    reserve_dropdown( 6.40, 3, 5, vals, valsAsStr, get_sr(meta, 5))..
-    reserve_dropdown( 7.65, 3, 6, vals, valsAsStr, get_sr(meta, 6))..
-    reserve_dropdown( 8.90, 3, 7, vals, valsAsStr, get_sr(meta, 7))..
-    reserve_dropdown(10.15, 3, 8, vals, valsAsStr, get_sr(meta, 8))..
-    "label[0.2,3.3;Res (?)]"..
+    formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, meta)..
+    formspec_get_reserve_dropdowns(vals, valsAsStr, meta)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring["..posForm..";storage]"..
@@ -115,6 +130,11 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "listring[current_player;main]"..
     logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, S("Pull Items"))..
     upgradeInvString..
+    "tooltip[3.4,4.0;1,1;"..PULL_TOOLTIP.."]"..
+    "tooltip[0.25,1.9;1,1;"..STORAGE_TOOLTIP.."]"..
+    "tooltip[0.2,3.8;1,1;"..INPUT_TOOLTIP.."]"..
+    "tooltip[0.25,0.8;1,1;"..FILTER_TOOLTIP.."]"..
+    "tooltip["..tostring(1.5 + 1.25 * (7 - numUpgradeSlots))..",3.8;1,1;"..UPGRADE_TOOLTIP.."]"..
     "tooltip[0.2,3.0;1,0.5;"..RESERVE_TOOLTIP.."]"..
     "tooltip[0.2,0.1;1,0.5;"..IMAGE_TOOLTIP.."]"
 end
