@@ -15,6 +15,10 @@ function logistica.inventory_formspec(x,y)
     return formspec
 end
 
+local formspec_width_extra = (mcl and 1 or 0) + 0.25
+logistica.inv_size = function(w, h)
+ return tostring(w + formspec_width_extra)..","..tostring(h)
+end
 logistica.inv_width = (mcl and 9 or 8) + 0.25
 logistica.stack_max = mcl and 64 or 99
 

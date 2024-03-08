@@ -17,7 +17,7 @@ local function get_item_storage_formspec(pos)
   local selectedSortIdx = logistica.get_item_storage_selected_sort_index(meta)
 
   return "formspec_version[4]" ..
-  "size["..(logistica.inv_width + 12.5)..",16.25]" ..
+  "size["..logistica.inv_size(20.5, 16.25).."]" ..
     logistica.ui.background..
     "label[5.3,10.6;"..S("Tool Box: Accepts only tools, no stackable items").."]"..
     -- logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..

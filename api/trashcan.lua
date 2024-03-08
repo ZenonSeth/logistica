@@ -6,7 +6,7 @@ local INV_UNDO = "dst"
 
 local function get_trashcan_formspec()
   return "formspec_version[4]" ..
-    "size["..(logistica.inv_width + 2.6)..",9.45]" ..
+    "size["..logistica.inv_size(10.6, 9.45).."]" ..
     logistica.ui.background..
     "label[0.5,0.4;"..S("List of Items to delete, if they can't be put elsewhere in the Network.").."]"..
     "label[0.5,0.8;"..S("If list is empty, it will delete all excess items.").."]"..

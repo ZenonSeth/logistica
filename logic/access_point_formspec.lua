@@ -171,7 +171,7 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
   local searchTerm = minetest.formspec_escape(logistica.access_point_get_current_search_term(meta))
   local usesMetaStr = usesMetadata and S("Metadata: ON") or S("Metadata: OFF")
   return "formspec_version[4]"..
-    "size["..(logistica.inv_width + 7.2)..",12.75]" ..
+    "size["..logistica.inv_size(15.2, 12.75).."]" ..
     logistica.ui.background..
     "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
     "image[3.2,6.5;0.8,0.8;logistica_icon_input.png]"..

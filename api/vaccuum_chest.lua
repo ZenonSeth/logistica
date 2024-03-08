@@ -9,7 +9,7 @@ local function get_vaccuum_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size["..(logistica.inv_width + 2.5)..",10]" ..
+    "size["..logistica.inv_size(10.5, 10).."]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Vaccuum items:")..
     "label[0.6,1.0;Supplies collected items to the network.]"..
