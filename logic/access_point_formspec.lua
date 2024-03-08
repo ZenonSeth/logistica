@@ -95,7 +95,8 @@ local function get_listrings(invName) return
   "listring[current_player;craft]"..
   "listring[current_player;main]"..
   "listring[current_player;craftpreview]"..
-  "listring[current_player;main]"
+  "listring[current_player;main]"..
+  "listring[detached:"..invName..";"..INV_LIQUID.."]"
 end
 
 local function get_tooltips() return
