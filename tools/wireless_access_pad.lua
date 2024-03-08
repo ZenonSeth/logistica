@@ -106,7 +106,7 @@ end
 --   end
 -- end)
 
-minetest.register_craftitem("logistica:wireless_access_pad",{
+minetest.register_tool("logistica:wireless_access_pad",{
   description = logistica.tools.wap.description_default,
   inventory_image = "logistica_wap.png",
   wield_image = "logistica_wap.png",

@@ -1,6 +1,6 @@
 local S = logistica.TRANSLATOR
 
-minetest.register_craftitem("logistica:hyperspanner",{
+minetest.register_tool("logistica:hyperspanner",{
   description = S("Hyperspanner\nA multipurpose engineering tool\nUse on nodes for network info.\nCan also reverse poliarity."),
   short_description = S("Hyperspanner"),
   inventory_image = "logistica_hyperspanner.png",
@@ -19,7 +19,7 @@ minetest.register_craftitem("logistica:hyperspanner",{
   end
 })
 
-minetest.register_craftitem("logistica:wand",{
+minetest.register_tool("logistica:wand",{
   description = S("Inv List Scanner"),
   inventory_image = "logistica_wand.png",
   wield_image = "logistica_wand.png",
