@@ -6,6 +6,7 @@ TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:blast_furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:smoker"] = true
+TARGET_NODES_REQUIRING_TIMER["logistica:lava_furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve0"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve1"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve2"] = true
