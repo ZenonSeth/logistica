@@ -206,9 +206,26 @@ logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a
 -- Reservoirs
 --------------------------------
 
-logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, "default_lava.png", 8)
-logistica.register_reservoir("water", "Water", itemstrings.water_bucket, "default_water.png")
-logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, "default_river_water.png")
+local mcla = minetest.get_game_info().id == "mineclonia"
+local mcl2 = minetest.get_game_info().id == "mineclone2"
+
+local lava_texture = "default_lava.png"
+local water_texture = "default_water.png"
+local river_water_texture = "default_river_water.png"
+
+if mcla then
+  lava_texture = "default_lava_source_animated.png^[sheet:1x16:0,0"
+  water_texture = "default_water_source_animated.png^[sheet:1x16:0,0"
+  river_water_texture = "default_river_water_source_animated.png^[sheet:1x16:0,0"
+elseif mcl2 then
+  lava_texture = "mcl_core_lava_source_animation.png^[sheet:1x16:0,0"
+  water_texture = "mcl_core_water_source_animation.png^[sheet:1x16:0,0^[multiply:#3F76E4"
+  river_water_texture = "mcl_core_water_source_animation.png^[sheet:1x16:0,0^[multiply:#0084FF"
+end
+
+logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, lava_texture, 8)
+logistica.register_reservoir("water", "Water", itemstrings.water_bucket, water_texture)
+logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, river_water_texture)
 
 --------------------------------
 -- Passive Supply Chest
