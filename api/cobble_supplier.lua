@@ -10,7 +10,7 @@ local META_UPGRADE_COUNT = "logupg"
 local ITEM_UPGRADE = "logistica:cobblegen_upgrade"
 local DEFAULT_GEN_RATE = 1
 local DEFAULT_MULT_PER_UPGRADE = 2
-local COBBLESTONE = "default:cobble"
+local COBBLESTONE = logistica.itemstrings.cobble
 
 local UPGRADE_TOOLTIP = S("Upgrade slots: The 2 slots to the right are for placing cobble generator upgrades.")
 
@@ -39,10 +39,10 @@ local function get_cobblegen_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,8]" ..
+    "size["..(logistica.inv_width + 2.5)..",10]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 0.4, 1.3, ON_OFF_BUTTON, S("Enable"))..
-    "list[current_player;main;0.4,2.9;8,4;0]"..
+    logistica.inventory_formspec(0.4, 2.9)..
     "list["..posForm..";"..INV_UPG..";7.8,1.1;2,1;0]"..
     "listring["..posForm..";"..INV_DST.."]"..
     "listring[current_player;main]"..

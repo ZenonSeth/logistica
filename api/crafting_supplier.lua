@@ -24,7 +24,7 @@ local function get_craftsup_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,13]" ..
+    "size["..(logistica.inv_width + 2.5)..",13.5]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 1.1, 2.6, ON_OFF_BUTTON, S("Enable"))..
     "label[0.4,0.5;"..S("Crafts items when requested by Network. Excess stored below.").."]"..
@@ -33,7 +33,7 @@ local function get_craftsup_formspec(pos)
     "label[4.6,1.2;Recipe]"..
     "label[0.5,5.6;"..S("Excess items, provided as supply. If full\\, excess will be thrown out.").."]"..
     "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
-    "list[current_player;main;0.4,7.8;8,4;0]"..
+    logistica.inventory_formspec(0.4,7.8)..
     "listring["..posForm..";"..INV_MAIN.."]"..
     "listring[current_player;main]"
 end

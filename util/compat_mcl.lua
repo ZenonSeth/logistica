@@ -2,6 +2,21 @@ local mcl = minetest.get_modpath("mcl_core")
 
 logistica.sound_mod = mcl and mcl_sounds or default
 
+-- Returns a player's inventory formspec with the correct width and hotbar position for the current game
+function logistica.inventory_formspec(x,y)
+    local formspec
+    if exchangeclone.mcl then
+        formspec = "list[current_player;main;"..x..","..y..";9,3;9]"..
+            "list[current_player;main;"..x..","..(y+4)..";9,1]"
+    else
+        formspec = "list[current_player;main;"..x..","..y..";8,1]"..
+        "list[current_player;main;"..x..","..(y+1.5)..";8,3;8]"
+    end
+    return formspec
+end
+
+logistica.inv_width = (mcl and 9 or 8) + 0.25
+
 logistica.itemstrings = {
     sand = mcl and "mcl_core:sand" or "default:silver_sand",
     chest = mcl and "mcl_chests:chest" or "default:chest",
@@ -18,4 +33,5 @@ logistica.itemstrings = {
     cactus = mcl and "mcl_core:cactus" or "default:cactus",
     ice = mcl and "mcl_core:ice" or "default:ice",
     glass = mcl and "mcl_core:glass" or "default:glass",
+    cobble = mcl and "mcl_core:cobble" or "default:cobble",
 }

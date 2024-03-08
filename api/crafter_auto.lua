@@ -30,18 +30,19 @@ local function get_formspec(pos, _isOn)
   local isOn = _isOn
   if isOn == nil then isOn = logistica.is_machine_on(pos) end
   return "formspec_version[4]"..
-    "size[10.5,13]"..
+    "size["..(logistica.inv_width + 2.5)..",13.5]" ..
+    "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
     logistica.ui.background_lava_furnace..
     "listring[context;INV_MAIN]"..
     "list[context;src;0.4,5;8,2;0]"..
-    "list[current_player;main;0.4,7.8;8,4;0]"..
+    logistica.inventory_formspec(0.4,7.8)..
     "list[context;dst;5.5,0.6;4,3;0]"..
     "list[context;crf;0.2,0.6;3,3;0]"..
     "list[context;crfres;3.9,1.85;1,1;0]"..
     "listring[current_player;main]"..
     "listring[context;src]"..
-    "listring[context;dst]"..
     "listring[current_player;main]"..
+    "listring[context;dst]"..
     "label[1.4,0.3;Recipe]"..
     "label[7.3,0.3;Output]"..
     "label[4.9,4.7;Input]"..

@@ -170,12 +170,12 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
   local searchTerm = minetest.formspec_escape(logistica.access_point_get_current_search_term(meta))
   local usesMetaStr = usesMetadata and S("Metadata: ON") or S("Metadata: OFF")
   return "formspec_version[4]"..
-    "size[15.2,12.5]"..
+    "size["..(logistica.inv_width + 7.2)..",13]" ..
     logistica.ui.background..
     "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
     "image[3.2,6.5;0.8,0.8;logistica_icon_input.png]"..
     "list[detached:"..invName..";"..INV_INSERT..";4.0,6.4;1,1;0]"..
-    "list[current_player;main;5.2,7.5;8.0,4.0;0]"..
+    logistica.inventory_formspec(5.2,7.5)..
     "label[1.4,12.2;"..S("Crafting").."]"..
     "list[current_player;craft;0.2,8.5;3,3;]"..
     "list[current_player;craftpreview;3.9,8.5;1,1;]"..
@@ -189,6 +189,15 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
 end
 
 local function show_access_point_formspec(pos, playerName, optMeta)
+  if minetest.get_modpath("mcl_core") then
+    local player = minetest.get_player_by_name(playerName)
+    if not player then return end
+    local inv = player:get_inventory()
+    if inv then
+      inv:set_width("craft", 3)
+      inv:set_size("craft", 9)
+    end
+  end
   local meta = optMeta or minetest.get_meta(pos)
   local invName = get_or_create_detached_inventory(pos, playerName)
   accessPointForms[playerName] = {

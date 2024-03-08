@@ -11,13 +11,14 @@ local function get_supplier_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,10]" ..
+    "size["..(logistica.inv_width + 2.5)..",10.5]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, S("Allow Storing from Network"))..
     "label[0.6,1.0;"..S("Passive Supplier: Items become available to network requests.").."]"..
     "list["..posForm..";main;0.4,1.4;8,2;0]"..
-    "list[current_player;main;0.4,4.5;8,4;0]"..
-    "listring[]"
+    logistica.inventory_formspec(0.4,4.5)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";main]"
 end
 
 local function show_supplier_formspec(playerName, pos)

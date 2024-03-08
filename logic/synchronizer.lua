@@ -273,9 +273,9 @@ local function get_formspec_sync(pos, playerName, optMeta)
   local currBoxes = get_point_boxes(0.3,2.6,10,4, f1, s1, f2, s2, ptsColor)
 
   return "formspec_version[4]"..
-    "size[10.5,13]"..
+    "size["..(logistica.inv_width + 2.5)..",13.5]" ..
     logistica.ui.background..
-    "list[current_player;main;0.4,8;8,4;0]"..
+    logistica.inventory_formspec(0.4,8)..
     "list["..posForm..";"..INV_C1..";2.9,1.1;1,1;0]"..
     "list["..posForm..";"..INV_C2..";6.6,1.1;1,1;0]"..
     get_adjust_buttons()..

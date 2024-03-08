@@ -13,13 +13,15 @@ local function get_requester_formspec(pos)
   local selectedList = logistica.get_requester_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size[10.6,7.2]" ..
+    "size["..(logistica.inv_width + 2.6)..",7.7]" ..
     logistica.ui.background..
     logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.2, pushPos, selectedList, S("Put items in:"))..
     logistica.ui.on_off_btn(isOn, 9.3, 1.0, ON_OFF_BUTTON, S("Enable"))..
     "label[0.5,0.4;"..S("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
     "list["..posForm..";filter;0.5,0.7;"..NUM_REQUEST_SLOTS..",1;0]"..
-    "list[current_player;main;0.5,2.2;8,4;0]"
+    logistica.inventory_formspec(0.5, 2.2)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";filter]"
 end
 
 local function show_requester_formspec(playerName, pos)

@@ -6,7 +6,7 @@ local INV_UNDO = "dst"
 
 local function get_trashcan_formspec()
   return "formspec_version[4]" ..
-    "size[10.6,9.2]" ..
+    "size["..(logistica.inv_width + 2.6)..",9.7]" ..
     logistica.ui.background..
     "label[0.5,0.4;"..S("List of Items to delete, if they can't be put elsewhere in the Network.").."]"..
     "label[0.5,0.8;"..S("If list is empty, it will delete all excess items.").."]"..
@@ -15,7 +15,7 @@ local function get_trashcan_formspec()
     "list[context;"..INV_MAIN..";3.0,2.8;1,1;0]"..
     "label[6.75,2.6;"..S("Last deleted item").."]"..
     "list[context;"..INV_UNDO..";6.75,2.8;1,1;0]"..
-    "list[current_player;main;0.5,4.2;8,4;0]"..
+    logistica.inventory_formspec(0.5,4.2)..
     "listring[current_player;main]"..
     "listring[context;"..INV_MAIN.."]"
 end

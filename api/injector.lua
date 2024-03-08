@@ -14,12 +14,14 @@ local function get_injector_formspec(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size[10.7,8.5]" ..
+    "size["..(logistica.inv_width + 2.7)..",9]" ..
     logistica.ui.background..
     "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
     "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
-    "list[current_player;main;0.5,3.3;8,4;0]" ..
+    logistica.inventory_formspec(0.5,3.3)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";filter]"..
     logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, S("Take items from:"))..
     logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, S("Enable"))
 end
