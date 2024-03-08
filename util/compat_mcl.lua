@@ -5,7 +5,7 @@ logistica.sound_mod = mcl and mcl_sounds or default
 -- Returns a player's inventory formspec with the correct width and hotbar position for the current game
 function logistica.inventory_formspec(x,y)
     local formspec
-    if exchangeclone.mcl then
+    if mcl then
         formspec = "list[current_player;main;"..x..","..y..";9,3;9]"..
             "list[current_player;main;"..x..","..(y+4)..";9,1]"
     else
