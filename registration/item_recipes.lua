@@ -46,7 +46,7 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("photonizer"),
   recipe = {
-    {"default:mese_crystal"},
+    {"default:mese_crystal_fragment"},
     {L("silverin_circuit")},
     {L("silverin_plate")},
   }
@@ -85,9 +85,9 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("storage_upgrade_2"),
   recipe = {
-    {L("standing_wave_box"), "default:diamond",      L("standing_wave_box")},
-    {L("silverin_slice"),    L("standing_wave_box"), L("silverin_slice")},
-    {L("silverin_slice"),    L("silverin_circuit"),  L("silverin_slice")},
+    {"", "default:diamond",      ""},
+    {"", L("storage_upgrade_1"), ""},
+    {"", L("standing_wave_box"), ""},
   }
 })
 
