@@ -89,10 +89,12 @@ logistica.register_controller("simple_controller", {
     "logistica_network_controller_front_off.png"
   },
   connect_sides = {"top", "bottom", "left", "back", "right" },
-  groups = { oddly_breakable_by_hand = 1, cracky = 2 },
+  groups = { oddly_breakable_by_hand = 1, cracky = 2, handy = 1, pickaxey = 2 },
   sounds = logistica.node_sound_metallic(),
   drawtype = "normal",
   node_box = { type = "regular"},
+  _mcl_hardness = 3,
+  _mcl_blast_resistance = 15
 })
 
 --------------------------------

@@ -365,7 +365,7 @@ end)
 function logistica.register_mass_storage(simpleName, description, numSlots, numItemsPerSlot, numUpgradeSlots, tiles)
   local lname = string.lower(string.gsub(simpleName, " ", "_"))
   local storageName = "logistica:"..lname
-  local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1}
+  local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1, pickaxey = 3, axey = 3, handy = 1}
   numUpgradeSlots = logistica.clamp(numUpgradeSlots, 0, 4)
   grps[logistica.TIER_ALL] = 1
   logistica.mass_storage[storageName] = true
@@ -406,6 +406,8 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
     on_rotate = on_mass_storage_rotate,
     preserve_metadata = on_mass_storage_preserve_metadata,
     stack_max = 1,
+    _mcl_hardness = 10,
+    _mcl_blast_resistance = 100
   }
 
   minetest.register_node(storageName, def)
@@ -415,7 +417,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   local tiles_disabled = {}
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1, pickaxey = 1, axey = 1, handy = 1 }
   def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
 
   minetest.register_node(storageName.."_disabled", def_disabled)

@@ -73,7 +73,7 @@ function logistica.register_access_point(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local access_point_name = "logistica:"..lname
   logistica.misc_machines[access_point_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3, [logistica.TIER_ACCESS_POINT] = 1 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, [logistica.TIER_ACCESS_POINT] = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -96,7 +96,9 @@ function logistica.register_access_point(desc, name, tiles)
     -- allow_metadata_inventory_put = allow_access_point_inv_put,
     -- allow_metadata_inventory_take = allow_access_point_inv_take,
     -- allow_metadata_inventory_move = allow_access_point_inv_move,
-    logistica = {}
+    logistica = {},
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(access_point_name, def)
@@ -106,7 +108,7 @@ function logistica.register_access_point(desc, name, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

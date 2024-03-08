@@ -129,13 +129,15 @@ local commonDef = {
   paramtype2 = "glasslikeliquidlevel",
   is_ground_content = false,
   sunlight_propagates = false,
-  groups = {cracky = 3, level = 1, [logistica.TIER_ALL] = 1},
+  groups = {cracky = 3, level = 1, pickaxey = 1, [logistica.TIER_ALL] = 1},
   preserve_metadata = preserve_metadata,
   after_place_node = after_place_node,
   after_dig_node = logistica.on_reservoir_change,
   on_rightclick = on_rightclick,
   stack_max = 1,
   backface_culling = false,
+  _mcl_hardness = 1.5,
+  _mcl_blast_resistance = 10
 }
 
 local function get_variant_def(variantName)

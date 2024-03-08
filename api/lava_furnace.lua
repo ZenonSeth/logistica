@@ -343,7 +343,7 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     description = S(desc),
     tiles = combinedTiles.inactive,
     paramtype2 = "facedir",
-    groups = { cracky= 2 },
+    groups = { cracky= 2, pickaxey = 2, },
     is_ground_content = false,
     sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = lava_furnace_can_dig,
@@ -360,7 +360,9 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     logistica = {
       lava_capacity = lavaCapacity,
       lava_furnace = true,
-    }
+    },
+    _mcl_hardness = 3,
+    _mcl_blast_resistance = 15
   }
 
   minetest.register_node("logistica:"..lname, def)

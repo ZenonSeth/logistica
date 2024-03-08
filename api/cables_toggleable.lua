@@ -58,6 +58,9 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
         cracky = 3,
         choppy = 3,
         oddly_breakable_by_hand = 2,
+        handy = 1,
+        pickaxey = 1,
+        axey = 1,
       },
       sounds = logistica.node_sound_metallic(),
       drop = nameOff,
@@ -70,6 +73,8 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
       on_construct = onConst,
       after_dig_node = afterDig,
       on_rightclick = toggle_cable,
+      _mcl_hardness = 1.5,
+      _mcl_blast_resistance = 10
     }
 
     if state == "on" then
@@ -86,7 +91,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     local def_broken = table.copy(def)
     def_broken.tiles = logistica.table_map(tiles, function(s) return s.."^logistica_broken.png" end)
     -- def_broken.inventory_image = "logistica_" .. lname .. "_inv.png^logistica_broken.png"
-    def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
+    def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2,  handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
     def_broken.description = "Broken " .. desc
     def_broken.node_box = { type = "fixed", fixed = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25} }
     def_broken.selection_box = def_broken.node_box

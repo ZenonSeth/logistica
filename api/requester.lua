@@ -129,7 +129,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local requester_name = "logistica:"..lname
   logistica.requesters[requester_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = description,
@@ -162,7 +162,9 @@ function logistica.register_requester(description, name, transferRate, tiles)
           logistica.start_requester_timer(pos)
         end
       end,
-    }
+    },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(requester_name, def)
@@ -172,7 +174,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

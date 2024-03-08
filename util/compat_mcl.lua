@@ -10,12 +10,13 @@ function logistica.inventory_formspec(x,y)
             "list[current_player;main;"..x..","..(y+4)..";9,1]"
     else
         formspec = "list[current_player;main;"..x..","..y..";8,1]"..
-        "list[current_player;main;"..x..","..(y+1.5)..";8,3;8]"
+        "list[current_player;main;"..x..","..(y + 1.5)..";8,3;8]"
     end
     return formspec
 end
 
 logistica.inv_width = (mcl and 9 or 8) + 0.25
+logistica.stack_max = mcl and 64 or 99
 
 logistica.itemstrings = {
     sand = mcl and "mcl_core:sand" or "default:silver_sand",
