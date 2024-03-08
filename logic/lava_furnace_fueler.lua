@@ -3,7 +3,7 @@ local TIMER_DURATION = 1
 local META_TARGET_LAVA = "tarlava"
 local META_LAVA_IN_TANK = "lavam"
 
-local EMPTY_BUCKET = "bucket:bucket_empty"
+local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local LAVA_LIQUID_NAME = "lava"
 
 local function get_lava_furnace_lava_in_tank(meta)

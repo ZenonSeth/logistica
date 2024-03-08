@@ -3,6 +3,7 @@ local TIMER_DURATION_LONG = 3.0
 local META_REQUESTER_LISTNAME = "demtarlist"
 local TARGET_NODES_REQUIRING_TIMER = {}
 TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
+TARGET_NODES_REQUIRING_TIMER["mcl_core:furnace"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve0"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve1"] = true
 TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve2"] = true

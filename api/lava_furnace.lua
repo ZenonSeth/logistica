@@ -7,8 +7,10 @@ local META_LAVA_USED = "ufuel"
 
 local get_meta = minetest.get_meta
 
-local BUCKET_LAVA = "bucket:bucket_lava"
-local BUCKET_EMPTY = "bucket:bucket_empty"
+local i = logistica.itemstrings
+
+local BUCKET_LAVA = i.lava_bucket
+local BUCKET_EMPTY = i.empty_bucket
 local LAVA_UNIT = "logistica:lava_unit"
 
 local INV_FUEL = "fuel"
@@ -342,7 +344,7 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     paramtype2 = "facedir",
     groups = { cracky= 2 },
     is_ground_content = false,
-    sounds = default.node_sound_stone_defaults(),
+    sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = lava_furnace_can_dig,
     on_timer = lava_furnace_node_timer,
     on_construct = lava_furnace_on_construct,

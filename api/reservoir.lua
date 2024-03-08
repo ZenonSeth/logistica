@@ -29,7 +29,7 @@ local variantSpecificDefs = {
   [VAR_LARGE] = {
     description = logistica.reservoir_get_description(0, LARGE_MAX, ""),
     tiles = {"logistica_reservoir_obsidian.png"},
-    sounds = default.node_sound_stone_defaults(),
+    sounds = logistica.sound_mod.node_sound_stone_defaults(),
     logistica = {
       maxBuckets = LARGE_MAX,
     },

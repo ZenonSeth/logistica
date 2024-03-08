@@ -151,7 +151,7 @@ function logistica.register_autocrafter(desc, name, tiles)
     paramtype2 = "facedir",
     groups = { cracky= 2 },
     is_ground_content = false,
-    sounds = default.node_sound_stone_defaults(),
+    sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = autocrafter_can_dig,
     on_timer = logistica.on_timer_powered(autocrafter_timer),
     on_construct = autocrafter_on_construct,

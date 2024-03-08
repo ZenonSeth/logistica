@@ -1,5 +1,6 @@
 local path = logistica.MODPATH.."/util"
 
+dofile(path.."/compat_mcl.lua")
 dofile(path.."/settings.lua")
 dofile(path.."/common.lua")
 dofile(path.."/rotations.lua")

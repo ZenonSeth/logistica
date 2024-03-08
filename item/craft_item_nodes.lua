@@ -7,7 +7,7 @@ local crystalGroups = {
   oddly_breakable_by_hand = 1, cracky = 3
 }
 
-local sounds = default.node_sound_glass_defaults()
+local sounds = logistica.sound_mod.node_sound_glass_defaults()
 
 items["logistica:silverin"] = {
   tiles = {

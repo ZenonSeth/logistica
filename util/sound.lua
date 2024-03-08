@@ -6,6 +6,6 @@ function logistica.node_sound_metallic()
     dug = {name = "logsitica_node_dug", gain = 0.5},
     place = {name = "default_place_node_hard", gain = 0.5},
   }
-  default.node_sound_defaults(tbl)
+  logistica.sound_mod.node_sound_defaults(tbl)
   return tbl
 end
