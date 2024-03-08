@@ -7,10 +7,10 @@ local META_LAVA_USED = "ufuel"
 
 local get_meta = minetest.get_meta
 
-local i = logistica.itemstrings
+local itemstrings = logistica.itemstrings
 
-local BUCKET_LAVA = i.lava_bucket
-local BUCKET_EMPTY = i.empty_bucket
+local BUCKET_LAVA = itemstrings.lava_bucket
+local BUCKET_EMPTY = itemstrings.empty_bucket
 local LAVA_UNIT = "logistica:lava_unit"
 
 local INV_FUEL = "fuel"

@@ -1,4 +1,4 @@
-local i = logistica.itemstrings
+local itemstrings = logistica.itemstrings
 local function L(s) return "logistica:"..s end
 local SILV = L("silverin")
 local SILV_SLICE = L("silverin_slice")
@@ -30,23 +30,23 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("optic_cable_toggleable_off"),
   recipe = {
-    {L("optic_cable"), i.fragment}
+    {L("optic_cable"), itemstrings.fragment}
   }
 })
 
 minetest.register_craft({
   output = L("hyperspanner"),
   recipe = {
-    {i.crystal},
+    {itemstrings.crystal},
     {L("silverin_circuit")},
-    {i.steel},
+    {itemstrings.steel},
   }
 })
 
 minetest.register_craft({
   output = L("photonizer"),
   recipe = {
-    {i.fragment},
+    {itemstrings.fragment},
     {L("silverin_circuit")},
     {L("silverin_plate")},
   }
@@ -85,14 +85,14 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("storage_upgrade_2"),
   recipe = {
-    {"", i.diamond,               ""},
+    {"", itemstrings.diamond,               ""},
     {"", L("storage_upgrade_1"),  ""},
     {"", L("standing_wave_box"),  ""},
   }
 })
 
 minetest.register_craft({
-  output = i.lava_bucket,
+  output = itemstrings.lava_bucket,
   type = "shapeless",
   recipe = { L("lava_unit"), "bucket:bucket_empty" }
 })
@@ -100,19 +100,19 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("cobblegen_upgrade"),
   recipe = {
-    {L("silverin_plate"), i.lava_bucket,  L("silverin_plate")},
-    {"",                  i.water_bucket, ""},
+    {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
+    {"",                  itemstrings.water_bucket, ""},
   },
   replacements = {
-    {i.water_bucket,  i.empty_bucket},
-    {i.water_bucket,  i.empty_bucket},
+    {itemstrings.water_bucket,  itemstrings.empty_bucket},
+    {itemstrings.water_bucket,  itemstrings.empty_bucket},
   }
 })
 
 minetest.register_craft({
   output = L("wireless_access_pad"),
   recipe = {
-    {L("standing_wave_box"), i.diamond,             L("standing_wave_box")},
+    {L("standing_wave_box"), itemstrings.diamond,             L("standing_wave_box")},
     {L("wireless_crystal"),  L("silverin_circuit"), L("wireless_crystal")},
     {L("silverin_slice"),    L("silverin_circuit"), L("silverin_slice")},
   }
