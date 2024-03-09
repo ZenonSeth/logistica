@@ -129,7 +129,7 @@ local commonDef = {
   paramtype2 = "glasslikeliquidlevel",
   is_ground_content = false,
   sunlight_propagates = false,
-  groups = {cracky = 3, level = 1, pickaxey = 1, [logistica.TIER_ALL] = 1},
+  groups = {cracky = 3, level = minetest.get_modpath("mcl_core") and 0 or 1, pickaxey = 1, [logistica.TIER_ALL] = 1},
   preserve_metadata = preserve_metadata,
   after_place_node = after_place_node,
   after_dig_node = logistica.on_reservoir_change,
