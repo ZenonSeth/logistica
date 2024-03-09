@@ -7,8 +7,10 @@ local META_LAVA_USED = "ufuel"
 
 local get_meta = minetest.get_meta
 
-local BUCKET_LAVA = "bucket:bucket_lava"
-local BUCKET_EMPTY = "bucket:bucket_empty"
+local itemstrings = logistica.itemstrings
+
+local BUCKET_LAVA = itemstrings.lava_bucket
+local BUCKET_EMPTY = itemstrings.empty_bucket
 local LAVA_UNIT = "logistica:lava_unit"
 
 local INV_FUEL = "fuel"
@@ -142,9 +144,10 @@ local function common_formspec(pos, meta)
   local lavaCap = logistica.lava_furnace_get_lava_capacity(pos) or 1
   local lavaPercent = logistica.round(currLava / lavaCap * 100)
   return "formspec_version[4]"..
-      "size[10.5,11]"..
+      "size["..logistica.inv_size(10.5, 11.25).."]" ..
       logistica.ui.background_lava_furnace..
-      "list[current_player;main;0.4,5.9;8,4;0]"..
+      "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
+      logistica.player_inv_formspec(0.5, 5.9)..
       "list[context;fuel;0.4,4.5;1,1;0]"..
       "list[context;src;2.2,2.3;1,1;0]"..
       "list[context;dst;7.8,2.3;2,2;0]"..
@@ -340,9 +343,9 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     description = S(desc),
     tiles = combinedTiles.inactive,
     paramtype2 = "facedir",
-    groups = { cracky= 2 },
+    groups = { cracky= 2, pickaxey = 2, },
     is_ground_content = false,
-    sounds = default.node_sound_stone_defaults(),
+    sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = lava_furnace_can_dig,
     on_timer = lava_furnace_node_timer,
     on_construct = lava_furnace_on_construct,
@@ -357,7 +360,9 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     logistica = {
       lava_capacity = lavaCapacity,
       lava_furnace = true,
-    }
+    },
+    _mcl_hardness = 3,
+    _mcl_blast_resistance = 15
   }
 
   minetest.register_node("logistica:"..lname, def)

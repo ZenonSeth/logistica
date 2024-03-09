@@ -4,10 +4,10 @@ logistica.craftitem.nodes = {}
 local items = logistica.craftitem.nodes
 
 local crystalGroups = {
-  oddly_breakable_by_hand = 1, cracky = 3
+  oddly_breakable_by_hand = 1, cracky = 3, handy = 1, pickaxey = 1
 }
 
-local sounds = default.node_sound_glass_defaults()
+local sounds = logistica.sound_mod.node_sound_glass_defaults()
 
 items["logistica:silverin"] = {
   tiles = {
@@ -32,7 +32,9 @@ items["logistica:silverin"] = {
   sounds = sounds,
   description = S("Silverin Crystal"),
   inventory_image = "logistica_silverin.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
+  _mcl_hardness = 1.5,
+  _mcl_blast_resistance = 10
 }
 
 items["logistica:silverin_plate"] = {
@@ -46,12 +48,12 @@ items["logistica:silverin_plate"] = {
       {-0.50, -0.50, -0.50, 0.50, -7/16, 0.50}
     }
   },
-  groups = { cracky = 2 },
+  groups = { cracky = 2, pickaxey = 2 },
   sounds = logistica.node_sound_metallic(),
   description = S("Silverin Plate"),
   inventory_image = "logistica_silverin_plate_inv.png",
   wield_image = "logistica_silverin_plate_inv.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
   after_place_node = function(pos, placer, itemstack, pointed_thing)
     local rotNeeded = true
     local node = minetest.get_node(pos)
@@ -74,12 +76,14 @@ items["logistica:silverin_plate"] = {
       end
     end
   end,
+  _mcl_hardness = 1.5,
+  _mcl_blast_resistance = 10
 }
 
 -- items["logistica:silverin_block"] = {
 --   description = S("Silverin Block"),
 --   tiles = "logistica_silverin_plate.png",
---   stack_max = 99,
+--   stack_max = logistica.stack_max,
 -- }
 
 for name, def in pairs(items) do

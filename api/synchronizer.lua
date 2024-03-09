@@ -37,7 +37,7 @@ function logistica.register_synchronizer(description, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local syncName = "logistica:"..lname
 
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   local def = {
     description = description,
     drawtype = "normal",
@@ -56,7 +56,9 @@ function logistica.register_synchronizer(description, name, tiles)
     -- on_metadata_inventory_move = logistica.sync_on_inv_move,
     on_metadata_inventory_put = logistica.sync_on_inv_put,
     on_metadata_inventory_take = logistica.sync_on_inv_take,
-    logistica = {}
+    logistica = {},
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(syncName, def)

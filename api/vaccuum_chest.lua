@@ -9,13 +9,14 @@ local function get_vaccuum_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,10]" ..
+    "size["..logistica.inv_size(10.5, 10).."]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Vaccuum items:")..
     "label[0.6,1.0;Supplies collected items to the network.]"..
     "list["..posForm..";main;0.4,1.4;8,2;0]"..
-    "list[current_player;main;0.4,4.5;8,4;0]"..
-    "listring[]"
+    logistica.player_inv_formspec(0.4,4.5)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";main]"
 end
 
 local function show_vaccuum_formspec(playerName, pos)
@@ -107,7 +108,7 @@ function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local vaccuum_name = "logistica:"..lname
   logistica.vaccuum_suppliers[vaccuum_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -132,7 +133,9 @@ function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
     logistica = {
       inventory_size = inventorySize,
       on_power = on_vaccuum_power,
-    }
+    },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(vaccuum_name, def)
@@ -142,7 +145,7 @@ function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

@@ -13,37 +13,37 @@ items[L("lava_unit")] = {
 items[L("silverin_slice")] = {
   description = S("Silverin Slice"),
   inventory_image = "logistica_silverin_slice.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("silverin_circuit")] = {
   description = S("Silverin Circuit"),
   inventory_image = "logistica_silverin_circuit.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("silverin_mirror_box")] = {
   description = S("Silverin Mirror Box"),
   inventory_image = "logistica_silverin_mirror_box.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("photonizer")] = {
   description = S("Photonizer\nE = M*C^2"),
   inventory_image = "logistica_photonizer.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("photonizer_reversed")] = {
   description = S("Photonizer (Reversed Polarity)\nM = E/C^2"),
   inventory_image = "logistica_photonizer_reversed.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("standing_wave_box")] = {
   description = S("Wave Function Maintainer"),
   inventory_image = "logistica_standing_wave_box.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 items[L("cobblegen_upgrade")] = {
@@ -55,7 +55,7 @@ items[L("cobblegen_upgrade")] = {
 items[L("wireless_crystal")] = {
   description = S("Wireless Crystal\nFor use in a Wireless Upgrader"),
   inventory_image = "logistica_wireless_crystal.png",
-  stack_max = 99,
+  stack_max = logistica.stack_max,
 }
 
 for name, info in pairs(items) do

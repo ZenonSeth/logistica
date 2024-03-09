@@ -6,7 +6,7 @@ local INV_UNDO = "dst"
 
 local function get_trashcan_formspec()
   return "formspec_version[4]" ..
-    "size[10.6,9.2]" ..
+    "size["..logistica.inv_size(10.6, 9.45).."]" ..
     logistica.ui.background..
     "label[0.5,0.4;"..S("List of Items to delete, if they can't be put elsewhere in the Network.").."]"..
     "label[0.5,0.8;"..S("If list is empty, it will delete all excess items.").."]"..
@@ -15,7 +15,7 @@ local function get_trashcan_formspec()
     "list[context;"..INV_MAIN..";3.0,2.8;1,1;0]"..
     "label[6.75,2.6;"..S("Last deleted item").."]"..
     "list[context;"..INV_UNDO..";6.75,2.8;1,1;0]"..
-    "list[current_player;main;0.5,4.2;8,4;0]"..
+    logistica.player_inv_formspec(0.5,4.2)..
     "listring[current_player;main]"..
     "listring[context;"..INV_MAIN.."]"
 end
@@ -73,7 +73,7 @@ function logistica.register_trashcan(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local trashcan_name = "logistica:"..lname
   logistica.trashcans[trashcan_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -92,6 +92,8 @@ function logistica.register_trashcan(desc, name, tiles)
     allow_metadata_inventory_move = allow_trashcan_inv_move,
     on_metadata_inventory_put = on_trashcan_inventory_put,
     logistica = { },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(trashcan_name, def)
@@ -101,7 +103,7 @@ function logistica.register_trashcan(desc, name, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

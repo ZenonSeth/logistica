@@ -102,13 +102,15 @@ function logistica.register_controller(name, def)
       show_controller_formspec(pos, clicker:get_player_name())
     end
   end
+  def._mcl_hardness = 1.5
+  def._mcl_blast_resistance = 10
 
   minetest.register_node(controller_name, def)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = def.tiles_disabled
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1, pickaxey = 1, handy = 1, axey = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_timer = nil

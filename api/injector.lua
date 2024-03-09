@@ -14,12 +14,14 @@ local function get_injector_formspec(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
   return "formspec_version[4]" ..
-    "size[10.7,8.5]" ..
+    "size["..logistica.inv_size(10.7, 8.75).."]" ..
     logistica.ui.background..
     "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
     "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
-    "list[current_player;main;0.5,3.3;8,4;0]" ..
+    logistica.player_inv_formspec(0.5,3.3)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";filter]"..
     logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, S("Take items from:"))..
     logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, S("Enable"))
 end
@@ -126,7 +128,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local injectorName = "logistica:"..lname
   logistica.injectors[injectorName] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = description,
@@ -159,7 +161,9 @@ function logistica.register_injector(description, name, transferRate, tiles)
         end
         logistica.set_node_tooltip_from_state(pos, nil, isPoweredOn)
       end,
-    }
+    },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(injectorName, def)
@@ -169,7 +173,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

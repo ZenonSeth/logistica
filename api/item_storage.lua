@@ -17,15 +17,16 @@ local function get_item_storage_formspec(pos)
   local selectedSortIdx = logistica.get_item_storage_selected_sort_index(meta)
 
   return "formspec_version[4]" ..
-    "size[20.5,16]" ..
+  "size["..logistica.inv_size(20.5, 16.25).."]" ..
     logistica.ui.background..
     "label[5.3,10.6;"..S("Tool Box: Accepts only tools, no stackable items").."]"..
     -- logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..
-    "dropdown[16,12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
-    "button[18.5,12;1,0.8;"..SORT_BUTTON..";"..S("Sort").."]"..
+    "dropdown["..(logistica.inv_width + 8)..",12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
+    "button["..(logistica.inv_width + 10.5)..",12;1,0.8;"..SORT_BUTTON..";"..S("Sort").."]"..
     "list["..posForm..";main;0.4,0.5;16,8;0]"..
-    "list[current_player;main;5.35,11.0;8,4;0]"..
-    "listring[]"
+    logistica.player_inv_formspec(5.35, 11)..
+    "listring[current_player;main]"..
+    "listring["..posForm..";main]"
 end
 
 local function show_item_storage_formspec(playerName, pos)
@@ -110,7 +111,7 @@ function logistica.register_item_storage(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local item_storage_name = "logistica:"..lname
   logistica.item_storage[item_storage_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -131,7 +132,9 @@ function logistica.register_item_storage(desc, name, tiles)
     can_dig = can_dig_item_storage,
     logistica = {
       on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end
-    }
+    },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(item_storage_name, def)
@@ -141,7 +144,7 @@ function logistica.register_item_storage(desc, name, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

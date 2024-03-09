@@ -1,3 +1,9 @@
+if not (minetest.get_modpath("default") and minetest.get_modpath("bucket"))
+and not (minetest.get_modpath("mcl_core") and minetest.get_modpath("mcl_buckets")) then
+    minetest.log("error", "Logistica requires either default and bucket (included in Minetest Game) or mcl_core and mcl_buckets (included in MineClone2 and Mineclonia)")
+    return
+end
+
 logistica = {}
 
 logistica.MODNAME = minetest.get_current_modname() or "logistica"

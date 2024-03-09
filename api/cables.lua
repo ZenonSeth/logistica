@@ -30,6 +30,9 @@ function logistica.register_cable(desc, name, customNodeBox)
       cracky = 3,
       choppy = 3,
       oddly_breakable_by_hand = 2,
+      pickaxey = 1,
+      axey = 1,
+      handy = 1,
       [cable_group] = 1,
     },
     sounds = logistica.node_sound_metallic(),
@@ -42,6 +45,8 @@ function logistica.register_cable(desc, name, customNodeBox)
     connects_to = { "group:" .. cable_group, logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF },
     on_construct = function(pos) logistica.on_cable_change(pos) end,
     after_dig_node = function(pos, oldnode, oldmeta, _) logistica.on_cable_change(pos, oldnode, oldmeta) end,
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(cable_name, def)
@@ -50,7 +55,7 @@ function logistica.register_cable(desc, name, customNodeBox)
   for k, v in pairs(def) do def_broken[k] = v end
   def_broken.tiles = { "logistica_" .. lname .. ".png^logistica_broken.png" }
   def_broken.inventory_image = "logistica_" .. lname .. "_inv.png^logistica_broken.png"
-  def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, not_in_creative_inventory = 1 }
+  def_broken.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 2, pickaxey = 1, axey = 1, handy = 1, not_in_creative_inventory = 1 }
   def_broken.description = "Broken " .. desc
   def_broken.node_box = { type = "fixed", fixed = { -0.5, -SIZE, -SIZE, 0.5, SIZE, SIZE } }
   def_broken.selection_box = def_broken.node_box

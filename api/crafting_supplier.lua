@@ -24,7 +24,7 @@ local function get_craftsup_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
 
   return "formspec_version[4]" ..
-    "size[10.5,13]" ..
+    "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 1.1, 2.6, ON_OFF_BUTTON, S("Enable"))..
     "label[0.4,0.5;"..S("Crafts items when requested by Network. Excess stored below.").."]"..
@@ -33,7 +33,7 @@ local function get_craftsup_formspec(pos)
     "label[4.6,1.2;Recipe]"..
     "label[0.5,5.6;"..S("Excess items, provided as supply. If full\\, excess will be thrown out.").."]"..
     "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
-    "list[current_player;main;0.4,7.8;8,4;0]"..
+    logistica.player_inv_formspec(0.4,7.8)..
     "listring["..posForm..";"..INV_MAIN.."]"..
     "listring[current_player;main]"
 end
@@ -150,7 +150,7 @@ function logistica.register_crafting_supplier(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local supplier_name = "logistica:"..lname
   logistica.craftsups[supplier_name] = true
-  local grps = {oddly_breakable_by_hand = 3, cracky = 3 }
+  local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
@@ -173,7 +173,9 @@ function logistica.register_crafting_supplier(desc, name, tiles)
     can_dig = can_dig_craftsup,
     logistica = {
       on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end
-    }
+    },
+    _mcl_hardness = 1.5,
+    _mcl_blast_resistance = 10
   }
 
   minetest.register_node(supplier_name, def)
@@ -183,7 +185,7 @@ function logistica.register_crafting_supplier(desc, name, tiles)
   for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
 
   def_disabled.tiles = tiles_disabled
-  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1 }
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1, pickaxey = 1, axey = 1, handy = 1 }
   def_disabled.on_construct = nil
   def_disabled.after_dig_node = nil
   def_disabled.on_punch = nil

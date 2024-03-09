@@ -6,7 +6,7 @@ local NAME_TO_EMPTY_BUCKET = {}
 local NAME_TO_DESC = {}
 local NAME_TO_TEXTURE = {}
 
-local EMPTY_BUCKET = "bucket:bucket_empty"
+local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local EMPTY_SUFFIX = "_empty"
 
 local META_LIQUID_LEVEL = "liquidLevel"

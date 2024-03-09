@@ -30,21 +30,22 @@ local function get_formspec(pos, _isOn)
   local isOn = _isOn
   if isOn == nil then isOn = logistica.is_machine_on(pos) end
   return "formspec_version[4]"..
-    "size[10.5,13]"..
+    "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background_lava_furnace..
+    "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
     "listring[context;INV_MAIN]"..
     "list[context;src;0.4,5;8,2;0]"..
-    "list[current_player;main;0.4,7.8;8,4;0]"..
+    logistica.player_inv_formspec(0.4,7.8)..
     "list[context;dst;5.5,0.6;4,3;0]"..
     "list[context;crf;0.2,0.6;3,3;0]"..
     "list[context;crfres;3.9,1.85;1,1;0]"..
     "listring[current_player;main]"..
     "listring[context;src]"..
-    "listring[context;dst]"..
     "listring[current_player;main]"..
-    "label[1.4,0.3;Recipe]"..
-    "label[7.3,0.3;Output]"..
-    "label[4.9,4.7;Input]"..
+    "listring[context;dst]"..
+    "label[1.4,0.3;"..S("Recipe").."]"..
+    "label[7.3,0.3;"..S("Output").."]"..
+    "label[4.9,4.7;"..S("Input").."]"..
     logistica.ui.on_off_btn(isOn, 4, 3.3, ON_OFF_BTN, S("Enable"))
 end
 
@@ -149,9 +150,9 @@ function logistica.register_autocrafter(desc, name, tiles)
     description = S(desc),
     tiles = tiles,
     paramtype2 = "facedir",
-    groups = { cracky= 2 },
+    groups = { cracky= 2, pickaxey = 2 },
     is_ground_content = false,
-    sounds = default.node_sound_stone_defaults(),
+    sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = autocrafter_can_dig,
     on_timer = logistica.on_timer_powered(autocrafter_timer),
     on_construct = autocrafter_on_construct,
@@ -165,7 +166,9 @@ function logistica.register_autocrafter(desc, name, tiles)
     on_receive_fields = autocrafter_receive_fields,
     logistica = {
       on_power = autocrafter_on_power,
-    }
+    },
+    _mcl_hardness = 3,
+    _mcl_blast_resistance = 15
   }
 
   minetest.register_node("logistica:"..lname, def)

@@ -31,7 +31,7 @@ local function get_guide_formspec(currPage, langCode)
   return "formspec_version[4]" ..
     "size[10.5,7.5]" ..
       logistica.ui.background_lava_furnace..
-      "item_image[0.4,4.5;1,1;bucket:bucket_lava]"..
+      "item_image[0.4,4.5;1,1;"..logistica.itemstrings.lava_bucket.."]"..
       "tooltip[0.4,0.8;1,5.1;"..S("Lava Furnace can only use Lava as fuel").."]"..
       "item_image[2.2,2.3;1,1;"..recipe.name.."]"..--src
       "tooltip[2.2,2.3;1,1;"..T(langCode, srcItem:get_short_description()).."]"..
