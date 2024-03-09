@@ -22,6 +22,8 @@ end
 logistica.inv_width = (mcl and 9 or 8) + 0.25
 logistica.stack_max = mcl and 64 or 99
 
+logistica.node_level = mcl and function(l) return 0 end or function(l) return l end
+
 logistica.itemstrings = {
     sand = mcl and "mcl_core:sand" or "default:silver_sand",
     chest = mcl and "mcl_chests:chest" or "default:chest",
