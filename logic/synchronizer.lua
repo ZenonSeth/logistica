@@ -275,7 +275,7 @@ local function get_formspec_sync(pos, playerName, optMeta)
   return "formspec_version[4]"..
     "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background..
-    logistica.inventory_formspec(0.4,8)..
+    logistica.player_inv_formspec(0.4,8)..
     "list["..posForm..";"..INV_C1..";2.9,1.1;1,1;0]"..
     "list["..posForm..";"..INV_C2..";6.6,1.1;1,1;0]"..
     get_adjust_buttons()..

@@ -42,7 +42,7 @@ local function get_cobblegen_formspec(pos)
     "size["..logistica.inv_size(10.5, 8.5).."]" ..
     logistica.ui.background..
     logistica.ui.on_off_btn(isOn, 0.4, 1.3, ON_OFF_BUTTON, S("Enable"))..
-    logistica.inventory_formspec(0.4, 2.9)..
+    logistica.player_inv_formspec(0.4, 2.9)..
     "list["..posForm..";"..INV_UPG..";7.8,1.1;2,1;0]"..
     "listring["..posForm..";"..INV_DST.."]"..
     "listring[current_player;main]"..

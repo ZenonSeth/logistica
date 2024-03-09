@@ -15,7 +15,7 @@ local function get_trashcan_formspec()
     "list[context;"..INV_MAIN..";3.0,2.8;1,1;0]"..
     "label[6.75,2.6;"..S("Last deleted item").."]"..
     "list[context;"..INV_UNDO..";6.75,2.8;1,1;0]"..
-    logistica.inventory_formspec(0.5,4.2)..
+    logistica.player_inv_formspec(0.5,4.2)..
     "listring[current_player;main]"..
     "listring[context;"..INV_MAIN.."]"
 end

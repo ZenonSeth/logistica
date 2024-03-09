@@ -14,7 +14,7 @@ local function get_vaccuum_formspec(pos)
     logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Vaccuum items:")..
     "label[0.6,1.0;Supplies collected items to the network.]"..
     "list["..posForm..";main;0.4,1.4;8,2;0]"..
-    logistica.inventory_formspec(0.4,4.5)..
+    logistica.player_inv_formspec(0.4,4.5)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end

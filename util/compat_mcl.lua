@@ -3,14 +3,14 @@ local mcl = minetest.get_modpath("mcl_core")
 logistica.sound_mod = mcl and mcl_sounds or default
 
 -- Returns a player's inventory formspec with the correct width and hotbar position for the current game
-function logistica.inventory_formspec(x,y)
+function logistica.player_inv_formspec(x,y)
     local formspec
     if mcl then
         formspec = "list[current_player;main;"..x..","..y..";9,3;9]"..
             "list[current_player;main;"..x..","..(y+4)..";9,1]"
     else
         formspec = "list[current_player;main;"..x..","..y..";8,1]"..
-        "list[current_player;main;"..x..","..(y + 1.5)..";8,3;8]"
+        "list[current_player;main;"..x..","..(y + 1.25)..";8,3;8]"
     end
     return formspec
 end

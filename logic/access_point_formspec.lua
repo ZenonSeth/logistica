@@ -176,7 +176,7 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
     "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
     "image[3.2,6.5;0.8,0.8;logistica_icon_input.png]"..
     "list[detached:"..invName..";"..INV_INSERT..";4.0,6.4;1,1;0]"..
-    logistica.inventory_formspec(5.2,7.5)..
+    logistica.player_inv_formspec(5.2,7.5)..
     "label[1.4,12.2;"..S("Crafting").."]"..
     "list[current_player;craft;0.2,8.5;3,3;]"..
     "list[current_player;craftpreview;3.9,8.5;1,1;]"..

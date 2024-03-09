@@ -33,7 +33,7 @@ local function get_craftsup_formspec(pos)
     "label[4.6,1.2;Recipe]"..
     "label[0.5,5.6;"..S("Excess items, provided as supply. If full\\, excess will be thrown out.").."]"..
     "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
-    logistica.inventory_formspec(0.4,7.8)..
+    logistica.player_inv_formspec(0.4,7.8)..
     "listring["..posForm..";"..INV_MAIN.."]"..
     "listring[current_player;main]"
 end

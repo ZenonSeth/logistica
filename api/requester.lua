@@ -19,7 +19,7 @@ local function get_requester_formspec(pos)
     logistica.ui.on_off_btn(isOn, 9.3, 1.0, ON_OFF_BUTTON, S("Enable"))..
     "label[0.5,0.4;"..S("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
     "list["..posForm..";filter;0.5,0.7;"..NUM_REQUEST_SLOTS..",1;0]"..
-    logistica.inventory_formspec(0.5, 2.2)..
+    logistica.player_inv_formspec(0.5, 2.2)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"
 end

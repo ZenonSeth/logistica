@@ -35,7 +35,7 @@ local function get_formspec(pos, _isOn)
     "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
     "listring[context;INV_MAIN]"..
     "list[context;src;0.4,5;8,2;0]"..
-    logistica.inventory_formspec(0.4,7.8)..
+    logistica.player_inv_formspec(0.4,7.8)..
     "list[context;dst;5.5,0.6;4,3;0]"..
     "list[context;crf;0.2,0.6;3,3;0]"..
     "list[context;crfres;3.9,1.85;1,1;0]"..

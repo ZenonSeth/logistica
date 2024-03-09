@@ -19,7 +19,7 @@ local function get_injector_formspec(pos)
     "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
     "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
-    logistica.inventory_formspec(0.5,3.3)..
+    logistica.player_inv_formspec(0.5,3.3)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"..
     logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, S("Take items from:"))..

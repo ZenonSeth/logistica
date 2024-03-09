@@ -147,7 +147,7 @@ local function common_formspec(pos, meta)
       "size["..logistica.inv_size(10.5, 11.25).."]" ..
       logistica.ui.background_lava_furnace..
       "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
-      logistica.inventory_formspec(0.5, 5.9)..
+      logistica.player_inv_formspec(0.5, 5.9)..
       "list[context;fuel;0.4,4.5;1,1;0]"..
       "list[context;src;2.2,2.3;1,1;0]"..
       "list[context;dst;7.8,2.3;2,2;0]"..
