@@ -3,12 +3,6 @@ local S = logistica.TRANSLATOR
 logistica.craftitem.nodes = {}
 local items = logistica.craftitem.nodes
 
-local crystalGroups = {
-  oddly_breakable_by_hand = 1, cracky = 3, handy = 1, pickaxey = 1
-}
-
-local sounds = logistica.sound_mod.node_sound_glass_defaults()
-
 items["logistica:silverin"] = {
   tiles = {
     "logistica_silverin_nodebox.png",
@@ -28,8 +22,8 @@ items["logistica:silverin"] = {
     }
   },
   use_texture_alpha = "blend",
-  groups = crystalGroups,
-  sounds = sounds,
+  groups = { oddly_breakable_by_hand = 1, cracky = 3, handy = 1, pickaxey = 1 },
+  sounds = logistica.sound_mod.node_sound_glass_defaults(),
   description = S("Silverin Crystal"),
   inventory_image = "logistica_silverin.png",
   stack_max = logistica.stack_max,

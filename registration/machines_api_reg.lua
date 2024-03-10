@@ -26,13 +26,23 @@ logistica.register_autocrafter("Autocrafter", "autocrafter", {
 --------------------------------
 
 -- regular
-logistica.register_cable("Optic cable", "optic_cable")
--- TODO: plate + cable = masked cable
--- logistica.register_cable("Optic cable", "optic_wall", CABLE_SIZE, {
---   fixed = {
---     { -CABLE_SIZE, -CABLE_SIZE, -CABLE_SIZE, CABLE_SIZE, CABLE_SIZE, CABLE_SIZE }
---   }
--- })
+logistica.register_cable("Optic Cable", "optic_cable")
+
+-- full-block cable
+logistica.register_cable("Embedded Optic Cable", "optic_cable_block",
+  {
+    fixed = {
+      { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 }
+    },
+    connect_top = {}, connect_bottom = {},
+    connect_front = {}, connect_back = {},
+    connect_left = {}, connect_right = {},
+  },
+  {
+    "logistica_silverin_plate.png^logistica_cable_connection_overlay.png"
+  },
+  -1
+)
 
 -- toggleable
 logistica.register_cable_toggleable("Toggleable Cable", "optic_cable_toggleable",

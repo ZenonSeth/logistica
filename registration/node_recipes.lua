@@ -175,3 +175,19 @@ minetest.register_craft({
     {L("silverin_plate"), itemstrings.clay, L("silverin_plate")},
   }
 })
+
+minetest.register_craft({
+  output = L("optic_cable_block"),
+  recipe = {
+    {L("silverin_plate")},
+    {L("optic_cable")},
+    {L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
+  output = L("silverin_block"),
+  recipe = {
+    {L("silverin_plate"), L("silverin_plate"), L("silverin_plate")}
+  }
+})
