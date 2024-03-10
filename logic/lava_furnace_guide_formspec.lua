@@ -98,4 +98,3 @@ function logistica.lava_furnace_show_guide(playername)
   local langCode = minetest.get_player_information(playername).lang_code or "en"
   minetest.show_formspec(playername, FORMSPEC, get_guide_formspec(page, langCode))
 end
-

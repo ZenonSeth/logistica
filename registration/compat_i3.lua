@@ -8,12 +8,6 @@ if minetest.global_exists("i3") then
   })
 
   i3.register_craft({
-    type   = "digging",
-    result = "default:cobble 2",
-    items  = {"default:stone"},
-  })
-
-  i3.register_craft({
 		items = {"default:silver_sand", "default:ice"},
 		result = L("silverin"),
 		type = "logisticalavafurnace"

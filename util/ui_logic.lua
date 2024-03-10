@@ -57,4 +57,3 @@ function logistica.add_allowed_pull_list(listName)
   if not listName then return end
   allowedPull[listName] = true
 end
-
