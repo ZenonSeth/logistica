@@ -1,7 +1,7 @@
 logistica.ui = {}
 
 logistica.ui.background = "no_prepend[]bgcolor[#0000;true;#0008]background9[0,0;1,1;logistica_formspec_background.png;true;8]"
-logistica.ui.background_lava_furnace = "no_prepend[]background9[0,0;1,1;logistica_lava_furnace_bg.png;true;8]"
+logistica.ui.background_lava_furnace = "no_prepend[]bgcolor[#0000;true;#0008]background9[0,0;1,1;logistica_lava_furnace_bg.png;true;8]"
 
 
 local function list_dropdown(name, itemTable, x, y, default, label)
