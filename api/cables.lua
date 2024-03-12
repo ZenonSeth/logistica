@@ -39,7 +39,7 @@ function logistica.register_cable(desc, name, customNodeBox, customTiles, custom
     paramtype = "light",
 		paramtype2 = "facedir",
     sunlight_propagates = true,
-    drawtype = "nodebox",
+    drawtype = cnb.type or "nodebox",
     node_box = node_box,
     connects_to = { "group:" .. cable_group, logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF },
     on_construct = function(pos) logistica.on_cable_change(pos) end,

@@ -31,6 +31,7 @@ logistica.register_cable("Optic Cable", "optic_cable")
 -- full-block cable
 logistica.register_cable("Embedded Optic Cable", "optic_cable_block",
   {
+    type = "normal",
     fixed = {
       { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 }
     },
