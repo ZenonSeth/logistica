@@ -4,10 +4,18 @@ local playerHud = {}
 local SHORT_TIME = 3
 local LONG_TIME = 10
 
-function logistica.show_popup(playerName, text, time)
+function logistica.show_popup(playerName, text, time, atBottom, scale)
   if not time then time = SHORT_TIME end
   local player = minetest.get_player_by_name(playerName)
   if not player then return end
+
+  local position = {x = 0.5, y = 0.5}
+  local offset = {x = 0, y = 40}
+  if atBottom then
+    position = {x = 0.5, y = 1}
+    offset = {x = 0, y = -100}
+  end
+  if not scale then scale = 1 end
 
   if playerHud[playerName] then
     player:hud_remove(playerHud[playerName].hudId)
@@ -17,10 +25,10 @@ function logistica.show_popup(playerName, text, time)
   local hudId = player:hud_add({
     hud_elem_type = "text",
     style     = 1,
-    position  = {x = 0.5, y = 0.5},
-    offset    = {x = 0, y = 40},
+    position  = position,
+    offset    = offset,
     text      = text,
-    size      = { x = 1, y = 1},
+    size      = { x = scale, y = scale},
     scale     = { x = 1, y = 1},
     alignment = { x = 0, y = 0 },
     number    = 0xDFDFDF,

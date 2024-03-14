@@ -10,7 +10,12 @@ local function get_meta(pos)
   return minetest.get_meta(pos)
 end
 
-local function fill_bucket_from_network(network, bucketItemStack, liquidName)
+--------------------------------
+-- public functions
+--------------------------------
+
+-- returns the new stack to replace the empty bucket given, or nil if not successful
+function logistica.fill_bucket_from_network(network, bucketItemStack, liquidName)
   local lowestReservoirPos = nil
   local lowestReservoirLvl = 999999
   for hash, _ in pairs(network.reservoirs or {}) do
@@ -32,7 +37,8 @@ local function fill_bucket_from_network(network, bucketItemStack, liquidName)
   end
 end
 
-local function empty_bucket_into_network(network, bucketItemStack)
+-- returns the new stack to replace the filled bucket given, or nil if not successful
+function logistica.empty_bucket_into_network(network, bucketItemStack)
   local bucketName = bucketItemStack:get_name()
   local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketName)
 
@@ -67,10 +73,6 @@ local function empty_bucket_into_network(network, bucketItemStack)
     return nil
   end
 end
-
---------------------------------
--- public functions
---------------------------------
 
 -- tries to take a stack from the network locations
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
@@ -111,6 +113,9 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
       remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
     elseif logistica.is_crafting_supplier(nodeName) then
       remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
+    elseif logistica.is_bucket_filler(nodeName) then
+      local result = logistica.take_item_from_bucket_filler(pos, takeStack, network, collectorFunc, isAutomatedRequest, dryRun, depth)
+      remaining = result.remaining
     end
     if remaining <= 0 then
       return true
@@ -286,8 +291,8 @@ function logistica.get_available_liquids_in_network(pos)
     local liquidLevels = logistica.reservoir_get_liquid_level(resPos)
     if liquidName and liquidLevels then
       local info = liquidInfo[liquidName] or {curr = 0, max = 0}
-      info.curr = info.curr + liquidLevels[1]
-      info.max = info.max + liquidLevels[2]
+      info.curr = info.curr + (liquidLevels[1] or 0)
+      info.max = info.max + (liquidLevels[2] or 0)
       liquidInfo[liquidName] = info
     end
   end
@@ -299,6 +304,27 @@ function logistica.get_available_liquids_in_network(pos)
         max = lInfo.max,
       }
     end)
+end
+
+-- Returns a table for the given liquidName {curr = int, max = int}
+function logistica.get_liquid_info_in_network(pos, liquidName)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return { curr = 0, max = 0 } end
+  local available = 0
+  local capacity = 0
+  for hash, _ in pairs(network.reservoirs or {}) do
+    local resPos = h2p(hash)
+    local resLiquid = logistica.reservoir_get_liquid_name(resPos)
+    local liquidLevels = logistica.reservoir_get_liquid_level(resPos)
+    if resLiquid == liquidName and liquidLevels then
+      available = available + (liquidLevels[1] or 0)
+      capacity = capacity + (liquidLevels[2] or 0)
+    end
+  end
+  return {
+    curr = available,
+    max = capacity,
+  }
 end
 
 -- attempts to use, either fill or empty, the given bucket in/from liquid storage on
@@ -316,8 +342,8 @@ function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquid
   local isFullBucket = logistica.reservoir_is_full_bucket(bucketName)
   if isEmptyBucket then
     if not liquidName then return nil end
-    return fill_bucket_from_network(network, bucketItemStack, liquidName)
+    return logistica.fill_bucket_from_network(network, bucketItemStack, liquidName)
   elseif isFullBucket then
-    return empty_bucket_into_network(network, bucketItemStack)
+    return logistica.empty_bucket_into_network(network, bucketItemStack)
   end
 end

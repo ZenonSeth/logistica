@@ -22,6 +22,16 @@ logistica.register_autocrafter("Autocrafter", "autocrafter", {
 })
 
 --------------------------------
+-- Bucket Filler
+--------------------------------
+
+logistica.register_bucket_filler("Bucket Filler", "bucket_filler", {
+  "logistica_bucket_filler_top.png",
+  "logistica_bucket_filler_top.png",
+  "logistica_bucket_filler_side.png",
+})
+
+--------------------------------
 -- Cables
 --------------------------------
 

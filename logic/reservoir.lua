@@ -14,7 +14,6 @@ local LIQUID_NONE = ""
 local BUCKET_ANY = "BUCKET_ANY"
 
 local strDescription = S("Reservoir")
-local strEmpty = S("Empty")
 local getStrContains = function(number, max, ofWhat)
   if number == 0 then
     return S("@1 / @2 buckets", number, max)
@@ -193,4 +192,16 @@ end
 -- return the liquid name for the given bucket name, or nil if there's none registered
 function logistica.reservoir_get_liquid_name_for_bucket(bucketName)
   return BUCKET_TO_NAME[bucketName]
+end
+
+function logistica.reservoir_get_all_buckets_to_names_map()
+  return table.copy(BUCKET_TO_NAME)
+end
+
+function logistica.reservoir_get_empty_bucket_for_liquid(liquidName)
+  return get_empty_bucket_needed_for(liquidName)
+end
+
+function logistica.reservoir_get_full_bucket_for_liquid(liquidName)
+  return get_full_bucket_needed_for(liquidName)
 end

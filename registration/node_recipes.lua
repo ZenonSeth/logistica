@@ -191,3 +191,12 @@ minetest.register_craft({
     {L("silverin_plate"), L("silverin_plate"), L("silverin_plate")}
   }
 })
+
+minetest.register_craft({
+  output = L("bucket_filler"),
+  recipe = {
+    {L("silverin_plate"), "",                       L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),          ""},
+    {L("silverin_plate"), itemstrings.empty_bucket, L("silverin_plate")},
+  }
+})
