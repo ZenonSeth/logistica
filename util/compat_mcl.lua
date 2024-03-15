@@ -2,6 +2,12 @@ local mcl = minetest.get_modpath("mcl_core")
 
 logistica.sound_mod = mcl and mcl_sounds or default
 
+local function get_mcl_river_water_source()
+    if minetest.registered_nodes["mcl_core:river_water_source"] then return "mcl_core:river_water_source"
+    elseif minetest.registered_nodes["mclx_core:river_water_source"] then return "mclx_core:river_water_source"
+    else return "" end
+end
+
 -- Returns a player's inventory formspec with the correct width and hotbar position for the current game
 function logistica.player_inv_formspec(x,y)
     local formspec
@@ -41,4 +47,7 @@ logistica.itemstrings = {
     ice = mcl and "mcl_core:ice" or "default:ice",
     glass = mcl and "mcl_core:glass" or "default:glass",
     cobble = mcl and "mcl_core:cobble" or "default:cobble",
+    water_source = mcl and "mcl_core:water_source" or "default:water_source",
+    river_water_source = mcl and get_mcl_river_water_source() or "default:river_water_source",
+    lava_source = mcl and "mcl_core:lava_source" or "default:lava_source",
 }

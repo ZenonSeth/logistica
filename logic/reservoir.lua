@@ -5,6 +5,8 @@ local NAME_TO_BUCKET = {}
 local NAME_TO_EMPTY_BUCKET = {}
 local NAME_TO_DESC = {}
 local NAME_TO_TEXTURE = {}
+local NAME_TO_SOURCE = {}
+local SOURCE_TO_NAME = {}
 
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local EMPTY_SUFFIX = "_empty"
@@ -76,7 +78,7 @@ function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName
   return strDescription.."\n"..getStrContains(currBuckets, maxBuckets, liquidName)
 end
 
-function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture)
+function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
   BUCKET_TO_NAME[bucketName] = liquidName
   NAME_TO_BUCKET[liquidName] = bucketName
   if emptyBucketName then
@@ -84,6 +86,10 @@ function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketN
   end
   NAME_TO_DESC[liquidName] = liquidDesc
   NAME_TO_TEXTURE[liquidName] = liquidTexture
+  if sourceNodeName then
+    NAME_TO_SOURCE[liquidName] = sourceNodeName
+    SOURCE_TO_NAME[sourceNodeName] = liquidName
+  end
 end
 
 -- returns nil if item had no effect<br>

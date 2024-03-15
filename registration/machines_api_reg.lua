@@ -254,9 +254,19 @@ elseif mcl2 then
   river_water_texture = "mcl_core_water_source_animation.png^[sheet:1x16:0,0^[multiply:#0084FF"
 end
 
-logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, lava_texture, 8)
-logistica.register_reservoir("water", "Water", itemstrings.water_bucket, water_texture)
-logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, river_water_texture)
+logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, lava_texture, itemstrings.lava_source, 8)
+logistica.register_reservoir("water", "Water", itemstrings.water_bucket, water_texture, itemstrings.water_source)
+logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, river_water_texture, itemstrings.river_water_source)
+-- milk buckets
+if minetest.registered_items["mcl_mobitems:milk_bucket"] then
+  logistica.register_reservoir("milk", "Milk", "mcl_mobitems:milk_bucket", "logistica_milk_liquid.png")
+end
+if minetest.registered_items["animalia:bucket_milk"] then
+  logistica.register_reservoir("milk", "Milk", "animalia:bucket_milk", "logistica_milk_liquid.png")
+end
+if minetest.registered_items["ethereal:bucket_cactus"] then
+  logistica.register_reservoir("cactus_pulp", "Cactus Pulp", "ethereal:bucket_cactus", "logistica_milk_liquid.png^[colorize:#697600:227")
+end
 
 --------------------------------
 -- Passive Supply Chest
