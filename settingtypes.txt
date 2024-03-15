@@ -4,3 +4,5 @@ logistica_wap_upgrade_step (How much distance each upgrade to the WAP adds) int 
 logistica_wifi_upgrader_hard_mode (Make Wireless Upgrader's minigame harder) bool false
 logistica_cable_size (Changes the visual/hitbox size of cables) enum Medium Small,Medium,Large,XLarge
 logistica_enable_large_liquid_tank (Enable the Large Liquid Tank) bool true
+logistica_pump_max_range (Sets from how far sideways from the Liquid Pump it can take liquids from) int 5 1 10
+logistica_pump_max_depth (Sets how far below the Liquid Pump it can take liquids from) int 5 1 32

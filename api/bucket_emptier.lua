@@ -97,7 +97,9 @@ local function on_player_receive_fields(player, formname, fields)
   local pos = forms[playerName].position
   if minetest.is_protected(pos, playerName) then return true end
 
-  if fields[ON_OFF_BTN] then
+  if fields.quit then
+    forms[playerName] = nil
+  elseif fields[ON_OFF_BTN] then
     logistica.toggle_machine_on_off(pos)
     show_emptier_formspec(playerName, pos)
   end
@@ -123,7 +125,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
   local lname = name:gsub("%s", "_"):lower()
   local emptier_name = "logistica:"..lname
 
-  logistica.bucketemptiers[emptier_name] = true
+  logistica.bucket_emptiers[emptier_name] = true
   local def = {
     description = S(desc),
     tiles = tiles,

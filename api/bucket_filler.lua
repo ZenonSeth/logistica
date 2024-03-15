@@ -138,7 +138,7 @@ end)
 function logistica.register_bucket_filler(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local filler_name = "logistica:"..lname
-  logistica.bucketfillers[filler_name] = true
+  logistica.bucket_fillers[filler_name] = true
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {

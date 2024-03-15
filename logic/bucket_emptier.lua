@@ -6,7 +6,6 @@ local INV_MAIN = "main"
 local TIMER_SHORT = 1.0
 local TIMER_LONG = 3.0
 
-
 function logistica.emptier_on_power(pos, power)
   if power then
     logistica.start_node_timer(pos, TIMER_SHORT)

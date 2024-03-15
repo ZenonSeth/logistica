@@ -208,6 +208,27 @@ logistica.register_lava_furnace_fueler("Lava Furnace Fueler", "lava_furnace_fuel
 })
 
 --------------------------------
+-- Liquid Pump
+--------------------------------
+
+logistica.register_pump("Liquid Pump", "pump",
+  {
+    "logistica_pump_top.png", "logistica_pump_bottom.png", "logistica_pump_side.png"
+  },
+  { "logistica_pump_top.png", "logistica_pump_bottom.png", {
+    image = "logistica_pump_side_on.png",
+    backface_culling = false,
+    animation = {
+      type = "vertical_frames",
+      aspect_w = 16,
+      aspect_h = 16,
+      length = 1
+    },
+    }
+}
+)
+
+--------------------------------
 -- Mass Storage
 --------------------------------
 

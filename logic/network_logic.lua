@@ -3,6 +3,8 @@ local HARD_NETWORK_NODE_LIMIT = 4000 -- A network cannot consist of more than th
 local STATUS_OK = 0
 local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
+local ON_SUFFIX = "_on"
+local DISABLED_SUFFIX = "_disabled"
 
 local META_STORED_NETWORK = "logisticanet"
 
@@ -120,9 +122,17 @@ local function clear_network(networkName)
   networks[networkName] = nil
 end
 
+local function ends_with(str, ending)
+  return str:sub(-#ending) == ending
+end
+
 local function break_logistica_node(pos)
   local node = minetest.get_node(pos)
-  logistica.swap_node(pos, node.name .. "_disabled")
+  local nodeName = node.name
+  if ends_with(nodeName, ON_SUFFIX) then
+    nodeName = nodeName:sub(1, #node.name - #ON_SUFFIX)
+  end
+  logistica.swap_node(pos, nodeName .. DISABLED_SUFFIX)
 end
 
 -- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
@@ -200,7 +210,9 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           network.item_storage[otherHash] = true
           valid = true
         end
-        if logistica.is_misc(otherName) then
+        if logistica.is_misc(otherName)
+            or logistica.is_pump(otherName)
+        then
           network.misc[otherHash] = true
           valid = true
         end
@@ -366,12 +378,6 @@ local ITEM_STORAGE_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
-local ACCESS_POINT_OPS = {
-  get_list = function(network) return network.misc end,
-  update_cache_node_added = function(_)  end,
-  update_cache_node_removed = function(_) end,
-}
-
 local TRASHCAN_OPS = {
   get_list = function(network) return network.trashcans end,
   update_cache_node_added = function(_)  end,
@@ -384,7 +390,7 @@ local RESERVOIR_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
-local LAVA_FURNACE_FUELER_OPS = {
+local MISC_OPS = {
   get_list = function(network) return network.misc end,
   update_cache_node_added = function(_)  end,
   update_cache_node_removed = function(_) end,
@@ -509,7 +515,7 @@ function logistica.on_item_storage_change(pos, oldNode, oldMeta)
 end
 
 function logistica.on_access_point_change(pos, oldNode, oldMeta)
-  on_node_change(pos, oldNode, oldMeta, ACCESS_POINT_OPS)
+  on_node_change(pos, oldNode, oldMeta, MISC_OPS)
 end
 
 function logistica.on_trashcan_change(pos, oldNode, oldMeta)
@@ -521,5 +527,9 @@ function logistica.on_reservoir_change(pos, oldNode, oldMeta)
 end
 
 function logistica.on_lava_furnace_fueler_change(pos, oldNode, oldMeta)
-  on_node_change(pos, oldNode, oldMeta, LAVA_FURNACE_FUELER_OPS)
+  on_node_change(pos, oldNode, oldMeta, MISC_OPS)
+end
+
+function logistica.on_pump_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, MISC_OPS)
 end

@@ -204,6 +204,10 @@ function logistica.reservoir_get_all_buckets_to_names_map()
   return table.copy(BUCKET_TO_NAME)
 end
 
+function logistica.reservoir_get_all_sources_to_names_map()
+  return table.copy(SOURCE_TO_NAME)
+end
+
 function logistica.reservoir_get_empty_bucket_for_liquid(liquidName)
   return get_empty_bucket_needed_for(liquidName)
 end

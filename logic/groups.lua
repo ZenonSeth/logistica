@@ -4,8 +4,9 @@ logistica.injectors = {}
 logistica.requesters = {}
 logistica.suppliers = {}
 logistica.craftsups = {}
-logistica.bucketemptiers = {}
-logistica.bucketfillers = {}
+logistica.bucket_emptiers = {}
+logistica.bucket_fillers = {}
+logistica.pumps = {}
 logistica.mass_storage = {}
 logistica.item_storage = {}
 logistica.misc_machines = {}
@@ -24,7 +25,7 @@ function logistica.is_machine(name)
           or logistica.is_item_storage(name) or logistica.is_controller(name) or logistica.is_injector(name)
           or logistica.is_crafting_supplier(name) or logistica.is_trashcan(name) or logistica.is_vaccuum_supplier(name)
           or logistica.is_misc(name) or logistica.is_reservoir(name) or logistica.is_bucket_filler(name)
-          or logistica.is_bucket_emptier(name)
+          or logistica.is_bucket_emptier(name) or logistica.is_pump(name)
 end
 
 function logistica.is_cable(name)
@@ -76,9 +77,13 @@ function logistica.is_reservoir(name)
 end
 
 function logistica.is_bucket_filler(name)
-  return logistica.bucketfillers[name] ~= nil
+  return logistica.bucket_fillers[name] ~= nil
 end
 
 function logistica.is_bucket_emptier(name)
-  return logistica.bucketemptiers[name] ~= nil
+  return logistica.bucket_emptiers[name] ~= nil
+end
+
+function logistica.is_pump(name)
+  return logistica.pumps[name] ~= nil
 end
