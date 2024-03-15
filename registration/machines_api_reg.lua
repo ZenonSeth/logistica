@@ -22,6 +22,16 @@ logistica.register_autocrafter("Autocrafter", "autocrafter", {
 })
 
 --------------------------------
+-- Bucket Emptier
+--------------------------------
+
+logistica.register_bucket_emptier("Bucket Emptier", "bucket_emptier", {
+  "logistica_bucket_emptier_top.png",
+  "logistica_bucket_emptier_top.png",
+  "logistica_bucket_emptier_side.png",
+})
+
+--------------------------------
 -- Bucket Filler
 --------------------------------
 

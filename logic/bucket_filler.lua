@@ -48,7 +48,7 @@ function logistica.filler_change_selected_bucket(pos, change)
     mainList[1] = ItemStack(allBucketsToNames[index].bucketName)
   end
   inv:set_list(INV_MAIN, mainList)
-  logistica.on_supplier_change(pos) -- notify we got new item (well probably)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER) -- notify we got new item (well probably)
 end
 
 -- return a table of {remaining = int, erroMsg = ""}, indicating how many items remain to be fulfilled, and an optional error msg if any

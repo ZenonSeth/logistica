@@ -187,6 +187,7 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
             or logistica.is_crafting_supplier(otherName)
             or logistica.is_vaccuum_supplier(otherName)
             or logistica.is_bucket_filler(otherName)
+            or logistica.is_bucket_emptier(otherName)
         then
           network.suppliers[otherHash] = true
           valid = true

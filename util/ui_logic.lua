@@ -1,29 +1,44 @@
-local allowedPull = {}
-allowedPull["main"] = true
---allowedPull["src"] = true
-allowedPull["dst"] = true
-allowedPull["output"] = true
---allowedPull["fuel"] = true
+local allowedPull = {
+  ["main"] = true,
+  --["src"] = true,
+  ["dst"] = true,
+  ["output"] = true,
+  --["fuel"] = true,
+}
 
-local allowedPush = {}
-allowedPush["main"] = true
-allowedPush["src"] = true
-allowedPush["fuel"] = true
-allowedPush["input"] = true
-allowedPush["shift"] = true
+local allowedPush = {
+  ["main"] = true,
+  ["src"] = true,
+  ["fuel"] = true,
+  ["input"] = true,
+  ["shift"] = true,
+}
 
-local function get_lists(targetPosition, allowedLists)
+-- this MUST be a subset of the allowed push list above
+local logisticaBucketEmptierAllowedPush = {
+  ["input"] = true,
+}
+
+local function get_lists(targetPosition, usePushLists)
   logistica.load_position(targetPosition)
   local node = minetest.get_node(targetPosition)
-  if logistica.is_machine(node.name) then return {} end
+
+  local allowedLists = {}
+  if logistica.is_bucket_emptier(node.name) then
+    if usePushLists then allowedLists = logisticaBucketEmptierAllowedPush
+    else return {} end -- can only push to bucket emptier, it acts as a supplier so no need to pull
+  elseif logistica.is_machine(node.name) then return {}
+  elseif usePushLists then allowedLists = allowedPush
+  else   allowedLists = allowedPull end
+
   local availableLists = minetest.get_meta(targetPosition):get_inventory():get_lists()
-  local pushLists = {}
+  local lists = {}
   for name, _ in pairs(availableLists) do
     if allowedLists[name] then
-      table.insert(pushLists, name)
+      table.insert(lists, name)
     end
   end
-  return pushLists
+  return lists
 end
 
 ----------------------------------------------------------------
@@ -32,12 +47,12 @@ end
 
 -- returns a string of comma separated lists allowed to push to at the given position
 function logistica.get_push_lists(targetPosition)
-  return get_lists(targetPosition, allowedPush)
+  return get_lists(targetPosition, true)
 end
 
 -- returns a string of comma separated lists allowed to pull to at the given position
 function logistica.get_pull_lists(targetPosition)
-  return get_lists(targetPosition, allowedPull)
+  return get_lists(targetPosition, false)
 end
 
 function logistica.is_allowed_pull_list(listName)

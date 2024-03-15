@@ -1,27 +1,33 @@
 local TIMER_DURATION_SHORT = 1.0
 local TIMER_DURATION_LONG = 3.0
 local META_REQUESTER_LISTNAME = "demtarlist"
-local TARGET_NODES_REQUIRING_TIMER = {}
-TARGET_NODES_REQUIRING_TIMER["default:furnace"] = true
-TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:furnace"] = true
-TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:blast_furnace"] = true
-TARGET_NODES_REQUIRING_TIMER["mcl_furnaces:smoker"] = true
-TARGET_NODES_REQUIRING_TIMER["logistica:lava_furnace"] = true
-TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve0"] = true
-TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve1"] = true
-TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve2"] = true
-TARGET_NODES_REQUIRING_TIMER["gravelsieve:auto_sieve3"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta2_grinder_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta3_grinder_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta4_grinder_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta2_gravelsieve_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta3_gravelsieve_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["techachge:ta4_gravelsieve_pas"] = true
-TARGET_NODES_REQUIRING_TIMER["tubelub_addons1:grinder"] = true
+local TARGET_NODES_REQUIRING_TIMER = {
+  ["default:furnace"] = true,
+  ["mcl_furnaces:furnace"] = true,
+  ["mcl_furnaces:blast_furnace"] = true,
+  ["mcl_furnaces:smoker"] = true,
+  ["logistica:lava_furnace"] = true,
+  ["logistica:bucket_emptier"] = true,
+  ["gravelsieve:auto_sieve0"] = true,
+  ["gravelsieve:auto_sieve1"] = true,
+  ["gravelsieve:auto_sieve2"] = true,
+  ["gravelsieve:auto_sieve3"] = true,
+  ["techachge:ta2_grinder_pas"] = true,
+  ["techachge:ta3_grinder_pas"] = true,
+  ["techachge:ta4_grinder_pas"] = true,
+  ["techachge:ta2_gravelsieve_pas"] = true,
+  ["techachge:ta3_gravelsieve_pas"] = true,
+  ["techachge:ta4_gravelsieve_pas"] = true,
+  ["tubelub_addons1:grinder"] = true,
+}
 
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
+end
+
+local function is_prohibited_logistica_machine(name)
+  return logistica.is_machine(name) and not logistica.is_bucket_emptier(name)
 end
 
 local function get_max_rate_for_requester(pos)
@@ -44,8 +50,8 @@ local function get_valid_requester_and_target_inventory(requesterPos)
   local targetPos = logistica.get_requester_target(requesterPos)
   if not targetPos then return end
 
-  -- exclude logistica machines from this
-  if logistica.is_machine(minetest.get_node(targetPos).name) then return end
+  -- exclude logistica machines from this (with exceptions)
+  if is_prohibited_logistica_machine(minetest.get_node(targetPos).name) then return end
 
   local targetInv = get_meta(targetPos):get_inventory()
   if not targetInv:get_list(targetList) then return end
@@ -155,10 +161,11 @@ function logistica.on_requester_timer(pos, elapsed)
   local targetPos = logistica.get_requester_target(pos)
   if not targetPos then return true end
   local targetNode = minetest.get_node_or_nil(targetPos)
-  if not targetNode or logistica.is_machine(targetNode.name) then
+  if not targetNode or is_prohibited_logistica_machine(targetNode.name) then
     logistica.start_node_timer(pos, TIMER_DURATION_LONG)
     return false
   end
+
   logistica.set_node_tooltip_from_state(pos)
   update_requester_actual_request(pos)
   if take_requested_items_from_network(pos, network) then

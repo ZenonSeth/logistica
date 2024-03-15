@@ -16,6 +16,7 @@ end
 
 -- returns the new stack to replace the empty bucket given, or nil if not successful
 function logistica.fill_bucket_from_network(network, bucketItemStack, liquidName)
+  if not logistica.reservoir_is_empty_bucket(bucketItemStack:get_name()) then return nil end
   local lowestReservoirPos = nil
   local lowestReservoirLvl = 999999
   for hash, _ in pairs(network.reservoirs or {}) do
@@ -39,6 +40,8 @@ end
 
 -- returns the new stack to replace the filled bucket given, or nil if not successful
 function logistica.empty_bucket_into_network(network, bucketItemStack)
+  if not logistica.reservoir_is_full_bucket(bucketItemStack:get_name()) then return nil end
+
   local bucketName = bucketItemStack:get_name()
   local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketName)
 
@@ -109,7 +112,10 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     local pos = h2p(hash)
     logistica.load_position(pos)
     local nodeName = minetest.get_node(pos).name
-    if logistica.is_supplier(nodeName) or logistica.is_vaccuum_supplier(nodeName) then
+    if logistica.is_supplier(nodeName)
+        or logistica.is_vaccuum_supplier(nodeName)
+        or logistica.is_bucket_emptier(nodeName)
+    then
       remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
     elseif logistica.is_crafting_supplier(nodeName) then
       remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)

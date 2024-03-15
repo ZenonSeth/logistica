@@ -74,12 +74,16 @@ local function after_place_filler(pos, placer, itemstack)
   inv:set_size(INV_INPUT, 4)
   logistica.set_node_tooltip_from_state(pos)
   logistica.filler_change_selected_bucket(pos, 1000000) -- makes sure the 1st liquid is selected
+  logistica.on_supplier_change(pos)
 end
 
 local function allow_filler_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if listname == INV_MAIN then return 0 end
-  return stack:get_count()
+  if listname == INV_INPUT then
+    if logistica.reservoir_is_empty_bucket(stack:get_name()) then return stack:get_count()
+    else return 0 end
+  end
 end
 
 local function allow_filler_inv_take(pos, listname, index, stack, player)
