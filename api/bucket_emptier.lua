@@ -132,7 +132,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2, [logistica.TIER_ALL] = 1 },
     is_ground_content = false,
-    sounds = logistica.sound_mod.node_sound_stone_defaults(),
+    sounds = logistica.node_sound_metallic(),
     can_dig = emptier_can_dig,
     drop = emptier_name,
     on_timer = logistica.on_timer_powered(logistica.emptier_timer),

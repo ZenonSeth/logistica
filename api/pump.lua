@@ -124,7 +124,7 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2, [logistica.TIER_ALL] = 1 },
     is_ground_content = false,
-    sounds = logistica.sound_mod.node_sound_stone_defaults(),
+    sounds = logistica.node_sound_metallic(),
     can_dig = pump_can_dig,
     drop = pump_name,
     on_timer = logistica.on_timer_powered(logistica.pump_timer),
