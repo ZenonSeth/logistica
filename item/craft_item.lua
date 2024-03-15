@@ -58,6 +58,12 @@ items[L("wireless_crystal")] = {
   stack_max = logistica.stack_max,
 }
 
+items[L("compression_tank")] = {
+  description = S("Compression Tank\nStores liquids at high pressure. Used for making Reservoirs."),
+  inventory_image = "logistica_compression_tank.png",
+  stack_max = logistica.stack_max,
+}
+
 for name, info in pairs(items) do
   minetest.register_craftitem(name, {
     description = info.description,

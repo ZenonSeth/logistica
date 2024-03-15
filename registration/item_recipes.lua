@@ -117,3 +117,12 @@ minetest.register_craft({
     {L("silverin_slice"),    L("silverin_circuit"), L("silverin_slice")},
   }
 })
+
+minetest.register_craft({
+  output = L("compression_tank 2"),
+  recipe = {
+    {"",                  L("silverin_plate"), ""},
+    {L("silverin_plate"), "",                  L("silverin_plate")},
+    {"",                  L("silverin_plate"), ""},
+  }
+})

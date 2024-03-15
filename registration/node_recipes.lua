@@ -152,18 +152,18 @@ minetest.register_craft({
 minetest.register_craft({
   output = L("reservoir_silverin_empty"),
   recipe = {
-    {L("silverin_plate"), "",                       L("silverin_plate")},
-    {L("optic_cable"),    itemstrings.empty_bucket, L("photonizer")},
-    {L("silverin_plate"), "",                       L("silverin_plate")},
+    {L("silverin_plate"), "",                    L("silverin_plate")},
+    {L("optic_cable"),    L("compression_tank"), L("photonizer")},
+    {L("silverin_plate"), "",                    L("silverin_plate")},
   }
 })
 
 minetest.register_craft({
   output = L("reservoir_obsidian_empty"),
   recipe = {
-    {itemstrings.obsidian, L("silverin_plate"),      itemstrings.obsidian},
-    {L("optic_cable"),     itemstrings.empty_bucket, L("photonizer")},
-    {itemstrings.obsidian, L("silverin_plate"),      itemstrings.obsidian},
+    {itemstrings.obsidian, L("silverin_plate"),   itemstrings.obsidian},
+    {L("optic_cable"),     L("compression_tank"), L("photonizer")},
+    {itemstrings.obsidian, L("silverin_plate"),   itemstrings.obsidian},
   }
 })
 
