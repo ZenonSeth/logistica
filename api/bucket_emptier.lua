@@ -132,6 +132,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
     is_ground_content = false,
     sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = emptier_can_dig,
+    drop = emptier_name,
     on_timer = logistica.on_timer_powered(logistica.emptier_timer),
     after_place_node = emptier_after_place,
     after_dig_node = logistica.on_supplier_change,

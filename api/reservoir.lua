@@ -177,7 +177,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
   for _, variantName in ipairs(variants) do
     local nodeName = L("reservoir_"..variantName.."_"..lname)
     local def = get_variant_def(variantName)
-    def.drops = nodeName
+    def.drop = nodeName
     def.special_tiles = {liquidTexture}
     def.logistica.liquidName = lname
     def.groups.not_in_creative_inventory = 1
