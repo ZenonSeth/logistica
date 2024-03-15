@@ -4,7 +4,7 @@ local function L(s) return "logistica:"..s end
 
 minetest.register_node(L("silverin_block"), {
   drawtype = "normal",
-  descrription = "Silverin Block",
+  description = "Silverin Block",
   tiles = {"logistica_silverin_plate.png"},
   paramtype2 = "facedir",
   groups = { cracky = 2, pickaxey = 2 },
