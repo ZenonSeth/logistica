@@ -154,6 +154,8 @@ local function common_formspec(pos, meta)
       "list[context;input;4.3,0.9;2,1;0]"..
       "label[0.5,1.1;Lava]"..
       "label[4.2,0.5;Additives]"..
+      "label[2.0,4.8;"..S("Crafts unique recipes (click ? button in top right)").."]"..
+      "label[2.0,5.2;"..S("and can also cook regular recipes at twice the speed").."]"..
       "listring[context;dst]"..
       "listring[current_player;main]"..
       "listring[context;src]"..
