@@ -193,6 +193,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("silverin_plate 3"),
+  type = "shapeless",
+  recipe = {
+    L("silverin_block")
+  }
+})
+
+minetest.register_craft({
   output = L("bucket_filler"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
