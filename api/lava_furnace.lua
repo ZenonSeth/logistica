@@ -341,7 +341,23 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
   local lname = name:gsub("%s", "_"):lower()
   local def = {
     description = S(desc),
+    drawtype = "nodebox",
     tiles = combinedTiles.inactive,
+    node_box = {
+      type = "fixed",
+      fixed = {
+        {-0.5, -0.5, -0.5, -0.4375, 0.3125, -0.4375},
+        {0.4375, -0.5, -0.5, 0.5, 0.3125, -0.4375},
+        {-0.5, -0.5, -0.5, 0.5, -0.4375, -0.4375},
+        {-0.5, -0.0625, -0.5, 0.5, 0.0625, -0.4375},
+        {-0.5, 0.3125, -0.5, -0.375, 0.5, -0.4375},
+        {0.375, 0.3125, -0.5, 0.5, 0.5, -0.4375},
+        {-0.375, 0.375, -0.5, -0.3125, 0.5, -0.4375},
+        {0.3125, 0.375, -0.5, 0.375, 0.5, -0.4375},
+        {-0.3125, 0.4375, -0.5, 0.3125, 0.5, -0.4375},
+        {-0.5, -0.5, -0.4375, 0.5, 0.5, 0.5},
+      }
+    },
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2, },
     is_ground_content = false,

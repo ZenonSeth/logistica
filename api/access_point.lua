@@ -77,8 +77,17 @@ function logistica.register_access_point(desc, name, tiles)
   grps[logistica.TIER_ALL] = 1
   local def = {
     description = desc,
-    drawtype = "normal",
+    drawtype = "nodebox",
     tiles = tiles,
+    node_box = {
+      type = "fixed",
+      fixed = {
+        {-0.5, -0.5, -0.5, 0.5, -0.4375, 0.5},
+        {-0.4375, -0.5, -0.4375, 0.4375, -0.375, -0.1875},
+        {-0.125, -0.5, -0.0625, 0.125, 0.1875, 0.0625},
+        {-0.5, -0.3125, -0.125, 0.5, 0.5, -0.0625},
+      },
+    },
     paramtype = "light",
     paramtype2 = "facedir",
     is_ground_content = false,
