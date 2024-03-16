@@ -1,42 +1,31 @@
 if minetest.global_exists("unified_inventory") then
+  unified_inventory.register_craft_type("logisticalavafurnace", {
+    description = "Lava Furnace [logistica]",
+    icon = "logistica_lava_furnace_front_off.png",
+    width = 2,
+    height = 1,
+  })
 
-  local L  = function(str) return "logistica:"..str end
 
-	unified_inventory.register_craft_type("logisticalavafurnace", {
-		description = "Lava Furnace [logistica]",
-		icon = "logistica_lava_furnace_front_off.png",
-		width = 2,
-		height = 1,
-	})
+  local function init_unified_inv_compat()
+    local lavaFurnaceRecipes = logistica.get_lava_furnace_internal_recipes()
 
-  unified_inventory.register_craft({
-		items = {"default:silver_sand", "default:ice"},
-		output = L("silverin"),
-		type = "logisticalavafurnace"
-	})
+    for _, recipes in pairs(lavaFurnaceRecipes) do
+      for _, recipe in pairs(recipes) do
+        local items = {}
+        table.insert(items, recipe.input.." "..tostring(recipe.input_count))
+        table.insert(items, recipe.additive)
+        unified_inventory.register_craft({
+          items = items,
+          output = recipe.output,
+          type = "logisticalavafurnace"
+        })
+      end
+    end
+  end
 
-	unified_inventory.register_craft({
-		items = {L("silverin"), "default:steel_ingot"},
-		output = L("silverin_plate 4"),
-		type = "logisticalavafurnace"
-	})
-
-	unified_inventory.register_craft({
-		items = {L("silverin_slice"), "default:mese_crystal_fragment"},
-		output = L("silverin_circuit"),
-		type = "logisticalavafurnace"
-	})
-
-  unified_inventory.register_craft({
-		items = {"default:glass", L("silverin_slice 6")},
-		output = L("silverin_mirror_box"),
-		type = "logisticalavafurnace"
-	})
-
-	unified_inventory.register_craft({
-		items = {L("silverin"), "default:mese_crystal"},
-		output = L("wireless_crystal"),
-		type = "logisticalavafurnace"
-	})
+  minetest.register_on_mods_loaded(function()
+    init_unified_inv_compat()
+  end)
 
 end
