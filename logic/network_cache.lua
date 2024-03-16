@@ -51,7 +51,7 @@ local function nameset_to_cache_str(nameset)
   local first = true
   for k, _ in pairs(nameset) do
     if first then str = k ; first = false
-    else str = str..","..k end
+    else str = str..SEP..k end
   end
   return str
 end
