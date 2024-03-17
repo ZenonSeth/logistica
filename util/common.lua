@@ -97,8 +97,8 @@ function logistica.toggle_machine_on_off(pos)
   local newState = (meta:get_int(META_ON_OFF_KEY) + 1) % 2
   local def = minetest.registered_nodes[node.name]
   if def and def.logistica and def.logistica.on_power then
-    def.logistica.on_power(pos, newState > 0)
     meta:set_int(META_ON_OFF_KEY, newState)
+    def.logistica.on_power(pos, newState > 0)
     return newState > 0
   end
   return nil
