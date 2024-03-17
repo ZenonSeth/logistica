@@ -51,16 +51,16 @@ function logistica.filler_change_selected_bucket(pos, change)
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER) -- notify we got new item (well probably)
 end
 
--- return a table of {remaining = int, erroMsg = ""}, indicating how many items remain to be fulfilled, and an optional error msg if any
+-- return a table of {remaining = int, error = ""}, indicating how many items remain to be fulfilled, and an optional error msg if any
 function logistica.take_item_from_bucket_filler(pos, stackToTake, network, collectorFunc, isAutomatedRequest, dryRun, depth)
-  if stackToTake:get_count() <= 0 then return { remaining = 0, errorMsg =  S("Can't take a stack of size 0") } end
-  if not network then return { remaining = stackToTake:get_count(), errorMsg =  S("No network") } end -- filling happens from network reservoirs, so need a network
+  if stackToTake:get_count() <= 0 then return { remaining = 0, error =  S("Can't take a stack of size 0") } end
+  if not network then return { remaining = stackToTake:get_count(), error =  S("No network") } end -- filling happens from network reservoirs, so need a network
   if not depth then depth = 1 end
 
   local originalRequestedBuckets = stackToTake:get_count()
   local stackToTakeName = stackToTake:get_name()
   local liquidName = logistica.reservoir_get_liquid_name_for_bucket(stackToTakeName)
-  if not liquidName then return { remaining = stackToTake:get_count(), errorMsg =  S("Unknown liquid: ")..liquidName } end
+  if not liquidName then return { remaining = stackToTake:get_count(), error =  S("Unknown liquid: ")..liquidName } end
 
   local liquidInfo = logistica.get_liquid_info_in_network(pos, liquidName)
   local remainingRequest = math.min(liquidInfo.curr, originalRequestedBuckets)
@@ -123,5 +123,5 @@ function logistica.take_item_from_bucket_filler(pos, stackToTake, network, colle
   elseif unfillableBuckets > 0 then
     error = S("Not enough liquid available in network")
   end
-  return { remaining = unfillableBuckets + remainingRequest, errorMsg = error }
+  return { remaining = unfillableBuckets + remainingRequest, error = error }
 end

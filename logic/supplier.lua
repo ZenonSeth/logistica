@@ -1,5 +1,10 @@
+local S = logistica.TRANSLATOR
 
 local META_SUPPLIER_LIST = "main"
+
+local function ret(remaining, optError)
+  return { remaining = remaining, error = optError and S(optError) or nil }
+end
 
 function logistica.get_supplier_inv_size(pos)
   local node = minetest.get_node_or_nil(pos)
@@ -41,7 +46,7 @@ function logistica.put_item_in_supplier(pos, stack)
   return leftover
 end
 
--- returns the number of items remaining to be fulfilled, or 0 if entire request was fulfilled
+-- returns table { remaining = # (how many items remain unfulfiled, 0 if full successful), error = "Error msg"/nil }
 function logistica.take_item_from_supplier(supplierPos, stackToTake, network, collectorFunc, useMetadata, dryRun, optIgnorePosition)
   if optIgnorePosition == nil then optIgnorePosition = -1 end
   local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
@@ -65,7 +70,7 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
           logistica.update_cache_at_pos(supplierPos, LOG_CACHE_SUPPLIER, network)
         end
       end
-      return 0
+      return ret(0)
     else -- not enough to fulfil requested
       local toSend = ItemStack(supplyStack)
       local leftover = collectorFunc(toSend)
@@ -75,7 +80,7 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
         supplierInv:set_stack(META_SUPPLIER_LIST, i, supplyStack)
       end
       if leftover > 0 then -- for some reason we could not insert all - exit early
-        return remaining
+        return ret(remaining, "Could not fulfil entire request: requester did not accept all items")
       end
     end
   end
@@ -85,5 +90,6 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
   if not dryRun then
     logistica.update_cache_at_pos(supplierPos, LOG_CACHE_SUPPLIER, network)
   end
-  return remaining
+
+  return ret(remaining, "Not enough items to fulfil entire request")
 end

@@ -1,13 +1,18 @@
+local S = logistica.TRANSLATOR
 
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
-local MAX_NETWORK_DEPTH_SEARCH = 16 -- somewhat arbitrary but prevents stackoverflows
+local MAX_NETWORK_DEPTH_SEARCH = 8 -- somewhat arbitrary but prevents stackoverflows
 
 local h2p = minetest.get_position_from_hash
 
 local function get_meta(pos)
   logistica.load_position(pos)
   return minetest.get_meta(pos)
+end
+
+local function ret(success, optError)
+  return { success = success, error = optError and S(optError) or nil }
 end
 
 --------------------------------
@@ -83,31 +88,61 @@ end
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
 -- `isAutomatedRequest` is optional, assumed to be false if not set
 -- `useMetaData` is optional, assume false if not set - only applies to items with stack_max = 1
+-- returns table {success = true/false, error = "Description of what went wrong"}
 function logistica.take_stack_from_network(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth)
   if not depth then depth = 0 end
-  if depth > MAX_NETWORK_DEPTH_SEARCH then return false end
-  if not network then return false end
-  -- first check suppliers
-  if logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth) then
-    return
-  end
+  if depth > MAX_NETWORK_DEPTH_SEARCH then return ret(false, "Too many crafting suppliers recursively using each other, limit reached") end
+  if not network then return ret(false, "No connected network") end
+  -- first check normal suppliers only
+  local suppliersCheck =
+    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "normal")
+  if suppliersCheck.success then return ret(true) end
+
   -- then check storages
+  local storageCheck = {success = false}
   if stackToTake:get_stack_max() <= 1 then
-    logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
+    storageCheck = logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   else
-    logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
+    storageCheck = logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
+  end
+  if storageCheck.success then return ret(true) end
+
+  -- finally check bucket and crafting suppliers
+  local bucketSuppliersCheck =
+    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "bucket")
+  if bucketSuppliersCheck.success then return ret(true) end
+
+  local craftingSuppliersCheck =
+    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "crafting")
+  if craftingSuppliersCheck.success then return ret(true) end
+
+  -- iffy, but specific suppliers error are more important than mass storage ones
+  if not bucketSuppliersCheck.success and bucketSuppliersCheck.error and bucketSuppliersCheck.error ~= "" then
+    return {success = false, error = bucketSuppliersCheck.error}
+  elseif not craftingSuppliersCheck.success and craftingSuppliersCheck.error and craftingSuppliersCheck.error ~= "" then
+    return {success = false, error = craftingSuppliersCheck.error}
+  elseif not storageCheck.success then
+    return {success = false, error = storageCheck.error}
+  else
+    return ret(true)
   end
 end
 
 -- tries to take the given stack from the passive suppliers on the network
 -- calls the collectorFunc with the stack when necessary
--- note that it may be called multiple times as the itemstack is gathered from mass storage
-function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth)
+-- note that it may be called multiple times as the itemstack is gathered from mass storage<br>
+-- `type` is which supplier type, leave as nil for all types. Other accepted types = "normal", "crafting", "bucket"<br>
+-- returns table { success = true/false, error = "Error msg"/nil, source = "normal"/"crafting"/"bucket"/"" the source of the error }
+function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, type)
   local takeStack = ItemStack(stackToTake)
   local requestedAmount = stackToTake:get_count()
   local remaining = requestedAmount
   local stackName = stackToTake:get_name()
   local validSupplers = network.supplier_cache[stackName] or {}
+  local normalSupplierResult = ret(0)
+  local craftingSupplierResult = ret(0)
+  local bucketFillerResult = ret(0)
+
   for hash, _ in pairs(validSupplers) do
     local pos = h2p(hash)
     logistica.load_position(pos)
@@ -115,25 +150,40 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     if logistica.is_supplier(nodeName)
         or logistica.is_vaccuum_supplier(nodeName)
         or logistica.is_bucket_emptier(nodeName)
+        and (type == nil or type == "normal")
     then
-      remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
-    elseif logistica.is_crafting_supplier(nodeName) then
-      remaining = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
-    elseif logistica.is_bucket_filler(nodeName) then
-      local result = logistica.take_item_from_bucket_filler(pos, takeStack, network, collectorFunc, isAutomatedRequest, dryRun, depth)
-      remaining = result.remaining
+      normalSupplierResult = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
+      remaining = normalSupplierResult.remaining
+    elseif logistica.is_crafting_supplier(nodeName) and (type == nil or type == "crafting") then
+      craftingSupplierResult = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
+      remaining = craftingSupplierResult.remaining
+    elseif logistica.is_bucket_filler(nodeName) and (type == nil or type == "bucket") then
+      bucketFillerResult = logistica.take_item_from_bucket_filler(pos, takeStack, network, collectorFunc, isAutomatedRequest, dryRun, depth)
+      remaining = bucketFillerResult.remaining
     end
     if remaining <= 0 then
-      return true
+      return ret(true)
     end
     takeStack:set_count(remaining)
   end
-  return false
+  local source = "crafting" -- assume crafting, then correct ourselves
+  if type then source = type
+  else
+    if craftingSupplierResult.remaining > 0 then source = "bucket" end
+    if bucketFillerResult.remaining  > 0 then source = "normal" end
+    if normalSupplierResult.remaining  > 0 then source = "" end
+  end
+
+  if source == "crafting" then return {success = false, error = craftingSupplierResult.error, source = source} end
+  if source == "bucket" then return {success = false, error = bucketFillerResult.error, source = source} end
+  if source == "normal" then return {success = false, error = normalSupplierResult.error, source = source} end
+  return {success = false, error = "Could not find all requested items in network suppliers", source = ""}
+
 end
 
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
--- returns true if item successfully found and given to collector, false otherwise
+-- returns table { success = true/false, error = "Error msg"/nil }
 function logistica.take_stack_from_item_storage(stack, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
   local eq = function(s1, s2) return s1:get_name() == s2:get_name() end
   if useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
@@ -150,27 +200,27 @@ function logistica.take_stack_from_item_storage(stack, network, collectorFunc, i
           if not dryRun then
             storageInv:set_list(ITEM_STORAGE_LIST_NAME, storageList)
           end
-          return true
+          return ret(true)
         else  -- otherwise, the insert failed, don't take stack
-          return false
+          return ret(false, "Found item, but could not be given to requester")
         end
       end -- end check if names equal
     end -- end loop over storageList
   end
-  return false
+  return ret(false, "Item not found in item storage")
 end
 
 -- tries to take a stack from the given network's mass storages
 -- calls the collectorFunc with the stack - collectorFunc needs to return how many were left-over<br>
 -- `collectorFunc = function(stackToInsert)`<br>
 -- note that it may be called multiple times as the itemstack is gathered from mass storage
--- returns true if item successfully found and given to collector, false otherwise
+-- returns table { success = true/false, error = "Error msg"/nil }
 function logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
   local stackToTakeName = stackToTake:get_name()
   local remainingRequest = stackToTake:get_count()
   local massLocations = network.storage_cache[stackToTake:get_name()]
-  if stackToTake:get_count() == 0 then return end
-  if massLocations == nil then return end
+  if stackToTake:get_count() == 0 then return ret(true) end
+  if massLocations == nil then return ret(false) end
   for storageHash, _ in pairs(massLocations) do
     local storagePos = h2p(storageHash)
     local meta = get_meta(storagePos)
@@ -194,7 +244,7 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
           if not dryRun then
             storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
           end
-          return true
+          return ret(true)
         end
       end
       i = i - 1
@@ -203,7 +253,7 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
       storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)
     end
   end
-  return false
+  return ret(false, "Not enough items present in mass storage")
 end
 
 -- try to insert the item into the item storage, returning a stack of remaining items

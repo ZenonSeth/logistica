@@ -1,6 +1,12 @@
+local S = logistica.TRANSLATOR
+
 local INV_MAIN = "main"
 local INV_CRAFT = "crf"
 local INV_HOUT = "hout"
+
+local function ret(remaining, optError)
+  return { remaining = remaining, error = optError and S(optError) or nil }
+end
 
 local function count_items_to_stack(list)
 	local map = {}
@@ -98,6 +104,7 @@ local function consume_for_craft(craftItems, craftItemsMult, extrasMadeByCraftin
   return { countCanCraft = 1, newExtrasList = extrasCopy }
 end
 
+-- returns table {remaining = # How many items remain to fulfil, 0 if successful, errorMsg = "error description here"/nil}
 function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, collectorFunc, useMetadata, dryRun, _depth)
   local depth = _depth or 0
   local takeStack = ItemStack(_takeStack)
@@ -106,11 +113,12 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local inv = minetest.get_meta(pos):get_inventory()
 
   -- first try to take from supply, ignore the 1st slot (which is for the crafted item)
-  remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, 1)
-  if remaining <= 0 then return 0 end -- everything was taken from existing supply, we're done
+  local supplierResult = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, 1)
+  remaining = supplierResult.remaining
+  if remaining <= 0 then return ret(0) end -- everything was taken from existing supply, we're done
 
   -- only craft if machine is on
-  if not logistica.is_machine_on(pos) then return _takeStack:get_count() end
+  if not logistica.is_machine_on(pos) then return ret(_takeStack:get_count()) end
 
   -- if we still have a number of requested itsm to fulfil, try crafting them
   takeStack:set_count(remaining)
@@ -118,7 +126,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
 
   -- if names are different, we can't craft this request
   if inv:is_empty(INV_CRAFT) or  craftStack:get_name() ~= takeStack:get_name() then
-    return remaining
+    return ret(remaining)
   end
 
   inv:set_list(INV_HOUT, {})
@@ -152,7 +160,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
     isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
   until (isEnough)
 
-  if numCrafted == 0 then return remaining end -- nothing could be crafted
+  if numCrafted == 0 then return ret(remaining, "Not enough materials available to craft items from crafting supplier") end -- nothing could be crafted
   remaining = math.max(0, remaining - numCrafted)
 
   -- give the item to the collector
@@ -186,5 +194,5 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
     logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER, network)
   end
 
-  return remaining
+  return ret(remaining)
 end

@@ -160,7 +160,15 @@ local function get_liquid_section(invName, meta, playerName)
     "image_button[1.85,5.8;0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"
 end
 
-local function get_access_point_formspec(pos, invName, optMeta, playerName)
+local function get_error_display(x, y, errorMsg)
+  local img = "" ; if errorMsg and errorMsg ~= "" then img = "logistica_disabled.png" end
+  return 
+    "image["..x..","..(y - 0.2)..";0.4,0.4;"..img.."]"..
+    "label["..(x + 0.5)..","..y..";"..errorMsg.."]"
+end
+
+local function get_access_point_formspec(pos, invName, optMeta, playerName, optError)
+  if not optError then optError = "" end
   --local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or minetest.get_meta(pos)
   local currentNetwork = logistica.get_network_name_or_nil(pos) or S("<NONE>")
@@ -171,15 +179,16 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
   local searchTerm = minetest.formspec_escape(logistica.access_point_get_current_search_term(meta))
   local usesMetaStr = usesMetadata and S("Metadata: ON") or S("Metadata: OFF")
   return "formspec_version[4]"..
-    "size["..logistica.inv_size(15.2, 12.75).."]" ..
+    "size["..logistica.inv_size(15.2, 13.25).."]" ..
     logistica.ui.background..
     "list[detached:"..invName..";"..INV_FAKE..";0.2,0.2;"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
     "image[3.2,6.5;0.8,0.8;logistica_icon_input.png]"..
     "list[detached:"..invName..";"..INV_INSERT..";4.0,6.4;1,1;0]"..
-    logistica.player_inv_formspec(5.2,7.5)..
-    "label[1.4,12.2;"..S("Crafting").."]"..
-    "list[current_player;craft;0.2,8.5;3,3;]"..
-    "list[current_player;craftpreview;3.9,8.5;1,1;]"..
+    get_error_display(5.2, 7.6, optError)..
+    logistica.player_inv_formspec(5.2, 8.0)..
+    "label[1.4,12.7;"..S("Crafting").."]"..
+    "list[current_player;craft;0.2,9.0;3,3;]"..
+    "list[current_player;craftpreview;3.9,9.0;1,1;]"..
     get_liquid_section(invName, meta, playerName)..
     get_listrings(invName)..
     get_filter_section(usesMetaStr, filterHighImg)..
@@ -189,7 +198,7 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName)
     get_search_and_page_section(searchTerm, pageInfo)
 end
 
-local function show_access_point_formspec(pos, playerName, optMeta)
+local function show_access_point_formspec(pos, playerName, optError)
   if minetest.get_modpath("mcl_core") then
     local player = minetest.get_player_by_name(playerName)
     if not player then return end
@@ -199,7 +208,7 @@ local function show_access_point_formspec(pos, playerName, optMeta)
       inv:set_size("craft", 9)
     end
   end
-  local meta = optMeta or minetest.get_meta(pos)
+  local meta = minetest.get_meta(pos)
   local invName = get_or_create_detached_inventory(pos, playerName)
   accessPointForms[playerName] = {
     position = pos,
@@ -210,7 +219,7 @@ local function show_access_point_formspec(pos, playerName, optMeta)
   minetest.show_formspec(
     playerName,
     FORMSPEC_NAME,
-    get_access_point_formspec(pos, invName, meta, playerName)
+    get_access_point_formspec(pos, invName, meta, playerName, optError and S("Error: ")..optError or "")
   )
 end
 
@@ -317,7 +326,11 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
     if stackMax > 1 then
       local taken = ItemStack("")
       local acceptTaken = function(st) taken:add_item(st); return 0 end
-      logistica.take_stack_from_network(stack, network, acceptTaken)
+
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken)
+      local error = nil ; if not takeResult.success then error = takeResult.error end
+      show_access_point_formspec(pos, player:get_player_name(), error)
+
       if not taken or taken:is_empty() then return 0 end
       return math.min(taken:get_count(), stackMax)
     else -- individual items are trickier 
@@ -325,8 +338,12 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       local useMetadata = logistica.access_point_is_set_to_use_metadata(pos)
       local taken = nil
       local acceptTaken = function(st) taken = st; return 0 end
+
       -- for the rare case where two items got stacked despite using metadata
-      logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
+      local error = nil ; if not takeResult.success then error = takeResult.error end
+      show_access_point_formspec(pos, player:get_player_name(), error)
+
       if not taken or taken:is_empty() then return 0 end
       inv:set_stack(listname, index, taken)
       return taken:get_count()
@@ -349,16 +366,21 @@ function logistica.access_point_on_put(inv, listname, index, stack, player)
   if not pos then return 0 end
   logistica.load_position(pos)
   local networkId = logistica.get_network_id_or_nil(pos)
-  if not networkId then show_access_point_formspec(pos, player:get_player_name()) ; return end
+  if not networkId then
+    show_access_point_formspec(pos, player:get_player_name(), S("Access Point not connected to any network"))
+    return
+  end
   if listname == INV_INSERT then
     local stackToAdd = inv:get_stack(listname, index)
     local leftover = logistica.insert_item_in_network(stackToAdd, networkId)
     stack:set_count(leftover)
+    local error = nil
     if not stack:is_empty() then
       give_to_player(player, stack)
+      error = S("Not enough space or allocated mass storage slots in network for item")
     end
     inv:set_stack(listname, index, ItemStack(""))
-    show_access_point_formspec(pos, player:get_player_name())
+    show_access_point_formspec(pos, player:get_player_name(), error)
   elseif listname == INV_LIQUID then
     local currLiquid = logistica.access_point_get_current_liquid_name(minetest.get_meta(pos), player:get_player_name())
     local newStack = logistica.use_bucket_for_liquid_in_network(pos, stack, currLiquid)

@@ -94,7 +94,7 @@ local function allow_filler_inv_take(pos, listname, index, stack, player)
     local takeFunc = function(takenStack) numTaken = takenStack:get_count() ; return 0 end
     local result = logistica.take_item_from_bucket_filler(pos, stack, logistica.get_network_or_nil(pos), takeFunc, false, false)
     if forms[playerName] then
-      forms[playerName].errorMsg = result.errorMsg
+      forms[playerName].errorMsg = result.error
     end
     if numTaken == 0 then show_filler_formspec(player:get_player_name(), pos) end
     return numTaken
