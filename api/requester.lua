@@ -77,8 +77,8 @@ local function after_place_requester(pos, placer, itemstack, numRequestSlots)
   inv:set_size("filter", numRequestSlots)
   inv:set_size("actual", numRequestSlots)
   logistica.on_requester_change(pos)
-  logistica.start_requester_timer(pos)
   logistica.show_output_at(logistica.get_requester_target(pos))
+  logistica.set_node_tooltip_from_state(pos, nil, false)
 end
 
 local function allow_requester_storage_inv_put(pos, listname, index, stack, player)
