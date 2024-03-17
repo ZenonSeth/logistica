@@ -21,6 +21,27 @@ local function count_items_to_stack(list)
   return items
 end
 
+-- returns table { newList = listWithoutStack, takenStack = stackOfHowManyRemoved }
+local function list_without_stack(invList, takeStack)
+  local newList = {}
+  local countedItems = count_items_to_stack(invList)
+  local takenStack = ItemStack(takeStack) ; takenStack:set_count(1)
+  for _, v in pairs(countedItems) do
+    if takeStack:get_count() > 0 and v:get_name() == takeStack:get_name() then
+      local countLeftoverAfterRemoved = math.max(0, v:get_count() - takeStack:get_count())
+      local modifiedV = ItemStack(v) ; modifiedV:set_count(countLeftoverAfterRemoved)
+      takenStack:set_count(takenStack:get_count() + v:get_count() - countLeftoverAfterRemoved)
+      if countLeftoverAfterRemoved > 0 then
+        table.insert(newList, modifiedV)
+      end
+    elseif v:get_count() > 0 then
+      table.insert(newList, v)
+    end
+  end
+  takenStack:set_count(takenStack:get_count() - 1)
+  return { newList = newList, takenStack = takenStack }
+end
+
 local function consume_from_network(craftItems, times, network, depth)
   if times <= 0 then return end
   local acceptItem = function (_) return 0 end
@@ -30,10 +51,12 @@ local function consume_from_network(craftItems, times, network, depth)
   end
 end
 
--- returns 0 if craftItems could not be taken from network, returns 1 if they could
-local function consume_for_craft(craftItems, craftItemsMult, network, depth, dryRun)
+-- returns table {countCanCraft = # (0 or 1), newExtrasList = extrasMadeByCrafting - removed items}
+local function consume_for_craft(craftItems, craftItemsMult, extrasMadeByCrafting, network, depth, dryRun)
   local itemTaken = ItemStack("")
   local acceptItem = function(st) itemTaken:add_item(st) ; return 0 end
+  local extrasCopy = table.copy(extrasMadeByCrafting)
+  local toConsumeFromNetwork = {}
   for _, _itemStack in ipairs(craftItems) do
     itemTaken:clear()
     local itemStack = ItemStack(_itemStack)
@@ -42,15 +65,37 @@ local function consume_for_craft(craftItems, craftItemsMult, network, depth, dry
       -- we have enough in the network by accounting for how many have been "crafted" so far
       itemStack:set_count(itemStack:get_count() * craftItemsMult)
     end
-    logistica.take_stack_from_network(itemStack, network, acceptItem, true, false, true, depth + 1)
-    if itemTaken:get_count() < itemStack:get_count() then
-      return 0
+
+    -- first check if we can take it from the extrasCopy
+    local takenFromExtras = 0
+    for _, v in ipairs(extrasCopy) do
+      if v:get_name() == itemStack:get_name() then
+        takenFromExtras = math.min(v:get_count(), itemStack:get_count())
+        itemStack:set_count(itemStack:get_count() - takenFromExtras)
+        if not dryRun then -- if not dry run, actually use up items in the extras copy list
+          v:set_count(math.max(0, v:get_count() - takenFromExtras))
+        end
+      end
+    end
+
+    -- then if any still needed, take from network
+    if itemStack:get_count() > 0 then
+      logistica.take_stack_from_network(itemStack, network, acceptItem, true, false, true, depth + 1)
+      if not dryRun and itemTaken:get_count() > 0 then
+        table.insert(toConsumeFromNetwork, ItemStack(itemTaken))
+      end
+    end
+
+    -- if there aren't enough combined items, we just can't craft this
+    if (takenFromExtras + itemTaken:get_count()) < itemStack:get_count() then
+      return { countCanCraft = 0, newExtrasList = extrasMadeByCrafting }
     end
   end
+  -- if we got here, it means we CAN craft this. remove the items as needed
   if not dryRun then
-    consume_from_network(craftItems, 1, network, depth)
+    consume_from_network(toConsumeFromNetwork, 1, network, depth)
   end
-  return 1
+  return { countCanCraft = 1, newExtrasList = extrasCopy }
 end
 
 function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, collectorFunc, useMetadata, dryRun, _depth)
@@ -60,9 +105,9 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local takeStackName = takeStack:get_name()
   local inv = minetest.get_meta(pos):get_inventory()
 
-  -- first check existing supply, ignore the 1st slot (which is for the crafted item)
+  -- first try to take from supply, ignore the 1st slot (which is for the crafted item)
   remaining = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, 1)
-  if remaining <= 0 then return 0 end -- we're done
+  if remaining <= 0 then return 0 end -- everything was taken from existing supply, we're done
 
   -- only craft if machine is on
   if not logistica.is_machine_on(pos) then return _takeStack:get_count() end
@@ -82,12 +127,27 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
 
   local craftItemMult = 0
   repeat
-    logistica.autocrafting_produce_single_item(inv, INV_CRAFT, nil, INV_HOUT)
     craftItemMult = craftItemMult + 1
-    -- if we can craft from network
-    local items = count_items_to_stack(inv:get_list(INV_CRAFT))
-    local numCanCraft = consume_for_craft(items, craftItemMult, network, depth, dryRun)
+    --
+    local recipeItems = count_items_to_stack(inv:get_list(INV_CRAFT))
+    -- use the output of any previous loop iterations to make it available to take from - except for the item we have to send to requester
+    local extrasListsMinusTarget = list_without_stack(inv:get_list(INV_HOUT), takeStack)
+    local extrasMadeByCrafting = extrasListsMinusTarget.newList -- extra items output by the previous craft loops (aka substitutes)
+
+    -- consume items required to craft the item from the extras and network if needed
+    local consumeResult = consume_for_craft(recipeItems, craftItemMult, extrasMadeByCrafting, network, depth, dryRun)
+    local numCanCraft = consumeResult.countCanCraft -- how many we can craft, really the function returns 0 or 1
+    -- if not a dry run, we might have taken some items from the extras, so override the HOUT list with our used-up list
+    if not dryRun then
+      if extrasListsMinusTarget.takenStack:get_count() > 0 then
+        table.insert(consumeResult.newExtrasList, extrasListsMinusTarget.takenStack)
+      end
+      inv:set_list(INV_HOUT, consumeResult.newExtrasList)
+    end
     numCrafted = numCrafted + numCanCraft
+    if numCanCraft > 0 then -- now "craft" the item
+      logistica.autocrafting_produce_single_item(inv, INV_CRAFT, nil, INV_HOUT)
+    end
 
     isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
   until (isEnough)
