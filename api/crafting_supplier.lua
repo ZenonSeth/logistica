@@ -129,6 +129,11 @@ local function can_dig_craftsup(pos, player)
   return true
 end
 
+local function on_craftsup_power(pos, power)
+  logistica.set_node_tooltip_from_state(pos, nil, power)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+end
+
 ----------------------------------------------------------------
 -- Minetest registration
 ----------------------------------------------------------------
@@ -172,7 +177,8 @@ function logistica.register_crafting_supplier(desc, name, tiles)
     on_metadata_inventory_take = on_craftsup_inventory_take,
     can_dig = can_dig_craftsup,
     logistica = {
-      on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end
+      on_power = on_craftsup_power,
+      get_cache_list = logistica.crafting_supplier_get_main_list
     },
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10

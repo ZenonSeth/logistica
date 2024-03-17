@@ -104,6 +104,23 @@ local function consume_for_craft(craftItems, craftItemsMult, extrasMadeByCraftin
   return { countCanCraft = 1, newExtrasList = extrasCopy }
 end
 
+-- returns a list of ItemStacks to be used for caching, which may be a sublist of INV_MAIN if the machine is off
+function logistica.crafting_supplier_get_main_list(pos)
+  local isOn = logistica.is_machine_on(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  local mainList = inv:get_list(INV_MAIN)
+  if isOn then return mainList
+  else
+    local sublist = {}
+    for i, stack in ipairs(mainList) do
+      if i ~= 1 then
+        table.insert(sublist, stack)
+      end
+    end
+    return sublist
+  end
+end
+
 -- returns table {remaining = # How many items remain to fulfil, 0 if successful, errorMsg = "error description here"/nil}
 function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, collectorFunc, useMetadata, dryRun, _depth)
   local depth = _depth or 0

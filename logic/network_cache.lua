@@ -93,7 +93,7 @@ local function update_network_cache(network, cacheOps)
     local storagePos = minetest.get_position_from_hash(hash)
     logistica.load_position(storagePos)
     local nodeMeta = get_meta(storagePos)
-    local list = nodeMeta:get_inventory():get_list(listName) or {}
+    local list = logistica.get_cache_list_for(storagePos, nodeMeta, listName)
     for _, itemStack in ipairs(list) do
       local name = itemStack:get_name()
       if name ~= "" then
@@ -113,7 +113,7 @@ local function update_network_cache_for_pos(pos, cacheOps, optNetwork)
   local hash = minetest.hash_node_position(pos)
   local listName = cacheOps.listName
   local prevCacheItems = get_prev_cache_as_nameset(meta, listName)
-  local currCacheItems = list_to_cache_nameset(meta:get_inventory():get_list(listName))
+  local currCacheItems = list_to_cache_nameset(logistica.get_cache_list_for(pos, meta, listName))
 
   local cache = cacheOps.cache(network)
   local remAndAdd = diff(prevCacheItems, currCacheItems)
@@ -165,4 +165,16 @@ end
 -- `type` is one of LOG_CACHE_MASS_STORAGE, LOG_CACHE_SUPPLIER, LOG_CACHE_REQUESTER
 function logistica.update_cache_node_removed_at_pos(pos, type, optNetwork)
   remove_network_cache_for_pos(pos, type, optNetwork)
+end
+
+-- helper
+
+function logistica.get_cache_list_for(position, meta, listName)
+  local nodeName = minetest.get_node(position).name
+  local nodeDef = minetest.registered_nodes[nodeName]
+  if nodeDef and nodeDef.logistica and nodeDef.logistica.get_cache_list then
+    return nodeDef.logistica.get_cache_list(position) or {}
+  else
+    return meta:get_inventory():get_list(listName) or {}
+  end
 end

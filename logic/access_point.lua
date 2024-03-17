@@ -101,17 +101,17 @@ local function build_stack_list(pos)
   -- we scan all supply chests and mass storage and item storage
   for hash, _ in pairs(network.suppliers) do
     local mPos = logistica.load_position(h2p(hash))
-    local list = get_meta(mPos):get_inventory():get_list("main") or {}
+    local list = logistica.get_cache_list_for(mPos, get_meta(mPos), "main")
     add_list_to_itemmap(itemMap, list, useMetadata)
   end
   for hash, _ in pairs(network.mass_storage) do
     local mPos = logistica.load_position(h2p(hash))
-    local list = get_meta(mPos):get_inventory():get_list("storage") or {}
+    local list = logistica.get_cache_list_for(mPos, get_meta(mPos), "storage")
     add_list_to_itemmap(itemMap, list, useMetadata)
   end
   for hash, _ in pairs(network.item_storage) do
     local mPos = logistica.load_position(h2p(hash))
-    local list = get_meta(mPos):get_inventory():get_list("main") or {}
+    local list = logistica.get_cache_list_for(mPos, get_meta(mPos), "main")
     add_list_to_itemmap(itemMap, list, useMetadata)
   end
   local itemList = {}
