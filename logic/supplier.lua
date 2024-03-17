@@ -71,11 +71,11 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
       local leftover = collectorFunc(toSend)
       remaining = remaining - (supplyCount - leftover)
       supplyStack:set_count(leftover)
+      if not dryRun then
+        supplierInv:set_stack(META_SUPPLIER_LIST, i, supplyStack)
+      end
       if leftover > 0 then -- for some reason we could not insert all - exit early
-        if not dryRun then
-          supplierInv:set_stack(META_SUPPLIER_LIST, i, supplyStack)
-        end
-        return 0
+        return remaining
       end
     end
   end
