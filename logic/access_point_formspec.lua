@@ -327,7 +327,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       local taken = ItemStack("")
       local acceptTaken = function(st) taken:add_item(st); return 0 end
 
-      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken)
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, false, true)
       local error = nil ; if not takeResult.success then error = takeResult.error end
 
       if not taken or taken:is_empty() then
@@ -342,7 +342,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       local acceptTaken = function(st) taken = st; return 0 end
 
       -- for the rare case where two items got stacked despite using metadata
-      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata, true)
       local error = nil ; if not takeResult.success then error = takeResult.error end
 
       if not taken or taken:is_empty() then
@@ -399,13 +399,20 @@ function logistica.access_point_on_take(inv, listname, index, stack, player)
   if listname == INV_FAKE then
     local pos = get_curr_pos(player)
     if not pos then return 0 end
-    local invName = accessPointForms[player:get_player_name()].invName
-    if not invName then return 0 end
+    local network = logistica.get_network_or_nil(pos)
+    if not network then return 0 end -- this isn't good, but nothing we can do at this point unforunately
 
+    local acceptTaken = function(st) return 0 end
     logistica.load_position(pos)
+    if stack:get_stack_max() > 1 then
+      logistica.take_stack_from_network(stack, network, acceptTaken, false, false, false)
+    else
+      -- we want to take the actual item, with exact metadata, always
+      -- because the on_take method should have placed the exact item in the slot already
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, false, false)
+    end
     -- refresh the page in case we had to swap out a fake item or a stack is gone
     show_access_point_formspec(pos, player:get_player_name())
-    -- logistica.access_point_refresh_fake_inv(pos, invName, listname, FAKE_INV_SIZE, player:get_player_name())
   end
 end
 
