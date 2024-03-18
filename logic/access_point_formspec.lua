@@ -329,9 +329,11 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
 
       local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken)
       local error = nil ; if not takeResult.success then error = takeResult.error end
-      show_access_point_formspec(pos, player:get_player_name(), error)
 
-      if not taken or taken:is_empty() then return 0 end
+      if not taken or taken:is_empty() then
+        show_access_point_formspec(pos, player:get_player_name(), error)
+        return 0
+      end
       return math.min(taken:get_count(), stackMax)
     else -- individual items are trickier 
       -- we want to take the actual item, so place it in the slot before its taken
@@ -342,9 +344,11 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       -- for the rare case where two items got stacked despite using metadata
       local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata)
       local error = nil ; if not takeResult.success then error = takeResult.error end
-      show_access_point_formspec(pos, player:get_player_name(), error)
 
-      if not taken or taken:is_empty() then return 0 end
+      if not taken or taken:is_empty() then
+        show_access_point_formspec(pos, player:get_player_name(), error)
+        return 0
+      end
       inv:set_stack(listname, index, taken)
       return taken:get_count()
     end
@@ -400,7 +404,8 @@ function logistica.access_point_on_take(inv, listname, index, stack, player)
 
     logistica.load_position(pos)
     -- refresh the page in case we had to swap out a fake item or a stack is gone
-    logistica.access_point_refresh_fake_inv(pos, invName, listname, FAKE_INV_SIZE, player:get_player_name())
+    show_access_point_formspec(pos, player:get_player_name())
+    -- logistica.access_point_refresh_fake_inv(pos, invName, listname, FAKE_INV_SIZE, player:get_player_name())
   end
 end
 
