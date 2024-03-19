@@ -20,7 +20,7 @@ end
 --------------------------------
 
 -- returns the new stack to replace the empty bucket given, or nil if not successful
-function logistica.fill_bucket_from_network(network, bucketItemStack, liquidName)
+function logistica.fill_bucket_from_network(network, bucketItemStack, liquidName, dryRun)
   if not logistica.reservoir_is_empty_bucket(bucketItemStack:get_name()) then return nil end
   local lowestReservoirPos = nil
   local lowestReservoirLvl = 999999
@@ -37,14 +37,14 @@ function logistica.fill_bucket_from_network(network, bucketItemStack, liquidName
   end
 
   if lowestReservoirPos then
-    return logistica.reservoir_use_item_on(lowestReservoirPos, bucketItemStack)
+    return logistica.reservoir_use_item_on(lowestReservoirPos, bucketItemStack, nil, dryRun)
   else
     return nil
   end
 end
 
 -- returns the new stack to replace the filled bucket given, or nil if not successful
-function logistica.empty_bucket_into_network(network, bucketItemStack)
+function logistica.empty_bucket_into_network(network, bucketItemStack, dryRun)
   if not logistica.reservoir_is_full_bucket(bucketItemStack:get_name()) then return nil end
 
   local bucketName = bucketItemStack:get_name()
@@ -74,9 +74,9 @@ function logistica.empty_bucket_into_network(network, bucketItemStack)
   end
 
   if highestReservoirPos then
-    return logistica.reservoir_use_item_on(highestReservoirPos, bucketItemStack)
+    return logistica.reservoir_use_item_on(highestReservoirPos, bucketItemStack, nil, dryRun)
   elseif emptyReservoirPos then
-    return logistica.reservoir_use_item_on(emptyReservoirPos, bucketItemStack)
+    return logistica.reservoir_use_item_on(emptyReservoirPos, bucketItemStack, nil, dryRun)
   else
     return nil
   end
@@ -391,7 +391,7 @@ end
 -- Otherwise a full bucket will attempt to fill any applicable reservoir on the network.
 -- This function attempts to take from the lowest filled reservoir, and insert into the highest filled reservoir first.<br>
 -- returns new itemstack to replace the old one, or `nil` if it wasn't changed
-function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquidName)
+function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquidName, dryRun)
   local network = logistica.get_network_or_nil(pos)
   if not network then return nil end
 
@@ -400,8 +400,8 @@ function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquid
   local isFullBucket = logistica.reservoir_is_full_bucket(bucketName)
   if isEmptyBucket then
     if not liquidName then return nil end
-    return logistica.fill_bucket_from_network(network, bucketItemStack, liquidName)
+    return logistica.fill_bucket_from_network(network, bucketItemStack, liquidName, dryRun)
   elseif isFullBucket then
-    return logistica.empty_bucket_into_network(network, bucketItemStack)
+    return logistica.empty_bucket_into_network(network, bucketItemStack, dryRun)
   end
 end

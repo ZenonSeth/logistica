@@ -94,7 +94,7 @@ end
 
 -- returns nil if item had no effect<br>
 -- returns an ItemStack to replace the item, if it had effect (e.g. took or stored liquid)
-function logistica.reservoir_use_item_on(pos, itemstack, optNode)
+function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
   local node = optNode or minetest.get_node(pos)
   local nodeDef = minetest.registered_nodes[node.name]
   if not nodeDef or not nodeDef.logistica or not nodeDef.logistica.liquidName or not nodeDef.logistica.maxBuckets then return end
@@ -123,14 +123,16 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode)
     else
       node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
     end
-    minetest.swap_node(pos, node)
-    meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
-    if nodeLiquidLevel == 0 then
-      local newNodeName = get_empty_reservoir_name(node.name, liquidName)
-      if not minetest.registered_nodes[newNodeName] then return nil end
-      logistica.swap_node(pos, newNodeName)
+    if not dryRun then
+      minetest.swap_node(pos, node)
+      meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
+      if nodeLiquidLevel == 0 then
+        local newNodeName = get_empty_reservoir_name(node.name, liquidName)
+        if not minetest.registered_nodes[newNodeName] then return nil end
+        logistica.swap_node(pos, newNodeName)
+      end
+      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, liquidDesc))
     end
-    meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, liquidDesc))
 
     return ItemStack(fullBucket)
   elseif fullBucket == BUCKET_ANY or itemStackName == fullBucket then
@@ -147,12 +149,14 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode)
 
     local nodeDef = minetest.registered_nodes[newNodeName]
     if not nodeDef or not nodeDef.logistica then return nil end
-    if nodeLiquidLevel == 1 then -- first bucket we added, swap to that reservoir type
-      logistica.swap_node(pos, newNodeName)
+    if not dryRun then
+      if nodeLiquidLevel == 1 then -- first bucket we added, swap to that reservoir type
+        logistica.swap_node(pos, newNodeName)
+      end
+      local newLiquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
+      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
+      meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
     end
-    local newLiquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
-    meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
-    meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
     return ItemStack(newEmptyBucket)
   end
   return nil

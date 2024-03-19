@@ -358,6 +358,7 @@ end
 
 function logistica.access_point_allow_move(inv, from_list, from_index, to_list, to_index, count, player)
   if from_list == INV_FAKE or to_list == INV_FAKE then return 0 end
+  if to_list == INV_INSERT then return 0 end
   if to_list == INV_LIQUID then return 0 end
   return count
 end

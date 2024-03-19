@@ -98,7 +98,7 @@ function logistica.take_item_from_bucket_filler(pos, stackToTake, network, colle
 
   local emptyBucketStack = ItemStack(emptyBucketName)
   for _ = 1, numEmptyBucketsAvailable, 1 do
-    logistica.fill_bucket_from_network(network, emptyBucketStack, liquidName)
+    logistica.fill_bucket_from_network(network, emptyBucketStack, liquidName, dryRun)
   end
 
   local toGive = ItemStack(filledBucketName) ; toGive:set_count(numEmptyBucketsAvailable)
