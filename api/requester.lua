@@ -128,7 +128,7 @@ end)
 function logistica.register_requester(description, name, transferRate, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local requester_name = "logistica:"..lname
-  logistica.requesters[requester_name] = true
+  logistica.GROUPS.requesters.register(requester_name)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {

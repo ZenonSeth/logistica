@@ -367,7 +367,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   local grps = {cracky = 1, choppy = 1, oddly_breakable_by_hand = 1, pickaxey = 3, axey = 3, handy = 1}
   numUpgradeSlots = logistica.clamp(numUpgradeSlots, 0, 4)
   grps[logistica.TIER_ALL] = 1
-  logistica.mass_storage[storageName] = true
+  logistica.GROUPS.mass_storage.register(storageName)
 
   local def = {
     description = description.."\n(Empty)",

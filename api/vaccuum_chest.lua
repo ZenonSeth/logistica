@@ -107,7 +107,7 @@ end)
 function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local vaccuum_name = "logistica:"..lname
-  logistica.vaccuum_suppliers[vaccuum_name] = true
+  logistica.GROUPS.vaccuum_suppliers.register(vaccuum_name)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {

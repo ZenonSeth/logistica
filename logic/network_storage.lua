@@ -147,17 +147,19 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     local pos = h2p(hash)
     logistica.load_position(pos)
     local nodeName = minetest.get_node(pos).name
-    if logistica.is_supplier(nodeName)
-        or logistica.is_vaccuum_supplier(nodeName)
-        or logistica.is_bucket_emptier(nodeName)
-        and (type == nil or type == "normal")
+    if (type == nil or type == "normal")
+      and (
+          logistica.GROUPS.suppliers.is(nodeName)
+          or logistica.GROUPS.vaccuum_suppliers.is(nodeName)
+          or logistica.GROUPS.bucket_emptiers.is(nodeName)
+      )
     then
       normalSupplierResult = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
       remaining = normalSupplierResult.remaining
-    elseif logistica.is_crafting_supplier(nodeName) and (type == nil or type == "crafting") then
+    elseif (type == nil or type == "crafting") and logistica.GROUPS.crafting_suppliers.is(nodeName) then
       craftingSupplierResult = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
       remaining = craftingSupplierResult.remaining
-    elseif logistica.is_bucket_filler(nodeName) and (type == nil or type == "bucket") then
+    elseif (type == nil or type == "bucket") and logistica.GROUPS.bucket_fillers.is(nodeName) then
       bucketFillerResult = logistica.take_item_from_bucket_filler(pos, takeStack, network, collectorFunc, isAutomatedRequest, dryRun, depth)
       remaining = bucketFillerResult.remaining
     end

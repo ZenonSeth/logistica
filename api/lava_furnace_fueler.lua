@@ -119,7 +119,7 @@ end)
 function logistica.register_lava_furnace_fueler(description, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local fuelerName = "logistica:"..lname
-  logistica.misc_machines[fuelerName] = true
+  logistica.GROUPS.misc_machines.register(fuelerName)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1, }
   grps[logistica.TIER_ALL] = 1
   local def = {

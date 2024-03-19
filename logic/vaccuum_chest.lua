@@ -33,7 +33,7 @@ local function collect_items_into(pos, distance)
   local inserted = 0
 
   local nodeName = minetest.get_node(pos).name
-  if not logistica.is_vaccuum_supplier(nodeName) then return inserted end
+  if not logistica.GROUPS.vaccuum_suppliers.is(nodeName) then return inserted end
   local nodeDef = minetest.registered_nodes[nodeName]
   if not nodeDef or not nodeDef.logistica or not nodeDef.on_metadata_inventory_put then
     return inserted

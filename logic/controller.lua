@@ -9,7 +9,7 @@ end
 function logistica.on_controller_timer(pos, _)
   local node = minetest.get_node_or_nil(pos)
   if not node then return true end -- what?
-  if not logistica.is_controller(node.name) then return false end
+  if not logistica.GROUPS.controllers.is(node.name) then return false end
 
   local network = logistica.get_network_or_nil(pos)
   if not network then

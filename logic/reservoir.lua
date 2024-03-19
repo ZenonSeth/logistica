@@ -161,7 +161,7 @@ end
 -- returns the liquid name for the reservoir; or "" if there's no liquid stored, or nil if its not a reservoir
 function logistica.reservoir_get_liquid_name(pos)
   local node = minetest.get_node(pos)
-  if not logistica.is_reservoir(node.name) then return nil end
+  if not logistica.GROUPS.reservoirs.is(node.name) then return nil end
   local def = minetest.registered_nodes[node.name]
   if not def or not def.logistica or not def.logistica.liquidName then return nil end
   return def.logistica.liquidName
@@ -170,7 +170,7 @@ end
 -- return {currentLevel, maxLevel} measured in buckets; or nil if its not a reservoir
 function logistica.reservoir_get_liquid_level(pos)
   local node = minetest.get_node(pos)
-  if not logistica.is_reservoir(node.name) then return nil end
+  if not logistica.GROUPS.reservoirs.is(node.name) then return nil end
   local def = minetest.registered_nodes[node.name]
   if not def or not def.logistica or not def.logistica.maxBuckets then return nil end
   local meta = minetest.get_meta(pos)

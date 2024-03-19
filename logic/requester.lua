@@ -27,7 +27,7 @@ local function get_meta(pos)
 end
 
 local function is_prohibited_logistica_machine(name)
-  return logistica.is_machine(name) and not logistica.is_bucket_emptier(name)
+  return logistica.is_machine(name) and not logistica.GROUPS.bucket_emptiers.is(name)
 end
 
 local function get_max_rate_for_requester(pos)

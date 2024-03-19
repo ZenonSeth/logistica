@@ -115,8 +115,8 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
   local pump_name = "logistica:"..lname
   local pump_name_on = pump_name.."_on"
 
-  logistica.pumps[pump_name] = true
-  logistica.pumps[pump_name_on] = true
+  logistica.GROUPS.pumps.register(pump_name)
+  logistica.GROUPS.pumps.register(pump_name_on)
 
   local def = {
     description = S(desc),

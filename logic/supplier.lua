@@ -31,7 +31,7 @@ end
 -- tries to put the given item in this supplier, returns what's leftover
 function logistica.put_item_in_supplier(pos, stack)
   local nodeName = minetest.get_node(pos).name
-  if not logistica.is_supplier(nodeName) then return stack end
+  if not logistica.GROUPS.suppliers.is(nodeName) then return stack end
   local nodeDef = minetest.registered_nodes[nodeName]
   if not nodeDef or not nodeDef.logistica then return stack end
   if not nodeDef.logistica.supplierMayAccept then return stack end

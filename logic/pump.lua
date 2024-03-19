@@ -106,7 +106,7 @@ local function put_liquid_in_neighboring_reservoirs(pumpPosition, bucketItemStac
     local neighborPos = vector.add(pumpPosition, v)
     logistica.load_position(neighborPos)
     local neighborNode = minetest.get_node_or_nil(neighborPos)
-    if neighborNode and logistica.is_reservoir(neighborNode.name) then
+    if neighborNode and logistica.GROUPS.reservoirs.is(neighborNode.name) then
       local resultStack = logistica.reservoir_use_item_on(neighborPos, bucketItemStack, neighborNode)
       if resultStack ~= nil then return true end
     end

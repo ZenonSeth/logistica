@@ -18,24 +18,15 @@ local adjecent = {
 
 local function has_machine(network, id)
   if not network then return false end
-  if network.requesters[id]
-    or network.suppliers[id]
-    or network.mass_storage[id]
-    or network.item_storage[id]
-    or network.injectors[id]
-    or network.misc[id]
-    or network.trashcans[id]
-    or network.reservoirs[id]
-  then
-    return true
-  else
-    return false
+  for networkGroup, v in pairs(logistica.network_group_get_all()) do
+    if network[networkGroup][id] ~= nil then return true end
   end
+  return false
 end
 
 local function network_contains_hash(network, hash)
   if hash == network.controller then return true end
-  if network.cables[hash] then return true end
+  if network[logistica.NETWORK_GROUPS.cables][hash] then return true end
   if has_machine(network, hash) then return true end
   return false
 end
@@ -141,7 +132,7 @@ local function find_adjecent_networks(pos)
   for _, adj in pairs(adjecent) do
     local otherPos = vector.add(pos, adj)
     local otherNodeName = minetest.get_node(otherPos).name
-    if logistica.is_cable(otherNodeName) or logistica.is_controller(otherNodeName) then
+    if logistica.GROUPS.cables.is(otherNodeName) or logistica.GROUPS.controllers.is(otherNodeName) then
       local otherNetwork = logistica.get_network_or_nil(otherPos)
       if otherNetwork ~= nil then
         if currNetwork == nil then currNetwork = otherNetwork
@@ -174,56 +165,23 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
       local otherHash = p2h(otherPos)
       if network.controller ~= otherHash
           and not has_machine(network, otherHash)
-          and network.cables[otherHash] == nil then
+          and network[logistica.NETWORK_GROUPS.cables][otherHash] == nil then
         local existingNetwork = logistica.get_network_id_or_nil(otherPos)
         if existingNetwork ~= nil and existingNetwork ~= network then
           return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
         end
         local valid = false
-        if logistica.is_cable(otherName) then
-          network.cables[otherHash] = true
+        local nodeNetworkGroup = logistica.get_network_group_for_node_name(otherName)
+        if nodeNetworkGroup == logistica.NETWORK_GROUPS.cables then -- cables get special treatment
+          network[nodeNetworkGroup][otherHash] = true
           connections[otherHash] = true
           valid = true
-        end
-        if logistica.is_requester(otherName) then
-          network.requesters[otherHash] = true
+        elseif nodeNetworkGroup ~= nil then
+          -- all machines, except controllers, should be added to network
+          network[nodeNetworkGroup][otherHash] = true
           valid = true
         end
-        if logistica.is_injector(otherName) then
-          network.injectors[otherHash] = true
-          valid = true
-        end
-        if logistica.is_supplier(otherName) 
-            or logistica.is_crafting_supplier(otherName)
-            or logistica.is_vaccuum_supplier(otherName)
-            or logistica.is_bucket_filler(otherName)
-            or logistica.is_bucket_emptier(otherName)
-        then
-          network.suppliers[otherHash] = true
-          valid = true
-        end
-        if logistica.is_mass_storage(otherName) then
-          network.mass_storage[otherHash] = true
-          valid = true
-        end
-        if logistica.is_item_storage(otherName) then
-          network.item_storage[otherHash] = true
-          valid = true
-        end
-        if logistica.is_misc(otherName)
-            or logistica.is_pump(otherName)
-        then
-          network.misc[otherHash] = true
-          valid = true
-        end
-        if logistica.is_trashcan(otherName) then
-          network.trashcans[otherHash] = true
-          valid = true
-        end
-        if logistica.is_reservoir(otherName) then
-          network.reservoirs[otherHash] = true
-          valid = true
-        end
+
         if valid then
           newToScan = newToScan + 1
           set_cache_network_id(minetest.get_meta(otherPos), network.controller)
@@ -251,18 +209,14 @@ local function create_network(controllerPosition, oldNetworkName)
   meta:set_string("infotext", "Controller of Network: "..networkName)
   network.controller = controllerHash
   network.name = networkName
-  network.cables = {}
-  network.requesters = {}
-  network.injectors = {}
-  network.suppliers = {}
-  network.mass_storage = {}
-  network.item_storage = {}
-  network.misc = {}
-  network.trashcans = {}
+  for group, _ in pairs(logistica.network_group_get_all()) do
+    network[group] = {}
+  end
+  -- caches aren't groups, so add them manually
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
-  network.reservoirs = {}
+
   local startPos = {}
   startPos[controllerHash] = true
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
@@ -399,7 +353,7 @@ local MISC_OPS = {
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
-  return logistica.is_cable(node.name) or logistica.is_controller(node.name)
+  return logistica.GROUPS.cables.is(node.name) or logistica.GROUPS.controllers.is(node.name)
 end
 
 ----------------------------------------------------------------
@@ -416,7 +370,7 @@ function logistica.try_to_wake_up_network(pos)
 
   logistica.load_position(conPos)
   local node = minetest.get_node(conPos)
-  if logistica.is_controller(node.name) then
+  if logistica.GROUPS.controllers.is(node.name) then
     local nodeDef = minetest.registered_nodes[node.name]
     if nodeDef.on_timer then
       nodeDef.on_timer(conPos, 1)
@@ -437,11 +391,11 @@ function logistica.on_cable_change(pos, oldNode, optMeta, wasPlacedOverride)
   if networkEnd then
     if not placed then -- removed a network end
       local network = logistica.get_network_or_nil(pos, optMeta)
-      if network then network.cables[p2h(pos)] = nil end
+      if network then network[logistica.NETWORK_GROUPS.cables][p2h(pos)] = nil end
     elseif cable_can_extend_network_from(connections[1]) then
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
-        otherNetwork.cables[p2h(pos)] = true
+        otherNetwork[logistica.NETWORK_GROUPS.cables][p2h(pos)] = true
         set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
       end
     end
@@ -469,7 +423,7 @@ function logistica.on_cable_change(pos, oldNode, optMeta, wasPlacedOverride)
     if placed and allConnectionsHaveSameNetwork then
       local addToNetwork = logistica.get_network_by_id_or_nil(firstNetworkId)
       if addToNetwork then
-        addToNetwork.cables[p2h(pos)] = true
+        addToNetwork[logistica.NETWORK_GROUPS.cables][p2h(pos)] = true
         set_cache_network_id(minetest.get_meta(pos), addToNetwork.controller)
       end
     else

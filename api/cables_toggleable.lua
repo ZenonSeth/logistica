@@ -78,7 +78,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     }
 
     if state == "on" then
-      logistica.cables[cable_name] = name
+      logistica.GROUPS.cables.register(cable_name)
       def.groups[logistica.TIER_ALL] = 1
       def.groups.not_in_creative_inventory = 1
     else

@@ -7,7 +7,7 @@ function logistica.register_cable(desc, name, customNodeBox, customTiles, custom
   local lname = string.lower(name)
   local cable_name = "logistica:" .. lname
   local cable_group = logistica.TIER_ALL
-  logistica.cables[cable_name] = name
+  logistica.GROUPS.cables.register(cable_name)
 	local cnb = customNodeBox or {}
   local tiles = customTiles or { "logistica_" .. lname .. ".png" }
 

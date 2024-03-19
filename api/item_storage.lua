@@ -110,7 +110,7 @@ end)
 function logistica.register_item_storage(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local item_storage_name = "logistica:"..lname
-  logistica.item_storage[item_storage_name] = true
+  logistica.GROUPS.item_storage.register(item_storage_name)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {

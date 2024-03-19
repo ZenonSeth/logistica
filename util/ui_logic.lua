@@ -24,7 +24,7 @@ local function get_lists(targetPosition, usePushLists)
   local node = minetest.get_node(targetPosition)
 
   local allowedLists = {}
-  if logistica.is_bucket_emptier(node.name) then
+  if logistica.GROUPS.bucket_emptiers.is(node.name) then
     if usePushLists then allowedLists = logisticaBucketEmptierAllowedPush
     else return {} end -- can only push to bucket emptier, it acts as a supplier so no need to pull
   elseif logistica.is_machine(node.name) then return {}

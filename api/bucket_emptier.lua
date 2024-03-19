@@ -125,7 +125,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
   local lname = name:gsub("%s", "_"):lower()
   local emptier_name = "logistica:"..lname
 
-  logistica.bucket_emptiers[emptier_name] = true
+  logistica.GROUPS.bucket_emptiers.register(emptier_name)
   local def = {
     description = S(desc),
     tiles = tiles,

@@ -175,7 +175,7 @@ end)
 function logistica.register_cobble_generator_supplier(desc, name, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local supplier_name = "logistica:"..lname
-  logistica.suppliers[supplier_name] = true
+  logistica.GROUPS.suppliers.register(supplier_name)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {

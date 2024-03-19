@@ -80,7 +80,7 @@ function logistica.register_controller(name, def)
   local controller_group = logistica.TIER_ALL
   local tier = logistica.TIER_ALL
   local controller_name = "logistica:" .. string.lower(name:gsub(" ", "_"))
-  logistica.controllers[controller_name] = tier
+  logistica.GROUPS.controllers.register(controller_name)
 
   local on_construct = function(pos)
       logistica.start_controller_timer(pos)
@@ -91,7 +91,6 @@ function logistica.register_controller(name, def)
     def.groups = {}
   end
   def.groups[controller_group] = 1
-  def.groups[logistica.TIER_CONTROLLER] = 1
   def.on_timer = logistica.on_controller_timer
   def.on_construct = on_construct
   def.after_dig_node = logistica.on_controller_change

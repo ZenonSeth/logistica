@@ -127,7 +127,7 @@ end)
 function logistica.register_injector(description, name, transferRate, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local injectorName = "logistica:"..lname
-  logistica.injectors[injectorName] = true
+  logistica.GROUPS.injectors.register(injectorName)
   local grps = {oddly_breakable_by_hand = 3, cracky = 3, handy = 1, pickaxey = 1 }
   grps[logistica.TIER_ALL] = 1
   local def = {
