@@ -1,5 +1,5 @@
 local networks = {}
-local HARD_NETWORK_NODE_LIMIT = 4000 -- A network cannot consist of more than this many nodes
+local HARD_NETWORK_NODE_LIMIT = logistica.settings.network_node_limit -- default is 4000, unless changed by server
 local STATUS_OK = 0
 local CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK = -1
 local CREATE_NETWORK_STATUS_TOO_MANY_NODES = -2
@@ -7,11 +7,12 @@ local ON_SUFFIX = "_on"
 local DISABLED_SUFFIX = "_disabled"
 
 local META_STORED_NETWORK = "logisticanet"
+local CACHED_NETWORK_ID_ALREADY_TRIED = "-"
 
 local p2h = minetest.hash_node_position
 local h2p = minetest.get_position_from_hash
 
-local adjecent = {
+local adjacent = {
   vector.new( 1,  0,  0), vector.new( 0,  1,  0), vector.new( 0,  0,  1),
   vector.new(-1,  0,  0), vector.new( 0, -1,  0), vector.new( 0,  0, -1),
 }
@@ -35,7 +36,11 @@ end
 local str = function(anInt) return string.format("%.0f", anInt) end
 
 local function set_cache_network_id(metaForPos, networkId)
-  metaForPos:set_string(META_STORED_NETWORK, str(networkId))
+  local formattedID = networkId
+  if formattedID ~= CACHED_NETWORK_ID_ALREADY_TRIED then
+    formattedID = str(formattedID)
+  end
+  metaForPos:set_string(META_STORED_NETWORK, formattedID)
 end
 
 local function get_unchecked_cached_network_id(metaForPos)
@@ -49,13 +54,18 @@ local function get_unchecked_cached_network_id(metaForPos)
   end
 end
 
+-- returns a table { network = network/nil, alreadyCacheTried = true/false }
 local function get_cached_network_or_nil(posHash, metaForPos)
   local cachedId = get_unchecked_cached_network_id(metaForPos)
+  if not cachedId then return { network = nil, alreadyCacheTried = false } end
+  if cachedId == CACHED_NETWORK_ID_ALREADY_TRIED then
+    return { network = nil, alreadyCacheTried = true }
+  end
   local network = networks[tonumber(cachedId)]
   if network and network_contains_hash(network, posHash) then
-    return network
+    return { network = network, alreadyCacheTried = false }
   end
-  return nil
+  return { network = nil, alreadyCacheTried = false }
 end
 
 function logistica.get_network_by_id_or_nil(networkId)
@@ -63,18 +73,29 @@ function logistica.get_network_by_id_or_nil(networkId)
 end
 
 function logistica.get_network_or_nil(pos, optMeta)
+  local nodeName = minetest.get_node(pos).name
+  if logistica.get_network_group_for_node_name(nodeName) == nil
+      and not logistica.GROUPS.controllers.is(nodeName) -- controllers don't have a network group, they ARE the network
+  then return nil end
   local hash = p2h(pos)
   local meta = minetest.get_meta(pos) -- optMeta or minetest.get_meta(pos)
-  local possibleNetwork = get_cached_network_or_nil(hash, optMeta or meta)
+  local networkLookup = get_cached_network_or_nil(hash, optMeta or meta)
+  local possibleNetwork = networkLookup.network
   if possibleNetwork then
     return possibleNetwork
   end
-  -- otherwise, serach all networks, save it if we find one
-  for netHash, network in pairs(networks) do
-    if network_contains_hash(network, hash) then
-      set_cache_network_id(meta, netHash)
-      return network
+  if not networkLookup.alreadyCacheTried then
+    -- otherwise, if we haven't tried before, serach all networks, save it if we find one
+    for netHash, network in pairs(networks) do
+      if network_contains_hash(network, hash) then
+        set_cache_network_id(meta, netHash)
+        return network
+      end
     end
+    -- we tried the cache, and then looking up all the networks - it didn't work.
+    -- so mark this as already tried, so we don't perform more full-network searches for this node
+    -- until something changes (e.g. something connects it to network and sets the cache)
+    set_cache_network_id(meta, CACHED_NETWORK_ID_ALREADY_TRIED)
   end
   return nil
 end
@@ -97,6 +118,8 @@ function logistica.get_network_id_or_nil(pos)
 end
 
 local function notify_connected(pos, nodeName, networkId)
+  -- set the cached network ID first
+  set_cache_network_id(minetest.get_meta(pos), networkId)
   local def = minetest.registered_nodes[nodeName]
   if def and def.logistica and def.logistica.on_connect_to_network then
     def.logistica.on_connect_to_network(pos, networkId)
@@ -110,6 +133,18 @@ end
 local function clear_network(networkName)
   local network = networks[networkName]
   if not network then return false end
+  local start = minetest.get_us_time()
+  -- setting the cached network position to ALREADY_TRIED prevents a lot of full network searches, which are expensive
+  local nodeCount = 0
+  for netGroup, _ in pairs(logistica.network_group_get_all()) do
+    local nodes = network[netGroup]
+    for nodeHash, _ in pairs(nodes) do
+      local position = h2p(nodeHash)
+      set_cache_network_id(minetest.get_meta(position), CACHED_NETWORK_ID_ALREADY_TRIED)
+      nodeCount = nodeCount + 1
+    end
+  end
+  local eend = minetest.get_us_time()
   networks[networkName] = nil
 end
 
@@ -127,9 +162,9 @@ local function break_logistica_node(pos)
 end
 
 -- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
-local function find_adjecent_networks(pos)
+local function find_adjacent_networks(pos)
   local currNetwork = nil
-  for _, adj in pairs(adjecent) do
+  for _, adj in pairs(adjacent) do
     local otherPos = vector.add(pos, adj)
     local otherNodeName = minetest.get_node(otherPos).name
     if logistica.GROUPS.cables.is(otherNodeName) or logistica.GROUPS.controllers.is(otherNodeName) then
@@ -156,14 +191,14 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
   local newToScan = 0
   for posHash, _ in pairs(positionHashes) do
     local pos = h2p(posHash)
-    numScanned = numScanned + 1
     logistica.load_position(pos)
-    for _, offset in pairs(adjecent) do
+    for _, offset in pairs(adjacent) do
       local otherPos = vector.add(pos, offset)
       logistica.load_position(otherPos)
       local otherName = minetest.get_node(otherPos).name
       local otherHash = p2h(otherPos)
       if network.controller ~= otherHash
+          and logistica.get_network_group_for_node_name(otherName) ~= nil
           and not has_machine(network, otherHash)
           and network[logistica.NETWORK_GROUPS.cables][otherHash] == nil then
         local existingNetwork = logistica.get_network_id_or_nil(otherPos)
@@ -183,6 +218,7 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
         end
 
         if valid then
+          numScanned = numScanned + 1
           newToScan = newToScan + 1
           set_cache_network_id(minetest.get_meta(otherPos), network.controller)
           notify_connected(otherPos, otherName, network.controller)
@@ -192,7 +228,7 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
   end -- end outer for loop
 
   -- We have nested loops so we can do tail recursion
-  if newToScan <= 0 then return STATUS_OK
+  if newToScan <= 0 then network._num_nodes = numScanned return STATUS_OK
   else return recursive_scan_for_nodes_for_controller(network, connections, numScanned) end
 end
 
@@ -201,6 +237,7 @@ local function create_network(controllerPosition, oldNetworkName)
   if not node.name:find("_controller") or not node.name:find("logistica:") then return false end
   local meta = minetest.get_meta(controllerPosition)
   local controllerHash = p2h(controllerPosition)
+  set_cache_network_id(meta, controllerHash)
   local network = {}
   local nameFromMeta = meta:get_string("name")
   if nameFromMeta == "" then nameFromMeta = nil end
@@ -216,6 +253,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
+  network._num_nodes = 0
 
   local startPos = {}
   startPos[controllerHash] = true
@@ -234,6 +272,7 @@ local function create_network(controllerPosition, oldNetworkName)
   end
   if errorMsg ~= nil then
     networks[controllerHash] = nil
+    break_logistica_node(controllerPosition)
     meta:set_string("infotext", "ERROR: "..errorMsg)
   end
 end
@@ -255,7 +294,7 @@ end
 
 local function find_cable_connections(pos)
   local connections = {}
-  for _, offset in pairs(adjecent) do
+  for _, offset in pairs(adjacent) do
     local otherPos = vector.add(pos, offset)
     local otherNode = minetest.get_node_or_nil(otherPos)
     if otherNode and minetest.get_item_group(otherNode.name, logistica.TIER_ALL) > 0 then
@@ -270,15 +309,22 @@ local function try_to_add_network(pos)
 end
 
 local function try_to_add_to_network(pos, ops)
-  local networkCount, otherNetwork  = find_adjecent_networks(pos)
+  local networkCount, otherNetwork  = find_adjacent_networks(pos)
   if networkCount <= 0 then return STATUS_OK end -- nothing to connect to
   if otherNetwork == nil or networkCount >= 2 then
     break_logistica_node(pos) -- swap out storage node for disabled one 
     minetest.get_meta(pos):set_string("infotext", "ERROR: cannot connect to multiple networks!")
     return CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK
   end
-  -- else, we have 1 network, add us to it!
+  -- else, we have 1 network
+  local newNodeCount = otherNetwork._num_nodes + 1
+  if newNodeCount > HARD_NETWORK_NODE_LIMIT then
+    break_logistica_node(pos) -- swap out storage node for disabled one
+    minetest.get_meta(pos):set_string("infotext", "ERROR: Network exceeds max limit of "..HARD_NETWORK_NODE_LIMIT.." nodes!")
+    return CREATE_NETWORK_STATUS_TOO_MANY_NODES
+  end
   ops.get_list(otherNetwork)[p2h(pos)] = true
+  otherNetwork._num_nodes = otherNetwork._num_nodes + 1
   set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
   ops.update_cache_node_added(pos)
 end
@@ -291,6 +337,8 @@ local function remove_from_network(pos, oldMeta, ops)
   ops.update_cache_node_removed(pos)
   -- then remove the position from the network
   ops.get_list(network)[hash] = nil
+  -- decrement count
+  network._num_nodes = network._num_nodes - 1
 end
 
 local function on_node_change(pos, oldNode, oldMeta, ops)
@@ -365,8 +413,8 @@ function logistica.try_to_wake_up_network(pos)
   logistica.load_position(pos)
   if logistica.get_network_or_nil(pos) then return end -- it's already awake
   local cachedId = get_unchecked_cached_network_id(minetest.get_meta(pos))
-  if not cachedId or cachedId == "" then return end
-  local conPos = minetest.get_position_from_hash(cachedId)
+  if not cachedId or cachedId == "" or cachedId == CACHED_NETWORK_ID_ALREADY_TRIED then return end
+  local conPos = minetest.get_position_from_hash(cachedId:sub(2)) -- remove the valid prefix
 
   logistica.load_position(conPos)
   local node = minetest.get_node(conPos)
@@ -391,12 +439,22 @@ function logistica.on_cable_change(pos, oldNode, optMeta, wasPlacedOverride)
   if networkEnd then
     if not placed then -- removed a network end
       local network = logistica.get_network_or_nil(pos, optMeta)
-      if network then network[logistica.NETWORK_GROUPS.cables][p2h(pos)] = nil end
+      if network then
+        network[logistica.NETWORK_GROUPS.cables][p2h(pos)] = nil
+        network._num_nodes = network._num_nodes - 1
+      end
     elseif cable_can_extend_network_from(connections[1]) then
       local otherNetwork = logistica.get_network_or_nil(connections[1])
       if otherNetwork then
-        otherNetwork[logistica.NETWORK_GROUPS.cables][p2h(pos)] = true
-        set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
+        local newNodeCount = otherNetwork._num_nodes + 1
+        if newNodeCount > HARD_NETWORK_NODE_LIMIT then
+          break_logistica_node(pos)
+          minetest.get_meta(pos):set_string("infotext", "ERROR: Network exceeds max limit of "..HARD_NETWORK_NODE_LIMIT.." nodes!")
+        else
+          otherNetwork[logistica.NETWORK_GROUPS.cables][p2h(pos)] = true
+          set_cache_network_id(minetest.get_meta(pos), otherNetwork.controller)
+          otherNetwork._num_nodes = newNodeCount
+        end
       end
     end
     return -- was a network end, no need to do anything else
