@@ -9,6 +9,7 @@ local META_PUMP_INDEX = "pumpix"
 local META_OWNER = "pumpowner"
 local META_LAST_LAYER = "pumplsl"
 local META_LAST_LAYER_HAD_SUCCESS = "pumplss"
+local META_MAX_AMOUNT_ON_NETWORK = "pumpmxn"
 
 local ON_SUFFIX = "_on"
 
@@ -61,6 +62,14 @@ end
 
 local function set_last_layer_success(meta, success)
   meta:set_int(META_LAST_LAYER_HAD_SUCCESS, success and 0 or 1)
+end
+
+local function get_max_level(meta)
+  return meta:get_int(META_MAX_AMOUNT_ON_NETWORK)
+end
+
+local function set_max_level(meta, maxLevel)
+  meta:set_int(META_MAX_AMOUNT_ON_NETWORK, maxLevel)
 end
 
 -- returns nil if target position does not have a valid liquid source
@@ -117,9 +126,18 @@ end
 -- returns true if succeeded, false if not
 local function put_liquid_in_network_reservoirs(pumpPosition, bucketItemStack, network)
   if not network then return false end
+  local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketItemStack:get_name())
+  if not liquidName then return false end
+  local amountInNetwork = logistica.get_liquid_info_in_network(pumpPosition, liquidName)
+  local maxAmount = get_max_level(minetest.get_meta(pumpPosition))
+  if maxAmount > 0 and amountInNetwork.curr >= maxAmount then return false end
   local resultStack = logistica.use_bucket_for_liquid_in_network(pumpPosition, bucketItemStack)
   return resultStack ~= nil -- if we got a replacement, it was successfully emptied into network
 end
+
+----------------------------------------------------------------
+-- public functions
+----------------------------------------------------------------
 
 function logistica.pump_on_power(pos, power)
   local node = minetest.get_node_or_nil(pos)
@@ -135,7 +153,6 @@ function logistica.pump_on_power(pos, power)
   end
   logistica.set_node_tooltip_from_state(pos, nil, power)
 end
-
 
 function logistica.pump_timer(pos, _)
   local network = logistica.get_network_or_nil(pos)
@@ -187,4 +204,16 @@ function logistica.pump_timer(pos, _)
   pump_set_index(meta, index) -- save index even if no success
 
   return false
+end
+
+function logistica.pump_change_max_network_level(pos, change)
+  local meta = minetest.get_meta(pos)
+  local currMax = get_max_level(meta)
+  local newMax = math.max(0, currMax + change)
+  set_max_level(meta, newMax)
+end
+
+function logistica.pump_get_max_network_level(pos)
+  local meta = minetest.get_meta(pos)
+  return get_max_level(meta)
 end

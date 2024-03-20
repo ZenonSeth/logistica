@@ -10,6 +10,10 @@ local INV_INPUT = "input"
 local INV_MAIN = "main"
 
 local ON_OFF_BTN = "onffbtn"
+local INC_1_BTN = "i1b"
+local INC_10_BTN = "i10b"
+local DEC_1_BTN = "d1b"
+local DEC_10_BTN = "d10b"
 
 local forms = {}
 
@@ -21,15 +25,22 @@ local function get_pump_formspec(pos, _isOn)
   local isOn = _isOn
   -- local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   if isOn == nil then isOn = logistica.is_machine_on(pos) end
+  local maxLevel = logistica.pump_get_max_network_level(pos)
   return "formspec_version[4]"..
-    "size["..logistica.inv_size(10.5, 4.0).."]" ..
+    "size["..logistica.inv_size(10.5, 5.0).."]" ..
     logistica.ui.background..
     "label[0.4,0.4;"..S("Pumps liquids directly into neighbouring reservoirs (one on each side)").."]"..
     "label[0.4,0.8;"..S("Or if there are none, or are full, pumps into any network reservoirs").."]"..
     "label[0.4,1.2;"..S("Max horizontal range, on each side of pump: ")..tostring(PUMP_MAX_RANGE).."]"..
     "label[0.4,1.6;"..S("Max vertical range, starting below the pump: ")..tostring(PUMP_MAX_DEPTH).."]"..
     "label[0.4,2.0;"..S("MUST be placed directly above liquid surface, without gaps to liquid").."]"..
-    logistica.ui.on_off_btn(isOn, 0.4, 2.8, ON_OFF_BTN, S("Enable"))
+    logistica.ui.on_off_btn(isOn, 0.4, 3.0, ON_OFF_BTN, S("Enable"))..
+    "label[3.8,2.6;"..S("Max Network Amount: If Network has more than\nthis amount of liquid, don't pump any more.\nSet to 0 to ALWAYS pump into network.\nOnly applies to pumping into network.").."]"..
+    "label[2.4,3.6;"..S("Max: ")..maxLevel.."]"..
+    "image_button[1.7,2.4;1.0,0.8;logistica_icon_highlight.png;"..INC_1_BTN..";+1]"..
+    "image_button[2.7,2.4;1.0,0.8;logistica_icon_highlight.png;"..INC_10_BTN..";+10]"..
+    "image_button[1.7,3.9;1.0,0.8;logistica_icon_highlight.png;"..DEC_1_BTN..";-1]"..
+    "image_button[2.7,3.9;1.0,0.8;logistica_icon_highlight.png;"..DEC_10_BTN..";-10]"
 end
 
 local function show_pump_formspec(playerName, pos)
@@ -90,6 +101,18 @@ local function on_player_receive_fields(player, formname, fields)
     forms[playerName] = nil
   elseif fields[ON_OFF_BTN] then
     logistica.toggle_machine_on_off(pos)
+    show_pump_formspec(playerName, pos)
+  elseif fields[INC_1_BTN] then
+    logistica.pump_change_max_network_level(pos, 1)
+    show_pump_formspec(playerName, pos)
+  elseif fields[INC_10_BTN] then
+    logistica.pump_change_max_network_level(pos, 10)
+    show_pump_formspec(playerName, pos)
+  elseif fields[DEC_1_BTN] then
+    logistica.pump_change_max_network_level(pos, -1)
+    show_pump_formspec(playerName, pos)
+  elseif fields[DEC_10_BTN] then
+    logistica.pump_change_max_network_level(pos, -10)
     show_pump_formspec(playerName, pos)
   end
 end
