@@ -156,7 +156,11 @@ local function break_logistica_node(pos)
   local node = minetest.get_node(pos)
   local nodeName = node.name
   if ends_with(nodeName, ON_SUFFIX) then
-    nodeName = nodeName:sub(1, #node.name - #ON_SUFFIX)
+    local newNodeName = nodeName:sub(1, #node.name - #ON_SUFFIX)
+    if minetest.registered_nodes[newNodeName..DISABLED_SUFFIX] then
+      -- a little ugly but some nodes (e.g. toggleable cable) have _on/_off and _on_disabled/_off_disabled
+      nodeName = newNodeName
+    end
   end
   logistica.swap_node(pos, nodeName .. DISABLED_SUFFIX)
 end
