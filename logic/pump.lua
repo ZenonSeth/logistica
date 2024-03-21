@@ -209,7 +209,7 @@ end
 function logistica.pump_change_max_network_level(pos, change)
   local meta = minetest.get_meta(pos)
   local currMax = get_max_level(meta)
-  local newMax = math.max(0, currMax + change)
+  local newMax = logistica.clamp(currMax + change, 0, 10000) -- 10k arbitrary max
   set_max_level(meta, newMax)
 end
 
