@@ -272,7 +272,7 @@ function logistica.insert_item_into_item_storage(pos, inv, inputStack, dryRun)
 end
 
 -- attempts to insert the given itemstack in the network, returns how many items remain
-function logistica.insert_item_in_network(itemstack, networkId, dryRun)
+function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreTrashcans)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not itemstack or itemstack:is_empty() then return 0 end
   if not network then return itemstack:get_count() end
@@ -318,12 +318,14 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun)
   end
 
   -- [Keep this last] delete the item if any trashcan accepts it
-  local trashcans = network.trashcans or {}
-  for hash, _ in pairs(trashcans) do
-    local pos = h2p(hash)
-    logistica.load_position(pos)
-    workingStack = logistica.trashcan_trash_item(pos, workingStack)
-    if workingStack:is_empty() then return 0 end
+  if not ignoreTrashcans then
+    local trashcans = network.trashcans or {}
+    for hash, _ in pairs(trashcans) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      workingStack = logistica.trashcan_trash_item(pos, workingStack)
+      if workingStack:is_empty() then return 0 end
+    end
   end
 
   return workingStack:get_count()
