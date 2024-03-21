@@ -158,13 +158,13 @@ logistica.register_injector("Fast Network Importer\nImports 99 items at a time",
 -- Item Storage
 --------------------------------
 
-logistica.register_item_storage("Tool Box\nStores Tools Only", "item_storage", {
-      "logistica_tool_box_top.png",
-      "logistica_tool_box_bottom.png",
-      "logistica_tool_box_side.png^[transformFX",
-      "logistica_tool_box_side.png",
-      "logistica_tool_box_back.png",
-      "logistica_tool_box_front.png",
+logistica.register_item_storage("Tool Chest\nStores Tools Only", "item_storage", {
+      "logistica_tool_chest_top.png",
+      "logistica_tool_chest_bottom.png",
+      "logistica_tool_chest_side.png^[transformFX",
+      "logistica_tool_chest_side.png",
+      "logistica_tool_chest_back.png",
+      "logistica_tool_chest_front.png",
 })
 
 --------------------------------
