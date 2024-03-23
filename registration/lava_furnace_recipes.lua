@@ -6,13 +6,22 @@ logistica.register_lava_furnace_recipe({
   output = L("silverin"),
   lava = 25,
   additive = itemstrings.ice,
+  additive_use_chance = 33,
+  time = 2.5
+})
+
+logistica.register_lava_furnace_recipe({
+  input = itemstrings.sand,
+  output = L("silverin"),
+  lava = 25,
+  additive = itemstrings.snow_block,
   additive_use_chance = 50,
   time = 2.5
 })
 
 logistica.register_lava_furnace_recipe({
   input = L("silverin"),
-  output = L("silverin_plate 4"),
+  output = L("silverin_plate 8"),
   lava = 50,
   additive = itemstrings.steel,
   additive_use_chance = 100,

@@ -45,6 +45,7 @@ logistica.itemstrings = {
     clay = mcl and "mcl_core:clay" or "default:clay",
     cactus = mcl and "mcl_core:cactus" or "default:cactus",
     ice = mcl and "mcl_core:ice" or "default:ice",
+    snow_block = mcl and "mcl_core:snowblock" or "default:snowblock",
     glass = mcl and "mcl_core:glass" or "default:glass",
     cobble = mcl and "mcl_core:cobble" or "default:cobble",
     water_source = mcl and "mcl_core:water_source" or "default:water_source",
