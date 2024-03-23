@@ -12,7 +12,6 @@ local itemStorageForms = {}
 local function get_item_storage_formspec(pos)
   local meta = minetest.get_meta(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
-  local isOn = logistica.is_machine_on(pos)
   local sortValues = logistica.get_item_storage_sort_list_str()
   local selectedSortIdx = logistica.get_item_storage_selected_sort_index(meta)
 
@@ -130,9 +129,7 @@ function logistica.register_item_storage(desc, name, tiles)
     allow_metadata_inventory_take = allow_item_storage_inv_take,
     allow_metadata_inventory_move = allow_item_storage_inv_move,
     can_dig = can_dig_item_storage,
-    logistica = {
-      on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end
-    },
+    logistica = {},
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10
   }
