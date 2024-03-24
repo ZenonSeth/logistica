@@ -473,5 +473,9 @@ logistica.GuideApi = Guide
 -- register to listen for form fields
 minetest.register_on_player_receive_fields(on_player_receive_fields)
 minetest.register_on_leaveplayer(function(objRef, _)
-  if objRef:is_player() then formsData[objRef:get_player_name()] = nil end
+  if objRef:is_player() then
+    local playerName = objRef:get_player_name()
+    formsData[playerName] = nil
+    logistica.HistoryStack.on_player_leave(playerName)
+  end
 end)
