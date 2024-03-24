@@ -7,10 +7,19 @@ local function show_guide(_, user, _)
   end
 end
 
-minetest.register_craftitem("logistica:guide", {
+minetest.register_tool("logistica:guide", {
   description = S("Guide Book to Logistica machines and concepts"),
   inventory_image = "logistica_guide_book_item.png",
   stack_max = 1,
   on_secondary_use = show_guide,
   on_place = show_guide,
+})
+
+minetest.register_craft({
+  output = "logistica:guide",
+  recipe = {
+    {logistica.itemstrings.sand},
+    {logistica.itemstrings.paper},
+    {logistica.itemstrings.sand},
+  }
 })

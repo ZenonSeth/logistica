@@ -51,4 +51,5 @@ logistica.itemstrings = {
     water_source = mcl and "mcl_core:water_source" or "default:water_source",
     river_water_source = mcl and get_mcl_river_water_source() or "default:river_water_source",
     lava_source = mcl and "mcl_core:lava_source" or "default:lava_source",
+    paper = mcl and "mcl_core:paper" or "default:paper"
 }
