@@ -506,5 +506,12 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipeLinks = RECIPE_LINKS,
       description = desc.wireless_crystal,
     },
+    
+    -- Settings
+
+    [PAGE_SERVER_SETTINGS] = {
+      title = S("Server Settings"),
+      description = desc.server_settings,
+    },
   }
 })
