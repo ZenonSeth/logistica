@@ -14,7 +14,7 @@ dofile(path.."/inv_list_filtering.lua")
 -- bad debug
 local d = {}
 d.ttos = logistica.ttos
-d.log = minetest.chat_send_all
+d.log = minetest.log
 d.table_map = logistica.table_map
 function d.ltos(list)
     if not list then return "{NIL}" end
