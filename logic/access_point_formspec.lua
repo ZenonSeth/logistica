@@ -410,7 +410,7 @@ function logistica.access_point_on_take(inv, listname, index, stack, player)
     else
       -- we want to take the actual item, with exact metadata, always
       -- because the on_take method should have placed the exact item in the slot already
-      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, false, false)
+      local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, true, false)
     end
     -- refresh the page in case we had to swap out a fake item or a stack is gone
     show_access_point_formspec(pos, player:get_player_name())
