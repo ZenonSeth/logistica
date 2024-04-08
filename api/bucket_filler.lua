@@ -165,6 +165,7 @@ function logistica.register_bucket_filler(desc, name, tiles)
   }
 
   minetest.register_node(filler_name, def)
+  logistica.register_non_pushable(filler_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

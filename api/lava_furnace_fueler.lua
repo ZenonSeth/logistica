@@ -155,6 +155,7 @@ function logistica.register_lava_furnace_fueler(description, name, tiles)
   }
 
   minetest.register_node(fuelerName, def)
+  logistica.register_non_pushable(fuelerName)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

@@ -171,6 +171,8 @@ function logistica.register_autocrafter(desc, name, tiles)
     _mcl_blast_resistance = 15
   }
 
-  minetest.register_node("logistica:"..lname, def)
+  local autocrafterName = "logistica:"..lname
+  minetest.register_node(autocrafterName, def)
+  logistica.register_non_pushable(autocrafterName)
 
 end

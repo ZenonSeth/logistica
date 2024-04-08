@@ -209,6 +209,7 @@ function logistica.register_cobble_generator_supplier(desc, name, tiles)
   }
 
   minetest.register_node(supplier_name, def)
+  logistica.register_non_pushable(supplier_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

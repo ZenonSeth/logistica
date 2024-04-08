@@ -167,6 +167,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
   }
 
   minetest.register_node(injectorName, def)
+  logistica.register_non_pushable(injectorName)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

@@ -87,6 +87,7 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
     end
 
     minetest.register_node(cable_name, def)
+    logistica.register_non_pushable(cable_name)
 
     local def_broken = table.copy(def)
     def_broken.tiles = logistica.table_map(tiles, function(s) return s.."^logistica_broken.png" end)

@@ -139,6 +139,7 @@ function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
   }
 
   minetest.register_node(vaccuum_name, def)
+  logistica.register_non_pushable(vaccuum_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

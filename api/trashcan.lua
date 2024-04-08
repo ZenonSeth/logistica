@@ -97,6 +97,7 @@ function logistica.register_trashcan(desc, name, tiles)
   }
 
   minetest.register_node(trashcan_name, def)
+  logistica.register_non_pushable(trashcan_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

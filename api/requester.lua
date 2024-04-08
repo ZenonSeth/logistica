@@ -168,6 +168,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
   }
 
   minetest.register_node(requester_name, def)
+  logistica.register_non_pushable(requester_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

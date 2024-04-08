@@ -410,6 +410,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   }
 
   minetest.register_node(storageName, def)
+  logistica.register_non_pushable(storageName)
 
   local def_disabled = {}
   for k, v in pairs(def) do def_disabled[k] = v end

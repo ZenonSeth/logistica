@@ -105,6 +105,7 @@ function logistica.register_controller(name, def)
   def._mcl_blast_resistance = 10
 
   minetest.register_node(controller_name, def)
+  logistica.register_non_pushable(controller_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = def.tiles_disabled

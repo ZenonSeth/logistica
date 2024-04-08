@@ -301,6 +301,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreTr
   end
   for hash, _ in pairs(storages) do
     local pos = h2p(hash)
+    logistica.load_position(pos)
     local inv = get_meta(pos):get_inventory()
     local remainingStack = addFunc(pos, inv, workingStack, dryRun)
     if remainingStack:is_empty() then return 0 end -- we took all items

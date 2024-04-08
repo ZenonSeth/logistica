@@ -111,6 +111,7 @@ function logistica.register_access_point(desc, name, tiles)
   }
 
   minetest.register_node(access_point_name, def)
+  logistica.register_non_pushable(access_point_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

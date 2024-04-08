@@ -383,7 +383,9 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     _mcl_blast_resistance = 15
   }
 
-  minetest.register_node("logistica:"..lname, def)
+  local lavaFurnaceName = "logistica:"..lname
+  minetest.register_node(lavaFurnaceName, def)
+  logistica.register_non_pushable(lavaFurnaceName)
 
   local defActive = table.copy(def)
 
@@ -391,6 +393,6 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
   defActive.groups.not_in_creative_inventory = 1
   defActive.light_source = 9
 
-  minetest.register_node("logistica:"..lname.."_active", defActive)
+  minetest.register_node(lavaFurnaceName.."_active", defActive)
 
 end

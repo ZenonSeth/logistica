@@ -62,4 +62,5 @@ function logistica.register_synchronizer(description, name, tiles)
   }
 
   minetest.register_node(syncName, def)
+  logistica.register_non_pushable(syncName)
 end

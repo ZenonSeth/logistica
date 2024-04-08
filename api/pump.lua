@@ -171,12 +171,14 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
   }
 
   minetest.register_node(pump_name, def)
+  logistica.register_non_pushable(pump_name)
 
   local def_on = table.copy(def)
   def_on.tiles = tilesOn
   def_on.groups.not_in_creative_inventory = 1
 
   minetest.register_node(pump_name_on, def_on)
+  logistica.register_non_pushable(pump_name_on)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

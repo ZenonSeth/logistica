@@ -135,6 +135,7 @@ function logistica.register_item_storage(desc, name, tiles)
   }
 
   minetest.register_node(item_storage_name, def)
+  logistica.register_non_pushable(item_storage_name)
 
   local def_disabled = table.copy(def)
   local tiles_disabled = {}

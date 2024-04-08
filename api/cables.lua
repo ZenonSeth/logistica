@@ -57,6 +57,7 @@ function logistica.register_cable(desc, name, customNodeBox, customTiles, custom
   end
 
   minetest.register_node(cable_name, def)
+  logistica.register_non_pushable(cable_name)
 
   local def_broken = {}
   for k, v in pairs(def) do def_broken[k] = v end

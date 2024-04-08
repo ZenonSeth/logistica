@@ -159,6 +159,7 @@ for _, variantName in ipairs(variants) do
   def.drops = nodeName
   def.logistica.liquidName = LIQUID_NONE
   minetest.register_node(nodeName, def)
+  logistica.register_non_pushable(nodeName)
   logistica.GROUPS.reservoirs.register(nodeName)
 end
 
@@ -185,6 +186,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
     def.inventory_image = make_inv_image(variantName, liquidTexture)
 
     minetest.register_node(nodeName, def)
+    logistica.register_non_pushable(nodeName)
     logistica.GROUPS.reservoirs.register(nodeName)
 
     logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
