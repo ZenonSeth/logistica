@@ -87,9 +87,18 @@ local function after_place_node(pos, placer, itemstack, pointed_thing)
   logistica.on_reservoir_change(pos)
 end
 
+local function ends_with(str, ending)
+  return str:sub(-#ending) == ending
+end
+
 local function preserve_metadata(pos, oldnode, oldmeta, drops)
-  if not drops or not drops[1] then return end
-  local nodeDef = minetest.registered_nodes[oldnode.name]
+  if not drops or not drops[1] or not oldnode or not oldnode.name then return end
+  local nodeName = oldnode.name
+  local disSuf = "_disabled"
+  if ends_with(nodeName, disSuf) then
+    nodeName = string.sub(nodeName, 1, #nodeName - #disSuf)
+  end
+  local nodeDef = minetest.registered_nodes[nodeName]
   if not nodeDef or not nodeDef.logistica then return end
 
   local meta = minetest.get_meta(pos)
@@ -148,6 +157,20 @@ local function get_variant_def(variantName)
   return def
 end
 
+local function get_disabled_def(def)
+  local def_disabled = table.copy(def)
+  local tiles_disabled = {}
+  for k, v in pairs(def.tiles) do tiles_disabled[k] = v.."^logistica_disabled.png" end
+  def_disabled.tiles = tiles_disabled
+  def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, handy = 1, pickaxey = 1, axey = 1, not_in_creative_inventory = 1 }
+  def_disabled.on_construct = nil
+  def_disabled.on_punch = nil
+  def_disabled.on_rightclick = nil
+  def_disabled.on_timer = nil
+  def_disabled.logistica = nil
+  return def_disabled
+end
+
 --------------------------------
 -- minetest registration
 --------------------------------
@@ -155,12 +178,16 @@ end
 -- register empty tanks, always
 for _, variantName in ipairs(variants) do
   local def = get_variant_def(variantName)
-  local nodeName = L("reservoir_"..variantName..EMPTY_SUFFIX)
-  def.drops = nodeName
-  def.logistica.liquidName = LIQUID_NONE
-  minetest.register_node(nodeName, def)
-  logistica.register_non_pushable(nodeName)
-  logistica.GROUPS.reservoirs.register(nodeName)
+  if def then
+    local nodeName = L("reservoir_"..variantName..EMPTY_SUFFIX)
+    def.drop = nodeName
+    def.logistica.liquidName = LIQUID_NONE
+    minetest.register_node(nodeName, def)
+    logistica.register_non_pushable(nodeName)
+    logistica.GROUPS.reservoirs.register(nodeName)
+
+    minetest.register_node(nodeName.."_disabled", get_disabled_def(def))
+  end
 end
 
 --[[
@@ -178,17 +205,21 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
   for _, variantName in ipairs(variants) do
     local nodeName = L("reservoir_"..variantName.."_"..lname)
     local def = get_variant_def(variantName)
-    def.drop = nodeName
-    def.special_tiles = {liquidTexture}
-    def.logistica.liquidName = lname
-    def.groups.not_in_creative_inventory = 1
-    def.light_source = optLight
-    def.inventory_image = make_inv_image(variantName, liquidTexture)
+    if def then
+      def.drop = nodeName
+      def.special_tiles = {liquidTexture}
+      def.logistica.liquidName = lname
+      def.groups.not_in_creative_inventory = 1
+      def.light_source = optLight
+      def.inventory_image = make_inv_image(variantName, liquidTexture)
 
-    minetest.register_node(nodeName, def)
-    logistica.register_non_pushable(nodeName)
-    logistica.GROUPS.reservoirs.register(nodeName)
+      minetest.register_node(nodeName, def)
+      logistica.register_non_pushable(nodeName)
+      logistica.GROUPS.reservoirs.register(nodeName)
 
-    logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
+      minetest.register_node(nodeName.."_disabled", get_disabled_def(def))
+
+      logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
+    end
   end
 end
