@@ -255,14 +255,14 @@ local function lava_furnace_node_timer(pos, elapsed)
 end
 
 local function lava_furnace_on_construct(pos)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		inv:set_size(INV_INPT, 1)
-		inv:set_size(INV_FUEL, 1)
-		inv:set_size(INV_OUTP, 4)
-		inv:set_size(INV_ADDI, 1)
+    local meta = minetest.get_meta(pos)
+    local inv = meta:get_inventory()
+    inv:set_size(INV_INPT, 1)
+    inv:set_size(INV_FUEL, 1)
+    inv:set_size(INV_OUTP, 4)
+    inv:set_size(INV_ADDI, 1)
     meta:set_string("formspec", get_inactive_formspec(pos, meta))
-		lava_furnace_node_timer(pos, 0)
+    lava_furnace_node_timer(pos, 0)
 end
 
 local function lava_furnace_on_destruct(pos)
@@ -348,18 +348,19 @@ function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles
     node_box = {
       type = "fixed",
       fixed = {
-        {-0.5, -0.5, -0.5, -0.4375, 0.3125, -0.4375},
-        {0.4375, -0.5, -0.5, 0.5, 0.3125, -0.4375},
-        {-0.5, -0.5, -0.5, 0.5, -0.4375, -0.4375},
-        {-0.5, -0.0625, -0.5, 0.5, 0.0625, -0.4375},
-        {-0.5, 0.3125, -0.5, -0.375, 0.5, -0.4375},
-        {0.375, 0.3125, -0.5, 0.5, 0.5, -0.4375},
-        {-0.375, 0.375, -0.5, -0.3125, 0.5, -0.4375},
-        {0.3125, 0.375, -0.5, 0.375, 0.5, -0.4375},
-        {-0.3125, 0.4375, -0.5, 0.3125, 0.5, -0.4375},
-        {-0.5, -0.5, -0.4375, 0.5, 0.5, 0.5},
+        {-8/16, -8/16, -8/16, -7/16,  5/16, -7/16},
+        { 7/16, -8/16, -8/16,  8/16,  5/16, -7/16},
+        {-8/16, -8/16, -8/16,  8/16, -7/16, -7/16},
+        {-8/16, -1/16, -8/16,  8/16,  1/16, -7/16},
+        {-8/16,  5/16, -8/16, -6/16,  8/16, -7/16},
+        { 6/16,  5/16, -8/16,  8/16,  8/16, -7/16},
+        {-6/16,  6/16, -8/16, -5/16,  8/16, -7/16},
+        { 5/16,  6/16, -8/16,  6/16,  8/16, -7/16},
+        {-5/16,  7/16, -8/16,  5/16,  8/16, -7/16},
+        {-8/16, -8/16, -7/16,  8/16,  8/16,  8/16},
       }
     },
+    selection_box = { type = "normal" },
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2, },
     is_ground_content = false,
