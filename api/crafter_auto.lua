@@ -13,7 +13,7 @@ local TIMER_LONG = 3.0
 
 
 local function update_craft_output(inv)
-  local inputList = inv:get_list(INV_CRAFT)
+  local inputList = logistica.get_list(inv, INV_CRAFT)
   local out, _ = minetest.get_craft_result({
     method = "normal",
     width = 3,

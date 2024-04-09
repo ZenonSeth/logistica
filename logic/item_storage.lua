@@ -33,7 +33,7 @@ function logistica.sort_item_storage_list(meta)
   local sortFunc = sortFunctions[logistica.get_item_storage_selected_sort_index(meta)]
   if not sortFunc then return end
   local inv = meta:get_inventory()
-  local list = inv:get_list(ITEM_STORAGE_LIST)
+  local list = logistica.get_list(inv, ITEM_STORAGE_LIST)
   local sortedList = sortFunc(list)
   if not sortedList then return end
   inv:set_list(ITEM_STORAGE_LIST, sortedList)

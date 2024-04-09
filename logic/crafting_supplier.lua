@@ -108,7 +108,7 @@ end
 function logistica.crafting_supplier_get_main_list(pos)
   local isOn = logistica.is_machine_on(pos)
   local inv = minetest.get_meta(pos):get_inventory()
-  local mainList = inv:get_list(INV_MAIN)
+  local mainList = logistica.get_list(inv, INV_MAIN)
   if isOn then return mainList
   else
     local sublist = {}
@@ -154,9 +154,9 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   repeat
     craftItemMult = craftItemMult + 1
     --
-    local recipeItems = count_items_to_stack(inv:get_list(INV_CRAFT))
+    local recipeItems = count_items_to_stack(logistica.get_list(inv, INV_CRAFT))
     -- use the output of any previous loop iterations to make it available to take from - except for the item we have to send to requester
-    local extrasListsMinusTarget = list_without_stack(inv:get_list(INV_HOUT), takeStack)
+    local extrasListsMinusTarget = list_without_stack(logistica.get_list(inv, INV_HOUT), takeStack)
     local extrasMadeByCrafting = extrasListsMinusTarget.newList -- extra items output by the previous craft loops (aka substitutes)
 
     -- consume items required to craft the item from the extras and network if needed
@@ -188,7 +188,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   if not dryRun then
     local extraNotTaken = 0
     local toInsert = {}
-    for _, st in ipairs(inv:get_list(INV_HOUT)) do
+    for _, st in ipairs(logistica.get_list(inv, INV_HOUT)) do
       if st:get_name() == takeStackName then
         extraNotTaken = extraNotTaken + st:get_count()
       else
@@ -198,7 +198,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
     taken:set_count(leftover + extraNotTaken)
 
     if not taken:is_empty() then
-      local main = inv:get_list(INV_MAIN) or {}
+      local main = logistica.get_list(inv, INV_MAIN) or {}
       for i = 2, #main do
         taken = main[i]:add_item(taken)
       end

@@ -66,7 +66,7 @@ local function get_valid_requester_and_target_inventory(requesterPos)
 end
 
 local function get_target_missing_item_stack(requestStack, invs)
-  local storageList = invs.targetInventory:get_list(invs.targetList)
+  local storageList = logistica.get_list(invs.targetInventory, invs.targetList)
   local remaining = requestStack:get_count()
     for i,_ in ipairs(storageList) do
       local stored = storageList[i]
@@ -91,7 +91,7 @@ local function get_next_requested_stack(pos, inventories)
   if not inventories then return nil end
   local nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "actual")
   if nextSlot <= 0 then return nil end
-  return inventories.requesterInventory:get_list("actual")[nextSlot]
+  return logistica.get_list(inventories.requesterInventory, "actual")[nextSlot]
 end
 
 -- updates the inv list called 'actual' with the latest checked request
@@ -105,7 +105,7 @@ local function update_requester_actual_request(pos)
   local startingSlot = nextSlot
   repeat
     if nextSlot <= 0 then return nil end
-    local filterStack = requesterInv:get_list("filter")[nextSlot]
+    local filterStack = logistica.get_list(requesterInv, "filter")[nextSlot]
     requestStack = get_target_missing_item_stack(filterStack, inventories)
     local demStackCount = requestStack:get_count()
     if demStackCount > 0 then
@@ -136,7 +136,7 @@ end
 
 -- returns 0 if no request, or the count of requested items
 local function get_filter_request_for(requesterInventory, itemStackName)
-  local actualRequestList = requesterInventory:get_list("actual")
+  local actualRequestList = logistica.get_list(requesterInventory, "actual")
   if not actualRequestList then return 0 end
   for _, v in ipairs(actualRequestList) do
     if v:get_name() == itemStackName then
@@ -199,10 +199,9 @@ end
 -- returns a list of ItemStacks tha represent the current requests of this requester
 function logistica.get_requester_request(pos)
   local inv = get_meta(pos):get_inventory()
-  local list = inv:get_list("filter")
-  if not list then return {} end
+  local list = logistica.get_list(inv, "filter")
   local ret = {}
-  for k, v in list do
+  for k, v in ipairs(list) do
     ret[k] = ItemStack(v)
   end
   return ret

@@ -175,6 +175,6 @@ function logistica.get_cache_list_for(position, meta, listName)
   if nodeDef and nodeDef.logistica and nodeDef.logistica.get_cache_list then
     return nodeDef.logistica.get_cache_list(position) or {}
   else
-    return meta:get_inventory():get_list(listName) or {}
+    return logistica.get_list(meta:get_inventory(), listName)
   end
 end

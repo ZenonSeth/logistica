@@ -23,7 +23,7 @@ local function update_upgrade_count(pos, optMeta)
     local meta = optMeta or minetest.get_meta(pos)
     local inv = meta:get_inventory()
     local upgCount = 0
-    for _, st in ipairs(inv:get_list(INV_UPG) or {}) do
+    for _, st in ipairs(logistica.get_list(inv, INV_UPG)) do
       if not st:is_empty() then upgCount = upgCount + 1 end
     end
     meta:set_int(META_UPGRADE_COUNT, upgCount)

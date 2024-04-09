@@ -10,7 +10,7 @@ local INV_HOUT = "hout"
 local forms = {}
 
 local function update_craft_output(inv)
-  local inputList = inv:get_list(INV_CRAFT)
+  local inputList = logistica.get_list(inv, INV_CRAFT)
   local out, _ = minetest.get_craft_result({
     method = "normal",
     width = 3,
@@ -122,7 +122,8 @@ local function on_craftsup_inventory_take(pos, listname, index, stack, player)
 end
 
 local function can_dig_craftsup(pos, player)
-  local main = minetest.get_meta(pos):get_inventory():get_list(INV_MAIN) or {}
+  local inv = minetest.get_meta(pos):get_inventory()
+  local main = logistica.get_list(inv, INV_MAIN)
   for i = 2, #main do
     if not main[i]:is_empty() then return false end
   end

@@ -72,3 +72,9 @@ function logistica.add_allowed_pull_list(listName)
   if not listName then return end
   allowedPull[listName] = true
 end
+
+-- a safer way to get inv list, returns an empty table if something goes wrong
+function logistica.get_list(inventory, listName)
+  if not inventory or not listName or type(listName) ~= "string" then return {} end
+  return inventory:get_list(listName) or {}
+end

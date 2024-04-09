@@ -39,7 +39,7 @@ end
 -- returns true if something was crafted, false if nothing was crafted
 -- optSourceListName is optional: if nil, no checks will be made if enough materials exist
 function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optSourceListName, outputListName)
-  local recipeList = inv:get_list(recipeList3x3Name) or {}
+  local recipeList = logistica.get_list(inv, recipeList3x3Name)
 
   local craftRes = get_combined_crafting_ouputs(recipeList)
   if craftRes.item:is_empty() then return false end
@@ -53,7 +53,7 @@ function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optS
   if optSourceListName ~= nil then
     -- check if source has enough materials
     local recCounts = count_items(recipeList)
-    local srcCounts = count_items(inv:get_list(optSourceListName) or {})
+    local srcCounts = count_items(logistica.get_list(inv, optSourceListName))
     for name, count in pairs(recCounts) do
       if srcCounts[name] == nil or srcCounts[name] < count then return false end
     end

@@ -8,8 +8,8 @@ local BASE_TRANSFER_RATE = 10
 local function mass_storage_room_for_item(pos, meta, stack)
   local stackName = stack:get_name()
   local maxNum = logistica.get_mass_storage_max_size(pos)
-  local filterList = meta:get_inventory():get_list("filter")
-  local storageList = meta:get_inventory():get_list("storage")
+  local filterList = logistica.get_list(meta:get_inventory(), "filter")
+  local storageList = logistica.get_list(meta:get_inventory(), "storage")
   local roomForItems = 0
   for i, storageStack in ipairs(filterList) do
     if storageStack:get_name() == stackName then
@@ -59,7 +59,7 @@ end
 -- Returns a stack of how many items remain
 function logistica.insert_item_into_mass_storage(pos, inv, inputStack, dryRun)
   local maxItems = logistica.get_mass_storage_max_size(pos)
-  local numSlots = #(inv:get_list("filter"))
+  local numSlots = #(logistica.get_list(inv, "filter"))
   local inputStackName = inputStack:get_name()
   local indices = {}
   for i = 1, numSlots do
@@ -146,7 +146,7 @@ function logistica.try_to_add_player_wield_item_to_mass_storage(pos, player)
 
   local pInv = player:get_inventory()
   local pListName = player:get_wield_list()
-  local pList = pInv:get_list(pListName)
+  local pList = logistica.get_list(pInv, pListName)
   for i, pInvStack in ipairs(pList) do
     if pInvStack:get_name() == wieldStack:get_name() then
       newStack = logistica.insert_item_into_mass_storage(pos, inv, pInvStack)
@@ -215,7 +215,8 @@ function logistica.update_mass_storage_front_image(origPos, newParam2)
   local meta = minetest.get_meta(pos)
   local slot = logistica.get_mass_storage_image_slot(meta)
   if slot > 0 then
-    local item = meta:get_inventory():get_list("filter")[slot] or ItemStack("")
+    local inv = meta:get_inventory()
+    local item = logistica.get_list(inv, "filter")[slot] or ItemStack("")
     logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
   end
 end
@@ -226,7 +227,7 @@ function logistica.get_mass_storage_imgname_or_first_item(meta)
   local index = meta:get_int(META_IMG_PIC)
   local itemStack = inv:get_stack("filter", index)
   if not itemStack:is_empty() then return "\n(Has: "..itemStack:get_description()..")" end
-  for _, v in ipairs(inv:get_list("filter")) do
+  for _, v in ipairs(logistica.get_list(inv, "filter")) do
     if not v:is_empty() then return "\n(Has: "..v:get_description()..")" end
   end
   return "\n(Empty)"
@@ -239,7 +240,7 @@ end
 function logistica.update_mass_storage_cap(pos, optMeta)
   local meta = optMeta or minetest.get_meta(pos)
   local storageUpgrade = 0
-  local list = meta:get_inventory():get_list("upgrade") or {}
+  local list = logistica.get_list(meta:get_inventory(), "upgrade")
   for _, item in ipairs(list) do
     local upgradeDef = logistica.craftitem.storage_upgrade[item:get_name()]
     if upgradeDef and upgradeDef.storage_upgrade then
@@ -264,7 +265,7 @@ function logistica.can_remove_mass_storage_upgrade(pos, upgradeName)
   if not upgradeDef or not upgradeDef.storage_upgrade then return true end
   local inv = minetest.get_meta(pos):get_inventory()
   local maxStored = 0
-  for _, st in ipairs(inv:get_list("storage") or {}) do
+  for _, st in ipairs(logistica.get_list(inv, "storage")) do
     if st:get_count() > maxStored then maxStored = st:get_count() end
   end
   local currMax = logistica.get_mass_storage_max_size(pos)

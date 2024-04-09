@@ -193,7 +193,7 @@ function logistica.take_stack_from_item_storage(stack, network, collectorFunc, i
   for storageHash, _ in pairs(network.item_storage) do
     local storagePos = h2p(storageHash)
     local storageInv = get_meta(storagePos):get_inventory()
-    local storageList = storageInv:get_list(ITEM_STORAGE_LIST_NAME) or {}
+    local storageList = logistica.get_list(storageInv, ITEM_STORAGE_LIST_NAME)
     for i, storedStack in ipairs(storageList) do
       if (not storedStack:is_empty()) and eq(storedStack, stack) then
         local leftover = collectorFunc(storedStack)
@@ -227,7 +227,7 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
     local storagePos = h2p(storageHash)
     local meta = get_meta(storagePos)
     local storageInv = meta:get_inventory()
-    local storageList = storageInv:get_list(MASS_STORAGE_LIST_NAME) or {}
+    local storageList = logistica.get_list(storageInv, MASS_STORAGE_LIST_NAME)
     -- we can't use the usual take/put methods because mass storage exceeds max stack
     for i = #storageList, 1, -1 do -- traverse backwards for taking items
       local storageStack = storageList[i]

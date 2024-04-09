@@ -55,7 +55,7 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
   local remaining = stackToTake:get_count()
 
   local supplierInv = minetest.get_meta(supplierPos):get_inventory()
-  local supplyList = supplierInv:get_list(META_SUPPLIER_LIST)
+  local supplyList = logistica.get_list(supplierInv, META_SUPPLIER_LIST)
   for i, supplyStack in ipairs(supplyList) do
   if i ~= optIgnorePosition and eq(supplyStack, stackToTake) then
     local supplyCount = supplyStack:get_count()
