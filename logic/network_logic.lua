@@ -72,7 +72,7 @@ function logistica.get_network_by_id_or_nil(networkId)
   return networks[networkId]
 end
 
-function logistica.get_network_or_nil(pos, optMeta)
+function logistica.get_network_or_nil(pos, optMeta, withoutModifying)
   local nodeName = minetest.get_node(pos).name
   if logistica.get_network_group_for_node_name(nodeName) == nil
       and not logistica.GROUPS.controllers.is(nodeName) -- controllers don't have a network group, they ARE the network
@@ -92,16 +92,18 @@ function logistica.get_network_or_nil(pos, optMeta)
         return network
       end
     end
-    -- we tried the cache, and then looking up all the networks - it didn't work.
-    -- so mark this as already tried, so we don't perform more full-network searches for this node
-    -- until something changes (e.g. something connects it to network and sets the cache)
-    set_cache_network_id(meta, CACHED_NETWORK_ID_ALREADY_TRIED)
+    if not withoutModifying then
+      -- we tried the cache, and then looking up all the networks - it didn't work.
+      -- so mark this as already tried, so we don't perform more full-network searches for this node
+      -- until something changes (e.g. something connects it to network and sets the cache)
+      set_cache_network_id(meta, CACHED_NETWORK_ID_ALREADY_TRIED)
+    end
   end
   return nil
 end
 
 function logistica.get_network_name_or_nil(pos)
-  local network = logistica.get_network_or_nil(pos)
+  local network = logistica.get_network_or_nil(pos, nil, true)
   if not network then return nil else return network.name end
 end
 
@@ -155,14 +157,19 @@ end
 local function break_logistica_node(pos)
   local node = minetest.get_node(pos)
   local nodeName = node.name
+  if ends_with(nodeName, DISABLED_SUFFIX) then return end -- already disabled
   if ends_with(nodeName, ON_SUFFIX) then
+    -- a little ugly but some nodes (e.g. toggleable cable) have _on/_off and _on_disabled/_off_disabled
     local newNodeName = nodeName:sub(1, #node.name - #ON_SUFFIX)
     if minetest.registered_nodes[newNodeName..DISABLED_SUFFIX] then
-      -- a little ugly but some nodes (e.g. toggleable cable) have _on/_off and _on_disabled/_off_disabled
       nodeName = newNodeName
     end
+  else
+    local newNodeName = nodeName .. DISABLED_SUFFIX
+    if minetest.registered_nodes[newNodeName] then
+      logistica.swap_node(pos, newNodeName)
+    end
   end
-  logistica.swap_node(pos, nodeName .. DISABLED_SUFFIX)
 end
 
 -- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
@@ -415,10 +422,10 @@ end
 -- attempts to 'wake up' - aka load the controller that was last assigned to this position
 function logistica.try_to_wake_up_network(pos)
   logistica.load_position(pos)
-  if logistica.get_network_or_nil(pos) then return end -- it's already awake
+  if logistica.get_network_or_nil(pos, nil, true) then return end -- it's already awake
   local cachedId = get_unchecked_cached_network_id(minetest.get_meta(pos))
   if not cachedId or cachedId == "" or cachedId == CACHED_NETWORK_ID_ALREADY_TRIED then return end
-  local conPos = minetest.get_position_from_hash(cachedId:sub(2)) -- remove the valid prefix
+  local conPos = h2p(cachedId)
 
   logistica.load_position(conPos)
   local node = minetest.get_node(conPos)
