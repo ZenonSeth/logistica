@@ -418,6 +418,7 @@ function logistica.access_point_on_take(inv, listname, index, stack, player)
 end
 
 function logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
+  logistica.try_to_wake_up_network(pos)
   show_access_point_formspec(pos, clicker:get_player_name())
 end
 
