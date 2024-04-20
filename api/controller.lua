@@ -104,6 +104,7 @@ function logistica.register_controller(name, def)
   def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
     if clicker and clicker:is_player() then
       show_controller_formspec(pos, clicker:get_player_name())
+      logistica.start_controller_timer(pos)
     end
   end
   def._mcl_hardness = 1.5
