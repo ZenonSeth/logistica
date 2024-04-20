@@ -126,3 +126,12 @@ minetest.register_craft({
     {"",                  L("silverin_plate"), ""},
   }
 })
+
+minetest.register_craft({
+  output = L("wireless_antenna 2"),
+  recipe = {
+    {"", L("silverin_plate"),   ""},
+    {"", L("wireless_crystal"), ""},
+    {"", L("silverin_circuit"), ""},
+  }
+})

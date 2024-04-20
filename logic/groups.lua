@@ -43,6 +43,8 @@ logistica.NETWORK_GROUPS = {
   misc = "misc",
   trashcans = "trashcans",
   reservoirs = "reservoirs",
+  wireless_transmitters = "wireless_transmitters",
+  wireless_receivers = "wireless_receivers",
 }
 
 -- The default node groups of Logistica, with utility shorthand attached.<br>
@@ -63,6 +65,8 @@ logistica.GROUPS = {
   trashcans = make_group_table("trashcans", logistica.NETWORK_GROUPS.trashcans),
   vaccuum_suppliers = make_group_table("vaccuum_suppliers", logistica.NETWORK_GROUPS.suppliers),
   reservoirs = make_group_table("reservoirs", logistica.NETWORK_GROUPS.reservoirs),
+  wireless_transmitters = make_group_table("wireless_transmitters", logistica.NETWORK_GROUPS.wireless_transmitters),
+  wireless_receivers = make_group_table("wireless_receivers", logistica.NETWORK_GROUPS.wireless_receivers),
 }
 
 ----------------------------------------------------------------
@@ -127,6 +131,20 @@ function logistica.group_get_node_group_name(nodeName)
     if v[nodeName] then return k end
   end
   return nil
+end
+
+-- returns a lua list of group all the nodes belonging to this group,
+-- or empty list if no such group exists, or is empty
+function logistica.group_get_all_nodes_for_group(groupName)
+  local nodeNames = {}
+  local index = 1
+  for nodeName, _ in pairs(logistica_groups[groupName] or {}) do
+    if nodeName ~= "_networkGroup" then
+      nodeNames[index] = nodeName
+      index = index + 1
+    end
+  end
+  return nodeNames
 end
 
 --------------------------------

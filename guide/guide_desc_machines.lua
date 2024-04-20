@@ -262,3 +262,25 @@ Alternatively, you can also connect the Trashcan to a network. When connected it
 
 If you only want to delete specific items from the network (instead of all excess items) you can configure that with the filter slot - the the Trashcan will delete only items configured in its filter list.
 ]]
+
+g.wireless_transmitter = [[
+The Wireless Transmitter is a node that allows a network to be extended wirelessly, by connecting to a Wireless Receiver. It isn't necessary to use a Wireless Access Pad, as that synchronizes to an Access Point instead.
+
+Each network can only have 1 and only 1 Wireless Transmitter. In order to function, the Wireless Transmitter must be placed directly on top of the Network Controller. Once placed, it automatically starts to transmit the network, over an unlimited distance.
+
+If a Wireless Transmitter is dug or destroyed, or if the Network Controller below it is dug or destroyed, all connected Wireless Receivers will be disconnected, and must manually be re-connected once the Transmitter is placed.
+
+A wireless Transmitter has a limit of how many Receivers can be connected to it. This setting is configured by server, see the Server Settings guide page at the bottom of the list on the left.
+]]
+
+g.wireless_receiver = [[
+The Wireless Receiver allows a network to be extended wirelessly, by connecting to a Wireless Transmitter.
+
+To use a Receiver, first place a Transmitter in a valid position (see its page for info) to allow the network to be wirelessly transmitted.
+
+Then place a Receiver in a valid position, such that it doesn't connect to an existing network. Then right click it and from the dropdown select the corresponding Network to connect to by name. Note that Networks can be renamed from their Network Controllers. Then press Connect - if successful, you will get a green "Connected" message.
+
+You can then connect Optic Cables to the Receiver and they will carry the network the Receiver was connected to.
+
+If you place a Receiver, and you cannot see your Network name (can happen after server/game restarts), first make sure the Network has a Wireless Transmitter attached to its controller. Then go and right click the Network Controller, which will make sure the network is active.
+]]

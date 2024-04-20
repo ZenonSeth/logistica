@@ -11,8 +11,8 @@ function logistica.on_controller_timer(pos, _)
   if not node then return true end -- what?
   if not logistica.GROUPS.controllers.is(node.name) then return false end
 
-  local network = logistica.get_network_or_nil(pos)
-  if not network then
+  local networkId = logistica.get_network_id_or_nil(pos)
+  if not networkId then
     logistica.on_controller_change(pos) -- this should re-scan the network
   end
   return true

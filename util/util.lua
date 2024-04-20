@@ -17,7 +17,3 @@ local d = {}
 d.ttos = logistica.ttos
 d.log = minetest.log
 d.table_map = logistica.table_map
-function d.ltos(list)
-    if not list then return "{NIL}" end
-    return d.ttos(d.table_map(list, function(st) return st:to_string() end))
-end

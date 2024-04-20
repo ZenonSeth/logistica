@@ -17,6 +17,7 @@ end
 
 local function show_controller_formspec(pos, playerName)
   controllerForms[playerName] = {position = pos}
+  logistica.on_controller_timer(pos, 1) -- to ensure net is initialized
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_controller_formspec(pos))
 end
 
@@ -35,9 +36,13 @@ local function on_controller_receive_fields(player, formname, fields)
       newNetworkName = string.sub(newNetworkName, 1, MAX_NETWORK_NAME_LENGTH)
     end
     logistica.rename_network(minetest.hash_node_position(pos), newNetworkName)
+    local readNetworkName = logistica.get_network_name_or_nil(pos) or newNetworkName
     local meta = minetest.get_meta(pos)
-    meta:set_string("infotext", S("Controller of Network: ")..newNetworkName)
-    meta:set_string("name", newNetworkName)
+    meta:set_string("infotext", S("Controller of Network: ")..readNetworkName)
+    meta:set_string("name", readNetworkName)
+    if readNetworkName ~= newNetworkName then
+      show_controller_formspec(pos, playerName)
+    end
   end
   return true
 end

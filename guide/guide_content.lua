@@ -27,6 +27,9 @@ local PAGE_VACCUUM_CHEST = "mvacchs"
 local PAGE_LAVA_FUELER = "mlvfuel"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
+local PAGE_WIRELESS_TRANSMITTER = "wrltrn"
+local PAGE_WIRELESS_RECEIVER = "wrlrec"
+local PAGE_WIRELESS_ANTENNA = "wrlant"
 
 local PAGE_MASS_STORAGE_UPGR = "msstup"
 local PAGE_COBBLE_GENERATOR_UPGR = "cbgnup"
@@ -91,6 +94,8 @@ local RECIPE_VACCUUMC = getrec({L("vaccuum_chest")})
 local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
+local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
+local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
 local RECIPE_MASSUPGR = getrec({L("storage_upgrade_1"), L("storage_upgrade_2")})
 local RECIPE_COBGENUP = getrec({L("cobblegen_upgrade")})
@@ -100,6 +105,7 @@ local RECIPE_STANDWAV = getrec({L("standing_wave_box")})
 local RECIPE_WIRLSSAP = getrec({L("wireless_access_pad")})
 local RECIPE_COMPTANK = getrec({L("compression_tank")})
 local RECIPE_SILVSLIC = getrec({L("silverin_slice")})
+local RECIPE_WRLSANTN = getrec({L("wireless_antenna")})
 
 local RECIPE_SILVERIN = getlavarec(L("silverin"))
 local RECIPE_SILVPLAT = getlavarec(L("silverin_plate"))
@@ -128,6 +134,7 @@ local RECIPE_LINKS = {
   [L("storage_upgrade_2")] = PAGE_MASS_STORAGE_UPGR,
   [L("cobblegen_upgrade")] = PAGE_COBBLE_GENERATOR_UPGR,
   [L("silverin_circuit")] = PAGE_SILVERIN_CIRCUIT,
+  [L("wireless_antenna")] = PAGE_WIRELESS_ANTENNA,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -140,6 +147,8 @@ local RECIPE_LINKS = {
   [L("pump")] = PAGE_PUMP,
   [L("mass_storage_basic")] = PAGE_MASS_STORAGE,
   [L("cobblegen_supplier")] = PAGE_COBBLE_GENERATOR,
+  [L("wireless_transmitter")] = PAGE_WIRELESS_TRANSMITTER,
+  [L("wireless_receiver")] = PAGE_WIRELESS_RECEIVER,
 
 }
 
@@ -172,7 +181,6 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Network Controller"), id = PAGE_NET_CONTROLLER },
     { name = S("  Access Point"), id = PAGE_ACCESS_POINT },
     { name = S("  Optic Cables"), id = PAGE_OPTIC_CABLE },
-    { name = S("  Wireless Upgrader"), id = PAGE_WIRELESS_UPGRADER },
     { name = header(S("Storage:"))},
     { name = S("  Mass Storage"), id = PAGE_MASS_STORAGE },
     { name = S("  Tool Chest"), id = PAGE_TOOL_CHEST },
@@ -180,6 +188,11 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("Moving Items:"))},
     { name = S("  Network Importer"), id = PAGE_NETWORK_IMPORTER },
     { name = S("  Request Inserter"), id = PAGE_REQUEST_INSERTER },
+    { name = header(S("Wireless Network")) },
+    { name = S("  Wireless Transmitter"), id = PAGE_WIRELESS_TRANSMITTER },
+    { name = S("  Wireless Receiver"), id = PAGE_WIRELESS_RECEIVER },
+    { name = S("  Wireless Access Pad"), id = PAGE_WIRELESS_ACCESS_PAD },
+    { name = S("  Wireless Upgrader"), id = PAGE_WIRELESS_UPGRADER },
     { name = header(S("Liquid Storage:"))},
     { name = S("  Reservoirs"), id = PAGE_RESERVOIR },
     { name = S("  Reservoir Pump"), id = PAGE_PUMP },
@@ -197,7 +210,6 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Mass Storage Upgrades"), id = PAGE_MASS_STORAGE_UPGR },
     { name = S("  Cobble Generator Upgrades"), id = PAGE_COBBLE_GENERATOR_UPGR },
     { name = header(S("Tools:"))},
-    { name = S("  Wireless Access Pad"), id = PAGE_WIRELESS_ACCESS_PAD },
     { name = S("  Hyperspanner"), id = PAGE_HYPERSPANNER },
     { name = header(S("Items:"))},
     { name = S("  Silverin Crystal"), id = PAGE_SILVERIN_CRYSTAL },
@@ -209,6 +221,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Photonizer/Reverse Polarity"), id = PAGE_PHOTONIZERS },
     { name = S("  Wave Function Maintainer"), id = PAGE_WAVE_FUN_MAIN },
     { name = S("  Wireless Crystal"), id = PAGE_WIRELESS_CRYSTAL },
+    { name = S("  Wireless Antenna"), id = PAGE_WIRELESS_ANTENNA },
     { name = header(S("Misc:"))},
     { name = S("  Server Settings"), id = PAGE_SERVER_SETTINGS },
   },
@@ -318,6 +331,32 @@ logistica.GuideApi.register(GUIDE_NAME, {
       description = desc.request_inserter,
     },
 
+    -- wireless network
+
+    [PAGE_WIRELESS_ACCESS_PAD] = {
+      title = S("The Wireless Access Pad"),
+      relatedItems = {L("wireless_synchronizer")},
+      recipes = RECIPE_WIRLSSAP,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.wireless_access_pad,
+    },
+
+    [PAGE_WIRELESS_TRANSMITTER] = {
+      title = S("Wireless Transmitter"),
+      relatedItems = {L("wireless_receiver")},
+      recipes = RECIPE_WRLSTRNS,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.wireless_transmitter,
+    },
+
+    [PAGE_WIRELESS_RECEIVER] = {
+      title = S("Wireless Receiver"),
+      relatedItems = {L("wireless_transmitter")},
+      recipes = RECIPE_WRLSRECV,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.wireless_receiver,
+    },
+
     -- liquids
 
     [PAGE_RESERVOIR] = {
@@ -420,14 +459,6 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     -- tools
 
-    [PAGE_WIRELESS_ACCESS_PAD] = {
-      title = S("The Wireless Access Pad"),
-      relatedItems = {L("wireless_synchronizer")},
-      recipes = RECIPE_WIRLSSAP,
-      recipeLinks = RECIPE_LINKS,
-      description = desc.wireless_access_pad,
-    },
-
     [PAGE_HYPERSPANNER] = {
       title = S("Hyperspanner"),
       recipes = RECIPE_HYPERSPN,
@@ -506,7 +537,15 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipeLinks = RECIPE_LINKS,
       description = desc.wireless_crystal,
     },
-    
+
+    [PAGE_WIRELESS_ANTENNA] = {
+      title = S("Wireless Antenna"),
+      relatedItems = {L("wireless_transmitter"), L("wireless_receiver") },
+      recipes = RECIPE_WRLSANTN,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.wireless_antenna,
+    },
+
     -- Settings
 
     [PAGE_SERVER_SETTINGS] = {

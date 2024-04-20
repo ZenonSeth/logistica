@@ -43,3 +43,5 @@ logistica.settings.pump_max_range = get_int("pump_max_range", 5, 1, 10)
 logistica.settings.pump_max_depth = get_int("pump_max_depth", 5, 1, 32)
 
 logistica.settings.network_node_limit = get_int("network_node_limit", 4000, 100, 1000000)
+
+logistica.settings.max_receivers_per_transmitter = get_int("max_receivers_per_transmitter", 100, 1, 1000)

@@ -19,6 +19,8 @@ Each upgrade doubles the rate of cobblestone output.
 g.wireless_access_pad = [[
 The Wireless Access Pad is a handheld device that allows you to access your Network Storage from potentially unlimited distance by synchronizing to an Access Point on your network. (distance may be limited by server settings, see Server Setting page on the left)
 
+The Wireless Access Pad has no relation to the Wireless Transmitter or Receiver. The Pad only requres an Access Point.
+
 The Wireless Access Pad provides the exact same interface as the Access Point, allowing you to store or retrieve items or liquids.
 
 To use a Wireless Access Pad:
@@ -97,4 +99,8 @@ g.wireless_crystal = [[
 The wireless crystal is an essential component to crafting the Wireless Access Pad and Wireless Upgrader. It is made in the Lava Furnace.
 
 See furnace's built-in recipe guide for details
+]]
+
+g.wireless_antenna = [[
+The Wireless Antenna is an essential component to crafting the Wireless Transmitter and Wireless Receiver. It is made on the regular crafting grid using the recipe above.
 ]]

@@ -7,3 +7,4 @@ logistica_enable_large_liquid_tank (Enable the Large Liquid Tank) bool true
 logistica_pump_max_range (Sets from how far sideways from the Liquid Pump it can take liquids from) int 5 1 10
 logistica_pump_max_depth (Sets how far below the Liquid Pump it can take liquids from) int 5 1 32
 logistica_network_node_limit (Sets how many nodes, including cables, a Network can consist of) int 4000 100 1000000
+logistica_max_receivers_per_transmitter (Sets how many wirless receivers can be linked to a single wirless transmitter) int 100 1 1000

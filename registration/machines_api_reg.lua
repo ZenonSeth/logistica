@@ -1,3 +1,4 @@
+local SIZE = logistica.settings.cable_size
 
 local itemstrings = logistica.itemstrings
 --------------------------------
@@ -326,6 +327,87 @@ logistica.register_vaccuum_chest("Vaccuum Supplier Chest", "vaccuum_chest", 16, 
   "logistica_vaccuum_side.png",
   "logistica_vaccuum_side.png",
   "logistica_vaccuum_front.png",
+})
+
+--------------------------------
+-- Wireless Receiver
+--------------------------------
+
+logistica.register_wireless_receiver("wireless_receiver", {
+  description = "Wireless Receiver",
+  paramtype2 = "color",
+  sunlight_propagates = true,
+  tiles = {
+      "logistica_wifi_receiver_top.png", "logistica_wifi_receiver_top.png",
+      "logistica_wifi_receiver_front.png", "logistica_wifi_receiver_front.png",
+      "logistica_wifi_receiver_side.png", "logistica_wifi_receiver_side.png",
+  },
+  paramtype = "light",
+  drawtype = "nodebox",
+  node_box = {
+    type = "connected",
+    fixed = {
+			{-4/16, -8/16, -4/16, 4/16, -6/16,  4/16}, -- base
+			{-SIZE, -8/16, -SIZE, SIZE,  5/16,  SIZE}, -- column
+			{-6/16,  3/16,  3/16, 6/16,  7/16,  4/16}, -- antenna1
+			{-6/16,  3/16, -4/16, 6/16,  7/16, -3/16}, -- antenna2
+			{-1/16,  4/16, -3/16, 1/16,  5/16,  3/16}, -- antenna bar
+    },
+    connect_top    = { -SIZE, -SIZE, -SIZE, SIZE, 8/16, SIZE }, -- y+
+    connect_front  = { -SIZE, -SIZE, -8/16, SIZE, SIZE, SIZE }, -- z-
+    connect_back   = { -SIZE, -SIZE,  SIZE, SIZE, SIZE, 8/16 }, -- z+
+    connect_left   = { -8/16, -SIZE, -SIZE, SIZE, SIZE, SIZE }, -- x-
+    connect_right  = { -SIZE, -SIZE, -SIZE, 8/16, SIZE, SIZE }, -- x+
+  },
+  selection_box = {
+    type = "fixed",
+    fixed = {
+      {-6/16, -8/16, -4/16,  6/16, 7/16, 4/16}
+    }
+  },
+  connects_to = { logistica.GROUP_ALL, logistica.GROUP_ALL, logistica.GROUP_CABLE_OFF },
+  connect_sides = {"bottom", "left", "right", "back", "front"},
+  groups = { oddly_breakable_by_hand = 1, cracky = 2, handy = 1, pickaxey = 2 },
+  sounds = logistica.node_sound_metallic(),
+})
+
+--------------------------------
+-- Wireless Transmitter
+--------------------------------
+
+logistica.register_wireless_transmitter("wireless_transmitter", {
+  description = "Wireless Transmitter\nMust be placed on top of a Network Controller",
+  short_description = "Wireless Transmitter",
+  paramtype = "light",
+  paramtype2 = "color",
+  drawtype = "nodebox",
+  tiles = {
+    "logistica_wifi_transmitter_top.png",
+    "logistica_wifi_transmitter_top.png",
+    "logistica_wifi_transmitter_side.png",
+  },
+  node_box = {
+    type = "fixed",
+    fixed = {
+      {-4/16, -8/16, -4/16,  4/16, -6/16,  4/16}, -- base bottom
+      {-3/16, -6/16, -3/16,  3/16, -5/16,  3/16}, -- base upper
+      {-6/16, -6/16, -1/16,  6/16, -5/16,  1/16}, -- crossbeam
+      {-1/16, -6/16, -6/16,  1/16, -5/16,  6/16}, -- crossbeam
+      {-7/16, -7/16, -2/16, -6/16,  7/16,  2/16}, -- antena
+      { 7/16, -7/16, -2/16,  6/16,  7/16,  2/16}, -- antena
+      {-2/16, -7/16,  7/16,  2/16,  7/16,  6/16}, -- antena
+      {-2/16, -7/16, -7/16,  2/16,  7/16, -6/16}, -- antena
+    }
+  },
+  selection_box = {
+    type = "fixed",
+    fixed = {
+      {-7/16, -8/16, -7/16,  7/16, 7/16, 7/16}
+    }
+  },
+  connect_sides = {},
+  groups = { oddly_breakable_by_hand = 1, cracky = 2, handy = 1, pickaxey = 2 },
+  sounds = logistica.node_sound_metallic(),
 })
 
 --------------------------------

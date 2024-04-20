@@ -206,8 +206,17 @@ end
 function logistica.table_to_list_indexed(table, func)
   local t = {}
   local index = 0
-  for k,v in pairs(table) do index = index + 1; t[index] = func(k, v) end
+  for k,v in pairs(table) do index = index + 1; t[index] = func(k, v, index) end
   return t
+end
+
+-- filter a list (aka indexed table), return new list with selected elements
+-- selectFunc must return true if we add the element, false if we exclude it
+function logistica.list_filter(table, selectFunc)
+  local r = {}
+  local index = 0
+  for _,v in ipairs(table) do if selectFunc(v) then index = index + 1 ; r[index] = v end end
+  return r
 end
 
 function logistica.round(x)

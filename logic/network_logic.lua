@@ -72,7 +72,7 @@ function logistica.get_network_by_id_or_nil(networkId)
   return networks[networkId]
 end
 
-function logistica.get_network_or_nil(pos, optMeta, withoutModifying)
+function logistica.get_network_or_nil(pos, optMeta, withoutModifying, withoutModifying)
   local nodeName = minetest.get_node(pos).name
   if logistica.get_network_group_for_node_name(nodeName) == nil
       and not logistica.GROUPS.controllers.is(nodeName) -- controllers don't have a network group, they ARE the network
@@ -110,12 +110,20 @@ end
 function logistica.rename_network(networkId, newName)
   local network = networks[networkId]
   if not network then return false end
+  if not newName or type(newName) ~= "string" or newName == "" then
+    newName = logistica.get_rand_string_for(h2p(network.controller))
+  end
   network.name = newName
+  --
+  for posHash, _ in pairs(network.wireless_transmitters) do
+    local trPos = h2p(posHash)
+    logistica.wifi_transmitter_set_infotext(trPos, network.name)
+  end
   return true
 end
 
 function logistica.get_network_id_or_nil(pos)
-  local network = logistica.get_network_or_nil(pos)
+  local network = logistica.get_network_or_nil(pos, nil, true)
   if not network then return nil else return network.controller end
 end
 
@@ -135,7 +143,6 @@ end
 local function clear_network(networkName)
   local network = networks[networkName]
   if not network then return false end
-  local start = minetest.get_us_time()
   -- setting the cached network position to ALREADY_TRIED prevents a lot of full network searches, which are expensive
   local nodeCount = 0
   for netGroup, _ in pairs(logistica.network_group_get_all()) do
@@ -146,7 +153,12 @@ local function clear_network(networkName)
       nodeCount = nodeCount + 1
     end
   end
-  local eend = minetest.get_us_time()
+  for posHash, _ in pairs(network.wireless_transmitters) do
+    local trPos = h2p(posHash)
+    logistica.load_position(trPos)
+    logistica.wifi_network_disconnect_transmitter(trPos)
+    logistica.wifi_transmitter_set_infotext(trPos, nil)
+  end
   networks[networkName] = nil
 end
 
@@ -222,6 +234,30 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           network[nodeNetworkGroup][otherHash] = true
           connections[otherHash] = true
           valid = true
+        elseif nodeNetworkGroup == logistica.NETWORK_GROUPS.wireless_transmitters then
+          local posBelow = vector.add(otherPos, vector.new(0,-1,0))
+          --transmitters must be on top the controller to work
+          if logistica.GROUPS.controllers.is(minetest.get_node(posBelow).name) then
+            local connectedRcs = logistica.wifi_network_get_connected_receivers_for_transmitter(otherPos)
+            network[nodeNetworkGroup][otherHash] = true
+            for _, rcPos in ipairs(connectedRcs) do
+              logistica.load_position(rcPos)
+              local rcNodeName = minetest.get_node(rcPos).name
+              local rcGroup = logistica.get_network_group_for_node_name(rcNodeName)
+              if rcGroup and rcGroup == logistica.NETWORK_GROUPS.wireless_receivers then
+                local rcHash = p2h(rcPos)
+                network[rcGroup][rcHash] = true
+                connections[rcHash] = true
+                notify_connected(rcPos, rcNodeName, network.controller)
+              end
+            end
+            valid = true
+          end
+        elseif nodeNetworkGroup == logistica.NETWORK_GROUPS.wireless_receivers then
+          -- encountered a wild wireless receiver that wasn't added by a transmitter
+          -- this is an invalid config, break the receiver, and don't add it
+          break_logistica_node(otherPos)
+          minetest.get_meta(otherPos):set_string("infotext", "ERROR: Receiver cannot be placed connecting to existing networks!")
         elseif nodeNetworkGroup ~= nil then
           -- all machines, except controllers, should be added to network
           network[nodeNetworkGroup][otherHash] = true
@@ -241,6 +277,12 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
   -- We have nested loops so we can do tail recursion
   if newToScan <= 0 then network._num_nodes = numScanned return STATUS_OK
   else return recursive_scan_for_nodes_for_controller(network, connections, numScanned) end
+end
+
+local function update_all_network_caches(network)
+  logistica.update_cache_network(network, LOG_CACHE_MASS_STORAGE)
+  logistica.update_cache_network(network, LOG_CACHE_REQUESTER)
+  logistica.update_cache_network(network, LOG_CACHE_SUPPLIER)
 end
 
 local function create_network(controllerPosition, oldNetworkName)
@@ -266,8 +308,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.requester_cache = {}
   network._num_nodes = 0
 
-  local startPos = {}
-  startPos[controllerHash] = true
+  local startPos = { [controllerHash] = true }
   local status = recursive_scan_for_nodes_for_controller(network, startPos)
   local errorMsg = nil
   if status == CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK then
@@ -277,9 +318,7 @@ local function create_network(controllerPosition, oldNetworkName)
     errorMsg = "Controller max nodes limit of "..HARD_NETWORK_NODE_LIMIT.." nodes per network exceeded!"
   elseif status == STATUS_OK then
     -- controller scan skips updating storage cache, do so now
-    logistica.update_cache_network(network, LOG_CACHE_MASS_STORAGE)
-    logistica.update_cache_network(network, LOG_CACHE_REQUESTER)
-    logistica.update_cache_network(network, LOG_CACHE_SUPPLIER)
+    update_all_network_caches(network)
   end
   if errorMsg ~= nil then
     networks[controllerHash] = nil
@@ -361,6 +400,44 @@ local function on_node_change(pos, oldNode, oldMeta, ops)
   end
 end
 
+-- returns true/false if adding to network succeeds/fails
+local function add_receiver_to_network(network, receiverPos)
+  local rcNodeName = minetest.get_node(receiverPos).name
+  local rcGroup = logistica.get_network_group_for_node_name(rcNodeName)
+  if not rcGroup then return false end
+
+  local rcHash = p2h(receiverPos)
+  local networkNumNodes = network._num_nodes
+  local startPos = { [rcHash] = true }
+  network[rcGroup][rcHash] = true
+  local status = recursive_scan_for_nodes_for_controller(network, startPos, networkNumNodes)
+  local errorMsg = nil
+
+  if status == CREATE_NETWORK_STATUS_FAIL_OTHER_NETWORK then
+    errorMsg = "Cannot connect Receiver to network: Would overlap with another network!"
+  elseif status == CREATE_NETWORK_STATUS_TOO_MANY_NODES then
+    errorMsg = "Max nodes limit of "..HARD_NETWORK_NODE_LIMIT.." nodes per network exceeded!"
+  elseif status == STATUS_OK then
+    -- update caches
+    notify_connected(receiverPos, rcNodeName, network.controller)
+    update_all_network_caches(network)
+  end
+  if errorMsg ~= nil then
+    network[rcGroup][rcHash] = nil
+    break_logistica_node(receiverPos)
+    minetest.get_meta(receiverPos):set_string("infotext", "ERROR: "..errorMsg)
+    return false
+  end
+  return true
+end
+
+local function remove_receiver_from_network(receiverPos)
+  logistica.try_to_wake_up_network(receiverPos)
+  local network = logistica.get_network_or_nil(receiverPos)
+  if not network then return end
+  rescan_network(network.controller)
+end
+
 local MASS_STORAGE_OPS = {
   get_list = function(network) return network.mass_storage end,
   update_cache_node_added = function(pos) logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE) end,
@@ -409,12 +486,54 @@ local MISC_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
+local TRANSMITTER_OPS = {
+  get_list = function(network) return network.wireless_transmitters end,
+  update_cache_node_added = function(_)  end,
+  update_cache_node_removed = function(_) end,
+}
+
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return false end
-  return logistica.GROUPS.cables.is(node.name) or logistica.GROUPS.controllers.is(node.name)
+  return
+    logistica.GROUPS.cables.is(node.name)
+    or logistica.GROUPS.controllers.is(node.name)
+    or logistica.GROUPS.wireless_receivers.is(node.name)
 end
 
+local function on_wifi_receiver_changed(pos, oldNode, oldMeta, objRef)
+  local playerName = ""
+  if objRef and objRef:is_player() then playerName = objRef:get_player_name() end
+  local added = (oldNode == nil)
+  if added then
+    for _, offset in ipairs(adjacent) do
+      local adjPos = vector.add(pos, offset)
+      local adjNet = logistica.get_network_id_or_nil(adjPos)
+      if adjNet then -- wifi receiver should NOT be placed next to existing networks
+        break_logistica_node(pos)
+        minetest.get_meta(pos):set_string("infotext", "ERROR: Receiver cannot be placed connecting to existing networks!")
+      end
+    end
+  else
+    local networkId = get_unchecked_cached_network_id(oldMeta)
+    if networkId then
+      rescan_network(tonumber(networkId))
+    end
+  end
+end
+
+local function on_wifi_transmitter_changed(pos, oldNode, oldMeta, objRef)
+  local added = (oldNode == nil)
+  if added then
+    try_to_add_to_network(pos, TRANSMITTER_OPS)
+    -- no need to rescan a network, just placing a transmitter can't result in more nodes immediately being added
+  else
+    local networkId = get_unchecked_cached_network_id(oldMeta)
+    if networkId then
+        rescan_network(tonumber(networkId))
+    end
+  end
+end
 ----------------------------------------------------------------
 -- global namespaced functions
 ----------------------------------------------------------------
@@ -517,6 +636,16 @@ function logistica.on_controller_change(pos, oldNode)
   end
 end
 
+-- returns true/false if successfully added receiver to position
+function logistica.add_receiver_to_network(network, receiverPos)
+  if not network or not receiverPos then return false end
+  return add_receiver_to_network(network, receiverPos)
+end
+
+function logistica.remove_receiver_from_network(receiverPos)
+  remove_receiver_from_network(receiverPos)
+end
+
 function logistica.on_mass_storage_change(pos, oldNode, oldMeta)
   on_node_change(pos, oldNode, oldMeta, MASS_STORAGE_OPS)
 end
@@ -555,4 +684,12 @@ end
 
 function logistica.on_pump_change(pos, oldNode, oldMeta)
   on_node_change(pos, oldNode, oldMeta, MISC_OPS)
+end
+
+function logistica.on_wifi_receiver_change(pos, oldNode, oldMeta, objRef)
+  on_wifi_receiver_changed(pos, oldNode, oldMeta, objRef)
+end
+
+function logistica.on_wifi_transmitter_change(pos, oldNode, oldMeta, objRef)
+  on_wifi_transmitter_changed(pos, oldNode, oldMeta, objRef)
 end
