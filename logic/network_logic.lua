@@ -140,7 +140,7 @@ end
 -- Network operation functions
 ----------------------------------------------------------------
 
-local function clear_network(networkName)
+local function clear_network(networkName, keepWifiConnections)
   local network = networks[networkName]
   if not network then return false end
   -- setting the cached network position to ALREADY_TRIED prevents a lot of full network searches, which are expensive
@@ -153,11 +153,13 @@ local function clear_network(networkName)
       nodeCount = nodeCount + 1
     end
   end
-  for posHash, _ in pairs(network.wireless_transmitters) do
-    local trPos = h2p(posHash)
-    logistica.load_position(trPos)
-    logistica.wifi_network_disconnect_transmitter(trPos)
-    logistica.wifi_transmitter_set_infotext(trPos, nil)
+  if not keepWifiConnections then
+    for posHash, _ in pairs(network.wireless_transmitters) do
+      local trPos = h2p(posHash)
+      logistica.load_position(trPos)
+      logistica.wifi_network_disconnect_transmitter(trPos)
+      logistica.wifi_transmitter_set_infotext(trPos, nil)
+    end
   end
   networks[networkName] = nil
 end
@@ -338,7 +340,7 @@ local function rescan_network(networkId)
   local conHash = network.controller
   local controllerPosition = h2p(conHash)
   local oldNetworkName = network.name
-  clear_network(networkId)
+  clear_network(networkId, true)
   create_network(controllerPosition, oldNetworkName)
 end
 
