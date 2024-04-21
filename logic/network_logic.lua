@@ -72,7 +72,7 @@ function logistica.get_network_by_id_or_nil(networkId)
   return networks[networkId]
 end
 
-function logistica.get_network_or_nil(pos, optMeta, withoutModifying, withoutModifying)
+function logistica.get_network_or_nil(pos, optMeta, withoutModifying)
   local nodeName = minetest.get_node(pos).name
   if logistica.get_network_group_for_node_name(nodeName) == nil
       and not logistica.GROUPS.controllers.is(nodeName) -- controllers don't have a network group, they ARE the network
