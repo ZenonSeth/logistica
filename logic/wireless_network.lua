@@ -121,7 +121,7 @@ function logistica.wifi_network_after_destroy_receiver(pos, metaDataTable)
 end
 
 function logistica.wifi_network_after_destroy_transmitter(pos, metaDataTable)
-  disconnect_transmitter(pos)
+  disconnect_transmitter(pos, metaDataTable)
   if metaDataTable and metaDataTable.fields and metaDataTable.fields[META_OWNER] then
     wifi_network_remove_transmitter_for_player(pos, metaDataTable.fields[META_OWNER])
   end
