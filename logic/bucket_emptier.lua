@@ -30,10 +30,10 @@ function logistica.emptier_timer(pos, elapsed)
     repeat
       local stack = inv:get_stack(INV_INPUT, currSlot)
       local stackName = stack:get_name()
-      local liquidName = logistica.reservoir_get_liquid_name_for_bucket(stackName)
+      local liquidName = logistica.reservoir_get_liquid_name_for_filled_bucket(stackName)
       if liquidName then
-        local emptyBucket = logistica.reservoir_get_empty_bucket_for_liquid(liquidName)
-        if inv:room_for_item(INV_MAIN, ItemStack(emptyBucket)) then
+        local emptyBucket = logistica.reservoir_get_empty_bucket_for_full_bucket(stackName)
+        if emptyBucket and inv:room_for_item(INV_MAIN, ItemStack(emptyBucket)) then
           local newStack = logistica.empty_bucket_into_network(network, stack)
           if newStack then
             success = true

@@ -259,36 +259,7 @@ logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a
 -- Reservoirs
 --------------------------------
 
-local mcla = minetest.get_game_info().id == "mineclonia"
-local mcl2 = minetest.get_game_info().id == "mineclone2"
-
-local lava_texture = "default_lava.png"
-local water_texture = "default_water.png"
-local river_water_texture = "default_river_water.png"
-
-if mcla then
-  lava_texture = "default_lava_source_animated.png^[sheet:1x16:0,0"
-  water_texture = "default_water_source_animated.png^[sheet:1x16:0,0"
-  river_water_texture = "default_river_water_source_animated.png^[sheet:1x16:0,0"
-elseif mcl2 then
-  lava_texture = "mcl_core_lava_source_animation.png^[sheet:1x16:0,0"
-  water_texture = "mcl_core_water_source_animation.png^[sheet:1x16:0,0^[multiply:#3F76E4"
-  river_water_texture = "mcl_core_water_source_animation.png^[sheet:1x16:0,0^[multiply:#0084FF"
-end
-
-logistica.register_reservoir("lava", "Lava", itemstrings.lava_bucket, lava_texture, itemstrings.lava_source, 8)
-logistica.register_reservoir("water", "Water", itemstrings.water_bucket, water_texture, itemstrings.water_source)
-logistica.register_reservoir("river_water", "River Water", itemstrings.river_water_bucket, river_water_texture, itemstrings.river_water_source)
--- milk buckets
-if minetest.registered_items["mcl_mobitems:milk_bucket"] then
-  logistica.register_reservoir("milk", "Milk", "mcl_mobitems:milk_bucket", "logistica_milk_liquid.png")
-end
-if minetest.registered_items["animalia:bucket_milk"] then
-  logistica.register_reservoir("milk", "Milk", "animalia:bucket_milk", "logistica_milk_liquid.png")
-end
-if minetest.registered_items["ethereal:bucket_cactus"] then
-  logistica.register_reservoir("cactus_pulp", "Cactus Pulp", "ethereal:bucket_cactus", "logistica_milk_liquid.png^[colorize:#697600:227")
-end
+logistica.compat_bucket_register_buckets()
 
 --------------------------------
 -- Passive Supply Chest

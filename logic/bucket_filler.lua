@@ -9,7 +9,7 @@ local buckets_to_names = nil
 local function get_all_buckets_to_names_list()
   if not buckets_to_names then
     buckets_to_names = logistica.table_to_list_indexed(
-      logistica.reservoir_get_all_buckets_to_names_map(),
+      logistica.reservoir_get_all_filled_buckets_to_names_map(),
       function (bucketName, liquidName)
         return { bucketName = bucketName, liquidName = liquidName }
       end
@@ -59,15 +59,18 @@ function logistica.take_item_from_bucket_filler(pos, stackToTake, network, colle
 
   local originalRequestedBuckets = stackToTake:get_count()
   local stackToTakeName = stackToTake:get_name()
-  local liquidName = logistica.reservoir_get_liquid_name_for_bucket(stackToTakeName)
+  local liquidName = logistica.reservoir_get_liquid_name_for_filled_bucket(stackToTakeName)
   if not liquidName then return { remaining = stackToTake:get_count(), error =  S("Unknown liquid: ")..liquidName } end
 
   local liquidInfo = logistica.get_liquid_info_in_network(pos, liquidName)
   local remainingRequest = math.min(liquidInfo.curr, originalRequestedBuckets)
   local unfillableBuckets = originalRequestedBuckets - remainingRequest
 
-  local filledBucketName = logistica.reservoir_get_full_bucket_for_liquid(liquidName)
-  local emptyBucketName = logistica.reservoir_get_empty_bucket_for_liquid(liquidName)
+  local filledBuckets = logistica.reservoir_get_full_buckets_for_liquid(liquidName)
+  if not filledBuckets[stackToTakeName] then return { remaining = stackToTake:get_count(), error =  S("Unknown filled bucket requested: ")..stackToTakeName } end
+  local filledBucketName = stackToTakeName
+  local emptyBucketName = logistica.reservoir_get_empty_bucket_for_full_bucket(stackToTakeName)
+  if not emptyBucketName then return { remaining = stackToTake:get_count(), error =  S("Unknown full bucket: ")..stackToTakeName } end
 
   -- first try to get the empty bucket from our internal inventory
   local inv = minetest.get_meta(pos):get_inventory()

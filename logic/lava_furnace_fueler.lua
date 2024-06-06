@@ -4,7 +4,7 @@ local META_TARGET_LAVA = "tarlava"
 local META_LAVA_IN_TANK = "lavam"
 
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
-local LAVA_LIQUID_NAME = "lava"
+local LAVA_LIQUID_NAME = logistica.liquids.lava
 
 local function get_lava_furnace_lava_in_tank(meta)
   return meta:get_int(META_LAVA_IN_TANK)

@@ -91,11 +91,16 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
-  output = itemstrings.lava_bucket,
-  type = "shapeless",
-  recipe = { L("lava_unit"), "bucket:bucket_empty" }
-})
+for filledBucket, _ in pairs(logistica.reservoir_get_full_buckets_for_liquid(logistica.liquids.lava)) do
+  local emptyBucket = logistica.reservoir_get_empty_bucket_for_full_bucket(filledBucket)
+  if minetest.registered_items[filledBucket] and minetest.registered_items[emptyBucket] then
+    minetest.register_craft({
+      output = filledBucket,
+      type = "shapeless",
+      recipe = { L("lava_unit"), emptyBucket }
+    })
+  end
+end
 
 minetest.register_craft({
   output = L("cobblegen_upgrade"),

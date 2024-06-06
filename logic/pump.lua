@@ -1,3 +1,5 @@
+local EMPTY_BUCKET = logistica.itemstrings.empty_bucket -- sort of weird, but we move liquids around in buckets, so we need some known "empty" bucket
+
 local PUMP_MAX_RANGE = logistica.settings.pump_max_range
 local PUMP_MAX_DEPTH = logistica.settings.pump_max_depth
 
@@ -89,8 +91,12 @@ local function get_valid_source(targetPosition, ownerName)
   local nodeDef = minetest.registered_nodes[node.name]
   if nodeDef.liquidtype ~= "source" then return nil end
 
-  local bucketName = logistica.reservoir_get_full_bucket_for_liquid(liquidName)
-  if not bucketName then return nil end
+  local bucketsName = logistica.reservoir_get_full_buckets_for_liquid(liquidName)
+  local bucketName = nil
+  for potentialBucket, _ in pairs(bucketsName) do
+    -- basically, try to pick the EMPTY_BUCKET, but if not present for some weird reason, pick any valid filled bucket
+    if bucketName ~= EMPTY_BUCKET then bucketName = potentialBucket end
+  end
 
   -- otherwise its valid
   local isRenewable = nodeDef.liquid_renewable ; if isRenewable == nil then isRenewable = true end -- default value is true, per api docs
@@ -126,7 +132,7 @@ end
 -- returns true if succeeded, false if not
 local function put_liquid_in_network_reservoirs(pumpPosition, bucketItemStack, network)
   if not network then return false end
-  local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketItemStack:get_name())
+  local liquidName = logistica.reservoir_get_liquid_name_for_filled_bucket(bucketItemStack:get_name())
   if not liquidName then return false end
   local amountInNetwork = logistica.get_liquid_info_in_network(pumpPosition, liquidName)
   local maxAmount = get_max_level(minetest.get_meta(pumpPosition))

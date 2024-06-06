@@ -1,12 +1,14 @@
 local S = logistica.TRANSLATOR
 
-local BUCKET_TO_NAME = {}
-local NAME_TO_BUCKET = {}
-local NAME_TO_EMPTY_BUCKET = {}
-local NAME_TO_DESC = {}
-local NAME_TO_TEXTURE = {}
-local NAME_TO_SOURCE = {}
-local SOURCE_TO_NAME = {}
+local FILLED_BUCKET_TO_NAME = {} -- { full_bucket_name = liquidName }
+local NAME_TO_FILLED_BUCKETS = {} -- { liquidName = { full_bucket_name = true, ... } }
+local FILLED_TO_EMPTY = {} -- { full_bucket_name = empty_bucket_name }
+local EMPTY_TO_FILLED = {} -- { empty_bucket_name = { liquidName = full_bucket_name } }
+local NAME_TO_EMPTY_BUCKETS = {} -- { liquidName = { emptyBucket = true, ... } }
+local NAME_TO_DESC = {} -- { liquidName = "Description of liquid" }
+local NAME_TO_TEXTURE = {} -- { liquidName = "texture_of_liquid" }
+local NAME_TO_SOURCE = {} -- { liquidName = source_node_name }
+local SOURCE_TO_NAME = {} -- { source_node_name = liquid_name }
 
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local EMPTY_SUFFIX = "_empty"
@@ -28,15 +30,29 @@ local function ends_with(str, ending)
   return ending == "" or string.sub(str, -#ending) == ending
 end
 
-local function get_empty_bucket_needed_for(liquidName)
-  local savedBucket = NAME_TO_EMPTY_BUCKET[liquidName]
-  if savedBucket then return savedBucket
-  else return EMPTY_BUCKET end
+local function get_empty_buckets_that_can_accept(liquidName)
+  local savedBuckets = NAME_TO_EMPTY_BUCKETS[liquidName]
+  if savedBuckets then return savedBuckets
+  else return {} end
 end
 
-local function get_full_bucket_needed_for(liquidName)
-  if liquidName == LIQUID_NONE then return BUCKET_ANY end
-  return NAME_TO_BUCKET[liquidName]
+local function does_full_bucket_match_liquid(fullBucketName, liquidName)
+  if liquidName == LIQUID_NONE then
+    return FILLED_BUCKET_TO_NAME[fullBucketName] ~= nil
+  end
+  local filledBuckets = NAME_TO_FILLED_BUCKETS[liquidName]
+  if not filledBuckets then return false end
+  return filledBuckets[fullBucketName] ~= nil
+end
+
+-- returns full bucket itemstack name, or nil if there isn't one (because empty can't hold liquid)
+local function get_filled_bucket_for_empty_and_liquid(emptyBucketName, liquidName)
+  local emptyBucketsForLiquid = NAME_TO_EMPTY_BUCKETS[liquidName]
+  if not emptyBucketsForLiquid then return nil end
+  if not emptyBucketsForLiquid[emptyBucketName] then return nil end
+  local potentialFilledBuckets = EMPTY_TO_FILLED[emptyBucketName]
+  if not potentialFilledBuckets then return nil end
+  return potentialFilledBuckets[liquidName]
 end
 
 local function get_empty_reservoir_name(nodeName, liquidName)
@@ -79,11 +95,21 @@ function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName
 end
 
 function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
-  BUCKET_TO_NAME[bucketName] = liquidName
-  NAME_TO_BUCKET[liquidName] = bucketName
-  if emptyBucketName then
-    NAME_TO_EMPTY_BUCKET[liquidName] = emptyBucketName
-  end
+  if not emptyBucketName then emptyBucketName = EMPTY_BUCKET end
+
+  FILLED_BUCKET_TO_NAME[bucketName] = liquidName
+
+  if not NAME_TO_FILLED_BUCKETS[liquidName] then NAME_TO_FILLED_BUCKETS[liquidName] = {} end
+  NAME_TO_FILLED_BUCKETS[liquidName][bucketName] = true
+
+  FILLED_TO_EMPTY[bucketName] = emptyBucketName
+
+  if not EMPTY_TO_FILLED[emptyBucketName] then EMPTY_TO_FILLED[emptyBucketName] = {} end
+  EMPTY_TO_FILLED[emptyBucketName][liquidName] = bucketName
+
+  if not NAME_TO_EMPTY_BUCKETS[liquidName] then NAME_TO_EMPTY_BUCKETS[liquidName] = {} end
+  NAME_TO_EMPTY_BUCKETS[liquidName][emptyBucketName] = true
+
   NAME_TO_DESC[liquidName] = liquidDesc
   NAME_TO_TEXTURE[liquidName] = liquidTexture
   if sourceNodeName then
@@ -106,15 +132,25 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
   local maxBuckets = nodeDef.logistica.maxBuckets
   local liquidDesc = logistica.reservoir_get_description_of_liquid(liquidName)
 
-  local emptyBucket = get_empty_bucket_needed_for(liquidName)
-  local fullBucket = get_full_bucket_needed_for(liquidName)
+  local isReservoirFull = liquidName ~= LIQUID_NONE
 
-  if itemStackName == emptyBucket then
+  local tryToFillBucket = false
+  local tryToEmptyBucket = false
+  if isReservoirFull then
+    local emptyBucketsForLiquid = get_empty_buckets_that_can_accept(liquidName)
+    if emptyBucketsForLiquid[itemStackName] then tryToFillBucket = true end
+  end
+  if not tryToFillBucket then
+    tryToEmptyBucket = does_full_bucket_match_liquid(itemStackName, liquidName)
+  end
+
+  if tryToFillBucket then
     if nodeLiquidLevel == 0 then
       -- make sure we swap this for the empty reservoir
       logistica.swap_node(pos, get_empty_reservoir_name(node.name, liquidName))
       return nil
     end
+    local fullBucket = get_filled_bucket_for_empty_and_liquid(itemStackName, liquidName)
     if not fullBucket then return nil end
 
     nodeLiquidLevel = nodeLiquidLevel - 1
@@ -135,10 +171,10 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
     end
 
     return ItemStack(fullBucket)
-  elseif fullBucket == BUCKET_ANY or itemStackName == fullBucket then
-    local newLiquidName = BUCKET_TO_NAME[itemStackName]
+  elseif tryToEmptyBucket then
+    local newLiquidName = FILLED_BUCKET_TO_NAME[itemStackName]
     if not newLiquidName then return nil end -- wasn't a bucket we can use
-    local newEmptyBucket = get_empty_bucket_needed_for(newLiquidName)
+    local newEmptyBucket = FILLED_TO_EMPTY[itemStackName]
     if not newEmptyBucket then return nil end
 
     nodeLiquidLevel = nodeLiquidLevel + 1
@@ -182,16 +218,11 @@ function logistica.reservoir_get_liquid_level(pos)
 end
 
 function logistica.reservoir_is_empty_bucket(bucketName)
-  if bucketName == EMPTY_BUCKET then return true end
-  for _, bucket in pairs(NAME_TO_EMPTY_BUCKET) do
-    if bucket == bucketName then return true end
-  end
-  return false
+  return EMPTY_TO_FILLED[bucketName] ~= nil
 end
 
 function logistica.reservoir_is_full_bucket(bucketName)
-  if BUCKET_TO_NAME[bucketName] ~= nil then return true end
-  return false
+  return FILLED_BUCKET_TO_NAME[bucketName] ~= nil
 end
 
 -- returns true if the itemname is a known empty or filled bucket that can be used in a reservoir
@@ -199,23 +230,35 @@ function logistica.reservoir_is_known_bucket(bucketName)
   return logistica.reservoir_is_empty_bucket(bucketName) or logistica.reservoir_is_full_bucket(bucketName)
 end
 
--- return the liquid name for the given bucket name, or nil if there's none registered
-function logistica.reservoir_get_liquid_name_for_bucket(bucketName)
-  return BUCKET_TO_NAME[bucketName]
+-- return the liquid name for the given filled bucket name, or nil if there's none registered
+function logistica.reservoir_get_liquid_name_for_filled_bucket(bucketName)
+  return FILLED_BUCKET_TO_NAME[bucketName]
 end
 
-function logistica.reservoir_get_all_buckets_to_names_map()
-  return table.copy(BUCKET_TO_NAME)
+function logistica.reservoir_get_all_filled_buckets_to_names_map()
+  return table.copy(FILLED_BUCKET_TO_NAME)
 end
 
 function logistica.reservoir_get_all_sources_to_names_map()
   return table.copy(SOURCE_TO_NAME)
 end
 
-function logistica.reservoir_get_empty_bucket_for_liquid(liquidName)
-  return get_empty_bucket_needed_for(liquidName)
+-- returns a list of empty buckets that can accept this liquid
+function logistica.reservoir_get_empty_buckets_that_can_accept(liquidName)
+  local emptyBuckets = NAME_TO_EMPTY_BUCKETS[liquidName]
+  if not emptyBuckets then return {} end
+  return table.copy(emptyBuckets)
 end
 
-function logistica.reservoir_get_full_bucket_for_liquid(liquidName)
-  return get_full_bucket_needed_for(liquidName)
+-- returns the empty bucket name corresponding to the filled bucket - or nil if the given filledBucketName isn't a full bucket
+function logistica.reservoir_get_empty_bucket_for_full_bucket(filledBucketName)
+  return FILLED_TO_EMPTY[filledBucketName]
+end
+
+-- returns a table {filledBucket = true, ...} of the filled buckets that can hold this liquid
+-- or empty table if there are none
+function logistica.reservoir_get_full_buckets_for_liquid(liquidName)
+  local filledBuckets = NAME_TO_FILLED_BUCKETS[liquidName]
+  if not filledBuckets then return {} end
+  return table.copy(filledBuckets)
 end

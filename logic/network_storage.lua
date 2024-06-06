@@ -48,7 +48,7 @@ function logistica.empty_bucket_into_network(network, bucketItemStack, dryRun)
   if not logistica.reservoir_is_full_bucket(bucketItemStack:get_name()) then return nil end
 
   local bucketName = bucketItemStack:get_name()
-  local liquidName = logistica.reservoir_get_liquid_name_for_bucket(bucketName)
+  local liquidName = logistica.reservoir_get_liquid_name_for_filled_bucket(bucketName)
 
   local highestReservoirPos = nil
   local emptyReservoirPos = nil

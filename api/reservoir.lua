@@ -213,11 +213,13 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
       def.light_source = optLight
       def.inventory_image = make_inv_image(variantName, liquidTexture)
 
-      minetest.register_node(nodeName, def)
-      logistica.register_non_pushable(nodeName)
-      logistica.GROUPS.reservoirs.register(nodeName)
+      if not minetest.registered_nodes[nodeName] then
+        minetest.register_node(nodeName, def)
+        logistica.register_non_pushable(nodeName)
+        logistica.GROUPS.reservoirs.register(nodeName)
 
-      minetest.register_node(nodeName.."_disabled", get_disabled_def(def))
+        minetest.register_node(nodeName.."_disabled", get_disabled_def(def))
+      end
 
       logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
     end

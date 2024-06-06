@@ -7,10 +7,6 @@ local META_LAVA_USED = "ufuel"
 
 local get_meta = minetest.get_meta
 
-local itemstrings = logistica.itemstrings
-
-local BUCKET_LAVA = itemstrings.lava_bucket
-local BUCKET_EMPTY = itemstrings.empty_bucket
 local LAVA_UNIT = "logistica:lava_unit"
 
 local INV_FUEL = "fuel"
@@ -22,14 +18,15 @@ local GUIDE_BTN = "guide"
 
 local UPDATE_INTERVAL = 1.0
 
+local function is_lava_bucket(itemstackName)
+  return logistica.reservoir_get_full_buckets_for_liquid(logistica.liquids.lava)[itemstackName] ~= nil
+end
+
 local function fill_lava_tank_from_fuel(pos, meta, inv)
   local itemstackName = inv:get_stack(INV_FUEL, 1):get_name()
-  if itemstackName ~= BUCKET_LAVA and itemstackName ~= LAVA_UNIT then return end
+  if not is_lava_bucket(itemstackName) and itemstackName ~= LAVA_UNIT then return end
 
-  local returnStack = ItemStack("")
-  if itemstackName == BUCKET_LAVA then
-    returnStack = ItemStack(BUCKET_EMPTY)
-  end
+  local returnStack = logistica.reservoir_get_empty_bucket_for_full_bucket(itemstackName) or ItemStack("")
   local currLevel = meta:get_int(META_LAVA_IN_TANK)
   local cap = logistica.lava_furnace_get_lava_capacity(pos)
   if cap - currLevel < 1000 then return end
@@ -288,10 +285,11 @@ end
 
 local function lava_furnace_allow_metadata_inv_put(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  local stackName = stack:get_name()
   if listname == INV_INPT or listname == INV_ADDI then
     return stack:get_count()
   elseif listname == INV_FUEL
-    and (stack:get_name() == BUCKET_LAVA or stack:get_name() == LAVA_UNIT) then
+    and (is_lava_bucket(stackName) or stackName == LAVA_UNIT) then
     return 1
   else
     return 0
