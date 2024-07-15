@@ -40,14 +40,15 @@ local function collect_items_into(pos, distance)
   end
 
   distance = distance + 0.5
-	local minPos = vector.subtract(pos, distance)
-	local maxPos = vector.add(pos, distance)
+  local minPos = vector.subtract(pos, distance)
+  local maxPos = vector.add(pos, distance)
   local inv = minetest.get_meta(pos):get_inventory()
-	for _, obj in pairs(minetest.get_objects_in_area(minPos, maxPos)) do
-		local entity = obj:get_luaentity()
-		if entity
+  for _, obj in pairs(minetest.get_objects_in_area(minPos, maxPos)) do
+    local entity = obj:get_luaentity()
+    if entity
       and entity.name == "__builtin:item"
-      and entity.itemstring ~= "" then
+      and entity.itemstring ~= ""
+      and not entity._removed then
       local itemStack = ItemStack(entity.itemstring)
       if inv:room_for_item(INV_MAIN, itemStack) then
         add_particle_effect_for_item_taken(obj:get_pos(), pos)
@@ -62,8 +63,8 @@ local function collect_items_into(pos, distance)
             return inserted
         end
       end
-		end
-	end
+    end
+  end
   if inserted > 0 then
     nodeDef.on_metadata_inventory_put(pos, nil, nil, nil, nil)
   end
