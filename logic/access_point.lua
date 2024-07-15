@@ -45,11 +45,12 @@ local get_meta = minetest.get_meta
 
 local function do_search_for(stackList, term, stackListSize)
   if not stackList or not term or term:gsub("%s+","") == "" then return stackList, stackListSize end
-  local match = function(stack) return string.find(stack:get_description(), term) ~= nil end
+  term = string.lower(term)
+  local match = function(stack) return string.find(string.lower(stack:get_description()), term) ~= nil end
   local grpS, grpE = term:find("group:")
   if grpS and grpS == 1 then
     local groupName = string.sub(term, grpE + 1)
-    match = function(stack) return minetest.get_item_group(stack:get_name(), groupName) > 0 end
+    match = function(stack) return minetest.get_item_group(string.lower(stack:get_name()), groupName) > 0 end
   end
   local res = {}
   local idx = 0
