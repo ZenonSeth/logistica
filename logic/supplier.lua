@@ -20,10 +20,15 @@ end
 -- returns an ItemStack of how many items were taken
 function logistica.take_item_from_supplier_simple(pos, stack)
   logistica.load_position(pos)
-  local meta = minetest.get_meta(pos)
-  local inv = meta:get_inventory()
-  local removed = inv:remove_item(META_SUPPLIER_LIST, stack)
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  local node = minetest.get_node(pos)
+  local removed = ItemStack("")
+  local network = logistica.get_network_or_nil(pos)
+  local collectFunc = function(st) removed:add_item(st); return 0 end
+  if logistica.GROUPS.crafting_suppliers.is(node.name) then
+    logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
+  else
+    logistica.take_item_from_supplier(pos, stack, network, collectFunc, false, false)
+  end
   return removed
 end
 
