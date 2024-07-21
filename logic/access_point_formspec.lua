@@ -55,11 +55,11 @@ local accessPointForms = {}
 
 -- creates the inv and returns the inv name
 local function get_or_create_detached_inventory(pos, playerName)
-  local hash = minetest.hash_node_position(pos)
-  if detachedInventories[hash] then
-    return detachedInventories[hash]
+  local posHash = logistica.get_rand_string_for(pos)
+  if detachedInventories[posHash] and detachedInventories[posHash][playerName] then
+    return detachedInventories[posHash][playerName]
   end
-  local invName = "Logistica_AP_"..logistica.get_rand_string_for(pos)..playerName
+  local invName = "Logistica_AP_"..posHash..playerName
   local inv = minetest.create_detached_inventory(invName, {
     allow_move = logistica.access_point_allow_move,
     allow_put = logistica.access_point_allow_put,
@@ -71,7 +71,8 @@ local function get_or_create_detached_inventory(pos, playerName)
   inv:set_size(INV_FAKE, FAKE_INV_SIZE)
   inv:set_size(INV_INSERT, 1)
   inv:set_size(INV_LIQUID, 1)
-  detachedInventories[hash] = invName
+  if not detachedInventories[posHash] then detachedInventories[posHash] = {} end
+  detachedInventories[posHash][playerName] = invName
   return invName
 end
 
@@ -432,7 +433,16 @@ function logistica.access_point_on_player_leave(playerName)
       if otherInfo.invName == info.invName then onlyRef = false end
     end
     if onlyRef then
-      minetest.remove_detached_inventory(info.invName)
+      local toRemForPlayer = {}
+      for posHash, tbl in pairs(detachedInventories) do
+        if tbl[playerName] then
+          toRemForPlayer[posHash] = true
+          minetest.remove_detached_inventory(info.invName)
+        end
+      end
+      for posHash, _ in pairs(toRemForPlayer) do
+        detachedInventories[posHash][playerName] = nil
+      end
     end
   end
   accessPointForms[playerName] = nil
