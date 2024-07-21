@@ -93,28 +93,40 @@ function logistica.take_stack_from_network(stackToTake, network, collectorFunc, 
   if not depth then depth = 0 end
   if depth > MAX_NETWORK_DEPTH_SEARCH then return ret(false, "Too many crafting suppliers recursively using each other, limit reached") end
   if not network then return ret(false, "No connected network") end
+
+  local takeStack = ItemStack(stackToTake)
+  local internalCollectorFunc = function(st)
+    local leftover = collectorFunc(st)
+    if leftover > 0 then
+      takeStack:set_count(0) -- because if there are leftover, we terminate early
+    else
+      takeStack:set_count(math.max(0, takeStack:get_count() - st:get_count()))
+    end
+    return leftover
+  end
+
   -- first check normal suppliers only
   local suppliersCheck =
-    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "normal")
-  if suppliersCheck.success then return ret(true) end
+    logistica.take_stack_from_suppliers(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "normal")
+  if takeStack:is_empty() or suppliersCheck.success then return ret(true) end
 
   -- then check storages
   local storageCheck = {success = false}
-  if stackToTake:get_stack_max() <= 1 then
-    storageCheck = logistica.take_stack_from_item_storage(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun)
+  if takeStack:get_stack_max() <= 1 then
+    storageCheck = logistica.take_stack_from_item_storage(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun)
   else
-    storageCheck = logistica.take_stack_from_mass_storage(stackToTake, network, collectorFunc, isAutomatedRequest, dryRun)
+    storageCheck = logistica.take_stack_from_mass_storage(takeStack, network, internalCollectorFunc, isAutomatedRequest, dryRun)
   end
-  if storageCheck.success then return ret(true) end
+  if takeStack:is_empty() or  storageCheck.success then return ret(true) end
 
   -- finally check bucket and crafting suppliers
   local bucketSuppliersCheck =
-    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "bucket")
-  if bucketSuppliersCheck.success then return ret(true) end
+    logistica.take_stack_from_suppliers(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "bucket")
+  if takeStack:is_empty() or  bucketSuppliersCheck.success then return ret(true) end
 
   local craftingSuppliersCheck =
-    logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "crafting")
-  if craftingSuppliersCheck.success then return ret(true) end
+    logistica.take_stack_from_suppliers(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "crafting")
+  if takeStack:is_empty() or  craftingSuppliersCheck.success then return ret(true) end
 
   -- iffy, but specific suppliers error are more important than mass storage ones
   if not bucketSuppliersCheck.success and bucketSuppliersCheck.error and bucketSuppliersCheck.error ~= "" then
