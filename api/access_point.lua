@@ -8,36 +8,6 @@ local function after_place_access_point(pos, placer, itemstack, numSlots, numUpg
   logistica.on_access_point_change(pos)
 end
 
-local function allow_access_point_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  return logistica.access_point_allow_put(pos, listname, index, stack, player)
-end
-
-local function allow_access_point_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  return logistica.access_point_allow_take(pos, listname, index, stack, player)
-end
-
-local function allow_access_point_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  return logistica.access_point_allow_move(pos, from_list, from_index, to_list, to_index, count, player)
-end
-
-local function on_access_point_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  logistica.access_point_on_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-end
-
-local function on_access_point_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  logistica.access_point_on_put(pos, listname, index, stack, player)
-end
-
-local function on_access_point_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
-  logistica.access_point_on_take(pos, listname, index, stack, player)
-end
-
 local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if minetest.is_protected(pos, clicker:get_player_name()) then return end
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
