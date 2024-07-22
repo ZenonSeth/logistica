@@ -280,9 +280,10 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
   end
   if listname == "filter" then
     if stack:get_stack_max() == 1 then return 0 end
+    local inv = minetest.get_meta(pos):get_inventory()
+    if not inv:get_stack("storage", index):is_empty() then return 0 end
     local copyStack = ItemStack(stack:get_name())
     copyStack:set_count(1)
-    local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack("filter", index, copyStack)
     logistica.update_cache_at_pos(pos, LOG_CACHE_MASS_STORAGE)
     return 0
