@@ -87,8 +87,12 @@ local function autocrafter_allow_metadata_inv_put(pos, listname, index, stack, p
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
     local st = inv:get_stack(listname, index)
-    st:add_item(stack)
-    inv:set_stack(listname, index, st)
+    if st:get_name() == stack:get_name() then
+      st:add_item(stack)
+      inv:set_stack(listname, index, st)
+    else
+      inv:set_stack(listname, index, stack)
+    end
     update_craft_output(inv)
     return 0
   end
@@ -112,11 +116,13 @@ end
 local function autocrafter_allow_metadata_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   if from_list == INV_DST and to_list == INV_SRC then return count end
+  if from_list == INV_CRAFT and to_list == INV_CRAFT then return count end
   return 0
 end
 
 local function autocrafter_on_inv_change(pos)
   local inv = minetest.get_meta(pos):get_inventory()
+  update_craft_output(inv)
   logistica.start_node_timer(pos, TIMER_SHORT)
 end
 

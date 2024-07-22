@@ -82,8 +82,12 @@ local function allow_craftsup_storage_inv_put(pos, listname, index, stack, playe
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
     local st = inv:get_stack(listname, index)
-    st:add_item(stack)
-    inv:set_stack(listname, index, st)
+    if st:get_name() == stack:get_name() then
+      st:add_item(stack)
+      inv:set_stack(listname, index, st)
+    else
+      inv:set_stack(listname, index, stack)
+    end
     update_craft_output(minetest.get_meta(pos):get_inventory())
     logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
   end
@@ -108,6 +112,7 @@ local function allow_craftsup_inv_take(pos, listname, index, stack, player)
 end
 
 local function allow_craftsup_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+  if from_list == INV_CRAFT and to_list == INV_CRAFT then return count end
   return 0
 end
 
@@ -117,6 +122,11 @@ local function on_craftsup_inventory_put(pos, listname, index, stack, player)
 end
 
 local function on_craftsup_inventory_take(pos, listname, index, stack, player)
+  update_craft_output(minetest.get_meta(pos):get_inventory())
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+end
+
+local function on_craftsup_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
   update_craft_output(minetest.get_meta(pos):get_inventory())
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
 end
@@ -176,6 +186,7 @@ function logistica.register_crafting_supplier(desc, name, tiles)
     allow_metadata_inventory_move = allow_craftsup_inv_move,
     on_metadata_inventory_put = on_craftsup_inventory_put,
     on_metadata_inventory_take = on_craftsup_inventory_take,
+    on_metadata_inventory_move = on_craftsup_inventory_move,
     can_dig = can_dig_craftsup,
     logistica = {
       on_power = on_craftsup_power,
