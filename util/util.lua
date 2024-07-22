@@ -12,6 +12,7 @@ dofile(path.."/ui.lua")
 dofile(path.."/sound.lua")
 dofile(path.."/inv_list_sorting.lua")
 dofile(path.."/inv_list_filtering.lua")
+dofile(path.."/inv_common.lua")
 dofile(path.."/compat_bucket.lua")
 
 -- bad debug

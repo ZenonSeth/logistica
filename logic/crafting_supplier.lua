@@ -8,29 +8,10 @@ local function ret(remaining, optError)
   return { remaining = remaining, error = optError and S(optError) or nil }
 end
 
-local function count_items_to_stack(list)
-	local map = {}
-	for _, stack in ipairs(list) do
-		if not stack:is_empty() then
-			local stName = stack:get_name()
-      if not map[stName] then map[stName] = 0 end
-			map[stName] = map[stName] + stack:get_count()
-		end
-	end
-  local items = {}
-  local i = 0
-	for name, count in pairs(map) do
-    i = i + 1
-    local item = ItemStack(name) ; item:set_count(count)
-    items[i] = item
-  end
-  return items
-end
-
 -- returns table { newList = listWithoutStack, takenStack = stackOfHowManyRemoved }
 local function list_without_stack(invList, takeStack)
   local newList = {}
-  local countedItems = count_items_to_stack(invList)
+  local countedItems = logistica.count_items_to_stack(invList)
   local takenStack = ItemStack(takeStack) ; takenStack:set_count(1)
   for _, v in pairs(countedItems) do
     if takeStack:get_count() > 0 and v:get_name() == takeStack:get_name() then
@@ -150,11 +131,13 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local numCrafted = 0
   local isEnough = false
 
+  local recipeItems = logistica.get_smart_craft_output_results(logistica.get_list(inv, INV_CRAFT)).requiredItems
+  if not recipeItems then ret(remaining) end
+
   local craftItemMult = 0
   repeat
     craftItemMult = craftItemMult + 1
     --
-    local recipeItems = count_items_to_stack(logistica.get_list(inv, INV_CRAFT))
     -- use the output of any previous loop iterations to make it available to take from - except for the item we have to send to requester
     local extrasListsMinusTarget = list_without_stack(logistica.get_list(inv, INV_HOUT), takeStack)
     local extrasMadeByCrafting = extrasListsMinusTarget.newList -- extra items output by the previous craft loops (aka substitutes)

@@ -12,18 +12,26 @@ local function count_items(list, existingMap)
 	return map
 end
 
+-- returns a name indexed map to count of items in the given list
+local function count_only_required_items(list)
+  local asList = logistica.get_smart_craft_output_results(list).requiredItems
+  if not asList then return {} end
+  local map = {}
+  for _, stack in ipairs(asList) do
+    map[stack:get_name()] = stack:get_count()
+  end
+  return map
+end
+
 -- returns {item = ItemStack, extras = {ItemStack, ItemStack...}}
 -- item is an empty Itemstack if not successful
 local function get_combined_crafting_ouputs(stacklist3x3)
-  local res, decr = minetest.get_craft_result({
-    method = "normal",
-    width = 3,
-    items = stacklist3x3
-  })
-  local item = res.item
+  local smartResult = logistica.get_smart_craft_output_results(stacklist3x3)
+  if not smartResult.output then return {item = ItemStack(), extras = {}} end
+  local item = smartResult.output
   local extraMap = {}
-  count_items(res.replacements or {}, extraMap)
-  count_items(decr.items or {}, extraMap)
+  count_items(smartResult.replacements or {}, extraMap)
+  count_items(smartResult.remainingDecrInput or {}, extraMap)
   local extras = {}
   local index = 0
   for stName, count in pairs(extraMap) do
@@ -41,7 +49,7 @@ end
 function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optSourceListName, outputListName)
   local recipeList = logistica.get_list(inv, recipeList3x3Name)
 
-  local craftRes = get_combined_crafting_ouputs(recipeList)
+  local craftRes = get_combined_crafting_ouputs(recipeList, true)
   if craftRes.item:is_empty() then return false end
 
   -- check if there's room for all the outputs
@@ -52,7 +60,7 @@ function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optS
 
   if optSourceListName ~= nil then
     -- check if source has enough materials
-    local recCounts = count_items(recipeList)
+    local recCounts = count_only_required_items(recipeList)
     local srcCounts = count_items(logistica.get_list(inv, optSourceListName))
     for name, count in pairs(recCounts) do
       if srcCounts[name] == nil or srcCounts[name] < count then return false end
