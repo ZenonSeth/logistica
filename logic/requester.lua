@@ -234,7 +234,7 @@ function logistica.insert_itemstack_for_requester(requesterPos, itemstack, limit
   local request = itemStackCount
   if limitByRequest then
     request = get_filter_request_for(inventories.requesterInventory, itemStackName)
-    toInsertStack:set_count(request)
+    toInsertStack:set_count(math.min(request, itemStackCount))
     toInsertStack = get_target_missing_item_stack(toInsertStack, inventories)
   end
   if toInsertStack:is_empty() then return itemStackCount end
