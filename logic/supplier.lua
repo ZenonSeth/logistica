@@ -17,22 +17,6 @@ function logistica.get_supplier_inv_size(pos)
   end
 end
 
--- returns an ItemStack of how many items were taken
-function logistica.take_item_from_supplier_simple(pos, stack)
-  logistica.load_position(pos)
-  local node = minetest.get_node(pos)
-  local removed = ItemStack("")
-  local network = logistica.get_network_or_nil(pos)
-  local collectFunc = function(st) removed:add_item(st); return 0 end
-  if logistica.GROUPS.crafting_suppliers.is(node.name) then
-    logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
-  else
-    logistica.take_item_from_supplier(pos, stack, network, collectFunc, false, false)
-  end
-  return removed
-end
-
-
 -- tries to put the given item in this supplier, returns what's leftover
 function logistica.put_item_in_supplier(pos, stack)
   local nodeName = minetest.get_node(pos).name

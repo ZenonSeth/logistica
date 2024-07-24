@@ -23,6 +23,22 @@ local function show_deposited_item_popup(player, numDeposited, name)
   logistica.show_popup(player:get_player_name(), "Stored "..numDeposited.." "..name, 1.5)
 end
 
+-- returns an ItemStack of how many items were taken
+local function take_item_from_supplier_for_mass_storage(pos, stack)
+  logistica.load_position(pos)
+  local node = minetest.get_node(pos)
+  local removed = ItemStack("")
+  local network = logistica.get_network_or_nil(pos)
+  local collectFunc = function(st) removed:add_item(st); return 0 end
+  if logistica.GROUPS.crafting_suppliers.is(node.name) then
+    -- no-op: it doesn't really make sense for mass storages too pull from crafting suppliers
+    -- logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
+  else
+    logistica.take_item_from_supplier(pos, stack, network, collectFunc, false, false)
+  end
+  return removed
+end
+
 --------------------------------
 -- public functions
 --------------------------------
@@ -107,7 +123,7 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
 
   local numTaken = 0
   for hash, _ in pairs(network.supplier_cache[requestStack:get_name()] or {}) do
-    local taken = logistica.take_item_from_supplier_simple(minetest.get_position_from_hash(hash), requestStack)
+    local taken = take_item_from_supplier_for_mass_storage(minetest.get_position_from_hash(hash), requestStack)
     numTaken = numTaken + taken:get_count()
     logistica.insert_item_into_mass_storage(pos, meta:get_inventory(), taken)
     if numTaken >= spaceForItems then return true end -- everything isnerted, return

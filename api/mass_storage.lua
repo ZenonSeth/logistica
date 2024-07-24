@@ -18,7 +18,7 @@ local FILTER_TOOLTIP = S("Place item to select what kind of item to store in eac
 local UPGRADE_TOOLTIP = S("Upgrade slots: The 4 slots to the right are for placing mass storage upgrades.")
 local STORAGE_TOOLTIP = S("Storage slots: items can be taken from them. To add items, put them in the input slot below.")
 local INPUT_TOOLTIP = S("Input slot: Place items here (or shift+click items to send them here) to put them in storage")
-local PULL_TOOLTIP = S("If ON, this mass storage will try to take items from connected suppliers, if it can store them.")
+local PULL_TOOLTIP = S("If ON, this mass storage will try to take stored items from Suppliers (except Crafting Suppliers) if it can store them.")
 
 local function get_sel_index(vals, selectedValue)
   for i, v in ipairs(vals) do if v == selectedValue then return i end end

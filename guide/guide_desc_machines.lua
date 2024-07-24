@@ -96,7 +96,7 @@ You can collectively access all Mass Storage on a particular network from an Acc
 - Select Front Image: Selects a stored node to display on the front of the storage node
 - Can Reserve a number of items per slot: Reserved items won't be taken by other machines on the network
 - Can quickly deposit items by punching it with a stack or sneak-punching it for deposit all stack items from your inventory
-- Pull items on/off: When On this storage will actively try to pull from Passive Supplier Chests]]
+- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.]]
 
 g.tool_chest = [[
 The Tool Chest provides a large number of storage slots -- but it can only store tools (specifically, items that have a max stack size of 1). The Tool Chest is also accessed by Requesters to provide items. Tool Chest cannot be dug while it contains items (unlike Mass Storage, which will keep its inventory)
