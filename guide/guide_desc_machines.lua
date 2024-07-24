@@ -149,15 +149,18 @@ To use an Inserter, you must:
 - Configure exactly which items to put in the target and how many - in the 4 upper slots. If not configured, nothing will be inserted.
 - Make sure you press the Enable button to enable operation
 - Request Inserters will request the configured items from the Network and try to keep its target's inventory full of at the minimum the specific items and the exact count. For example, a Request Inserter might be configured to target a Furnace's "fuel" inventory and always try to keep 2 Coal in it, while another request inserter targeting the same furnace, but it's "src" inventory can be configured to try and always keep 2 Iron Ore in it.
+- You can also check the "Inf" (short for "Infinite") checkbox to make the Request Inserter always request the item
 
-If the target inventory of has at least as many, or more, items as the requester is configured to put in it, the requester will not add any more.
+When the "Inf" checkbox below a slot is not checked, then the Inserter checks if the target inventory has at least as many items as the configured Inserter slot contains, and if there are fewer, then the requester will request the difference to try and reach the configured number.
+
+When the "Inf" checkbox below a slot is checked, then the Inserter won't check how many of that item are contained in the target inventory, but instead will request that amount of items every time interval (roughly every 1 second) and will attempt to put them in the target inventory, until there is no more room in that inventory.
 
 Request Inserters check for to obtain the items in the following order:
 
 - Any Suppliers (e.g. Passive Supply Chest, Vaccuum Chest, Cobble Gen Supplier or Crafting Supplier)
 - Mass Storage or Tool Box nodes (depending on the item needed)
 
-There's two variation of the Request Inserter, and as mentioned above in ALMOST ALL you only need the item-wise Inserter.
+There's two variation of the Request Inserter, and as mentioned above in almost all cases you only need the item-wise Inserter.
 
 - Item Request Inserter: Moves 1 item at a time to fulfil the requested items.
 - Stack Request Inserter: Moves up to 99 items at a time to fulfil the requested items. Note that this does not mean it will insert 99 items, but rather it can insert up to 99 - it will still only insert as many as are necessary to meet the target number set by the filter list.

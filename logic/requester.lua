@@ -1,6 +1,9 @@
 local TIMER_DURATION_SHORT = 1.0
 local TIMER_DURATION_LONG = 3.0
+local NUM_REQUEST_SLOTS = 4
 local META_REQUESTER_LISTNAME = "demtarlist"
+local META_REQUESTER_INF_REQ_ = "infreq"
+local INF_REQUEST_COUNT = 999
 local TARGET_NODES_REQUIRING_TIMER = {
   ["default:furnace"] = true,
   ["mcl_furnaces:furnace"] = true,
@@ -28,6 +31,11 @@ end
 
 local function is_prohibited_logistica_machine(name)
   return logistica.is_machine(name) and not logistica.GROUPS.bucket_emptiers.is(name)
+end
+
+-- returns true/false if the infinite state for the given slot is enabled
+local function get_requester_infinite_state(meta, i)
+  return meta:get_int(META_REQUESTER_INF_REQ_..i) > 0
 end
 
 local function get_max_rate_for_requester(pos)
@@ -94,6 +102,16 @@ local function get_next_requested_stack(pos, inventories)
   return logistica.get_list(inventories.requesterInventory, "actual")[nextSlot]
 end
 
+-- returns an index of which filter slot contains the named itemstack, or 0 if none do
+local function find_filter_slot_for_item(pos, itemstack)
+  local meta = get_meta(pos)
+  local list = logistica.get_list(meta:get_inventory(), "filter")
+  for i, v in ipairs(list) do
+    if v and v:get_name() == itemstack:get_name() then return i end
+  end
+  return 0
+end
+
 -- updates the inv list called 'actual' with the latest checked request
 local function update_requester_actual_request(pos)
   local inventories = get_valid_requester_and_target_inventory(pos)
@@ -106,7 +124,11 @@ local function update_requester_actual_request(pos)
   repeat
     if nextSlot <= 0 then return nil end
     local filterStack = logistica.get_list(requesterInv, "filter")[nextSlot]
-    requestStack = get_target_missing_item_stack(filterStack, inventories)
+    if get_requester_infinite_state(get_meta(pos), nextSlot) then
+      requestStack = filterStack
+    else
+      requestStack = get_target_missing_item_stack(filterStack, inventories)
+    end
     local demStackCount = requestStack:get_count()
     if demStackCount > 0 then
       local prev = actualRequestList[requestStack:get_name()] or 0
@@ -186,6 +208,22 @@ function logistica.get_requester_target_list(pos)
   return meta:get_string(META_REQUESTER_LISTNAME)
 end
 
+function logistica.requester_on_infinite_request_toggle(pos, i, state)
+  local meta = get_meta(pos)
+  local value = 0 ; if state == true then value = 1 end
+  meta:set_int(META_REQUESTER_INF_REQ_..i, value)
+end
+
+-- returns a naturally indexed list of true/false, specifying if 'infinite requesting' is enabled for a given slot
+function logistica.get_requester_inf_state(pos)
+  local vals = {}
+  local meta = get_meta(pos)
+  for i = 1, NUM_REQUEST_SLOTS do
+    vals[i] = get_requester_infinite_state(meta, i)
+  end
+  return vals
+end
+
 -- function logistica.update_requester_request(requesterPos)
 --   local meta = get_meta(requesterPos)
 --   local inventories = get_valid_requester_and_target_inventory(requesterPos)
@@ -231,18 +269,27 @@ function logistica.insert_itemstack_for_requester(requesterPos, itemstack, limit
   local targetList = inventories.targetList
 
   local toInsertStack = ItemStack(itemstack)
-  local request = itemStackCount
+  local needed = itemStackCount
   if limitByRequest then
-    request = get_filter_request_for(inventories.requesterInventory, itemStackName)
-    toInsertStack:set_count(math.min(request, itemStackCount))
-    toInsertStack = get_target_missing_item_stack(toInsertStack, inventories)
+    needed = get_filter_request_for(inventories.requesterInventory, itemStackName)
+    toInsertStack:set_count(math.min(needed, itemStackCount))
+    if not get_requester_infinite_state(
+        get_meta(requesterPos),
+        find_filter_slot_for_item(requesterPos, toInsertStack)
+      )
+    then
+      toInsertStack = get_target_missing_item_stack(toInsertStack, inventories)
+    end
+    toInsertStack:set_count(math.min(needed, toInsertStack:get_count()))
   end
   if toInsertStack:is_empty() then return itemStackCount end
+  minetest.log("toInsertStack = "..toInsertStack:to_string())
 
   local leftover = targetInventory:add_item(targetList, toInsertStack)
+  minetest.log("leftover: "..leftover:to_string()..", itemStackCount = "..itemStackCount..", needed = "..needed)
   local targetNode = minetest.get_node(inventories.targetPos)
   if leftover:get_count() < toInsertStack:get_count() and TARGET_NODES_REQUIRING_TIMER[targetNode.name] then
     logistica.start_node_timer(inventories.targetPos, 1)
   end
-  return leftover:get_count() + itemStackCount - request
+  return leftover:get_count() + itemStackCount - needed
 end
