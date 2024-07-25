@@ -19,7 +19,7 @@ local water_texture = "default_water.png"
 local river_water_texture = "default_river_water.png"
 
 local mcla = minetest.get_game_info().id == "mineclonia"
-local mcl2 = minetest.get_game_info().id == "mineclone2"
+local mcl2 = minetest.get_game_info().id == "VoxeLibre"
 if mcla then
   lava_texture = "default_lava_source_animated.png^[sheet:1x16:0,0"
   water_texture = "default_water_source_animated.png^[sheet:1x16:0,0"
