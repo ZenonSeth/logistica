@@ -33,6 +33,7 @@ end
 -- These have special meaning and are treated with special actions. Each node group above must
 -- map to one network group, though multiple node groups can map to the same network group<br>
 -- More can be registered via logistica.network_group_register
+-- NOTE: For display purposes, this needs to be kept in sync with the hyperspanner_advanced_use code
 logistica.NETWORK_GROUPS = {
   cables = "cables",
   requesters = "requesters",
@@ -45,6 +46,20 @@ logistica.NETWORK_GROUPS = {
   reservoirs = "reservoirs",
   wireless_transmitters = "wireless_transmitters",
   wireless_receivers = "wireless_receivers",
+}
+
+local NETWORK_GROUP_NAMES = {
+  cables = "Cables",
+  requesters = "Request Inserters",
+  injectors = "Network Importers",
+  suppliers = "Suppliers",
+  mass_storage = "Mass Storages",
+  item_storage = "Item Storages",
+  misc = "Misc Machines",
+  trashcans = "Trashcans",
+  reservoirs = "Reservoirs",
+  wireless_transmitters = "Wireless Transmitter",
+  wireless_receivers = "Wireless Receivers",
 }
 
 -- The default node groups of Logistica, with utility shorthand attached.<br>
@@ -178,6 +193,12 @@ end
 function logistica.network_group_exists(group_name)
   local lname = group_name:lower():gsub(" ", "")
   return network_groups[lname] ~= nil
+end
+
+-- returns a readible, user-friendly name, or empty string if the groupName is not valid
+function logistica.get_network_group_description(groupName)
+  if not groupName or not type(groupName) == "string" then return "" end
+  return NETWORK_GROUP_NAMES[groupName] or ""
 end
 
 ----------------------------------------------------------------
