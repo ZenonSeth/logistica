@@ -3,27 +3,46 @@ local S = logistica.TRANSLATOR
 
 local PULL_LIST_PICKER = "pull_pick"
 local ON_OFF_BUTTON = "on_off_btn"
+local CBX_REQ = "cbxreq"
+local CBX_MAS = "cbxmas"
+local CBX_SUP = "cbxsup"
+local CBX_TRA = "cbxtra"
+
 local FORMSPEC_NAME = "logistica_storinject"
 local NUM_FILTER_SLOTS = 8
 
+local PUT_INTO_TOOLTIP = S("Select what types of machines this Importer will put items into.\nMachine priority is from top to bottom, e.g. Trashcans, if enabled,\nare always the last machine type that items are put into.")
+
 local injectorForms = {}
+
+local function get_add_into_section(pos, x, y)
+  local chst = function(idx) if logistica.injector_get_put_into_state(pos, idx) == true then return "true" else return "false" end end
+  return
+    "label["..(x)..","..(y + 0.5)..";Put in (?):]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.0)..";"..CBX_REQ..";Requesters;"..chst(1).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.4)..";"..CBX_MAS..";Mass/Item Storage;"..chst(2).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.8)..";"..CBX_SUP..";Supply Chests;"..chst(3).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 1.2)..";"..CBX_TRA..";Trashcans;"..chst(4).."]"..
+    "tooltip["..(x)..","..(y + 0.2)..";1,0.6;"..PUT_INTO_TOOLTIP.."]"
+end
 
 local function get_injector_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local pullPos = logistica.get_injector_target(pos)
   local selectedList = logistica.get_injector_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
-  return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.7, 8.75).."]" ..
+  return "formspec_version[4]"..
+    "size["..logistica.inv_size(10.7, 9.45).."]"..
     logistica.ui.background..
     "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
     "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
-    logistica.player_inv_formspec(0.5,3.3)..
+    logistica.player_inv_formspec(0.5,4.0)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.5, pullPos, selectedList, S("Take items from:"))..
-    logistica.ui.on_off_btn(isOn, 4.5, 2.3, ON_OFF_BUTTON, S("Enable"))
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.8, pullPos, selectedList, S("Take items from:"))..
+    logistica.ui.on_off_btn(isOn, 4.0, 2.6, ON_OFF_BUTTON, S("Enable"))..
+    get_add_into_section(pos, 6.5, 2.3)
 end
 
 local function show_injector_formspec(playerName, pos)
@@ -47,7 +66,15 @@ local function on_player_receive_fields(player, formname, fields)
   elseif fields[ON_OFF_BUTTON] then
     logistica.toggle_machine_on_off(pos)
     show_injector_formspec(player:get_player_name(), pos)
-  elseif fields[PULL_LIST_PICKER] then
+  elseif fields[CBX_REQ] ~= nil then
+    logistica.injector_set_put_into_state(pos, 1, fields[CBX_REQ])
+  elseif fields[CBX_MAS] ~= nil then
+    logistica.injector_set_put_into_state(pos, 2, fields[CBX_MAS])
+  elseif fields[CBX_SUP] ~= nil then
+    logistica.injector_set_put_into_state(pos, 3, fields[CBX_SUP])
+  elseif fields[CBX_TRA] ~= nil then
+    logistica.injector_set_put_into_state(pos, 4, fields[CBX_TRA])
+  elseif fields[PULL_LIST_PICKER] then -- this has to be last, because its always sent
     local selected = fields[PULL_LIST_PICKER]
     if logistica.is_allowed_pull_list(selected) then
       logistica.set_injector_target_list(pos, selected)

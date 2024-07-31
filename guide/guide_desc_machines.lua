@@ -119,15 +119,18 @@ To get a Network Importer working you must:
 - Select which inventory of the target node to take from - some nodes have multiple inventories, and one must be selected.
 - Make sure you press the Enable button to enable its functionality.
 - Optionally, you can configure the importer to only pull specific items by placing them in the Filter List. If the list is empty, the importer will indiscriminately attempt to pull any item, slot by slot, from its input node.
+- Optionally, select which machine types the importer will try to insert items into.
 
 Network importers scan 1 slot, and rotate which slot they take from each time they tick.
 
-Network Importers prioritize where they put their items in this order:
+Network Importers prioritize where they put their items in this order, assuming the type of machine to import into is enabled in the Importer's interface:
 
 - Fill the requests of any Requesters on the network
-- Fill any Mass Storage that can handle this item
+- Fill any Mass or Item Storages (depending on whether item is stackable or not) that can handle this item
 - Fill any passive supply chests (if the chests are configured to accept items from the network)
 - Trash the item if there's any Trashcans connected that accept this kind of item. (see Trashcan)
+
+Using the Importer's GUI, you can enable or disable each of the 4 types of machines to import items into, and any disabled won't be added into. If no machine type is enabled to import into, then the Importer won't add any items at all. Note that even when a machine type is enabled, the Importer obeys the configuration of those machines, e.g. if a Passive Supply Chest is marked as "Don't allow storing from network" then the importer won't add into it.
 
 There's 2 version of the Network Importer:
 

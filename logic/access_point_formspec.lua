@@ -380,7 +380,7 @@ function logistica.access_point_on_put(inv, listname, index, stack, player)
   end
   if listname == INV_INSERT then
     local stackToAdd = inv:get_stack(listname, index)
-    local leftover = logistica.insert_item_in_network(stackToAdd, networkId, false, true)
+    local leftover = logistica.insert_item_in_network(stackToAdd, networkId, false, false, false, false, true)
     stack:set_count(leftover)
     local error = nil
     if not stack:is_empty() then

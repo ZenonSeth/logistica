@@ -284,7 +284,7 @@ function logistica.insert_item_into_item_storage(pos, inv, inputStack, dryRun)
 end
 
 -- attempts to insert the given itemstack in the network, returns how many items remain
-function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreTrashcans)
+function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRequesters, ignoreStorages, ignoreSuppliers, ignoreTrashcans)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not itemstack or itemstack:is_empty() then return 0 end
   if not network then return itemstack:get_count() end
@@ -292,42 +292,48 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreTr
   local workingStack = ItemStack(itemstack)
 
   -- check requesters first
-  local listOfRequestersInNeedOfItem = network.requester_cache[itemstack:get_name()] or {}
-  for hash, _ in pairs(listOfRequestersInNeedOfItem) do
-    local pos = h2p(hash)
-    logistica.load_position(pos)
-    local leftover = logistica.insert_itemstack_for_requester(pos, workingStack, true)
-    if leftover <= 0 then return 0 end -- we took all items
-    workingStack:set_count(leftover)
+  if not ignoreRequesters then
+    local listOfRequestersInNeedOfItem = network.requester_cache[itemstack:get_name()] or {}
+    for hash, _ in pairs(listOfRequestersInNeedOfItem) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local leftover = logistica.insert_itemstack_for_requester(pos, workingStack, true)
+      if leftover <= 0 then return 0 end -- we took all items
+      workingStack:set_count(leftover)
+    end
   end
 
   -- check storages
-  local storages = {}
-  local addFunc = nil
-  if itemstack:get_stack_max() <= 1 then
-    storages = network.item_storage
-    addFunc = logistica.insert_item_into_item_storage
-  else
-    storages = network.storage_cache[itemstack:get_name()] or {}
-    addFunc = logistica.insert_item_into_mass_storage
-  end
-  for hash, _ in pairs(storages) do
-    local pos = h2p(hash)
-    logistica.load_position(pos)
-    local inv = get_meta(pos):get_inventory()
-    local remainingStack = addFunc(pos, inv, workingStack, dryRun)
-    if remainingStack:is_empty() then return 0 end -- we took all items
-    workingStack = remainingStack
+  if not ignoreStorages then
+    local storages = {}
+    local addFunc = nil
+    if itemstack:get_stack_max() <= 1 then
+      storages = network.item_storage
+      addFunc = logistica.insert_item_into_item_storage
+    else
+      storages = network.storage_cache[itemstack:get_name()] or {}
+      addFunc = logistica.insert_item_into_mass_storage
+    end
+    for hash, _ in pairs(storages) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local inv = get_meta(pos):get_inventory()
+      local remainingStack = addFunc(pos, inv, workingStack, dryRun)
+      if remainingStack:is_empty() then return 0 end -- we took all items
+      workingStack = remainingStack
+    end
   end
 
   -- try to add to passive suppliers that accept this
-  local suppliers = network.suppliers
-  for hash, _ in pairs(suppliers) do
-    local pos = h2p(hash)
-    logistica.load_position(pos)
-    local leftover = logistica.put_item_in_supplier(pos, workingStack)
-    if leftover:is_empty() then return 0 end
-    workingStack = leftover
+  if not ignoreSuppliers then
+    local suppliers = network.suppliers
+    for hash, _ in pairs(suppliers) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local leftover = logistica.put_item_in_supplier(pos, workingStack)
+      if leftover:is_empty() then return 0 end
+      workingStack = leftover
+    end
   end
 
   -- [Keep this last] delete the item if any trashcan accepts it

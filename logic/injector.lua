@@ -1,4 +1,5 @@
 local META_INJECTOR_LISTNAME = "tarinjlist"
+local META_PUT_INTO_PREFIX = "putinto"
 local TIMER_DURATION_SHORT = 1
 local TIMER_DURATION_LONG = 3
 
@@ -13,6 +14,10 @@ local function get_injector_rate(nodeName)
     return def.logistica.injector_transfer_rate
   end
   return 0
+end
+
+local function get_put_into_state(meta, index)
+  return meta:get_int(META_PUT_INTO_PREFIX..index) == 0 --check if == 0 because by default we assume all are on
 end
 
 local function get_next_injector_filtered_slot(targetMeta, targetList, targetInv, injInv)
@@ -85,11 +90,30 @@ function logistica.on_injector_timer(pos, elapsed)
   local targetStackSize = copyStack:get_count()
   local numToTake = math.min(targetStackSize, maxStack)
   copyStack:set_count(numToTake)
-  local numRemaining = logistica.insert_item_in_network(copyStack, networkId)
+  local numRemaining = logistica.insert_item_in_network(
+      copyStack,
+      networkId,
+      false,
+      not get_put_into_state(meta, 1),
+      not get_put_into_state(meta, 2),
+      not get_put_into_state(meta, 3),
+      not get_put_into_state(meta, 4)
+    )
   numRemaining = targetStackSize - numToTake + numRemaining
   copyStack:set_count(numRemaining)
   targetInv:set_stack(targetList, targetSlot, copyStack)
 
   logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
   return false
+end
+
+-- returns true/false
+function logistica.injector_get_put_into_state(pos, index)
+  return get_put_into_state(get_meta(pos), index)
+end
+
+-- state must be "true"/"false" as a string
+function logistica.injector_set_put_into_state(pos, index, state)
+  local value = 1 ; if state == "true" then value = 0 end
+  return get_meta(pos):set_int(META_PUT_INTO_PREFIX..index, value)
 end
