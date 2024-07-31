@@ -36,7 +36,8 @@ If you need more range, just place it in a Wireless Upgrader and repeat the upgr
 g.hyperspanner = [[
 A multipurpose engineering tool.
 
-- Use it on Logistica nodes to get information about which network, if any, the node is connected to. This does not use or damage the Hyperspanner.
+- Use (right-click on PC) it on Logistica nodes to get information about which network, if any, the node is connected to. This does not use or damage the Hyperspanner.
+- Sneak + Use it on a Logistica node to get more information about the network, if any, to which the machine is connected to.
 
 - Combined with a Photonizer or a Photonizer (Reversed Polarity) in the crafting grid, it will turn one into the other. This does not use or damage the Hyperspanner.
 ]]
