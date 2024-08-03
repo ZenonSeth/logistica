@@ -8,4 +8,4 @@ The core principle behind this mod is that item transportation is demand-driven:
 Available for download at ContentDB: https://content.minetest.net/packages/ZenonSeth/logistica/
 
 # Guide
-An in-game and online guide to all Logistica machiens are available, see: https://github.com/ZenonSeth/logistica/wiki
+An in-game and online guide to all Logistica machines are available, see: https://github.com/ZenonSeth/logistica/wiki
