@@ -462,3 +462,7 @@ function logistica.access_point_on_dug(pos)
     logistica.access_point_on_player_leave(playerName)
   end
 end
+
+function logistica.access_point_is_player_using_ap(playerName)
+  return accessPointForms[playerName] ~= nil
+end
