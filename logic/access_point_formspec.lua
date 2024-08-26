@@ -325,7 +325,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
     -- either way, only allow taking up to stack max
     stack:set_count(math.min(stack:get_count(), stackMax))
     -- remove the sometimes manually added count display
-    stack:get_meta():set_string("count_meta", nil)
+    stack:get_meta():set_string("count_meta", "")
     if stackMax > 1 then
       local taken = ItemStack("")
       local acceptTaken = function(st) taken:add_item(st); return 0 end
