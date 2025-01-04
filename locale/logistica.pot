@@ -1604,13 +1604,13 @@ msgstr ""
 #: item/storage_upgrade.lua:7
 msgid ""
 "Silverin Storage Upgrade\n"
-"Adds 1024 Mass Storage Slot Capacity"
+"Adds 512 Mass Storage Slot Capacity"
 msgstr ""
 
 #: item/storage_upgrade.lua:14
 msgid ""
 "Diamond Storage Upgrade\n"
-"Adds 2048 Mass Storage Slot Capacity"
+"Adds 1024 Mass Storage Slot Capacity"
 msgstr ""
 
 #: logic/access_point.lua:10
