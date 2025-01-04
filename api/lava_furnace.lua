@@ -1,4 +1,5 @@
 local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local META_LAVA_IN_TANK = "lavam"
 local META_RUNNING_TIME = "cktm"
@@ -133,7 +134,7 @@ local function get_lava_img(currLava, lavaPercent)
   else
     img = "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png]"
   end
-  return img.."tooltip[0.4,1.4;1,3;"..S("Remaining: ")..(currLava/1000)..S(" Buckets").."]"
+  return img.."tooltip[0.4,1.4;1,3;"..FS("Remaining: ")..(currLava/1000)..FS(" Buckets").."]"
 end
 
 local function common_formspec(pos, meta)
@@ -149,10 +150,10 @@ local function common_formspec(pos, meta)
       "list[context;src;2.2,2.3;1,1;0]"..
       "list[context;dst;7.8,2.3;2,2;0]"..
       "list[context;input;4.3,0.9;2,1;0]"..
-      "label[0.5,1.1;Lava]"..
-      "label[4.2,0.5;Additives]"..
-      "label[2.0,4.8;"..S("Crafts unique recipes (click ? button in top right)").."]"..
-      "label[2.0,5.2;"..S("and can also cook regular recipes at twice the speed").."]"..
+      "label[0.5,1.1;"..FS("Lava").."]"..
+      "label[4.2,0.5;"..FS("Additives").."]"..
+      "label[2.0,4.8;"..FS("Crafts unique recipes (click ? button in top right)").."]"..
+      "label[2.0,5.2;"..FS("and can also cook regular recipes at twice the speed").."]"..
       "listring[context;dst]"..
       "listring[current_player;main]"..
       "listring[context;src]"..
@@ -160,7 +161,7 @@ local function common_formspec(pos, meta)
       "listring[context;fuel]"..
       "listring[current_player;main]"..
       "button[9.2,0.4;0.8,0.8;"..GUIDE_BTN..";?]"..
-      "tooltip["..GUIDE_BTN..";"..S("Recipes").."]"..
+      "tooltip["..GUIDE_BTN..";"..FS("Recipes").."]"..
       get_lava_img(currLava, lavaPercent)
 end
 
@@ -340,7 +341,7 @@ The Lava Furnace does not require nor does it connect to any networks - but it c
 function logistica.register_lava_furnace(desc, name, lavaCapacity, combinedTiles)
   local lname = name:gsub("%s", "_"):lower()
   local def = {
-    description = S(desc),
+    description = desc,
     drawtype = "nodebox",
     tiles = combinedTiles.inactive,
     node_box = {

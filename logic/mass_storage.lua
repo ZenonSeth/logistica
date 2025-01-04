@@ -1,3 +1,5 @@
+local S = logistica.TRANSLATOR
+
 local META_IMG_PIC = "logimgpick"
 local META_RES_VAL = "logresval"
 local META_UPGRADE_ADD = "logstorupgr"
@@ -20,7 +22,7 @@ local function mass_storage_room_for_item(pos, meta, stack)
 end
 
 local function show_deposited_item_popup(player, numDeposited, name)
-  logistica.show_popup(player:get_player_name(), "Stored "..numDeposited.." "..name, 1.5)
+  logistica.show_popup(player:get_player_name(), S("Stored ")..numDeposited.." "..name, 1.5)
 end
 
 -- returns an ItemStack of how many items were taken
@@ -239,14 +241,14 @@ end
 
 function logistica.get_mass_storage_imgname_or_first_item(meta)
   local inv = meta:get_inventory()
-  if inv:is_empty("filter") then return "\n(Empty)" end
+  if inv:is_empty("filter") then return S("\n(Empty)") end
   local index = meta:get_int(META_IMG_PIC)
   local itemStack = inv:get_stack("filter", index)
-  if not itemStack:is_empty() then return "\n(Has: "..itemStack:get_description()..")" end
+  if not itemStack:is_empty() then return S("\n(Has: ")..itemStack:get_description()..")" end
   for _, v in ipairs(logistica.get_list(inv, "filter")) do
-    if not v:is_empty() then return "\n(Has: "..v:get_description()..")" end
+    if not v:is_empty() then return S("\n(Has: ")..v:get_description()..")" end
   end
-  return "\n(Empty)"
+  return S("\n(Empty)")
 end
 
 function logistica.is_valid_storage_upgrade(stackName)

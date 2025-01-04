@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local INV_SRC = "src"
 local INV_DST = "dst"
@@ -43,10 +42,10 @@ local function get_formspec(pos, _isOn)
     "listring[context;src]"..
     "listring[current_player;main]"..
     "listring[context;dst]"..
-    "label[1.4,0.3;"..S("Recipe").."]"..
-    "label[7.3,0.3;"..S("Output").."]"..
-    "label[4.9,4.7;"..S("Input").."]"..
-    logistica.ui.on_off_btn(isOn, 4, 3.3, ON_OFF_BTN, S("Enable"))
+    "label[1.4,0.3;"..FS("Recipe").."]"..
+    "label[7.3,0.3;"..FS("Output").."]"..
+    "label[4.9,4.7;"..FS("Input").."]"..
+    logistica.ui.on_off_btn(isOn, 4, 3.3, ON_OFF_BTN, FS("Enable"))
 end
 
 --------------------------------
@@ -153,7 +152,7 @@ The Autocrafter does not connect to networks, but it can be tnteracted with usin
 function logistica.register_autocrafter(desc, name, tiles)
   local lname = name:gsub("%s", "_"):lower()
   local def = {
-    description = S(desc),
+    description = desc,
     tiles = tiles,
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2 },

@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 local T = minetest.get_translated_string
 
 local FORMSPEC = "lavafunguide"
@@ -32,23 +32,23 @@ local function get_guide_formspec(currPage, langCode)
     "size[10.5,7.5]" ..
       logistica.ui.background_lava_furnace..
       "item_image[0.4,4.5;1,1;"..logistica.itemstrings.lava_bucket.."]"..
-      "tooltip[0.4,0.8;1,5.1;"..S("Lava Furnace can only use Lava as fuel").."]"..
+      "tooltip[0.4,0.8;1,5.1;"..FS("Lava Furnace can only use Lava as fuel").."]"..
       "item_image[2.2,2.3;1,1;"..recipe.name.."]"..--src
-      "tooltip[2.2,2.3;1,1;"..T(langCode, srcItem:get_short_description()).."]"..
+      "tooltip[2.2,2.3;1,1;"..minetest.formspec_escape(T(langCode, srcItem:get_short_description())).."]"..
       "item_image[7.8,2.3;1,1;"..tostring(recipe.recipe.output).."]"..--dst
-      "tooltip[7.8,2.3;1,1;"..T(langCode, dstItem:get_short_description()).."]"..
+      "tooltip[7.8,2.3;1,1;"..minetest.formspec_escape(T(langCode, dstItem:get_short_description())).."]"..
       "item_image[4.3,0.9;1,1;"..tostring(recipe.recipe.additive).."]"..--add
-      "tooltip[4.3,0.9;1,1;"..T(langCode, addItem:get_short_description()).."]"..
+      "tooltip[4.3,0.9;1,1;"..minetest.formspec_escape(T(langCode, addItem:get_short_description())).."]"..
       "image[4,2.3;3,1;logistica_lava_furnace_arrow_bg.png^[transformR270]"..
       "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png]"..
-      "label[0.7,1.1;"..S("Lava").."]"..
-      "label[4.2,0.5;"..S("Additives").." : "..S("Use Chance: ")..tostring(recipe.recipe.additive_use_chance).."%]"..
-      "label[2.4,2.0;"..S("Input").."]"..
-      "label[8.0,2.0;"..S("Output").."]"..
+      "label[0.7,1.1;"..FS("Lava").."]"..
+      "label[4.2,0.5;"..FS("Additives").." : "..FS("Use Chance: ")..tostring(recipe.recipe.additive_use_chance).."%]"..
+      "label[2.4,2.0;"..FS("Input").."]"..
+      "label[8.0,2.0;"..FS("Output").."]"..
       "button[0.5,6.0;1,1;"..PREV_BTN..";<]"..
       "button[9.0,6.0;1,1;"..NEXT_BTN..";>]"..
-      "label[4.4,5.5;"..S("Lava Furnace Recipes").."]"..
-      "label[4.8,6.5;"..S("Page: ")..tostring(currPage).." / "..tostring(numInternalRecipes).."]"
+      "label[4.4,5.5;"..FS("Lava Furnace Recipes").."]"..
+      "label[4.8,6.5;"..FS("Page: ")..tostring(currPage).." / "..tostring(numInternalRecipes).."]"
 end
 
 local function guide_receive_fields(player, formname, fields)

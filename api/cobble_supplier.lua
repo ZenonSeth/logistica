@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_cobblegen"
 local ON_OFF_BUTTON = "on_off_btn"
@@ -12,7 +11,7 @@ local DEFAULT_GEN_RATE = 1
 local DEFAULT_MULT_PER_UPGRADE = 2
 local COBBLESTONE = logistica.itemstrings.cobble
 
-local UPGRADE_TOOLTIP = S("Upgrade slots: The 2 slots to the right are for placing cobble generator upgrades.")
+local UPGRADE_TOOLTIP = FS("Upgrade slots: The 2 slots to the right are for placing cobble generator upgrades.")
 
 local TIMER_SHORT = 2
 local TIMER_LONG = 4
@@ -41,13 +40,13 @@ local function get_cobblegen_formspec(pos)
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.5, 8.5).."]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 0.4, 1.3, ON_OFF_BUTTON, S("Enable"))..
+    logistica.ui.on_off_btn(isOn, 0.4, 1.3, ON_OFF_BUTTON, FS("Enable"))..
     logistica.player_inv_formspec(0.4, 2.9)..
     "list["..posForm..";"..INV_UPG..";7.8,1.1;2,1;0]"..
     "listring["..posForm..";"..INV_DST.."]"..
     "listring[current_player;main]"..
     "list["..posForm..";"..INV_DST..";2.9,1.1;2,1;0]"..
-    "label[0.4,0.5;"..S("Generates Cobblestone and passively supplies it to Network").."]"..
+    "label[0.4,0.5;"..FS("Generates Cobblestone and passively supplies it to Network").."]"..
     "image[6.6,1.1;1,1;logistica_icon_upgrade.png]"..
     "tooltip[6.6,1.1;1,1;"..UPGRADE_TOOLTIP.."]"
 end

@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local PUMP_MAX_RANGE = logistica.settings.pump_max_range
 local PUMP_MAX_DEPTH = logistica.settings.pump_max_depth
@@ -29,14 +29,14 @@ local function get_pump_formspec(pos, _isOn)
   return "formspec_version[4]"..
     "size["..logistica.inv_size(10.5, 5.0).."]" ..
     logistica.ui.background..
-    "label[0.4,0.4;"..S("Pumps liquids directly into neighbouring reservoirs (one on each side)").."]"..
-    "label[0.4,0.8;"..S("Or if there are none, or are full, pumps into any network reservoirs").."]"..
-    "label[0.4,1.2;"..S("Max horizontal range, on each side of pump: ")..tostring(PUMP_MAX_RANGE).."]"..
-    "label[0.4,1.6;"..S("Max vertical range, starting below the pump: ")..tostring(PUMP_MAX_DEPTH).."]"..
-    "label[0.4,2.0;"..S("MUST be placed directly above liquid surface, without gaps to liquid").."]"..
-    logistica.ui.on_off_btn(isOn, 0.4, 3.0, ON_OFF_BTN, S("Enable"))..
-    "label[3.8,2.6;"..S("Max Network Amount: If Network has more than\nthis amount of liquid, don't pump any more.\nSet to 0 to ALWAYS pump into network.\nOnly applies to pumping into network.").."]"..
-    "label[2.4,3.6;"..S("Max: ")..maxLevel.."]"..
+    "label[0.4,0.4;"..FS("Pumps liquids directly into neighbouring reservoirs (one on each side)").."]"..
+    "label[0.4,0.8;"..FS("Or if there are none, or are full, pumps into any network reservoirs").."]"..
+    "label[0.4,1.2;"..FS("Max horizontal range, on each side of pump: ")..tostring(PUMP_MAX_RANGE).."]"..
+    "label[0.4,1.6;"..FS("Max vertical range, starting below the pump: ")..tostring(PUMP_MAX_DEPTH).."]"..
+    "label[0.4,2.0;"..FS("MUST be placed directly above liquid surface, without gaps to liquid").."]"..
+    logistica.ui.on_off_btn(isOn, 0.4, 3.0, ON_OFF_BTN, FS("Enable"))..
+    "label[3.8,2.6;"..FS("Max Network Amount: If Network has more than\nthis amount of liquid, don't pump any more.\nSet to 0 to ALWAYS pump into network.\nOnly applies to pumping into network.").."]"..
+    "label[2.4,3.6;"..FS("Max: ")..maxLevel.."]"..
     "image_button[1.7,2.4;1.0,0.8;logistica_icon_highlight.png;"..INC_1_BTN..";+1]"..
     "image_button[2.7,2.4;1.0,0.8;logistica_icon_highlight.png;"..INC_10_BTN..";+10]"..
     "image_button[1.7,3.9;1.0,0.8;logistica_icon_highlight.png;"..DEC_1_BTN..";-1]"..
@@ -142,7 +142,7 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
   logistica.GROUPS.pumps.register(pump_name_on)
 
   local def = {
-    description = S(desc),
+    description = desc,
     tiles = tiles,
     paramtype2 = "facedir",
     groups = { cracky= 2, pickaxey = 2, [logistica.TIER_ALL] = 1 },

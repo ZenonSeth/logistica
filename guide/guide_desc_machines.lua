@@ -2,13 +2,13 @@ local S = logistica.TRANSLATOR
 
 local g = logistica.Guide.Desc
 
-g.network_controller = [[
+g.network_controller = S([[
 A Controller is the node required to create an active network. Exactly one controller can be connected to a network, and removing it will disconnect all other devices connected to the network.
 
 Controllers allow you to rename the network, but this is for visual identification only, and naming two networks with the same name will not connect them together.
-]]
+]])
 
-g.access_point = [[
+g.access_point = S([[
 The Access Point provides easy access to all Storage devices connected to the Network.
 
 It can both take and insert items into the network's storage. It provides a Crafting Grid built into it for convenience.
@@ -53,9 +53,9 @@ To withdraw a liquid, first select which liquid you want, then put an Empty Buck
 # Taking items from the Network
 
 The Access Point shows a snapshot of available items, or items supplied by crafting suppliers. When you try to take an item, the Access Point makes a real request to the network. If the items are no longer available, you won't receive anything. In most cases the Access Point will try to show an error message informing what went wrong.
-]]
+]])
 
-g.optic_cable = [[
+g.optic_cable = S([[
 # Regular Cables
 
 Cables are used to connect a controller to other machines, allowing the establishing of a network.
@@ -69,9 +69,9 @@ The Toggleable Cable works exactly like a regular cable, but can be right-clicke
 
 #Embedded Cables
 The Embedded Cable is a full block that acts like a regular Optic Cable, allowing cables to be run through walls without leaving visible gaps.
-]]
+]])
 
-g.wireless_upgrader = [[
+g.wireless_upgrader = S([[
 The Wireless Upgrader is a machine used to upgrade the Wireless Access Pad's range.
 
 To upgrade a Wireless Access Pad:
@@ -84,9 +84,9 @@ To upgrade a Wireless Access Pad:
 6. Press the Upgrade button to increase your Wireless Access Pad's range.
 
 The Wireless Upgrader also has a "Hard Mode" toggleable via settings - see the "Server Settings" page on the left for info.
-]]
+]])
 
-g.mass_storage = [[
+g.mass_storage = S([[
 Mass Storage node provide 1024 item storage for up to 8 different item types by default. This capacity can be upgraded with 4 upgrade lots and 2 different upgrades. Mass Storage needs to be configured with the exact items to store.
 
 You can collectively access all Mass Storage on a particular network from an Access Point/Wireless Access Pad.
@@ -96,21 +96,21 @@ You can collectively access all Mass Storage on a particular network from an Acc
 - Select Front Image: Selects a stored node to display on the front of the storage node
 - Can Reserve a number of items per slot: Reserved items won't be taken by other machines on the network
 - Can quickly deposit items by punching it with a stack or sneak-punching it for deposit all stack items from your inventory
-- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.]]
+- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.]])
 
-g.tool_chest = [[
+g.tool_chest = S([[
 The Tool Chest provides a large number of storage slots -- but it can only store tools (specifically, items that have a max stack size of 1). The Tool Chest is also accessed by Requesters to provide items. Tool Chest cannot be dug while it contains items (unlike Mass Storage, which will keep its inventory)
 
 You can also choose to sort the stored tools by Name, Mod or Wear.
-]]
+]])
 
-g.passive_supplier = [[
+g.passive_supplier = S([[
 A Passive Supplier Chest acts as a regular chest, and a source for items for network requests.
 
 It has a small inventory, as it is not meant to be used for regular storage, but any item can be put in it. Passive Supplier Chests won't actively push items into the network, but Demanders and Mass Storage nodes can both take items from Suppliers when needed. Passive Supplier Chests have a toggle if they should also accept items to be stored in them from Network Importers.
-]]
+]])
 
-g.network_importer = [[
+g.network_importer = S([[
 Network Importer are used to automatically take items from other nodes (e.g. furnaces) and add them to the network.
 
 To get a Network Importer working you must:
@@ -138,9 +138,9 @@ There's 2 version of the Network Importer:
 - Fast Network Importer: Takes up to 99 items from a slot at a time, and tries to insert them in the network.
 
 Note that how many items can be sent at one time to a Requester is still limited by the Requester itself (meaning an Item Requester will only receive 1 item, while a Stack Requester will receive up to 99). However when sending to Mass Storage or Passive Supply chests, the full stack the importer is capable of taking will be sent.
-]]
+]])
 
-g.request_inserter = [[
+g.request_inserter = S([[
 The Request Inserter is used to put items in other nodes outside the network.
 
 Note that while there item-wise and stack-wise Inserters, in ALMOST ALL you only need the item-wise Inserter.
@@ -167,9 +167,9 @@ There's two variation of the Request Inserter, and as mentioned above in almost 
 
 - Item Request Inserter: Moves 1 item at a time to fulfil the requested items.
 - Stack Request Inserter: Moves up to 99 items at a time to fulfil the requested items. Note that this does not mean it will insert 99 items, but rather it can insert up to 99 - it will still only insert as many as are necessary to meet the target number set by the filter list.
-]]
+]])
 
-g.reservoir = [[
+g.reservoir = S([[
 Reservoirs are portable nodes capable of storing liquids.
 
 To use one, place it on the ground, then right-click with a full or empty bucket to put or take liquid from it. Each reservoir stores only 1 liquid type.
@@ -181,9 +181,9 @@ Reservoirs also connect to a Logistic Network and can thus be accessed via both 
 Reservoirs come in 2 variations:
 - Silverin: Stores up to 32 buckets of liquid
 - Obsidian: Stores up to 128 buckets of liquid
-]]
+]])
 
-g.reservoir_pump = [[
+g.reservoir_pump = S([[
 The Pump is a machine that can automatically collect liquid nodes from the world and fill up Reservoirs.
 
 To use a Pump:
@@ -201,9 +201,9 @@ The Max Level setting tells the pump when to stop pumping liquid into a network.
 Note that the Max only applies to pumping into network reservoirs. Reservoirs that are directly connected to the pump (by being adjacent to it) will be filled to max capacity, regardless of the Max setting.
 
 Note that Renewable liquids (like Water) are not taken by the pump, allowing you to essentially have an unlimited supply of Water in your Logistics Network.
-]]
+]])
 
-g.bucket_filler = [[
+g.bucket_filler = S([[
 The Bucket Filler machine connects to a network and can provide the specified filled bucket On-Demand (meaning only when something on the network needs it), much like crafting suppliers provide items on-demand.
 
 To use it:
@@ -212,9 +212,9 @@ To use it:
 - Either provide empty buckets in its inventory, or ensure empty buckets are available as a supply on the network
 - Select the type of filled Bucket you want the machine to provide
 - You can also take filled buckets from it, or from an Access Point/Wireless Access Pad on the same network
-]]
+]])
 
-g.bucket_emptier = [[
+g.bucket_emptier = S([[
 The Bucket Emptier accepts filled buckets into its inventory and attempts to empty them into any applicable reservoirs connected to the network. The resulting Empty Buckets are put in its output slot, and become available as a passive supply of empty buckets to the connected network
 
 Notes:
@@ -222,9 +222,9 @@ Notes:
 - The Bucket Emptier's input inventory (where filled buckets go) is accessible by a Requester, which can insert items into it.
 - The machine has to be turned on to start processing filled buckets.
 - If no reservoir can accept the liquid, it will cycle to the next slot in its input.
-]]
+]])
 
-g.crafting_supplier = [[
+g.crafting_supplier = S([[
 The Crafting Supplier is a powerful on-demand supplier that crafts items on the fly, meaning it only crafts when asked for an item it can produce.
 
 For example: do you want to store only Steel Blocks in your network storage, but some of your machines need Steel Ingots? Put one of these machines on your network and it will automatically craft only as many Steel Ingots as your machines need!
@@ -232,44 +232,44 @@ For example: do you want to store only Steel Blocks in your network storage, but
 These machines also work recursively: if you have multiple Crafting Suppliers set up on your network, they can use each other to get materials they need. For example you can set up one Crafting Supplier to craft Mese Crystals from Mese Blocks, and another to craft Mese Shards from Mese Crystals. Then only store Mese Blocks in your Network storage and if any machine needs a Mese Shard, it will be crafted for you!
 
 These machines also interface with the Access Point and Wireless Access Pad, so you can take items that aren't stored on your network and they will be crafted by the Crafting Supplier for you!
-]]
+]])
 
-g.autocrafter = [[
+g.autocrafter = S([[
 The Autocrafter is simple a non-network machine that simply crafts from its input to the output. It does not interface directly with a network but can be accessed by both Network Importers and Request Inserters to feed it to/from the network.
-]]
+]])
 
-g.vaccuum_chest = [[
+g.vaccuum_chest = S([[
 The Vaccuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
 
 - As the name indicates, the Vaccuum chest will collect nearby dropped items, up to a distance of 3 blocks, into its inventory, automatically making them available for the Network.
 - It cannot be used by the Network to store items in it (unlike regular Supply Chests which can be configured to allow storing from the Network)
 
 The on/off switch in the Vaccuum Chests's inventory enables whether the chest will be collecting nearby items or not.
-]]
+]])
 
-g.lava_furnace_fueler = [[
+g.lava_furnace_fueler = S([[
 The Lava Furnace Fueler is a Network-connected machine that will attempt to re-fuel a Lava Furnace from any Reservoirs containing Lava that are connected to the network, thus allowing Automation of the Lava Furnace.
 
 When configured with a minimum level, it will refuel the Lava Furnace it points to by 1 bucket if the Lava Furnace's level drops below the set minimum fuel level. Note that you must have Reservoirs containing Lava connected to the same network and that the Fueler will take 1 bucket at a time each time it refuels a Lava Furnace.
-]]
+]])
 
-g.cobblegen_supplier = [[
+g.cobblegen_supplier = S([[
 The Cobble Generator Supplier acts as a supplier that generates Cobble and stores a small buffer in its inventory, providing it as a passive supply to the Network its connected to. By default it produces 1 Cobble every 2 seconds, but can be upgraded to produce up to 4 every 2 seconds.
 
 Why a Cobble Generator when it's possible to make one with Lava and Water and a Node Breaker?
 
 The answer is: to reduce lag. Breaking a node causes a rather expensive update to the world, recalculating lighting and getting lava or water flowing updates to trigger. Instead, the Cobble Gen provides a far less intensive way to generate Cobble while still requiring the same materials - lava and water.
-]]
+]])
 
-g.trashcan = [[
+g.trashcan = S([[
 The trashcan is a node that deletes items. You can use it stand-alone without connecting it to a network - any time you delete an item it goes into the Last Deleted Item slot, allowing you to recover the very last item you deleted.
 
 Alternatively, you can also connect the Trashcan to a network. When connected it will delete any items that Network Importers push into the network that cannot be stored elsewhere.
 
 If you only want to delete specific items from the network (instead of all excess items) you can configure that with the filter slot - the the Trashcan will delete only items configured in its filter list.
-]]
+]])
 
-g.wireless_transmitter = [[
+g.wireless_transmitter = S([[
 The Wireless Transmitter is a node that allows a network to be extended wirelessly, by connecting to a Wireless Receiver. It isn't necessary to use a Wireless Access Pad, as that synchronizes to an Access Point instead.
 
 Each network can only have 1 and only 1 Wireless Transmitter. In order to function, the Wireless Transmitter must be placed directly on top of the Network Controller. Once placed, it automatically starts to transmit the network, over an unlimited distance.
@@ -277,9 +277,9 @@ Each network can only have 1 and only 1 Wireless Transmitter. In order to functi
 If a Wireless Transmitter is dug or destroyed, or if the Network Controller below it is dug or destroyed, all connected Wireless Receivers will be disconnected, and must manually be re-connected once the Transmitter is placed.
 
 A wireless Transmitter has a limit of how many Receivers can be connected to it. This setting is configured by server, see the Server Settings guide page at the bottom of the list on the left.
-]]
+]])
 
-g.wireless_receiver = [[
+g.wireless_receiver = S([[
 The Wireless Receiver allows a network to be extended wirelessly, by connecting to a Wireless Transmitter.
 
 To use a Receiver, first place a Transmitter in a valid position (see its page for info) to allow the network to be wirelessly transmitted.
@@ -289,4 +289,4 @@ Then place a Receiver in a valid position, such that it doesn't connect to an ex
 You can then connect Optic Cables to the Receiver and they will carry the network the Receiver was connected to.
 
 If you place a Receiver, and you cannot see your Network name (can happen after server/game restarts), first make sure the Network has a Wireless Transmitter attached to its controller. Then go and right click the Network Controller, which will make sure the network is active.
-]]
+]])

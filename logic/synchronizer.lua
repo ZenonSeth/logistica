@@ -1,4 +1,5 @@
 local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_sync"
 
@@ -222,23 +223,23 @@ local function get_adjust_buttons()
     "image_button[7.6,1.2;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"
   end
   local tips =
-    "tooltip["..FUP1_BTN..";"..S("Increase Frequency").."]"..
-    "tooltip["..FDN1_BTN..";"..S("Decrease Frequency").."]"..
-    "tooltip["..FUP2_BTN..";"..S("Increase Frequency").."]"..
-    "tooltip["..FDN2_BTN..";"..S("Decrease Frequency").."]"
+    "tooltip["..FUP1_BTN..";"..FS("Increase Frequency").."]"..
+    "tooltip["..FDN1_BTN..";"..FS("Decrease Frequency").."]"..
+    "tooltip["..FUP2_BTN..";"..FS("Increase Frequency").."]"..
+    "tooltip["..FDN2_BTN..";"..FS("Decrease Frequency").."]"
   if HARD_MODE then
     tips = tips..
-    "tooltip["..SR1_BTN..";"..S("Shift Right").."]"..
-    "tooltip["..SL1_BTN..";"..S("Shift Left").."]"..
-    "tooltip["..SR2_BTN..";"..S("Shift Right").."]"..
-    "tooltip["..SL2_BTN..";"..S("Shift Left").."]"
+    "tooltip["..SR1_BTN..";"..FS("Shift Right").."]"..
+    "tooltip["..SL1_BTN..";"..FS("Shift Left").."]"..
+    "tooltip["..SR2_BTN..";"..FS("Shift Right").."]"..
+    "tooltip["..SL2_BTN..";"..FS("Shift Left").."]"
   end
   return btns..tips
 end
 
 local function get_guide_labels() return
-  "label[0.8,6.9;"..S("Target Wave").."]" ..
-  "label[0.8,7.4;"..S("Crsyals' Wave").."]" ..
+  "label[0.8,6.9;"..FS("Target Wave").."]" ..
+  "label[0.8,7.4;"..FS("Crsyals' Wave").."]" ..
   "box[0.4,6.8;0.3,0.2;"..COLOR_TARGET.."]" ..
   "box[0.4,7.3;0.3,0.2;"..COLOR_PTS_NO_MATCH.."]"
 end
@@ -262,7 +263,7 @@ local function get_formspec_sync(pos, playerName, optMeta)
   if valid then
     if matching then
       ptsColor = COLOR_PTS_MATCH
-      applyBtn = "button[3.2,6.8;2,0.8;"..APPLY_BUTTON..";"..S("Upgrade").."]"
+      applyBtn = "button[3.2,6.8;2,0.8;"..APPLY_BUTTON..";"..FS("Upgrade").."]"
     else
       tarColor = COLOR_TARGET
       ptsColor = COLOR_PTS_NO_MATCH
@@ -286,9 +287,9 @@ local function get_formspec_sync(pos, playerName, optMeta)
     applyBtn..
     get_guide_labels()..
     "list["..posForm..";"..INV_UPGRADE..";5.3,6.7;1,1;0]"..
-    "label[3.0,0.5;Crystal 1]"..
-    "label[6.6,0.5;Crystal 2]"..
-    "label[6.4,7.2;"..S("Wireless Access Pad").."]"
+    "label[3.0,0.5;"..FS("Crystal").." 1]"..
+    "label[6.6,0.5;"..FS("Crystal").." 2]"..
+    "label[6.4,7.2;"..FS("Wireless Access Pad").."]"
 end
 
 local function show_formspec_sync(playerName, pos, optMeta)

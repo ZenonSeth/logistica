@@ -1,6 +1,11 @@
 
 logistica.TRANSLATOR = minetest.get_translator(logistica.MODNAME)
 
+-- formspec escape translation
+logistica.FTRANSLATOR = function (...)
+  return minetest.formspec_escape(logistica.TRANSLATOR(...))
+end
+
 local META_ON_OFF_KEY = "logonoff"
 
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

@@ -1,3 +1,4 @@
+local S = logistica.TRANSLATOR
 
 local ITEM_STORAGE_LIST = "main"
 local META_STORED_ORDER = "logitemsort"
@@ -9,7 +10,7 @@ local sortFunctions = {
 }
 
 -- the order should match above lookup
-local sortListOrder = {"Name", "Mod", "Durability"}
+local sortListOrder = {S("Name"), S("Mod"), S("Durability")}
 local sortListStr = table.concat(sortListOrder, ",")
 
 --------------------------------

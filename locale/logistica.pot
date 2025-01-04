@@ -1,0 +1,1968 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-04 22:18+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: api/bucket_emptier.lua:22
+msgid "Provided with filled buckets, empties them into any network reservoirs"
+msgstr ""
+
+#: api/bucket_emptier.lua:23
+msgid "Resulting empty buckets are provided as passive supply to network"
+msgstr ""
+
+#: api/bucket_emptier.lua:27
+msgid "Input: Filled Buckets to be emptied"
+msgstr ""
+
+#: api/bucket_emptier.lua:28 api/cobble_supplier.lua:43 api/crafter_auto.lua:48
+#: api/crafting_supplier.lua:28 api/injector.lua:43
+#: api/lava_furnace_fueler.lua:38 api/pump.lua:37 api/requester.lua:37
+msgid "Enable"
+msgstr ""
+
+#: api/bucket_filler.lua:10
+msgid ""
+"If no Empty Buckets are added here,\n"
+"then they will be taken from the network."
+msgstr ""
+
+#: api/bucket_filler.lua:15 logic/access_point_formspec.lua:223
+msgid "Error: "
+msgstr ""
+
+#: api/bucket_filler.lua:25
+msgid ""
+"Supplies the selected filled buckets on-demand, if empty buckets are "
+"available"
+msgstr ""
+
+#: api/bucket_filler.lua:26
+msgid "Optional Empty Buckets"
+msgstr ""
+
+#: api/bucket_filler.lua:30
+msgid "Supply"
+msgstr ""
+
+#: api/bucket_filler.lua:31
+msgid "Amount Available"
+msgstr ""
+
+#: api/cables.lua:67 api/cables_toggleable.lua:97
+msgid "Broken "
+msgstr ""
+
+#: api/cobble_supplier.lua:14
+msgid ""
+"Upgrade slots: The 2 slots to the right are for placing cobble generator "
+"upgrades."
+msgstr ""
+
+#: api/cobble_supplier.lua:49
+msgid "Generates Cobblestone and passively supplies it to Network"
+msgstr ""
+
+#: api/controller.lua:15
+msgid "Network Name"
+msgstr ""
+
+#: api/controller.lua:16
+msgid "Set"
+msgstr ""
+
+#: api/controller.lua:42
+msgid "Controller of Network: "
+msgstr ""
+
+#: api/crafter_auto.lua:45 api/crafting_supplier.lua:32
+msgid "Recipe"
+msgstr ""
+
+#: api/crafter_auto.lua:46 logic/lava_furnace_guide_formspec.lua:47
+msgid "Output"
+msgstr ""
+
+#: api/crafter_auto.lua:47 logic/lava_furnace_guide_formspec.lua:46
+msgid "Input"
+msgstr ""
+
+#: api/crafting_supplier.lua:29
+msgid "Crafts items when requested by Network. Excess stored below."
+msgstr ""
+
+#: api/crafting_supplier.lua:33
+msgid "Excess items, provided as supply. If full, excess will be thrown out."
+msgstr ""
+
+#: api/injector.lua:13
+msgid ""
+"Select what types of machines this Importer will put items into.\n"
+"Machine priority is from top to bottom, e.g. Trashcans, if enabled,\n"
+"are always the last machine type that items are put into."
+msgstr ""
+
+#: api/injector.lua:20
+msgid "Put in (?):"
+msgstr ""
+
+#: api/injector.lua:21
+msgid "Requesters"
+msgstr ""
+
+#: api/injector.lua:22
+msgid "Mass/Item Storage"
+msgstr ""
+
+#: api/injector.lua:23
+msgid "Supply Chests"
+msgstr ""
+
+#: api/injector.lua:24
+msgid "Trashcans"
+msgstr ""
+
+#: api/injector.lua:36
+msgid "Network Importer take items from target and add them to the network"
+msgstr ""
+
+#: api/injector.lua:37
+msgid "Filter: Import only filtered. If empty, imports all items."
+msgstr ""
+
+#: api/injector.lua:42
+msgid "Take items from:"
+msgstr ""
+
+#: api/item_storage.lua:20
+msgid "Tool Chest: Accepts only tools, no stackable items"
+msgstr ""
+
+#: api/item_storage.lua:23 logic/access_point_formspec.lua:128
+msgid "Sort"
+msgstr ""
+
+#: api/lava_furnace.lua:137
+msgid "Remaining: "
+msgstr ""
+
+#: api/lava_furnace.lua:137 api/lava_furnace_fueler.lua:20
+#: api/lava_furnace_fueler.lua:36
+msgid " Buckets"
+msgstr ""
+
+#: api/lava_furnace.lua:153 logic/lava_furnace_guide_formspec.lua:44
+#: util/liquids.lua:12
+msgid "Lava"
+msgstr ""
+
+#: api/lava_furnace.lua:154 logic/lava_furnace_guide_formspec.lua:45
+msgid "Additives"
+msgstr ""
+
+#: api/lava_furnace.lua:155
+msgid "Crafts unique recipes (click ? button in top right)"
+msgstr ""
+
+#: api/lava_furnace.lua:156
+msgid "and can also cook regular recipes at twice the speed"
+msgstr ""
+
+#: api/lava_furnace.lua:164
+msgid "Recipes"
+msgstr ""
+
+#: api/lava_furnace_fueler.lua:20
+msgid "Refuel if level below: "
+msgstr ""
+
+#: api/lava_furnace_fueler.lua:31
+msgid "Lava Furnace Fueler: Refuels Lava Furnace"
+msgstr ""
+
+#: api/lava_furnace_fueler.lua:32
+msgid "from Reservoirs connected to Network"
+msgstr ""
+
+#: api/lava_furnace_fueler.lua:33
+msgid "Refuel when lava drops below:"
+msgstr ""
+
+#: api/mass_storage.lua:15
+msgid ""
+"How many items to reserve.\n"
+"Reserved items won't be taken by other network machines"
+msgstr ""
+
+#: api/mass_storage.lua:16
+msgid ""
+"Pick which slot to use as front image.\n"
+"Click the selected slot again to disable the front image."
+msgstr ""
+
+#: api/mass_storage.lua:17
+msgid "Place item to select what kind of item to store in each slot."
+msgstr ""
+
+#: api/mass_storage.lua:18
+msgid ""
+"Upgrade slots: The 4 slots to the right are for placing mass storage "
+"upgrades."
+msgstr ""
+
+#: api/mass_storage.lua:19
+msgid ""
+"Storage slots: items can be taken from them. To add items, put them in the "
+"input slot below."
+msgstr ""
+
+#: api/mass_storage.lua:20
+msgid ""
+"Input slot: Place items here (or shift+click items to send them here) to put "
+"them in storage"
+msgstr ""
+
+#: api/mass_storage.lua:21
+msgid ""
+"If ON, this mass storage will try to take stored items from Suppliers "
+"(except Crafting Suppliers) if it can store them."
+msgstr ""
+
+#: api/mass_storage.lua:86
+msgid "Front Img"
+msgstr ""
+
+#: api/mass_storage.lua:99
+msgid "Res (?)"
+msgstr ""
+
+#: api/mass_storage.lua:131
+msgid "Pull Items"
+msgstr ""
+
+#: api/mass_storage.lua:196 guide/guide_content.lua:297
+#: registration/machines_api_reg.lua:238
+msgid "Mass Storage"
+msgstr ""
+
+#: api/mass_storage.lua:374 logic/mass_storage.lua:244
+#: logic/mass_storage.lua:251
+msgid ""
+"\n"
+"(Empty)"
+msgstr ""
+
+#: api/pump.lua:32
+msgid "Pumps liquids directly into neighbouring reservoirs (one on each side)"
+msgstr ""
+
+#: api/pump.lua:33
+msgid "Or if there are none, or are full, pumps into any network reservoirs"
+msgstr ""
+
+#: api/pump.lua:34
+msgid "Max horizontal range, on each side of pump: "
+msgstr ""
+
+#: api/pump.lua:35
+msgid "Max vertical range, starting below the pump: "
+msgstr ""
+
+#: api/pump.lua:36
+msgid "MUST be placed directly above liquid surface, without gaps to liquid"
+msgstr ""
+
+#: api/pump.lua:38
+msgid ""
+"Max Network Amount: If Network has more than\n"
+"this amount of liquid, don't pump any more.\n"
+"Set to 0 to ALWAYS pump into network.\n"
+"Only applies to pumping into network."
+msgstr ""
+
+#: api/pump.lua:39
+msgid "Max: "
+msgstr ""
+
+#: api/requester.lua:22
+msgid ""
+"Tick this to always try to insert the item above into the target inventory,\n"
+"regardless of how many of that item the target inventory contains.\n"
+"The number of items put above is then requested every second."
+msgstr ""
+
+#: api/requester.lua:36
+msgid "Put items in:"
+msgstr ""
+
+#: api/requester.lua:38
+msgid ""
+"Configure items and count to put, and keep a minimium of, in target's "
+"inventory"
+msgstr ""
+
+#: api/requester.lua:39
+msgid ""
+"Or tick the \"Inf\" (infinite) checkbox below a slot to always keep "
+"inserting the item."
+msgstr ""
+
+#: api/supplier.lua:15
+msgid "Allow Storing from Network"
+msgstr ""
+
+#: api/supplier.lua:16
+msgid ""
+"Passive Supplier\n"
+"Items become available to network requests."
+msgstr ""
+
+#: api/trashcan.lua:11
+msgid "List of Items to delete, if they can't be put elsewhere in the Network."
+msgstr ""
+
+#: api/trashcan.lua:12
+msgid "If list is empty, it will delete all excess items."
+msgstr ""
+
+#: api/trashcan.lua:14
+msgid "Trash slot"
+msgstr ""
+
+#: api/trashcan.lua:16
+msgid "Last deleted item"
+msgstr ""
+
+#: api/vaccuum_chest.lua:15
+msgid "Vaccuum items:"
+msgstr ""
+
+#: api/vaccuum_chest.lua:16
+msgid "Supplies collected items to the network."
+msgstr ""
+
+#: api/wireless_receiver.lua:38 guide/guide_content.lua:353
+#: registration/machines_api_reg.lua:310
+msgid "Wireless Receiver"
+msgstr ""
+
+#: api/wireless_receiver.lua:39
+msgid "Choose a network to connect to."
+msgstr ""
+
+#: api/wireless_receiver.lua:41
+msgid "Connect"
+msgstr ""
+
+#: api/wireless_receiver.lua:43
+msgid "Only your networks with a Wireless Transmitter can be connected to."
+msgstr ""
+
+#: api/wireless_receiver.lua:44
+msgid "If a network isn't showing up, go near its controller to reactivate it."
+msgstr ""
+
+#: api/wireless_receiver.lua:80
+msgid "Connected!"
+msgstr ""
+
+#: api/wireless_receiver.lua:83
+msgid "Failed to connect!"
+msgstr ""
+
+#: api/wireless_transmitter.lua:6
+msgid "Invalid Placement!"
+msgstr ""
+
+#: api/wireless_transmitter.lua:7
+msgid "Transmitter must be placed on top of a Network Controller"
+msgstr ""
+
+#: api/wireless_transmitter.lua:27
+msgid "Transmitting Network: "
+msgstr ""
+
+#: api/wireless_transmitter.lua:28
+msgid "Receivers connected: "
+msgstr ""
+
+#: api/wireless_transmitter.lua:28
+msgid " out of max: "
+msgstr ""
+
+#: api/wireless_transmitter.lua:33 guide/guide_content.lua:345
+msgid "Wireless Transmitter"
+msgstr ""
+
+#: guide/guide_content.lua:67 registration/machines_api_reg.lua:177
+msgid "Lava Furnace"
+msgstr ""
+
+#: guide/guide_content.lua:166
+msgid "Logistica Guide"
+msgstr ""
+
+#: guide/guide_content.lua:175
+msgid "Intro"
+msgstr ""
+
+#: guide/guide_content.lua:176
+msgid "How To:"
+msgstr ""
+
+#: guide/guide_content.lua:177
+msgid "  Get Started: The Lava Furnace"
+msgstr ""
+
+#: guide/guide_content.lua:178
+msgid "  Create a Logistic Network"
+msgstr ""
+
+#: guide/guide_content.lua:179
+msgid "  Move items from/to other mods"
+msgstr ""
+
+#: guide/guide_content.lua:180
+msgid "General Machines:"
+msgstr ""
+
+#: guide/guide_content.lua:181
+msgid "  Network Controller"
+msgstr ""
+
+#: guide/guide_content.lua:182
+msgid "  Access Point"
+msgstr ""
+
+#: guide/guide_content.lua:183
+msgid "  Optic Cables"
+msgstr ""
+
+#: guide/guide_content.lua:184
+msgid "Storage:"
+msgstr ""
+
+#: guide/guide_content.lua:185
+msgid "  Mass Storage"
+msgstr ""
+
+#: guide/guide_content.lua:186
+msgid "  Tool Chest"
+msgstr ""
+
+#: guide/guide_content.lua:187
+msgid "  Passive Supplier Chest"
+msgstr ""
+
+#: guide/guide_content.lua:188
+msgid "Moving Items:"
+msgstr ""
+
+#: guide/guide_content.lua:189
+msgid "  Network Importer"
+msgstr ""
+
+#: guide/guide_content.lua:190
+msgid "  Request Inserter"
+msgstr ""
+
+#: guide/guide_content.lua:191
+msgid "Wireless Network"
+msgstr ""
+
+#: guide/guide_content.lua:192
+msgid "  Wireless Transmitter"
+msgstr ""
+
+#: guide/guide_content.lua:193
+msgid "  Wireless Receiver"
+msgstr ""
+
+#: guide/guide_content.lua:194
+msgid "  Wireless Access Pad"
+msgstr ""
+
+#: guide/guide_content.lua:195
+msgid "  Wireless Upgrader"
+msgstr ""
+
+#: guide/guide_content.lua:196
+msgid "Liquid Storage:"
+msgstr ""
+
+#: guide/guide_content.lua:197
+msgid "  Reservoirs"
+msgstr ""
+
+#: guide/guide_content.lua:198
+msgid "  Reservoir Pump"
+msgstr ""
+
+#: guide/guide_content.lua:199
+msgid "  Bucket Filler"
+msgstr ""
+
+#: guide/guide_content.lua:200
+msgid "  Bucket Emptier"
+msgstr ""
+
+#: guide/guide_content.lua:201
+msgid "Autocrafting:"
+msgstr ""
+
+#: guide/guide_content.lua:202
+msgid "  Crafting Supplier"
+msgstr ""
+
+#: guide/guide_content.lua:203
+msgid "  Autocrafter"
+msgstr ""
+
+#: guide/guide_content.lua:204
+msgid "Utility Machines:"
+msgstr ""
+
+#: guide/guide_content.lua:205
+msgid "  Vaccuum Chest"
+msgstr ""
+
+#: guide/guide_content.lua:206
+msgid "  Lava Furnace Fueler"
+msgstr ""
+
+#: guide/guide_content.lua:207
+msgid "  Cobble Generator"
+msgstr ""
+
+#: guide/guide_content.lua:208
+msgid "  Trashcan"
+msgstr ""
+
+#: guide/guide_content.lua:209
+msgid "Machine Upgrades:"
+msgstr ""
+
+#: guide/guide_content.lua:210
+msgid "  Mass Storage Upgrades"
+msgstr ""
+
+#: guide/guide_content.lua:211
+msgid "  Cobble Generator Upgrades"
+msgstr ""
+
+#: guide/guide_content.lua:212
+msgid "Tools:"
+msgstr ""
+
+#: guide/guide_content.lua:213
+msgid "  Hyperspanner"
+msgstr ""
+
+#: guide/guide_content.lua:214
+msgid "Items:"
+msgstr ""
+
+#: guide/guide_content.lua:215
+msgid "  Silverin Crystal"
+msgstr ""
+
+#: guide/guide_content.lua:216
+msgid "  Silverin Slice"
+msgstr ""
+
+#: guide/guide_content.lua:217
+msgid "  Silverin Circuit"
+msgstr ""
+
+#: guide/guide_content.lua:218
+msgid "  Silverin Mirror Box"
+msgstr ""
+
+#: guide/guide_content.lua:219
+msgid "  Silverin Plate"
+msgstr ""
+
+#: guide/guide_content.lua:220
+msgid "  Compression Tank"
+msgstr ""
+
+#: guide/guide_content.lua:221
+msgid "  Photonizer/Reverse Polarity"
+msgstr ""
+
+#: guide/guide_content.lua:222
+msgid "  Wave Function Maintainer"
+msgstr ""
+
+#: guide/guide_content.lua:223
+msgid "  Wireless Crystal"
+msgstr ""
+
+#: guide/guide_content.lua:224
+msgid "  Wireless Antenna"
+msgstr ""
+
+#: guide/guide_content.lua:225
+msgid "Misc:"
+msgstr ""
+
+#: guide/guide_content.lua:226
+msgid "  Server Settings"
+msgstr ""
+
+#: guide/guide_content.lua:234
+msgid "Intro to Logistica"
+msgstr ""
+
+#: guide/guide_content.lua:241
+msgid "Getting started with Logistica"
+msgstr ""
+
+#: guide/guide_content.lua:249
+msgid "Create a Logistic Network"
+msgstr ""
+
+#: guide/guide_content.lua:256
+msgid "Moving items from/to other mod's machines or storage"
+msgstr ""
+
+#: guide/guide_content.lua:265
+msgid "Network Controller"
+msgstr ""
+
+#: guide/guide_content.lua:272 logic/access_point_formspec.lua:290
+#: registration/machines_api_reg.lua:10
+msgid "Access Point"
+msgstr ""
+
+#: guide/guide_content.lua:279 guide/guide_content.lua:305
+msgid "Optic cables"
+msgstr ""
+
+#: guide/guide_content.lua:287 guide/guide_content.lua:312
+#: logic/synchronizer.lua:345 registration/machines_api_reg.lua:390
+msgid "Wireless Upgrader"
+msgstr ""
+
+#: guide/guide_content.lua:321
+msgid "Network Importer"
+msgstr ""
+
+#: guide/guide_content.lua:328
+msgid "Request Inserter"
+msgstr ""
+
+#: guide/guide_content.lua:337
+msgid "The Wireless Access Pad"
+msgstr ""
+
+#: guide/guide_content.lua:363
+msgid "Liquid Reservoirs"
+msgstr ""
+
+#: guide/guide_content.lua:371
+msgid "Resevoir Pump"
+msgstr ""
+
+#: guide/guide_content.lua:379 registration/machines_api_reg.lua:31
+msgid "Bucket Emptier"
+msgstr ""
+
+#: guide/guide_content.lua:387 registration/machines_api_reg.lua:41
+msgid "Bucket Filler"
+msgstr ""
+
+#: guide/guide_content.lua:397
+msgid "Crafting Supplierr"
+msgstr ""
+
+#: guide/guide_content.lua:404 registration/machines_api_reg.lua:23
+msgid "Autocrafter"
+msgstr ""
+
+#: guide/guide_content.lua:413
+msgid "Vaccuum Chest"
+msgstr ""
+
+#: guide/guide_content.lua:420 registration/machines_api_reg.lua:204
+msgid "Lava Furnace Fueler"
+msgstr ""
+
+#: guide/guide_content.lua:428
+msgid "Cobblestone Generator"
+msgstr ""
+
+#: guide/guide_content.lua:436 registration/machines_api_reg.lua:283
+msgid "Trashcan"
+msgstr ""
+
+#: guide/guide_content.lua:445
+msgid "Mass Storage Upgrades"
+msgstr ""
+
+#: guide/guide_content.lua:453
+msgid "Cobblestone Generator Upgrades"
+msgstr ""
+
+#: guide/guide_content.lua:463
+msgid "Hyperspanner"
+msgstr ""
+
+#: guide/guide_content.lua:472 item/craft_item_nodes.lua:27
+msgid "Silverin Crystal"
+msgstr ""
+
+#: guide/guide_content.lua:480
+msgid "Silvrin Silce"
+msgstr ""
+
+#: guide/guide_content.lua:488
+msgid "Silvrin Circuit"
+msgstr ""
+
+#: guide/guide_content.lua:496
+msgid "Mirror Box"
+msgstr ""
+
+#: guide/guide_content.lua:504
+msgid "Silvrin Plate"
+msgstr ""
+
+#: guide/guide_content.lua:512
+msgid "Compression Tank"
+msgstr ""
+
+#: guide/guide_content.lua:520
+msgid "Photonizer and Reverse Polarity Photonizer"
+msgstr ""
+
+#: guide/guide_content.lua:527 item/craft_item.lua:44
+msgid "Wave Function Maintainer"
+msgstr ""
+
+#: guide/guide_content.lua:534
+msgid "Wireless Crystal"
+msgstr ""
+
+#: guide/guide_content.lua:542 item/craft_item.lua:68
+msgid "Wireless Antenna"
+msgstr ""
+
+#: guide/guide_content.lua:552
+msgid "Server Settings"
+msgstr ""
+
+#: guide/guide_desc_howto.lua:5
+msgid ""
+"Logistica is an item storage and transportation mod.\n"
+"\n"
+"It provides easy to use storage that can be used standalone, or connected to "
+"a logistic network.\n"
+"\n"
+"The Logistic network is able to transport items - both taking from other "
+"mod's machines and inserting items into them. The network transportation "
+"works on-demand: only the exact amount of items needed are moved. \n"
+"\n"
+"Logistica also provides a way to access all your storage remotely, from "
+"potentially unlimited distance (configured per server).\n"
+"\n"
+"To see how to get started, click the 'Get Started' entry in the list on the "
+"left.\n"
+msgstr ""
+
+#: guide/guide_desc_howto.lua:17
+msgid ""
+"In order to construct all other Logistica machines, you need a unique "
+"material: Silverin Crystals, which are made in a Lava Furnace.\n"
+"\n"
+"The Lava Furnace can only be fueled by Lava. Place lava buckets in the lower "
+"left slot to fuel it manually, or later construct a Lava Fueler.\n"
+"\n"
+"The Lava Furnace has a built-in recipe guide, accessed by clicking the [?] "
+"button in the upper right corner.\n"
+"\n"
+"There are 2 recipes for Silverin Crystals, one that uses Snow as the "
+"additive, one that uses Ice. Both recipes use 25 milibuckets of Lava (that's "
+"25/1000 of a full bucket) so 1 bucket of fuel can make 40 Silverin "
+"Crystals.\n"
+"\n"
+"The Lava Furnace can also cook regular recipes in half the regular cooking "
+"time, but at the cost of using a bit of lava. For normal items it uses 5 "
+"milibuckets (0.005 buckets) of lava per second of cooking time.\n"
+msgstr ""
+
+#: guide/guide_desc_howto.lua:29
+msgid ""
+"You can use all storages as stand-alone nodes. \n"
+"\n"
+"However if you want to access all your storage from one place OR you want to "
+"import items from other machines or distribute items to other machines, you "
+"need to create a Logistic Network and connect your storages to it.\n"
+"\n"
+"To create a Logistic Network you need a Network Controller (click button "
+"above for more info). A network can have at most 1 Network Controller, "
+"trying to connect more will disable the newly connected ones.\n"
+"\n"
+"Once you have a Network Controller, use Optic Cables to connect the "
+"controller to all machines: storage, injectors, importers, etc can all be "
+"connected to a network. There are only a few machines that are not network "
+"connectable, such as the Autocrafter, but in those cases you can use Network "
+"Importers and Request Inserters to interact with them.\n"
+msgstr ""
+
+#: guide/guide_desc_howto.lua:39
+msgid ""
+"Logistica allows you to access the inventories of machines or storage from "
+"other mods - both to take and insert items.\n"
+"\n"
+"# Taking Items\n"
+"\n"
+"To take items from machines of other mods, or storage of other mods, you can "
+"use a Network Importer - see button above for details. \n"
+"\n"
+"In the rare case where the network importer cannot access the inventory of a "
+"machine or storage, try to use machines from the other mod to put all the "
+"items in a regular Chest, then use the Network Importer to take items from "
+"the Chest.\n"
+"\n"
+"# Placing Items\n"
+"\n"
+"To place items into other mahcines, ues a Request Inserter - see button "
+"above for details. \n"
+"\n"
+"# What NOT to do\n"
+"\n"
+"Don't try to use Passive Supply chests as outputs of other mod's machines. "
+"Passive Supply chests have no direct compatibility with other mods, and are "
+"just a utility for personal storage.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:5
+msgid ""
+"Mass Storage upgrades increase the capacity of the Mass Storage machine.\n"
+"\n"
+"There are two types, as seen above.\n"
+"\n"
+"Note that you cannot remove Mass Storage upgrades from a Mass Storage "
+"machine if removing the upgrade will result in insufficient storage "
+"available for any of the stacks stored in the machine.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:13
+msgid ""
+"Cobblestone Generator Upgrades are added the Cobble Generator Supplier.\n"
+"\n"
+"Each upgrade doubles the rate of cobblestone output.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:19
+msgid ""
+"The Wireless Access Pad is a handheld device that allows you to access your "
+"Network Storage from potentially unlimited distance by synchronizing to an "
+"Access Point on your network. (distance may be limited by server settings, "
+"see Server Setting page on the left)\n"
+"\n"
+"The Wireless Access Pad has no relation to the Wireless Transmitter or "
+"Receiver. The Pad only requres an Access Point.\n"
+"\n"
+"The Wireless Access Pad provides the exact same interface as the Access "
+"Point, allowing you to store or retrieve items or liquids.\n"
+"\n"
+"To use a Wireless Access Pad:\n"
+"\n"
+"1. Craft one via the recipe. Tip: the Wireless Crystals are made in a Lava "
+"Furnace.\n"
+"2. Craft a Wireless Upgrader machine, and use it to Upgrade your Wireless "
+"Access Pad as many times as you need (see Wireless Upgrader).\n"
+"3. Sneak + Punch an Access Point with the Wireless Access Pad - if "
+"successful, you will see a short message appear.\n"
+"4. Use the Wireless Access Pad from anywhere within its current range to "
+"open the Access Point and take or store items remotely!\n"
+"\n"
+"If you need more range, just place it in a Wireless Upgrader and repeat the "
+"upgrade process!\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:36
+msgid ""
+"A multipurpose engineering tool.\n"
+"\n"
+"- Use (right-click on PC) it on Logistica nodes to get information about "
+"which network, if any, the node is connected to. This does not use or damage "
+"the Hyperspanner.\n"
+"- Sneak + Use it on a Logistica node to get more information about the "
+"network, if any, to which the machine is connected to.\n"
+"\n"
+"- Combined with a Photonizer or a Photonizer (Reversed Polarity) in the "
+"crafting grid, it will turn one into the other. This does not use or damage "
+"the Hyperspanner.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:45
+msgid ""
+"Silverin Crystals are the base for other craft items, some of which can be "
+"made in the regular crafting grid, some of which require the use of the Lava "
+"Furnace (and are listed in the Lava Furnace's built-in crafting guide).\n"
+"\n"
+"See the Lava Furnace's built-in guide.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:51
+msgid ""
+"8 of them are Made from a single Silverin Crystal, the process can also be "
+"reversed - 8 slices = 1 crystal.\n"
+"\n"
+"They are used in the lava furnace as a basis for a few other crafting "
+"components, which in turn are used in many machines.\n"
+"\n"
+"See the Lava Furnace's built-in guide.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:59
+msgid ""
+"Made in the Lava Furnace, these circuits are used as basis for many "
+"machines.\n"
+"\n"
+"See the Lava Furnace's built-in guide.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:65
+msgid ""
+"A piece of glass surrounded by sliverin crystals, and baked to perfection. "
+"This allows the creation of Wave Function Maintainer, which are in turn, the "
+"basis for all storage.\n"
+"\n"
+"See the Lava Furnace's built-in guide.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:71
+msgid ""
+"Silverin Plates are made in the Lava Furnace using 1 Silverin Crystal as "
+"input and 1 Steel Ingot as additive. See furnace's built-in recipe guide for "
+"details.\n"
+"\n"
+"In addition to being used for the construction of almost all machines, the "
+"Silverin Plate can be placed as a node.\n"
+"\n"
+"3 Silverin Plates can also make a Silverin Block, which is a purely "
+"decorateive item. This crafting process is reversible.\n"
+"\n"
+"See the Lava Furnace's built-in guide.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:81
+msgid ""
+"A tank capable of compressing liquids when used in the right machine. Used "
+"for creation of Reservoirs.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:85
+msgid ""
+"The regular Photonizer is made in normal crafting grid from other materials, "
+"but can also be made from a Reversed Polarity Photonizer using a "
+"Hyperspanner by combining them in the grid.\n"
+"\n"
+"The Photonizer (Reverse Polarity) is only made by comibing a hyperspanner "
+"and a normal Photonizer in the crafting grid.\n"
+"\n"
+"The Photonizer's job is to convert matter, aka items, into wave packets "
+"which can then be transmitted over the Logistic Network, and stored in "
+"machines. This is why the Photonizer is a vital component in any machine "
+"that can add items to the Logistics Network.\n"
+"\n"
+"The Revered Polarity Photonizer does the opposite - it takes wave packets "
+"and converts them into items. Thus it is used in many machines that are "
+"capable of taking items from the Logistics Network.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:95
+msgid ""
+"The Wave Function Maintainer is a component that can \"store\" (aka "
+"maintain) wave packets indefinitely, when used in the right machine. This "
+"allows photonized matter to essentially be stored in it.\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:99
+msgid ""
+"The wireless crystal is an essential component to crafting the Wireless "
+"Access Pad and Wireless Upgrader. It is made in the Lava Furnace.\n"
+"\n"
+"See furnace's built-in recipe guide for details\n"
+msgstr ""
+
+#: guide/guide_desc_items.lua:105
+msgid ""
+"The Wireless Antenna is an essential component to crafting the Wireless "
+"Transmitter and Wireless Receiver. It is made on the regular crafting grid "
+"using the recipe above.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:5
+msgid ""
+"A Controller is the node required to create an active network. Exactly one "
+"controller can be connected to a network, and removing it will disconnect "
+"all other devices connected to the network.\n"
+"\n"
+"Controllers allow you to rename the network, but this is for visual "
+"identification only, and naming two networks with the same name will not "
+"connect them together.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:11
+msgid ""
+"The Access Point provides easy access to all Storage devices connected to "
+"the Network.\n"
+"\n"
+"It can both take and insert items into the network's storage. It provides a "
+"Crafting Grid built into it for convenience.\n"
+"\n"
+"You can also access an Access Point and all its features remotely using a "
+"Wireless Access Pad synced to the Access Point.\n"
+"\n"
+"# Searching by text\n"
+"\n"
+"You can enter a search term to show items that term.\n"
+"\n"
+"A special search can be done by adding the groups: prefix at the start. For "
+"example groups:flower will match only items that have flower group set, thus "
+"it will display all flowers added by any mod.\n"
+"\n"
+"# Filtering\n"
+"\n"
+"You can filter items by:\n"
+"\n"
+"All items, Blocks only, Craft-items only, Tools only, Lights only\n"
+"\n"
+"# Sorting\n"
+"\n"
+"Items can also sorted by\n"
+"\n"
+"- Name: alphabetically sorted by the item's localized description to sort\n"
+"- Mod: alphabetically sorted by the item's technical name that is prefixed "
+"with the mod\n"
+"- Count: sorts by total item count, with largest first.\n"
+"- Wear: Sorts by item wear, with most uses remaining first (best used when "
+"filtering for Tools only)\n"
+"\n"
+"# Use Metadata button\n"
+"\n"
+"Some items, usually tools, have other information stored in them, like wear, "
+"descriptions or more complex metadata.\n"
+"\n"
+"If \"Use Metadata\" is ON, the Access Point will display these items "
+"individually. If it's OFF, the Access Point will group items with the same "
+"name, but different metadata into 1 stack. When taking such an item when Use "
+"Metadata is OFF, you will still receive an actual item with the correct wear "
+"and metadata, but it will be picked at random from the network.\n"
+"\n"
+"# Liquid Storage\n"
+"\n"
+"Below the Metadata button is a small section where the Access Point will "
+"show any Reservoirs connected to the network.\n"
+"\n"
+"You can use the two arrows to cycle through all liquids (if there are any).\n"
+"To deposit a liquid, just put a full bucket into the slot below the liquid "
+"image. It does not matter which liquid is selected for this, the Access "
+"Point will attempt to deposit it into the fullest applicable Reservoir, or "
+"assign the next smallest empty reservoir, if one is available.\n"
+"To withdraw a liquid, first select which liquid you want, then put an Empty "
+"Bucket into the slot below. The liquid will be taken from the least-full "
+"Reservoir holding that liquid type on the Network.\n"
+"\n"
+"# Taking items from the Network\n"
+"\n"
+"The Access Point shows a snapshot of available items, or items supplied by "
+"crafting suppliers. When you try to take an item, the Access Point makes a "
+"real request to the network. If the items are no longer available, you won't "
+"receive anything. In most cases the Access Point will try to show an error "
+"message informing what went wrong.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:58
+msgid ""
+"# Regular Cables\n"
+"\n"
+"Cables are used to connect a controller to other machines, allowing the "
+"establishing of a network.\n"
+"\n"
+"Placing a cable that bridges two different active networks will burn that "
+"cable. Burned cables can simply be picked up, and return normal cables.\n"
+"\n"
+"Note that Cables are the only way to extend a network's reach - meaning, "
+"machines will not carry the network connection through them. If you connect "
+"a network cable to one side of a machine, and then place a 2nd cable on the "
+"other side of the machine, the 2nd cable will not carry the network "
+"connection.\n"
+"\n"
+"# Toggleable Cables\n"
+"The Toggleable Cable works exactly like a regular cable, but can be right-"
+"clicked (aka used) to disconnect it from all other surrounding cables or "
+"machines. This allows you to make parts of your network easy to disconnect "
+"when you don't want to use them (For example, a disconnecting an auto-"
+"furnace setup when you don't need it anymore)\n"
+"\n"
+"#Embedded Cables\n"
+"The Embedded Cable is a full block that acts like a regular Optic Cable, "
+"allowing cables to be run through walls without leaving visible gaps.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:74
+msgid ""
+"The Wireless Upgrader is a machine used to upgrade the Wireless Access Pad's "
+"range.\n"
+"\n"
+"To upgrade a Wireless Access Pad:\n"
+"\n"
+"1. Craft the Wireless Upgrader\n"
+"2. In the Wireless Upgrader put the Wireless Access Pad at the bottom slot, "
+"and 1 Wireless crystal in each top slot (see screenshot above)\n"
+"3. You'll see two waves appear, one blue, one orange. The Orange wave is "
+"controlled by the buttons around the crystals.\n"
+"4. Use the buttons around each Crystal to make the orange wave match the "
+"blue wave.\n"
+"5. When they match, the wave turns Green and an Upgrade button appears.\n"
+"6. Press the Upgrade button to increase your Wireless Access Pad's range.\n"
+"\n"
+"The Wireless Upgrader also has a \"Hard Mode\" toggleable via settings - see "
+"the \"Server Settings\" page on the left for info.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:89
+msgid ""
+"Mass Storage node provide 1024 item storage for up to 8 different item types "
+"by default. This capacity can be upgraded with 4 upgrade lots and 2 "
+"different upgrades. Mass Storage needs to be configured with the exact items "
+"to store.\n"
+"\n"
+"You can collectively access all Mass Storage on a particular network from an "
+"Access Point/Wireless Access Pad.\n"
+"\n"
+"- Can be dug and keeps its Inventory when placed again, allowing easy moving "
+"of stored items\n"
+"- Can be upgraded to increase inventory size, up to maximum of 5120 items "
+"per slot\n"
+"- Select Front Image: Selects a stored node to display on the front of the "
+"storage node\n"
+"- Can Reserve a number of items per slot: Reserved items won't be taken by "
+"other machines on the network\n"
+"- Can quickly deposit items by punching it with a stack or sneak-punching it "
+"for deposit all stack items from your inventory\n"
+"- Pull items on/off: When On this storage will actively try to pull from any "
+"Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except "
+"Crafting Suppliers."
+msgstr ""
+
+#: guide/guide_desc_machines.lua:101
+msgid ""
+"The Tool Chest provides a large number of storage slots -- but it can only "
+"store tools (specifically, items that have a max stack size of 1). The Tool "
+"Chest is also accessed by Requesters to provide items. Tool Chest cannot be "
+"dug while it contains items (unlike Mass Storage, which will keep its "
+"inventory)\n"
+"\n"
+"You can also choose to sort the stored tools by Name, Mod or Wear.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:107
+msgid ""
+"A Passive Supplier Chest acts as a regular chest, and a source for items for "
+"network requests.\n"
+"\n"
+"It has a small inventory, as it is not meant to be used for regular storage, "
+"but any item can be put in it. Passive Supplier Chests won't actively push "
+"items into the network, but Demanders and Mass Storage nodes can both take "
+"items from Suppliers when needed. Passive Supplier Chests have a toggle if "
+"they should also accept items to be stored in them from Network Importers.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:113
+msgid ""
+"Network Importer are used to automatically take items from other nodes (e.g. "
+"furnaces) and add them to the network.\n"
+"\n"
+"To get a Network Importer working you must:\n"
+"\n"
+"- Place it facing a node that has an inventory it can access. Sneak + punch "
+"an importer to see its input position.\n"
+"- Select which inventory of the target node to take from - some nodes have "
+"multiple inventories, and one must be selected.\n"
+"- Make sure you press the Enable button to enable its functionality.\n"
+"- Optionally, you can configure the importer to only pull specific items by "
+"placing them in the Filter List. If the list is empty, the importer will "
+"indiscriminately attempt to pull any item, slot by slot, from its input "
+"node.\n"
+"- Optionally, select which machine types the importer will try to insert "
+"items into.\n"
+"\n"
+"Network importers scan 1 slot, and rotate which slot they take from each "
+"time they tick.\n"
+"\n"
+"Network Importers prioritize where they put their items in this order, "
+"assuming the type of machine to import into is enabled in the Importer's "
+"interface:\n"
+"\n"
+"- Fill the requests of any Requesters on the network\n"
+"- Fill any Mass or Item Storages (depending on whether item is stackable or "
+"not) that can handle this item\n"
+"- Fill any passive supply chests (if the chests are configured to accept "
+"items from the network)\n"
+"- Trash the item if there's any Trashcans connected that accept this kind of "
+"item. (see Trashcan)\n"
+"\n"
+"Using the Importer's GUI, you can enable or disable each of the 4 types of "
+"machines to import items into, and any disabled won't be added into. If no "
+"machine type is enabled to import into, then the Importer won't add any "
+"items at all. Note that even when a machine type is enabled, the Importer "
+"obeys the configuration of those machines, e.g. if a Passive Supply Chest is "
+"marked as \"Don't allow storing from network\" then the importer won't add "
+"into it.\n"
+"\n"
+"There's 2 version of the Network Importer:\n"
+"\n"
+"- Slow Network Importer: Takes up to 10 items from a slot at a time, and "
+"tries to insert it in the network.\n"
+"- Fast Network Importer: Takes up to 99 items from a slot at a time, and "
+"tries to insert them in the network.\n"
+"\n"
+"Note that how many items can be sent at one time to a Requester is still "
+"limited by the Requester itself (meaning an Item Requester will only receive "
+"1 item, while a Stack Requester will receive up to 99). However when sending "
+"to Mass Storage or Passive Supply chests, the full stack the importer is "
+"capable of taking will be sent.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:143
+msgid ""
+"The Request Inserter is used to put items in other nodes outside the "
+"network.\n"
+"\n"
+"Note that while there item-wise and stack-wise Inserters, in ALMOST ALL you "
+"only need the item-wise Inserter.\n"
+"\n"
+"To use an Inserter, you must:\n"
+"\n"
+"- Place it facing a node that has an inventory it can target. Sneak + "
+"punching an inserter will show its output location.\n"
+"- Pick an inventory to place items into. Some nodes have multiple input "
+"inventories (e.g. a furnace)\n"
+"- Configure exactly which items to put in the target and how many - in the 4 "
+"upper slots. If not configured, nothing will be inserted.\n"
+"- Make sure you press the Enable button to enable operation\n"
+"- Request Inserters will request the configured items from the Network and "
+"try to keep its target's inventory full of at the minimum the specific items "
+"and the exact count. For example, a Request Inserter might be configured to "
+"target a Furnace's \"fuel\" inventory and always try to keep 2 Coal in it, "
+"while another request inserter targeting the same furnace, but it's \"src\" "
+"inventory can be configured to try and always keep 2 Iron Ore in it.\n"
+"- You can also check the \"Inf\" (short for \"Infinite\") checkbox to make "
+"the Request Inserter always request the item\n"
+"\n"
+"When the \"Inf\" checkbox below a slot is not checked, then the Inserter "
+"checks if the target inventory has at least as many items as the configured "
+"Inserter slot contains, and if there are fewer, then the requester will "
+"request the difference to try and reach the configured number.\n"
+"\n"
+"When the \"Inf\" checkbox below a slot is checked, then the Inserter won't "
+"check how many of that item are contained in the target inventory, but "
+"instead will request that amount of items every time interval (roughly every "
+"1 second) and will attempt to put them in the target inventory, until there "
+"is no more room in that inventory.\n"
+"\n"
+"Request Inserters check for to obtain the items in the following order:\n"
+"\n"
+"- Any Suppliers (e.g. Passive Supply Chest, Vaccuum Chest, Cobble Gen "
+"Supplier or Crafting Supplier)\n"
+"- Mass Storage or Tool Box nodes (depending on the item needed)\n"
+"\n"
+"There's two variation of the Request Inserter, and as mentioned above in "
+"almost all cases you only need the item-wise Inserter.\n"
+"\n"
+"- Item Request Inserter: Moves 1 item at a time to fulfil the requested "
+"items.\n"
+"- Stack Request Inserter: Moves up to 99 items at a time to fulfil the "
+"requested items. Note that this does not mean it will insert 99 items, but "
+"rather it can insert up to 99 - it will still only insert as many as are "
+"necessary to meet the target number set by the filter list.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:172
+msgid ""
+"Reservoirs are portable nodes capable of storing liquids.\n"
+"\n"
+"To use one, place it on the ground, then right-click with a full or empty "
+"bucket to put or take liquid from it. Each reservoir stores only 1 liquid "
+"type.\n"
+"\n"
+"You can dig a reservoir and it will keep its liquid content when you place "
+"it again, which is why reservoirs are non-stackable items.\n"
+"\n"
+"Reservoirs also connect to a Logistic Network and can thus be accessed via "
+"both the Access Point and Wireless Access Pad.\n"
+"\n"
+"Reservoirs come in 2 variations:\n"
+"- Silverin: Stores up to 32 buckets of liquid\n"
+"- Obsidian: Stores up to 128 buckets of liquid\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:186
+msgid ""
+"The Pump is a machine that can automatically collect liquid nodes from the "
+"world and fill up Reservoirs.\n"
+"\n"
+"To use a Pump:\n"
+"\n"
+"- Place it directly above the liquid level, as in screenshot above, (no air "
+"gaps or solid blocks between - it there are gaps/nodes it won't work!)\n"
+"- Connect reservoirs by one of 2 methods:\n"
+"- Place Reservoirs directly adjacent to it, up to 4, one on each side - no "
+"Network connection required\n"
+"- Connect the Pump to a network on which Reservoirs are also connected\n"
+"- Enable the machine via its GUI\n"
+"\n"
+"The Pump will first fill out any adjacent Reservoirs before attempting to "
+"fill any Network-connected Reservoirs\n"
+"\n"
+"The Max Level setting tells the pump when to stop pumping liquid into a "
+"network. For example, if it's set to 30 and the pump is pumping water, once "
+"there are 30 buckets of water available in the network, the pump will not "
+"add more to the network reservoirs. If the amount on the network goes below "
+"30, the pump will once again start pumping liquid until it reaches 30. "
+"Setting the Max to 0 will make the pump continuously pump liquid into the "
+"network without caring how much is already available.\n"
+"\n"
+"Note that the Max only applies to pumping into network reservoirs. "
+"Reservoirs that are directly connected to the pump (by being adjacent to it) "
+"will be filled to max capacity, regardless of the Max setting.\n"
+"\n"
+"Note that Renewable liquids (like Water) are not taken by the pump, allowing "
+"you to essentially have an unlimited supply of Water in your Logistics "
+"Network.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:206
+msgid ""
+"The Bucket Filler machine connects to a network and can provide the "
+"specified filled bucket On-Demand (meaning only when something on the "
+"network needs it), much like crafting suppliers provide items on-demand.\n"
+"\n"
+"To use it:\n"
+"\n"
+"- Place Bucket Filler so it connects to network\n"
+"- Either provide empty buckets in its inventory, or ensure empty buckets are "
+"available as a supply on the network\n"
+"- Select the type of filled Bucket you want the machine to provide\n"
+"- You can also take filled buckets from it, or from an Access Point/Wireless "
+"Access Pad on the same network\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:217
+msgid ""
+"The Bucket Emptier accepts filled buckets into its inventory and attempts to "
+"empty them into any applicable reservoirs connected to the network. The "
+"resulting Empty Buckets are put in its output slot, and become available as "
+"a passive supply of empty buckets to the connected network\n"
+"\n"
+"Notes:\n"
+"\n"
+"- The Bucket Emptier's input inventory (where filled buckets go) is "
+"accessible by a Requester, which can insert items into it.\n"
+"- The machine has to be turned on to start processing filled buckets.\n"
+"- If no reservoir can accept the liquid, it will cycle to the next slot in "
+"its input.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:227
+msgid ""
+"The Crafting Supplier is a powerful on-demand supplier that crafts items on "
+"the fly, meaning it only crafts when asked for an item it can produce.\n"
+"\n"
+"For example: do you want to store only Steel Blocks in your network storage, "
+"but some of your machines need Steel Ingots? Put one of these machines on "
+"your network and it will automatically craft only as many Steel Ingots as "
+"your machines need!\n"
+"\n"
+"These machines also work recursively: if you have multiple Crafting "
+"Suppliers set up on your network, they can use each other to get materials "
+"they need. For example you can set up one Crafting Supplier to craft Mese "
+"Crystals from Mese Blocks, and another to craft Mese Shards from Mese "
+"Crystals. Then only store Mese Blocks in your Network storage and if any "
+"machine needs a Mese Shard, it will be crafted for you!\n"
+"\n"
+"These machines also interface with the Access Point and Wireless Access Pad, "
+"so you can take items that aren't stored on your network and they will be "
+"crafted by the Crafting Supplier for you!\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:237
+msgid ""
+"The Autocrafter is simple a non-network machine that simply crafts from its "
+"input to the output. It does not interface directly with a network but can "
+"be accessed by both Network Importers and Request Inserters to feed it to/"
+"from the network.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:241
+msgid ""
+"The Vaccuum Supply Chest acts like a regular Supply chest, providing items "
+"to the network when there's requests or storage pulls items. There are two "
+"differences:\n"
+"\n"
+"- As the name indicates, the Vaccuum chest will collect nearby dropped "
+"items, up to a distance of 3 blocks, into its inventory, automatically "
+"making them available for the Network.\n"
+"- It cannot be used by the Network to store items in it (unlike regular "
+"Supply Chests which can be configured to allow storing from the Network)\n"
+"\n"
+"The on/off switch in the Vaccuum Chests's inventory enables whether the "
+"chest will be collecting nearby items or not.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:250
+msgid ""
+"The Lava Furnace Fueler is a Network-connected machine that will attempt to "
+"re-fuel a Lava Furnace from any Reservoirs containing Lava that are "
+"connected to the network, thus allowing Automation of the Lava Furnace.\n"
+"\n"
+"When configured with a minimum level, it will refuel the Lava Furnace it "
+"points to by 1 bucket if the Lava Furnace's level drops below the set "
+"minimum fuel level. Note that you must have Reservoirs containing Lava "
+"connected to the same network and that the Fueler will take 1 bucket at a "
+"time each time it refuels a Lava Furnace.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:256
+msgid ""
+"The Cobble Generator Supplier acts as a supplier that generates Cobble and "
+"stores a small buffer in its inventory, providing it as a passive supply to "
+"the Network its connected to. By default it produces 1 Cobble every 2 "
+"seconds, but can be upgraded to produce up to 4 every 2 seconds.\n"
+"\n"
+"Why a Cobble Generator when it's possible to make one with Lava and Water "
+"and a Node Breaker?\n"
+"\n"
+"The answer is: to reduce lag. Breaking a node causes a rather expensive "
+"update to the world, recalculating lighting and getting lava or water "
+"flowing updates to trigger. Instead, the Cobble Gen provides a far less "
+"intensive way to generate Cobble while still requiring the same materials - "
+"lava and water.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:264
+msgid ""
+"The trashcan is a node that deletes items. You can use it stand-alone "
+"without connecting it to a network - any time you delete an item it goes "
+"into the Last Deleted Item slot, allowing you to recover the very last item "
+"you deleted.\n"
+"\n"
+"Alternatively, you can also connect the Trashcan to a network. When "
+"connected it will delete any items that Network Importers push into the "
+"network that cannot be stored elsewhere.\n"
+"\n"
+"If you only want to delete specific items from the network (instead of all "
+"excess items) you can configure that with the filter slot - the the Trashcan "
+"will delete only items configured in its filter list.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:272
+msgid ""
+"The Wireless Transmitter is a node that allows a network to be extended "
+"wirelessly, by connecting to a Wireless Receiver. It isn't necessary to use "
+"a Wireless Access Pad, as that synchronizes to an Access Point instead.\n"
+"\n"
+"Each network can only have 1 and only 1 Wireless Transmitter. In order to "
+"function, the Wireless Transmitter must be placed directly on top of the "
+"Network Controller. Once placed, it automatically starts to transmit the "
+"network, over an unlimited distance.\n"
+"\n"
+"If a Wireless Transmitter is dug or destroyed, or if the Network Controller "
+"below it is dug or destroyed, all connected Wireless Receivers will be "
+"disconnected, and must manually be re-connected once the Transmitter is "
+"placed.\n"
+"\n"
+"A wireless Transmitter has a limit of how many Receivers can be connected to "
+"it. This setting is configured by server, see the Server Settings guide page "
+"at the bottom of the list on the left.\n"
+msgstr ""
+
+#: guide/guide_desc_machines.lua:282
+msgid ""
+"The Wireless Receiver allows a network to be extended wirelessly, by "
+"connecting to a Wireless Transmitter.\n"
+"\n"
+"To use a Receiver, first place a Transmitter in a valid position (see its "
+"page for info) to allow the network to be wirelessly transmitted.\n"
+"\n"
+"Then place a Receiver in a valid position, such that it doesn't connect to "
+"an existing network. Then right click it and from the dropdown select the "
+"corresponding Network to connect to by name. Note that Networks can be "
+"renamed from their Network Controllers. Then press Connect - if successful, "
+"you will get a green \"Connected\" message.\n"
+"\n"
+"You can then connect Optic Cables to the Receiver and they will carry the "
+"network the Receiver was connected to.\n"
+"\n"
+"If you place a Receiver, and you cannot see your Network name (can happen "
+"after server/game restarts), first make sure the Network has a Wireless "
+"Transmitter attached to its controller. Then go and right click the Network "
+"Controller, which will make sure the network is active.\n"
+msgstr ""
+
+#: guide/guide_desc_settings.lua:8
+msgid "Current Server Settings for Logistica:\n"
+msgstr ""
+
+#: guide/guide_item.lua:11
+msgid "Guide Book to Logistica machines and concepts"
+msgstr ""
+
+#: guide_api/api.lua:46 logic/access_point_formspec.lua:190
+msgid "Crafting"
+msgstr ""
+
+#: guide_api/api.lua:130
+msgid "Go back"
+msgstr ""
+
+#: guide_api/api.lua:134
+msgid "Go forward"
+msgstr ""
+
+#: guide_api/api.lua:175
+msgid "Recipe: @1 of @2"
+msgstr ""
+
+#: guide_api/api.lua:215
+msgid "Related:"
+msgstr ""
+
+#: item/craft_item.lua:8
+msgid ""
+"A Unit of Lava\n"
+"Use in Lava Furnace or with Empty Bucket"
+msgstr ""
+
+#: item/craft_item.lua:14
+msgid "Silverin Slice"
+msgstr ""
+
+#: item/craft_item.lua:20
+msgid "Silverin Circuit"
+msgstr ""
+
+#: item/craft_item.lua:26
+msgid "Silverin Mirror Box"
+msgstr ""
+
+#: item/craft_item.lua:32
+msgid ""
+"Photonizer\n"
+"E = M*C^2"
+msgstr ""
+
+#: item/craft_item.lua:38
+msgid ""
+"Photonizer (Reversed Polarity)\n"
+"M = E/C^2"
+msgstr ""
+
+#: item/craft_item.lua:50
+msgid ""
+"Cobble Generator Upgrade\n"
+"Increases Cobble Generator Output"
+msgstr ""
+
+#: item/craft_item.lua:56
+msgid ""
+"Wireless Crystal\n"
+"For use in a Wireless Upgrader"
+msgstr ""
+
+#: item/craft_item.lua:62
+msgid ""
+"Compression Tank\n"
+"Stores liquids at high pressure. Used for making Reservoirs."
+msgstr ""
+
+#: item/craft_item_nodes.lua:47
+msgid "Silverin Plate"
+msgstr ""
+
+#: item/storage_upgrade.lua:7
+msgid ""
+"Silverin Storage Upgrade\n"
+"Adds 1024 Mass Storage Slot Capacity"
+msgstr ""
+
+#: item/storage_upgrade.lua:14
+msgid ""
+"Diamond Storage Upgrade\n"
+"Adds 2048 Mass Storage Slot Capacity"
+msgstr ""
+
+#: logic/access_point.lua:10
+msgid "No Liquid Storage"
+msgstr ""
+
+#: logic/access_point.lua:11
+msgid "Free Capacity:"
+msgstr ""
+
+#: logic/access_point_formspec.lua:44
+msgid ""
+"Applies to Tools only:\n"
+"ON = Differentiate items using metadata\n"
+"OFF = Group items only by name, ignore metadata"
+msgstr ""
+
+#: logic/access_point_formspec.lua:45
+msgid "Show All items"
+msgstr ""
+
+#: logic/access_point_formspec.lua:46
+msgid "Show Nodes only"
+msgstr ""
+
+#: logic/access_point_formspec.lua:47
+msgid "Show Craft items only"
+msgstr ""
+
+#: logic/access_point_formspec.lua:48
+msgid "Show Tools only"
+msgstr ""
+
+#: logic/access_point_formspec.lua:49
+msgid "Show Light sources only"
+msgstr ""
+
+#: logic/access_point_formspec.lua:50
+msgid ""
+"Search by text\n"
+"Use group:some_group to find items belongong to some_group"
+msgstr ""
+
+#: logic/access_point_formspec.lua:51
+msgid "Clear search"
+msgstr ""
+
+#: logic/access_point_formspec.lua:114
+msgid "Filter"
+msgstr ""
+
+#: logic/access_point_formspec.lua:146
+msgid "Page"
+msgstr ""
+
+#: logic/access_point_formspec.lua:175
+msgid "<NONE>"
+msgstr ""
+
+#: logic/access_point_formspec.lua:181
+msgid "Metadata: ON"
+msgstr ""
+
+#: logic/access_point_formspec.lua:181
+msgid "Metadata: OFF"
+msgstr ""
+
+#: logic/access_point_formspec.lua:198
+msgid "Network: "
+msgstr ""
+
+#: logic/access_point_formspec.lua:378
+msgid "Access Point not connected to any network"
+msgstr ""
+
+#: logic/access_point_formspec.lua:388
+msgid "Not enough space or allocated mass storage slots in network for item"
+msgstr ""
+
+#: logic/bucket_filler.lua:56
+msgid "Can't take a stack of size 0"
+msgstr ""
+
+#: logic/bucket_filler.lua:57
+msgid "No network"
+msgstr ""
+
+#: logic/bucket_filler.lua:63
+msgid "Unknown liquid: "
+msgstr ""
+
+#: logic/bucket_filler.lua:70
+msgid "Unknown filled bucket requested: "
+msgstr ""
+
+#: logic/bucket_filler.lua:73
+msgid "Unknown full bucket: "
+msgstr ""
+
+#: logic/bucket_filler.lua:125
+msgid "Not enough empty buckets available"
+msgstr ""
+
+#: logic/bucket_filler.lua:127
+msgid "Not enough liquid available in network"
+msgstr ""
+
+#: logic/item_storage.lua:13
+msgid "Name"
+msgstr ""
+
+#: logic/item_storage.lua:13
+msgid "Mod"
+msgstr ""
+
+#: logic/item_storage.lua:13
+msgid "Durability"
+msgstr ""
+
+#: logic/lava_furnace_guide_formspec.lua:35
+msgid "Lava Furnace can only use Lava as fuel"
+msgstr ""
+
+#: logic/lava_furnace_guide_formspec.lua:45
+msgid "Use Chance: "
+msgstr ""
+
+#: logic/lava_furnace_guide_formspec.lua:50
+msgid "Lava Furnace Recipes"
+msgstr ""
+
+#: logic/lava_furnace_guide_formspec.lua:51
+msgid "Page: "
+msgstr ""
+
+#: logic/mass_storage.lua:25
+msgid "Stored "
+msgstr ""
+
+#: logic/mass_storage.lua:247 logic/mass_storage.lua:249
+msgid ""
+"\n"
+"(Has: "
+msgstr ""
+
+#: logic/reservoir.lua:20
+msgid "Reservoir"
+msgstr ""
+
+#: logic/reservoir.lua:23
+msgid "@1 / @2 buckets"
+msgstr ""
+
+#: logic/reservoir.lua:25
+msgid "@1 / @2 buckets of @3"
+msgstr ""
+
+#: logic/synchronizer.lua:136
+msgid "Max range of @1 reached, cannot upgrade WAP further"
+msgstr ""
+
+#: logic/synchronizer.lua:226 logic/synchronizer.lua:228
+msgid "Increase Frequency"
+msgstr ""
+
+#: logic/synchronizer.lua:227 logic/synchronizer.lua:229
+msgid "Decrease Frequency"
+msgstr ""
+
+#: logic/synchronizer.lua:232 logic/synchronizer.lua:234
+msgid "Shift Right"
+msgstr ""
+
+#: logic/synchronizer.lua:233 logic/synchronizer.lua:235
+msgid "Shift Left"
+msgstr ""
+
+#: logic/synchronizer.lua:241
+msgid "Target Wave"
+msgstr ""
+
+#: logic/synchronizer.lua:242
+msgid "Crsyals' Wave"
+msgstr ""
+
+#: logic/synchronizer.lua:266
+msgid "Upgrade"
+msgstr ""
+
+#: logic/synchronizer.lua:290 logic/synchronizer.lua:291
+msgid "Crystal"
+msgstr ""
+
+#: logic/synchronizer.lua:292 tools/wireless_access_pad.lua:10
+msgid "Wireless Access Pad"
+msgstr ""
+
+#: logic/synchronizer.lua:331
+msgid "Someone is currently using this Upgrader!"
+msgstr ""
+
+#: logic/wireless_network.lua:9
+msgid "Wireless Transmitter for Network: "
+msgstr ""
+
+#: registration/compat_i3.lua:6 registration/compat_unified_inv.lua:5
+msgid "Lava Furnace [logistica]"
+msgstr ""
+
+#: registration/machines_api_reg.lua:52
+msgid "Optic Cable"
+msgstr ""
+
+#: registration/machines_api_reg.lua:55
+msgid "Embedded Optic Cable"
+msgstr ""
+
+#: registration/machines_api_reg.lua:72
+msgid "Toggleable Cable"
+msgstr ""
+
+#: registration/machines_api_reg.lua:81
+msgid "Cobble Generator"
+msgstr ""
+
+#: registration/machines_api_reg.lua:95
+msgid "Logistic Network Controller"
+msgstr ""
+
+#: registration/machines_api_reg.lua:138
+msgid "Crafting Supplier"
+msgstr ""
+
+#: registration/machines_api_reg.lua:157
+msgid ""
+"Slow Network Importer\n"
+"Imports 10 items at a time"
+msgstr ""
+
+#: registration/machines_api_reg.lua:158
+msgid ""
+"Fast Network Importer\n"
+"Imports 99 items at a time"
+msgstr ""
+
+#: registration/machines_api_reg.lua:164
+msgid ""
+"Tool Chest\n"
+"Stores Tools Only"
+msgstr ""
+
+#: registration/machines_api_reg.lua:217
+msgid "Liquid Pump"
+msgstr ""
+
+#: registration/machines_api_reg.lua:257
+msgid ""
+"Item Request Inserter\n"
+"Inserts 1 item at a time"
+msgstr ""
+
+#: registration/machines_api_reg.lua:258
+msgid ""
+"Bulk Request Inserter\n"
+"Inserts up to 64 items at a time"
+msgstr ""
+
+#: registration/machines_api_reg.lua:270
+msgid "Passive Supplier Chest"
+msgstr ""
+
+#: registration/machines_api_reg.lua:296
+msgid "Vaccuum Supplier Chest"
+msgstr ""
+
+#: registration/machines_api_reg.lua:352
+msgid ""
+"Wireless Transmitter\n"
+"Must be placed on top of a Network Controller"
+msgstr ""
+
+#: registration/misc.lua:7
+msgid "Silverin Block"
+msgstr ""
+
+#: tools/hyperspanner.lua:3
+msgid ""
+"Hyperspanner\n"
+"Use on node to see which network it belongs to\n"
+"Sneak + Use on node to see detailed network info"
+msgstr ""
+
+#: tools/hyperspanner.lua:4
+msgid "Node has no connected network!"
+msgstr ""
+
+#: tools/hyperspanner.lua:29
+msgid "Network"
+msgstr ""
+
+#: tools/hyperspanner.lua:83
+msgid "Network info for"
+msgstr ""
+
+#: tools/misc.lua:4
+msgid "Inv List Scanner"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:6
+msgid "Use in a Wireless Upgrader to initialize"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:12
+msgid ""
+"Wireless Access Pad\n"
+"Sneak+Punch an Access Point to Sync\n"
+"Range: @1"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:33 tools/wireless_access_pad.lua:72
+msgid "This Wireless Access Pad is not initialized"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:39
+msgid "This Access Point is in a protected area!"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:46
+msgid "Synced to Access Point at"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:78
+msgid "This WAP is not synced to any Access Point."
+msgstr ""
+
+#: tools/wireless_access_pad.lua:86
+msgid "The synced Access Point is too far away!"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:96
+msgid "The synced Access Point no longer exists!"
+msgstr ""
+
+#: tools/wireless_access_pad.lua:101
+msgid ""
+"The synced Access Point is in a protected area! How did you manage that?"
+msgstr ""
+
+#: util/liquids.lua:13
+msgid "Water"
+msgstr ""
+
+#: util/liquids.lua:14
+msgid "River Water"
+msgstr ""

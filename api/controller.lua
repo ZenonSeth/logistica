@@ -1,4 +1,5 @@
 local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local SET_BUTTON = "logsetbtn"
 local NAME_FIELD = "namef"
@@ -11,8 +12,8 @@ local function get_controller_formspec(pos)
   return "formspec_version[4]" ..
     "size[10.5,2]" ..
     logistica.ui.background..
-    "field[2.5,0.6;3,0.8;"..NAME_FIELD..";"..S("Network Name")..";"..name.."]" ..
-    "button[5.6,0.6;3,0.8;"..SET_BUTTON..";"..S("Set").."]"
+    "field[2.5,0.6;3,0.8;"..NAME_FIELD..";"..FS("Network Name")..";"..name.."]" ..
+    "button[5.6,0.6;3,0.8;"..SET_BUTTON..";"..FS("Set").."]"
 end
 
 local function show_controller_formspec(pos, playerName)

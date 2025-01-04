@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local PULL_LIST_PICKER = "pull_pick"
 local ON_OFF_BUTTON = "on_off_btn"
@@ -11,18 +10,18 @@ local CBX_TRA = "cbxtra"
 local FORMSPEC_NAME = "logistica_storinject"
 local NUM_FILTER_SLOTS = 8
 
-local PUT_INTO_TOOLTIP = S("Select what types of machines this Importer will put items into.\nMachine priority is from top to bottom, e.g. Trashcans, if enabled,\nare always the last machine type that items are put into.")
+local PUT_INTO_TOOLTIP = FS("Select what types of machines this Importer will put items into.\nMachine priority is from top to bottom, e.g. Trashcans, if enabled,\nare always the last machine type that items are put into.")
 
 local injectorForms = {}
 
 local function get_add_into_section(pos, x, y)
   local chst = function(idx) if logistica.injector_get_put_into_state(pos, idx) == true then return "true" else return "false" end end
   return
-    "label["..(x)..","..(y + 0.5)..";Put in (?):]"..
-    "checkbox["..(x + 1.3)..","..(y + 0.0)..";"..CBX_REQ..";Requesters;"..chst(1).."]"..
-    "checkbox["..(x + 1.3)..","..(y + 0.4)..";"..CBX_MAS..";Mass/Item Storage;"..chst(2).."]"..
-    "checkbox["..(x + 1.3)..","..(y + 0.8)..";"..CBX_SUP..";Supply Chests;"..chst(3).."]"..
-    "checkbox["..(x + 1.3)..","..(y + 1.2)..";"..CBX_TRA..";Trashcans;"..chst(4).."]"..
+    "label["..(x)..","..(y + 0.5)..";"..FS("Put in (?):").."]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.0)..";"..CBX_REQ..";"..FS("Requesters")..";"..chst(1).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.4)..";"..CBX_MAS..";"..FS("Mass/Item Storage")..";"..chst(2).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 0.8)..";"..CBX_SUP..";"..FS("Supply Chests")..";"..chst(3).."]"..
+    "checkbox["..(x + 1.3)..","..(y + 1.2)..";"..CBX_TRA..";"..FS("Trashcans")..";"..chst(4).."]"..
     "tooltip["..(x)..","..(y + 0.2)..";1,0.6;"..PUT_INTO_TOOLTIP.."]"
 end
 
@@ -34,14 +33,14 @@ local function get_injector_formspec(pos)
   return "formspec_version[4]"..
     "size["..logistica.inv_size(10.7, 9.45).."]"..
     logistica.ui.background..
-    "label[0.5,0.3;"..S("Network Importer take items from target and add them to the network").."]"..
-    "label[0.5,0.8;"..S("Filter: Import only filtered. If empty, imports all items.").."]"..
+    "label[0.5,0.3;"..FS("Network Importer take items from target and add them to the network").."]"..
+    "label[0.5,0.8;"..FS("Filter: Import only filtered. If empty, imports all items.").."]"..
     "list["..posForm..";filter;0.5,1.0;"..NUM_FILTER_SLOTS..",1;0]"..
     logistica.player_inv_formspec(0.5,4.0)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"..
-    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.8, pullPos, selectedList, S("Take items from:"))..
-    logistica.ui.on_off_btn(isOn, 4.0, 2.6, ON_OFF_BUTTON, S("Enable"))..
+    logistica.ui.pull_list_picker(PULL_LIST_PICKER, 0.5, 2.8, pullPos, selectedList, FS("Take items from:"))..
+    logistica.ui.on_off_btn(isOn, 4.0, 2.6, ON_OFF_BUTTON, FS("Enable"))..
     get_add_into_section(pos, 6.5, 2.3)
 end
 

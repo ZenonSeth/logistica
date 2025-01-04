@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_bktfil"
 local INV_MAIN = "main"
@@ -7,12 +7,12 @@ local INV_INPUT = "input"
 local BTN_NEXT_LIQUID = "btn_next"
 local BTN_PREV_LIQUID = "btn_prev"
 
-local TOOLTIP_BUCKET_INPUT = S("If no Empty Buckets are added here,\nthen they will be taken from the network.")
+local TOOLTIP_BUCKET_INPUT = FS("If no Empty Buckets are added here,\nthen they will be taken from the network.")
 
 local forms = {}
 
 local function get_filler_formspec(pos, errorMsg)
-  if not errorMsg then errorMsg = "" else errorMsg = S("Error: ")..errorMsg end
+  if not errorMsg then errorMsg = "" else errorMsg = FS("Error: ")..errorMsg end
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local currLiquid = logistica.filler_get_current_selected_bucket(pos)
   local liquidInfo = logistica.get_liquid_info_in_network(pos, currLiquid.liquidName)
@@ -22,13 +22,13 @@ local function get_filler_formspec(pos, errorMsg)
     logistica.ui.background..
     "list["..posForm..";"..INV_MAIN..";6.7,1.2;1,1;0]"..
     "list["..posForm..";"..INV_INPUT..";0.4,1.2;4,1;0]"..
-    "label[0.4,0.4;"..S("Supplies the selected filled buckets on-demand, if empty buckets are available").."]"..
-    "label[0.4,1.0;"..S("Optional Empty Buckets").." \\[?\\]]"..
+    "label[0.4,0.4;"..FS("Supplies the selected filled buckets on-demand, if empty buckets are available").."]"..
+    "label[0.4,1.0;"..FS("Optional Empty Buckets").." \\[?\\]]"..
     "button[5.8,1.3;0.8,0.8;"..BTN_PREV_LIQUID..";<]"..
     "button[7.8,1.3;0.8,0.8;"..BTN_NEXT_LIQUID..";>]"..
     "label[0.4,3.0;"..errorMsg.."]"..
-    "label[5.7,1.0;"..S("Supply")..": "..liquidText.."]"..
-    "label[5.7,2.5;"..S("Amount Available")..": "..liquidInfo.curr.." ]"..
+    "label[5.7,1.0;"..FS("Supply")..": "..liquidText.."]"..
+    "label[5.7,2.5;"..FS("Amount Available")..": "..liquidInfo.curr.." ]"..
     "tooltip[0.2,0.4;3.5,1.0;"..TOOLTIP_BUCKET_INPUT.."]"..
     "listring[current_player;main]"..
     "listring["..posForm..";"..INV_INPUT.."]"..

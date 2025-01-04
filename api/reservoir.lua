@@ -1,4 +1,3 @@
-local S = logistica.TRANSLATOR
 local function L(str) return "logistica:"..str end
 
 local META_LIQUID_LEVEL = "liquidLevel"

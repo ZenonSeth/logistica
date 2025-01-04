@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local NUM_REQUEST_SLOTS = 4 -- maybe at some point make this a param, but why?
 local PUSH_LIST_PICKER = "push_pick"
@@ -19,7 +19,7 @@ local function get_filter_list_inf_checkboxes(checkboxStates, x, y)
     local ticked = "false" ; if checkboxStates[i] then ticked = "true" end
     checkboxes[i] =
       "checkbox["..(x + 0.1 + (i - 1) * 1.25)..","..y..";"..checkboxName..";Inf;"..ticked.."]"..
-      "tooltip["..checkboxName..";"..S("Tick this to always try to insert the item above into the target inventory,\nregardless of how many of that item the target inventory contains.\nThe number of items put above is then requested every second.").."]"
+      "tooltip["..checkboxName..";"..FS("Tick this to always try to insert the item above into the target inventory,\nregardless of how many of that item the target inventory contains.\nThe number of items put above is then requested every second.").."]"
   end
   return table.concat(checkboxes)
 end
@@ -33,10 +33,10 @@ local function get_requester_formspec(pos)
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.6, 8.45).."]" ..
     logistica.ui.background..
-    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.5, pushPos, selectedList, S("Put items in:"))..
-    logistica.ui.on_off_btn(isOn, 9.3, 1.3, ON_OFF_BUTTON, S("Enable"))..
-    "label[0.5,0.4;"..S("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
-    "label[0.5,0.7;"..S("Or tick the \"Inf\" (infinite) checkbox below a slot to always keep inserting the item.").."]"..
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.5, pushPos, selectedList, FS("Put items in:"))..
+    logistica.ui.on_off_btn(isOn, 9.3, 1.3, ON_OFF_BUTTON, FS("Enable"))..
+    "label[0.5,0.4;"..FS("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
+    "label[0.5,0.7;"..FS("Or tick the \"Inf\" (infinite) checkbox below a slot to always keep inserting the item.").."]"..
     "list["..posForm..";filter;0.5,1.2;"..NUM_REQUEST_SLOTS..",1;0]"..
     get_filter_list_inf_checkboxes(checkboxStates, 0.5, 2.5)..
     logistica.player_inv_formspec(0.5, 3.0)..

@@ -1,3 +1,4 @@
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_vaccuum_chest"
 local ON_OFF_BUTTON = "on_off_btn"
@@ -11,8 +12,8 @@ local function get_vaccuum_formspec(pos)
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.5, 10).."]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, "Vaccuum items:")..
-    "label[0.6,1.0;Supplies collected items to the network.]"..
+    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, FS("Vaccuum items:"))..
+    "label[0.6,1.0;"..FS("Supplies collected items to the network.").."]"..
     "list["..posForm..";main;0.4,1.4;8,2;0]"..
     logistica.player_inv_formspec(0.4,4.5)..
     "listring[current_player;main]"..

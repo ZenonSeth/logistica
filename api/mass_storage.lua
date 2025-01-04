@@ -1,5 +1,5 @@
-
 local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local META_SERIALIZED_INV = "logserlist"
 local META_IMG_INDEX = "logimginxd"
@@ -12,13 +12,13 @@ local MASS_STORAGE_TIMER = 1
 
 local storageForms = {}
 
-local RESERVE_TOOLTIP = S("How many items to reserve.\nReserved items won't be taken by other network machines")
-local IMAGE_TOOLTIP = S("Pick which slot to use as front image.\nClick the selected slot again to disable the front image.")
-local FILTER_TOOLTIP = S("Place item to select what kind of item to store in each slot.")
-local UPGRADE_TOOLTIP = S("Upgrade slots: The 4 slots to the right are for placing mass storage upgrades.")
-local STORAGE_TOOLTIP = S("Storage slots: items can be taken from them. To add items, put them in the input slot below.")
-local INPUT_TOOLTIP = S("Input slot: Place items here (or shift+click items to send them here) to put them in storage")
-local PULL_TOOLTIP = S("If ON, this mass storage will try to take stored items from Suppliers (except Crafting Suppliers) if it can store them.")
+local RESERVE_TOOLTIP = FS("How many items to reserve.\nReserved items won't be taken by other network machines")
+local IMAGE_TOOLTIP = FS("Pick which slot to use as front image.\nClick the selected slot again to disable the front image.")
+local FILTER_TOOLTIP = FS("Place item to select what kind of item to store in each slot.")
+local UPGRADE_TOOLTIP = FS("Upgrade slots: The 4 slots to the right are for placing mass storage upgrades.")
+local STORAGE_TOOLTIP = FS("Storage slots: items can be taken from them. To add items, put them in the input slot below.")
+local INPUT_TOOLTIP = FS("Input slot: Place items here (or shift+click items to send them here) to put them in storage")
+local PULL_TOOLTIP = FS("If ON, this mass storage will try to take stored items from Suppliers (except Crafting Suppliers) if it can store them.")
 
 local function get_sel_index(vals, selectedValue)
   for i, v in ipairs(vals) do if v == selectedValue then return i end end
@@ -83,7 +83,7 @@ local function formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, 
     image_picker(imgPickX, imgPickY, 6, selectedImgIndex, meta)..
     image_picker(imgPickX, imgPickY, 7, selectedImgIndex, meta)..
     image_picker(imgPickX, imgPickY, 8, selectedImgIndex, meta)..
-    "label[0.2,0.4;Front Img]"
+    "label[0.2,0.4;"..FS("Front Img").."]"
 end
 
 local function formspec_get_reserve_dropdowns(vals, valsAsStr, meta)
@@ -96,7 +96,7 @@ local function formspec_get_reserve_dropdowns(vals, valsAsStr, meta)
     reserve_dropdown( 7.65, 3, 6, vals, valsAsStr, get_sr(meta, 6))..
     reserve_dropdown( 8.90, 3, 7, vals, valsAsStr, get_sr(meta, 7))..
     reserve_dropdown(10.15, 3, 8, vals, valsAsStr, get_sr(meta, 8))..
-    "label[0.2,3.3;Res (?)]"
+    "label[0.2,3.3;"..FS("Res (?)").."]"
 end
 
 -- `meta` is optional
@@ -128,7 +128,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring[current_player;main]"..
-    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, S("Pull Items"))..
+    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, FS("Pull Items"))..
     upgradeInvString..
     "tooltip[3.4,4.0;1,1;"..PULL_TOOLTIP.."]"..
     "tooltip[0.25,1.9;1,1;"..STORAGE_TOOLTIP.."]"..
@@ -371,7 +371,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   logistica.GROUPS.mass_storage.register(storageName)
 
   local def = {
-    description = description.."\n(Empty)",
+    description = description..S("\n(Empty)"),
     tiles = tiles,
     groups = grps,
     sounds = logistica.node_sound_metallic(),

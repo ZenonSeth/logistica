@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local ON_OFF_BUTTON = "on_off_btn"
 local FORMSPEC_NAME = "logistica_lvfurnfueler"
@@ -18,7 +17,7 @@ local function get_lava_img(currLava, lavaPercent)
   else
     img = "image[4.1,1.6;1,3;logistica_lava_furnace_tank_bg.png]"
   end
-  return img.."tooltip[4.1,1.6;1,3;"..S("Refuel if level below: ")..(currLava/1000)..S(" Buckets").."]"
+  return img.."tooltip[4.1,1.6;1,3;"..FS("Refuel if level below: ")..(currLava/1000)..FS(" Buckets").."]"
 end
 
 local function get_fueler_formspec(pos)
@@ -29,14 +28,14 @@ local function get_fueler_formspec(pos)
   return "formspec_version[4]"..
       "size[8.0,5.5]"..
       logistica.ui.background_lava_furnace..
-      "label[0.2,0.2;"..S("Lava Furnace Fueler: Refuels Lava Furnace").."]"..
-      "label[0.2,0.6;"..S("from Reservoirs connected to Network").."]"..
-      "label[2.0,1.3;"..S("Refuel when lava drops below:").."]"..
+      "label[0.2,0.2;"..FS("Lava Furnace Fueler: Refuels Lava Furnace").."]"..
+      "label[0.2,0.6;"..FS("from Reservoirs connected to Network").."]"..
+      "label[2.0,1.3;"..FS("Refuel when lava drops below:").."]"..
       "button[2.9,1.6;1,1;"..BTN_INC..";+]"..
       "button[2.9,3.6;1,1;"..BTN_DEC..";-]"..
-      "label[3.7,4.9;"..(currLava/1000)..S(" Buckets").."]"..
+      "label[3.7,4.9;"..(currLava/1000)..FS(" Buckets").."]"..
       get_lava_img(currLava, lavaPercent)..
-      logistica.ui.on_off_btn(isOn, 0.5, 1.3, ON_OFF_BUTTON, S("Enable"))
+      logistica.ui.on_off_btn(isOn, 0.5, 1.3, ON_OFF_BUTTON, FS("Enable"))
 end
 
 local function change_target_lava(pos, change)
