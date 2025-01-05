@@ -1,11 +1,6 @@
 
 logistica.TRANSLATOR = minetest.get_translator(logistica.MODNAME)
 
--- formspec escape translation
-logistica.FTRANSLATOR = function (...)
-  return minetest.formspec_escape(logistica.TRANSLATOR(...))
-end
-
 local META_ON_OFF_KEY = "logonoff"
 
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -23,6 +18,11 @@ end
 ----------------------------------------------------------------
 -- global namespaced functions
 ----------------------------------------------------------------
+
+-- formspec escape translation
+logistica.FTRANSLATOR = function (...)
+return minetest.formspec_escape(logistica.TRANSLATOR(...))
+end
 
 -- Loads and returns the given position, or nil if its outisde the current bounds
 function logistica.load_position(pos)
