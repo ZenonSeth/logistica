@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_craftsup"
 local ON_OFF_BUTTON = "on_off_btn"
@@ -26,12 +25,12 @@ local function get_craftsup_formspec(pos)
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 1.1, 2.6, ON_OFF_BUTTON, S("Enable"))..
-    "label[0.4,0.5;"..S("Crafts items when requested by Network. Excess stored below.").."]"..
+    logistica.ui.on_off_btn(isOn, 1.1, 2.6, ON_OFF_BUTTON, FS("Enable"))..
+    "label[0.4,0.5;"..FS("Crafts items when requested by Network. Excess stored below.").."]"..
     "list["..posForm..";"..INV_CRAFT..";3.4,1.5;3,3;0]"..
     "list["..posForm..";"..INV_MAIN..";7.1,2.75;1,1;0]"..
-    "label[4.6,1.2;Recipe]"..
-    "label[0.5,5.6;"..S("Excess items, provided as supply. If full\\, excess will be thrown out.").."]"..
+    "label[4.6,1.2;"..FS("Recipe").."]"..
+    "label[0.5,5.6;"..FS("Excess items, provided as supply. If full, excess will be thrown out.").."]"..
     "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
     logistica.player_inv_formspec(0.4,7.8)..
     "listring["..posForm..";"..INV_MAIN.."]"..

@@ -1,5 +1,4 @@
-
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_itemstor"
 local ON_OFF_BUTTON = "on_off_btn"
@@ -18,10 +17,10 @@ local function get_item_storage_formspec(pos)
   return "formspec_version[4]" ..
   "size["..logistica.inv_size(20.5, 16.25).."]" ..
     logistica.ui.background..
-    "label[5.3,10.6;"..S("Tool Chest: Accepts only tools, no stackable items").."]"..
-    -- logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, S("Allow Storing from Network"))..
+    "label[5.3,10.6;"..FS("Tool Chest: Accepts only tools, no stackable items").."]"..
+    -- logistica.ui.on_off_btn(isOn, 16.0, 11.0, ON_OFF_BUTTON, FS("Allow Storing from Network"))..
     "dropdown["..(logistica.inv_width + 8)..",12;2,0.8;"..SORT_PICKER..";"..sortValues..";"..selectedSortIdx..";false]"..
-    "button["..(logistica.inv_width + 10.5)..",12;1,0.8;"..SORT_BUTTON..";"..S("Sort").."]"..
+    "button["..(logistica.inv_width + 10.5)..",12;1,0.8;"..SORT_BUTTON..";"..FS("Sort").."]"..
     "list["..posForm..";main;0.4,0.5;16,8;0]"..
     logistica.player_inv_formspec(5.35, 11)..
     "listring[current_player;main]"..

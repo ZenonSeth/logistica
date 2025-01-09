@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_bktempt"
 local INV_INPUT = "input"
@@ -19,13 +19,13 @@ local function get_emptier_formspec(pos, _isOn)
   return "formspec_version[4]"..
     "size["..logistica.inv_size(10.5, 12.0).."]" ..
     logistica.ui.background..
-    "label[0.4,0.4;"..S("Provided with filled buckets, empties them into any network reservoirs").."]"..
-    "label[0.4,0.8;"..S("Resulting empty buckets are provided as passive supply to network").."]"..
+    "label[0.4,0.4;"..FS("Provided with filled buckets, empties them into any network reservoirs").."]"..
+    "label[0.4,0.8;"..FS("Resulting empty buckets are provided as passive supply to network").."]"..
     "list["..posForm..";"..INV_INPUT..";0.3,1.3;6,4;0]"..
     "list["..posForm..";"..INV_MAIN..";9.1,1.3;1,4;0]"..
     "image[7.8,3.1;1,1;logistica_icon_next.png]"..
-    "label[1.4,6.4;"..S("Input: Filled Buckets to be emptied").."]"..
-    logistica.ui.on_off_btn(isOn, 7.7, 2.2, ON_OFF_BTN, S("Enable"))..
+    "label[1.4,6.4;"..FS("Input: Filled Buckets to be emptied").."]"..
+    logistica.ui.on_off_btn(isOn, 7.7, 2.2, ON_OFF_BTN, FS("Enable"))..
     logistica.player_inv_formspec(0.4, 7.0)..
     "listring["..posForm..";"..INV_INPUT.."]"..
     "listring[current_player;main]"..
@@ -127,7 +127,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
 
   logistica.GROUPS.bucket_emptiers.register(emptier_name)
   local def = {
-    description = S(desc),
+    description = desc,
     tiles = tiles,
     paramtype2 = "facedir",
     groups = { oddly_breakable_by_hand = 3, cracky= 2, pickaxey = 2, handy = 1, [logistica.TIER_ALL] = 1 },

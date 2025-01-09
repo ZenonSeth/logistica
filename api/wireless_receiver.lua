@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local CONNECT_BUTTON = "logconbtn"
 local FORMSPEC_NAME = "logwifirc"
@@ -35,13 +35,13 @@ local function get_formspec(pos, playerName, msg)
   return "formspec_version[4]" ..
     "size[10.0,3.5]" ..
     logistica.ui.background..
-    "label[0.2,0.4;"..S("Wireless Receiver").."]"..
-    "label[2.5,0.9;"..S("Choose a network to connect to.").."]"..
+    "label[0.2,0.4;"..FS("Wireless Receiver").."]"..
+    "label[2.5,0.9;"..FS("Choose a network to connect to.").."]"..
     "dropdown[2.5,1.1;3,0.8;"..TR_DROP_PICKER..";"..dropdownItems..";true]" ..
-    "button[5.6,1.1;3,0.8;"..CONNECT_BUTTON..";"..S("Connect").."]"..
+    "button[5.6,1.1;3,0.8;"..CONNECT_BUTTON..";"..FS("Connect").."]"..
     "label[2.5,2.1;"..(msg or "").."]"..
-    "label[0.2,2.5;"..S("Only your networks with a Wireless Transmitter can be connected to.").."]"..
-    "label[0.2,2.9;"..S("If a network isn't showing up, go near its controller to reactivate it.").."]"
+    "label[0.2,2.5;"..FS("Only your networks with a Wireless Transmitter can be connected to.").."]"..
+    "label[0.2,2.9;"..FS("If a network isn't showing up, go near its controller to reactivate it.").."]"
 end
 
 local function show_formspec(pos, playerName, msg)
@@ -77,10 +77,10 @@ local function on_receive_fields(player, formname, fields)
           minetest.close_formspec(playerName, formname)
           return true
         end
-        msg = minetest.colorize(CLR_GRN, S("Connected!"))
+        msg = minetest.colorize(CLR_GRN, FS("Connected!"))
       end
     end
-    if not msg then msg = minetest.colorize(CLR_RED, S("Failed to connect!")) end
+    if not msg then msg = minetest.colorize(CLR_RED, FS("Failed to connect!")) end
     show_formspec(pos, playerName, msg)
   elseif fields[TR_DROP_PICKER] then -- this check should be below the CONNECT_BUTTON
     -- hmmm

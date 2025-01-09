@@ -1,3 +1,5 @@
+local S = logistica.TRANSLATOR
+
 local SIZE = logistica.settings.cable_size
 
 local itemstrings = logistica.itemstrings
@@ -5,7 +7,7 @@ local itemstrings = logistica.itemstrings
 -- Access Point
 --------------------------------
 
-logistica.register_access_point("Access Point", "access_point", {
+logistica.register_access_point(S("Access Point"), "access_point", {
       "logistica_access_point_top.png",
       "logistica_access_point_bottom.png",
       "logistica_access_point_side.png^[transformFX",
@@ -18,7 +20,7 @@ logistica.register_access_point("Access Point", "access_point", {
 -- Autocrafter
 --------------------------------
 
-logistica.register_autocrafter("Autocrafter", "autocrafter", {
+logistica.register_autocrafter(S("Autocrafter"), "autocrafter", {
   "logistica_autocrafter.png"
 })
 
@@ -26,7 +28,7 @@ logistica.register_autocrafter("Autocrafter", "autocrafter", {
 -- Bucket Emptier
 --------------------------------
 
-logistica.register_bucket_emptier("Bucket Emptier", "bucket_emptier", {
+logistica.register_bucket_emptier(S("Bucket Emptier"), "bucket_emptier", {
   "logistica_bucket_emptier_top.png",
   "logistica_bucket_emptier_top.png",
   "logistica_bucket_emptier_side.png",
@@ -36,7 +38,7 @@ logistica.register_bucket_emptier("Bucket Emptier", "bucket_emptier", {
 -- Bucket Filler
 --------------------------------
 
-logistica.register_bucket_filler("Bucket Filler", "bucket_filler", {
+logistica.register_bucket_filler(S("Bucket Filler"), "bucket_filler", {
   "logistica_bucket_filler_top.png",
   "logistica_bucket_filler_top.png",
   "logistica_bucket_filler_side.png",
@@ -47,10 +49,10 @@ logistica.register_bucket_filler("Bucket Filler", "bucket_filler", {
 --------------------------------
 
 -- regular
-logistica.register_cable("Optic Cable", "optic_cable")
+logistica.register_cable(S("Optic Cable"), "optic_cable")
 
 -- full-block cable
-logistica.register_cable("Embedded Optic Cable", "optic_cable_block",
+logistica.register_cable(S("Embedded Optic Cable"), "optic_cable_block",
   {
     type = "normal",
     fixed = {
@@ -67,7 +69,7 @@ logistica.register_cable("Embedded Optic Cable", "optic_cable_block",
 )
 
 -- toggleable
-logistica.register_cable_toggleable("Toggleable Cable", "optic_cable_toggleable",
+logistica.register_cable_toggleable(S("Toggleable Cable"), "optic_cable_toggleable",
   {"logistica_cable_toggleable_on.png"},
   {"logistica_cable_toggleable_off.png"}
 )
@@ -76,7 +78,7 @@ logistica.register_cable_toggleable("Toggleable Cable", "optic_cable_toggleable"
 -- Cobble Generator
 --------------------------------
 
-logistica.register_cobble_generator_supplier("Cobble Generator", "cobblegen_supplier", {
+logistica.register_cobble_generator_supplier(S("Cobble Generator"), "cobblegen_supplier", {
   "logistica_cobblegen_top.png",
   "logistica_cobblegen_bottom.png",
   "logistica_cobblegen_side.png^[transformFX",
@@ -90,7 +92,7 @@ logistica.register_cobble_generator_supplier("Cobble Generator", "cobblegen_supp
 --------------------------------
 
 logistica.register_controller("simple_controller", {
-  description = "Logistic Network Controller",
+  description = S("Logistic Network Controller"),
   paramtype = "none",
   paramtype2 = "facedir",
   sunlight_propagates = false,
@@ -133,7 +135,7 @@ logistica.register_controller("simple_controller", {
 -- Crafting Supplier
 --------------------------------
 
-logistica.register_crafting_supplier("Crafting Supplier", "crafting_supplier", {
+logistica.register_crafting_supplier(S("Crafting Supplier"), "crafting_supplier", {
   "logistica_crafting_supplier_top.png",
   "logistica_crafting_supplier_bottom.png",
   "logistica_crafting_supplier_side.png",
@@ -152,14 +154,14 @@ local function imp_tiles(name) return {
   "logistica_"..name.."_injector_front.png",
 } end
 
-logistica.register_injector("Slow Network Importer\nImports 10 items at a time", "injector_slow", 10, imp_tiles("item"))
-logistica.register_injector("Fast Network Importer\nImports 99 items at a time", "injector_fast", 99, imp_tiles("stack"))
+logistica.register_injector(S("Slow Network Importer\nImports 10 items at a time"), "injector_slow", 10, imp_tiles("item"))
+logistica.register_injector(S("Fast Network Importer\nImports 99 items at a time"), "injector_fast", 99, imp_tiles("stack"))
 
 --------------------------------
 -- Item Storage
 --------------------------------
 
-logistica.register_item_storage("Tool Chest\nStores Tools Only", "item_storage", {
+logistica.register_item_storage(S("Tool Chest\nStores Tools Only"), "item_storage", {
       "logistica_tool_chest_top.png",
       "logistica_tool_chest_bottom.png",
       "logistica_tool_chest_side.png^[transformFX",
@@ -172,7 +174,7 @@ logistica.register_item_storage("Tool Chest\nStores Tools Only", "item_storage",
 -- Lava Furnace
 --------------------------------
 
-logistica.register_lava_furnace("Lava Furnace", "lava_furnace", 4, {
+logistica.register_lava_furnace(S("Lava Furnace"), "lava_furnace", 4, {
   inactive = {
     "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
     "logistica_lava_furnace_side.png", "logistica_lava_furnace_side.png",
@@ -199,7 +201,7 @@ logistica.register_lava_furnace("Lava Furnace", "lava_furnace", 4, {
 -- Lava Furnace Fueler
 --------------------------------
 
-logistica.register_lava_furnace_fueler("Lava Furnace Fueler", "lava_furnace_fueler", {
+logistica.register_lava_furnace_fueler(S("Lava Furnace Fueler"), "lava_furnace_fueler", {
   "logistica_fueler_side.png^[transformR270",
   "logistica_fueler_side.png^[transformR90",
   "logistica_fueler_side.png^[transformR180",
@@ -212,7 +214,7 @@ logistica.register_lava_furnace_fueler("Lava Furnace Fueler", "lava_furnace_fuel
 -- Liquid Pump
 --------------------------------
 
-logistica.register_pump("Liquid Pump", "pump",
+logistica.register_pump(S("Liquid Pump"), "pump",
   {
     "logistica_pump_top.png", "logistica_pump_bottom.png", "logistica_pump_side.png"
   },
@@ -233,7 +235,7 @@ logistica.register_pump("Liquid Pump", "pump",
 -- Mass Storage
 --------------------------------
 
-logistica.register_mass_storage("mass_storage_basic", "Mass Storage", 8, 1024, 4, { 
+logistica.register_mass_storage("mass_storage_basic", S("Mass Storage"), 8, 1024, 4, { 
   "logistica_basic_mass_storage_top.png", "logistica_basic_mass_storage_top.png",
   "logistica_basic_mass_storage.png", "logistica_basic_mass_storage.png",
   "logistica_basic_mass_storage.png", "logistica_basic_mass_storage_front.png"
@@ -252,8 +254,8 @@ local function ins_tiles(lname) return {
   "logistica_"..lname.."_requester_front.png",
 } end
 
-logistica.register_requester("Item Request Inserter\nInserts 1 item at a time", "requester_item", 1, ins_tiles("item"))
-logistica.register_requester("Bulk Request Inserter\nInserts up to 64 items at a time", "requester_stack", 64, ins_tiles("stack"))
+logistica.register_requester(S("Item Request Inserter\nInserts 1 item at a time"), "requester_item", 1, ins_tiles("item"))
+logistica.register_requester(S("Bulk Request Inserter\nInserts up to 64 items at a time"), "requester_stack", 64, ins_tiles("stack"))
 
 --------------------------------
 -- Reservoirs
@@ -265,7 +267,7 @@ logistica.compat_bucket_register_buckets()
 -- Passive Supply Chest
 --------------------------------
 
-logistica.register_supplier("Passive Supplier Chest", "passive_supplier", 16, {
+logistica.register_supplier(S("Passive Supplier Chest"), "passive_supplier", 16, {
       "logistica_passive_supplier_top.png",
       "logistica_passive_supplier_bottom.png",
       "logistica_passive_supplier_side.png^[transformFX",
@@ -278,7 +280,7 @@ logistica.register_supplier("Passive Supplier Chest", "passive_supplier", 16, {
 -- Trashcan
 --------------------------------
 
-logistica.register_trashcan("Trashcan", "trashcan", {
+logistica.register_trashcan(S("Trashcan"), "trashcan", {
   "logistica_trashcan_top.png",
   "logistica_trashcan_bottom.png",
   "logistica_trashcan_side.png",
@@ -291,7 +293,7 @@ logistica.register_trashcan("Trashcan", "trashcan", {
 -- Vaccuum Supply Chest
 --------------------------------
 
-logistica.register_vaccuum_chest("Vaccuum Supplier Chest", "vaccuum_chest", 16, {
+logistica.register_vaccuum_chest(S("Vaccuum Supplier Chest"), "vaccuum_chest", 16, {
   "logistica_vaccuum_top.png",
   "logistica_vaccuum_bottom.png",
   "logistica_vaccuum_side.png",
@@ -305,7 +307,7 @@ logistica.register_vaccuum_chest("Vaccuum Supplier Chest", "vaccuum_chest", 16, 
 --------------------------------
 
 logistica.register_wireless_receiver("wireless_receiver", {
-  description = "Wireless Receiver",
+  description = S("Wireless Receiver"),
   paramtype2 = "color",
   sunlight_propagates = true,
   tiles = {
@@ -347,7 +349,7 @@ logistica.register_wireless_receiver("wireless_receiver", {
 --------------------------------
 
 logistica.register_wireless_transmitter("wireless_transmitter", {
-  description = "Wireless Transmitter\nMust be placed on top of a Network Controller",
+  description = S("Wireless Transmitter\nMust be placed on top of a Network Controller"),
   short_description = "Wireless Transmitter",
   paramtype = "light",
   paramtype2 = "color",
@@ -385,6 +387,6 @@ logistica.register_wireless_transmitter("wireless_transmitter", {
 -- Wireless Upgrader
 --------------------------------
 
-logistica.register_synchronizer("Wireless Upgrader", "wireless_synchronizer", {
+logistica.register_synchronizer(S("Wireless Upgrader"), "wireless_synchronizer", {
   "logistica_synchronizer_side.png"
 })

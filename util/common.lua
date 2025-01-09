@@ -19,6 +19,11 @@ end
 -- global namespaced functions
 ----------------------------------------------------------------
 
+-- formspec escape translation
+logistica.FTRANSLATOR = function (...)
+return minetest.formspec_escape(logistica.TRANSLATOR(...))
+end
+
 -- Loads and returns the given position, or nil if its outisde the current bounds
 function logistica.load_position(pos)
   if pos.x < -30912 or pos.y < -30912 or pos.z < -30912 or

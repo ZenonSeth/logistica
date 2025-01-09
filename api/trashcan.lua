@@ -1,4 +1,4 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local INV_FILT = "filt"
 local INV_MAIN = "main"
@@ -8,12 +8,12 @@ local function get_trashcan_formspec()
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.6, 9.45).."]" ..
     logistica.ui.background..
-    "label[0.5,0.4;"..S("List of Items to delete, if they can't be put elsewhere in the Network.").."]"..
-    "label[0.5,0.8;"..S("If list is empty, it will delete all excess items.").."]"..
+    "label[0.5,0.4;"..FS("List of Items to delete, if they can't be put elsewhere in the Network.").."]"..
+    "label[0.5,0.8;"..FS("If list is empty, it will delete all excess items.").."]"..
     "list[context;"..INV_FILT..";0.5,1.1;8,1;0]"..
-    "label[3.0,2.6;"..S("Trash slot").."]" ..
+    "label[3.0,2.6;"..FS("Trash slot").."]" ..
     "list[context;"..INV_MAIN..";3.0,2.8;1,1;0]"..
-    "label[6.75,2.6;"..S("Last deleted item").."]"..
+    "label[6.75,2.6;"..FS("Last deleted item").."]"..
     "list[context;"..INV_UNDO..";6.75,2.8;1,1;0]"..
     logistica.player_inv_formspec(0.5,4.2)..
     "listring[current_player;main]"..

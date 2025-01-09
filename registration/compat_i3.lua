@@ -1,7 +1,9 @@
+local S = logistica.TRANSLATOR
+
 if minetest.global_exists("i3") then
 
   i3.register_craft_type("logisticalavafurnace", {
-    description = "Lava Furnace [logistica]",
+    description = S("Lava Furnace [logistica]"),
     icon = "logistica_lava_furnace_front_off.png",
     width = 2,
     height = 1,

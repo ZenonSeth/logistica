@@ -1,10 +1,10 @@
-local S = logistica.TRANSLATOR
+local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logwifitr"
 local forms = {}
 
-local INAVLID_PLACEMENT_MSG = minetest.colorize("#FF4444", S("Invalid Placement!"))
-local INVALID_PLACEMENT_MSG2 = S("Transmitter must be placed on top of a Network Controller")
+local INAVLID_PLACEMENT_MSG = minetest.colorize("#FF4444", FS("Invalid Placement!"))
+local INVALID_PLACEMENT_MSG2 = FS("Transmitter must be placed on top of a Network Controller")
 
 local function color_node(pos, isValid)
   local node = minetest.get_node(pos)
@@ -24,13 +24,13 @@ local function get_formspec(pos, playerName)
     local receivers = logistica.wifi_network_get_connected_receivers_for_transmitter(pos) or {}
     local numConnected = #receivers
     local maxReceivers = logistica.settings.max_receivers_per_transmitter
-    content = "label[0.2,1.0;"..S("Transmitting Network: ")..networkName.."]"..
-    "label[0.2,1.6;"..S("Receivers connected: ")..numConnected..S(" out of max: ")..maxReceivers.."]"
+    content = "label[0.2,1.0;"..FS("Transmitting Network: ")..networkName.."]"..
+    "label[0.2,1.6;"..FS("Receivers connected: ")..numConnected..FS(" out of max: ")..maxReceivers.."]"
     -- color_node(pos, true)
   end
   return "formspec_version[4]" ..
     "size[8.5,2.2]" ..
-    "label[0.2,0.4;"..S("Wireless Transmitter").."]"..
+    "label[0.2,0.4;"..FS("Wireless Transmitter").."]"..
     logistica.ui.background..
     content
 end
