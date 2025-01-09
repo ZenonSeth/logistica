@@ -43,10 +43,13 @@ local filterMethodMap = {
 local h2p = minetest.get_position_from_hash
 local get_meta = minetest.get_meta
 
-local function do_search_for(stackList, term, stackListSize)
+local function do_search_for(stackList, term, stackListSize, playerName)
   if not stackList or not term or term:gsub("%s+","") == "" then return stackList, stackListSize end
   term = string.lower(term)
-  local match = function(stack) return string.find(string.lower(stack:get_description()), term, nil, true) ~= nil end
+  -- Search in original and translated descriptions
+  local player_info = minetest.get_player_information(playerName)
+  local lang = player_info and player_info.lang_code or ""
+  local match = function(stack) return string.find(string.lower(minetest.get_translated_string(lang, stack:get_description())), term, nil, true) ~= nil or string.find(string.lower(stack:get_description()), term, nil, true) ~= nil end
   local grpS, grpE = term:find("group:", nil, true)
   if grpS and grpS == 1 then
     local groupName = string.sub(term, grpE + 1)
@@ -92,7 +95,7 @@ local function add_list_to_itemmap(itemMap, list, useMetadata)
   end
 end
 
-local function build_stack_list(pos)
+local function build_stack_list(pos, playerName)
   local network = logistica.get_network_or_nil(pos)
   if not network then return {stackList = {}, stackListSize = 0} end
   local useMetadata = logistica.access_point_is_set_to_use_metadata(pos)
@@ -127,7 +130,7 @@ local function build_stack_list(pos)
     itemList[listSize] = stack
   end
   local searchList, searchSize =
-    do_search_for(itemList, logistica.access_point_get_current_search_term(meta), listSize)
+    do_search_for(itemList, logistica.access_point_get_current_search_term(meta), listSize, playerName)
   local filtered, filtSize = filterMethodMap[get_curr_filter_method_int(meta)](searchList, searchSize)
   local sorted = sortMethodMap[get_curr_sort_method_int(meta)](filtered)
   return {
@@ -248,7 +251,7 @@ function logistica.access_point_get_sort_highlight_images(meta, highlightImg, bl
 end
 
 function logistica.access_point_refresh_fake_inv(pos, invName, listName, listSize, playerName)
-  local listInfo = build_stack_list(pos)
+  local listInfo = build_stack_list(pos, playerName)
   fakeInvMap[playerName] = listInfo
   logistica.update_fake_inv(pos, invName, listName, listSize, playerName)
 end
