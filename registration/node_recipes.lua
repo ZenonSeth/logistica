@@ -131,7 +131,7 @@ minetest.register_craft({
   output = L("cobblegen_supplier"),
   recipe = {
     {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),          L("silverin_circuit")},
+    {L("optic_cable"),    L("photonizer"),          itemstrings.nodebreaker},
     {L("silverin_plate"), itemstrings.water_bucket, L("silverin_plate")},
   },
   replacements = {
