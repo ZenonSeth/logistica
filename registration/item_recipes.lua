@@ -105,7 +105,8 @@ end
 minetest.register_craft({
   output = L("cobblegen_upgrade"),
   recipe = {
-    {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
+    {"",                  itemstrings.lava_bucket,  ""},
+    {L("silverin_plate"), itemstrings.nodebreaker,  L("silverin_plate")},
     {"",                  itemstrings.water_bucket, ""},
   },
   replacements = {
