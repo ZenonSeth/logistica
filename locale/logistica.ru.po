@@ -77,8 +77,8 @@ msgid ""
 msgstr "Слоты улучшений: 2 слота справа для улучшений генератора булыжника."
 
 #: api/cobble_supplier.lua:49
-msgid "Generates Cobblestone and passively supplies it to Network"
-msgstr "Генерирует булыжник и пассивно поставляет его в сеть"
+msgid "Generates @1 and passively supplies it to Network"
+msgstr "Генерирует @1 и пассивно поставляет его в сеть"
 
 #: api/controller.lua:15
 msgid "Network Name"
@@ -745,7 +745,7 @@ msgid "Lava Furnace Fueler"
 msgstr "Заправщик лавовой печи"
 
 #: guide/guide_content.lua:428
-msgid "Cobblestone Generator"
+msgid "Cobble Generator"
 msgstr "Генератор булыжника"
 
 #: guide/guide_content.lua:436 registration/machines_api_reg.lua:283
@@ -757,7 +757,7 @@ msgid "Mass Storage Upgrades"
 msgstr "Улучшения массового хранилища"
 
 #: guide/guide_content.lua:453
-msgid "Cobblestone Generator Upgrades"
+msgid "Cobble Generator Upgrades"
 msgstr "Улучшения генератора булыжника"
 
 #: guide/guide_content.lua:463
@@ -980,9 +980,9 @@ msgstr ""
 
 #: guide/guide_desc_items.lua:13
 msgid ""
-"Cobblestone Generator Upgrades are added the Cobble Generator Supplier.\n"
+"Cobble Generator Upgrades are added the Cobble Generator Supplier.\n"
 "\n"
-"Each upgrade doubles the rate of cobblestone output.\n"
+"Each upgrade doubles the rate of cobble output.\n"
 msgstr ""
 "Улучшения Генератора булыжника вставляются в соответствующую машину.\n"
 "\n"

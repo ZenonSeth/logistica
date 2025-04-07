@@ -425,7 +425,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_COBBLE_GENERATOR] = {
-      title = S("Cobblestone Generator"),
+      title = S("Cobble Generator"),
       relatedItems = {L("cobblegen_upgrade")},
       recipes = RECIPE_COBBLGEN,
       recipeLinks = RECIPE_LINKS,
@@ -450,7 +450,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_COBBLE_GENERATOR_UPGR] = {
-      title = S("Cobblestone Generator Upgrades"),
+      title = S("Cobble Generator Upgrades"),
       relatedItems = {L("cobblegen_supplier")},
       recipes = RECIPE_COBGENUP,
       recipeLinks = RECIPE_LINKS,

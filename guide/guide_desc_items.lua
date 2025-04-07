@@ -11,9 +11,9 @@ Note that you cannot remove Mass Storage upgrades from a Mass Storage machine if
 ]])
 
 g.cobblegen_upgrade = S([[
-Cobblestone Generator Upgrades are added the Cobble Generator Supplier.
+Cobble Generator Upgrades are added the Cobble Generator Supplier.
 
-Each upgrade doubles the rate of cobblestone output.
+Each upgrade doubles the rate of cobble output.
 ]])
 
 g.wireless_access_pad = S([[
