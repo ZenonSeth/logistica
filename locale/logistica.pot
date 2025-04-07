@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 
 #: api/cobble_supplier.lua:49
-msgid "Generates Cobblestone and passively supplies it to Network"
+msgid "Generates @1 and passively supplies it to Network"
 msgstr ""
 
 #: api/controller.lua:15
@@ -703,7 +703,7 @@ msgid "Lava Furnace Fueler"
 msgstr ""
 
 #: guide/guide_content.lua:428
-msgid "Cobblestone Generator"
+msgid "Cobble Generator"
 msgstr ""
 
 #: guide/guide_content.lua:436 registration/machines_api_reg.lua:283
@@ -715,7 +715,7 @@ msgid "Mass Storage Upgrades"
 msgstr ""
 
 #: guide/guide_content.lua:453
-msgid "Cobblestone Generator Upgrades"
+msgid "Cobble Generator Upgrades"
 msgstr ""
 
 #: guide/guide_content.lua:463
@@ -864,9 +864,9 @@ msgstr ""
 
 #: guide/guide_desc_items.lua:13
 msgid ""
-"Cobblestone Generator Upgrades are added the Cobble Generator Supplier.\n"
+"Cobble Generator Upgrades are added the Cobble Generator Supplier.\n"
 "\n"
-"Each upgrade doubles the rate of cobblestone output.\n"
+"Each upgrade doubles the rate of cobble output.\n"
 msgstr ""
 
 #: guide/guide_desc_items.lua:19

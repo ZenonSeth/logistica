@@ -46,7 +46,7 @@ local function get_cobblegen_formspec(pos)
     "listring["..posForm..";"..INV_DST.."]"..
     "listring[current_player;main]"..
     "list["..posForm..";"..INV_DST..";2.9,1.1;2,1;0]"..
-    "label[0.4,0.5;"..FS("Generates Cobblestone and passively supplies it to Network").."]"..
+    "label[0.4,0.5;"..FS("Generates @1 and passively supplies it to Network", minetest.registered_items[COBBLESTONE].description).."]"..
     "image[6.6,1.1;1,1;logistica_icon_upgrade.png]"..
     "tooltip[6.6,1.1;1,1;"..UPGRADE_TOOLTIP.."]"
 end
