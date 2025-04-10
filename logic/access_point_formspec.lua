@@ -421,9 +421,6 @@ function logistica.access_point_on_take(inv, listname, index, stack, player)
     -- refresh the page in case we had to swap out a fake item or a stack is gone
     show_access_point_formspec(pos, player:get_player_name())
   end
-  -- remove the sometimes manually added count display
-  stack:get_meta():set_string("count_meta", nil)
-  stack:set_count(stack:get_count())
 end
 
 function logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
