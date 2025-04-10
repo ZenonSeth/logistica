@@ -1,5 +1,7 @@
 local S = logistica.TRANSLATOR
 
+local STACK_MAX_SIZE = 65535
+
 local META_CURR_PAGE = "ap_curr_p"
 local META_SORT_TYPE = "ap_sort"
 local META_FILTER_TYPE = "ap_fltr"
@@ -122,9 +124,11 @@ local function build_stack_list(pos, playerName)
   local listSize = 0
   for item, count in pairs(itemMap) do
     local stack = ItemStack(item)
-    stack:set_count(count)
+    stack:set_count(math.min(count, STACK_MAX_SIZE)) -- limit actual size to max so it doesn't vanish from inventory
     if count > 1 and stack:get_stack_max() == 1 then
       stack:get_meta():set_string("count_meta", tostring(count))
+    elseif count > STACK_MAX_SIZE then
+      stack:get_meta():set_string("count_meta", "> "..tostring(STACK_MAX_SIZE))
     end
     listSize = listSize + 1
     itemList[listSize] = stack
