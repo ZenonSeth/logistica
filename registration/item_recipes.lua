@@ -109,8 +109,8 @@ minetest.register_craft({
     {"",                  itemstrings.water_bucket, itemstrings.cobgen_upgr_additional},
   },
   replacements = {
-    {itemstrings.water_bucket,  itemstrings.empty_bucket},
-    {itemstrings.water_bucket,  itemstrings.empty_bucket},
+    {itemstrings.lava_bucket,  itemstrings.empty_bucket},
+    {itemstrings.water_bucket, itemstrings.empty_bucket},
   }
 })
 
