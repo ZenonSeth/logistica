@@ -55,13 +55,15 @@ logistica.itemstrings = {
 }
 
 -- function overrides
-if mcl_crafting_table and mcl_crafting_table.has_crafting_table and type(mcl_crafting_table.has_crafting_table) == "function" then
-  local has_crafting_table_orig = mcl_crafting_table.has_crafting_table
-  mcl_crafting_table.has_crafting_table = function(player)
-    if logistica.access_point_is_player_using_ap(player:get_player_name()) then
-      return true
-    else
-      return has_crafting_table_orig(player)
+if mcl then
+  if mcl_crafting_table and mcl_crafting_table.has_crafting_table and type(mcl_crafting_table.has_crafting_table) == "function" then
+    local has_crafting_table_orig = mcl_crafting_table.has_crafting_table
+    mcl_crafting_table.has_crafting_table = function(player)
+      if logistica.access_point_is_player_using_ap(player:get_player_name()) then
+        return true
+      else
+        return has_crafting_table_orig(player)
+      end
     end
   end
 end
