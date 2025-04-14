@@ -324,8 +324,6 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
     local stackMax = stack:get_stack_max()
     -- either way, only allow taking up to stack max
     stack:set_count(math.min(stack:get_count(), stackMax))
-    -- remove the sometimes manually added count display
-    stack:get_meta():set_string("count_meta", "")
     if stackMax > 1 then
       local taken = ItemStack("")
       local acceptTaken = function(st) taken:add_item(st); return 0 end
@@ -337,6 +335,9 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
         show_access_point_formspec(pos, player:get_player_name(), error)
         return 0
       end
+      -- remove the sometimes manually added count display - and set the stack in the inventory slot
+      taken:get_meta():set_string("count_meta", nil)
+      inv:set_stack(listname, index, taken)
       return math.min(taken:get_count(), stackMax)
     else -- individual items are trickier 
       -- we want to take the actual item, so place it in the slot before its taken
@@ -352,6 +353,8 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
         show_access_point_formspec(pos, player:get_player_name(), error)
         return 0
       end
+      -- remove the sometimes manually added count display - and set the stack in the inventory slot
+      taken:get_meta():set_string("count_meta", nil)
       inv:set_stack(listname, index, taken)
       return taken:get_count()
     end
