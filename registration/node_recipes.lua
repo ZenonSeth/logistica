@@ -32,7 +32,7 @@ minetest.register_craft({
   output = L("passive_supplier"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest, L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),   L("silverin_circuit")},
+    {L("optic_cable"),    L("photonizer"),   ""},
     {L("silverin_plate"), "",                L("silverin_plate")},
   }
 })
@@ -41,7 +41,7 @@ minetest.register_craft({
   output = L("requester_item"),
   recipe = {
     {L("silverin_plate"), "",              L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"), L("silverin_circuit")},
+    {L("optic_cable"),    L("photonizer"), ""},
     {L("silverin_plate"), "",              L("silverin_plate")},
   }
 })
@@ -50,8 +50,8 @@ minetest.register_craft({
   output = L("requester_stack"),
   recipe = {
     {L("silverin_plate"), L("silverin_circuit"), L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),       L("silverin_circuit")},
-    {L("silverin_plate"), L("silverin_circuit"), L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer"),       ""},
+    {L("silverin_plate"), "",                   L("silverin_plate")},
   }
 })
 
@@ -59,7 +59,7 @@ minetest.register_craft({
   output = L("injector_slow"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer_reversed"), L("silverin_circuit")},
+    {L("optic_cable"),    L("photonizer_reversed"), ""},
     {L("silverin_plate"), "",                       L("silverin_plate")},
   }
 })
@@ -68,8 +68,8 @@ minetest.register_craft({
   output = L("injector_fast"),
   recipe = {
     {L("silverin_plate"), L("silverin_circuit"),    L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer_reversed"), L("silverin_circuit")},
-    {L("silverin_plate"), L("silverin_circuit"),    L("silverin_plate")},
+    {L("optic_cable"),    L("photonizer_reversed"), ""},
+    {L("silverin_plate"), "",                       L("silverin_plate")},
   }
 })
 
@@ -104,7 +104,7 @@ minetest.register_craft({
   output = L("vaccuum_chest"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest,   L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),     L("silverin_circuit")},
+    {L("optic_cable"),    L("photonizer"),     ""},
     {L("silverin_plate"), itemstrings.crystal, L("silverin_plate")},
   }
 })
