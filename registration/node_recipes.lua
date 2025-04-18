@@ -56,6 +56,12 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("requester_stack"),
+  recipe = {
+    {L("requester_item"), L("silverin_circuit"), ""},
+  }
+})
+minetest.register_craft({
   output = L("injector_slow"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
@@ -70,6 +76,13 @@ minetest.register_craft({
     {L("silverin_plate"), L("silverin_circuit"),    L("silverin_plate")},
     {L("optic_cable"),    L("photonizer_reversed"), ""},
     {L("silverin_plate"), "",                       L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
+  output = L("injector_fast"),
+  recipe = {
+    {L("injector_slow"), L("silverin_circuit"),""},
   }
 })
 
