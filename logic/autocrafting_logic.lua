@@ -1,15 +1,15 @@
 -- returns a name-indexed count of items in the given list
 -- adds to the existingMap if provided
 local function count_items(list, existingMap)
-	local map = existingMap or {}
-	for _, stack in ipairs(list) do
-		if not stack:is_empty() then
-			local stName = stack:get_name()
+  local map = existingMap or {}
+  for _, stack in ipairs(list) do
+    if not stack:is_empty() then
+      local stName = stack:get_name()
       if not map[stName] then map[stName] = 0 end
-			map[stName] = map[stName] + stack:get_count()
-		end
-	end
-	return map
+      map[stName] = map[stName] + stack:get_count()
+    end
+  end
+  return map
 end
 
 -- returns a name indexed map to count of items in the given list

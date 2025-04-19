@@ -31,7 +31,7 @@ function logistica.load_position(pos)
   if minetest.get_node_or_nil(pos) then return pos end
   local vm = minetest.get_voxel_manip()
   vm:read_from_map(pos, pos)
-	return pos
+  return pos
 end
 
 function logistica.swap_node(pos, newName)
@@ -188,7 +188,7 @@ end
 function logistica.on_timer_powered(func)
   return function(pos, elapsed)
     if logistica.is_machine_on(pos) then return func(pos, elapsed)
-		else return false end
+    else return false end
   end
 end
 
@@ -224,8 +224,8 @@ function logistica.list_filter(table, selectFunc)
 end
 
 function logistica.round(x)
-	if x >= 0 then
-		return math.floor(x + 0.5)
-	end
-	return math.ceil(x - 0.5)
+  if x >= 0 then
+    return math.floor(x + 0.5)
+  end
+  return math.ceil(x - 0.5)
 end

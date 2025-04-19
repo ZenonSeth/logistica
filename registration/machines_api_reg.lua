@@ -320,11 +320,11 @@ logistica.register_wireless_receiver("wireless_receiver", {
   node_box = {
     type = "connected",
     fixed = {
-			{-4/16, -8/16, -4/16, 4/16, -6/16,  4/16}, -- base
-			{-SIZE, -8/16, -SIZE, SIZE,  5/16,  SIZE}, -- column
-			{-6/16,  3/16,  3/16, 6/16,  7/16,  4/16}, -- antenna1
-			{-6/16,  3/16, -4/16, 6/16,  7/16, -3/16}, -- antenna2
-			{-1/16,  4/16, -3/16, 1/16,  5/16,  3/16}, -- antenna bar
+      {-4/16, -8/16, -4/16, 4/16, -6/16,  4/16}, -- base
+      {-SIZE, -8/16, -SIZE, SIZE,  5/16,  SIZE}, -- column
+      {-6/16,  3/16,  3/16, 6/16,  7/16,  4/16}, -- antenna1
+      {-6/16,  3/16, -4/16, 6/16,  7/16, -3/16}, -- antenna2
+      {-1/16,  4/16, -3/16, 1/16,  5/16,  3/16}, -- antenna bar
     },
     connect_top    = { -SIZE, -SIZE, -SIZE, SIZE, 8/16, SIZE }, -- y+
     connect_front  = { -SIZE, -SIZE, -8/16, SIZE, SIZE, SIZE }, -- z-

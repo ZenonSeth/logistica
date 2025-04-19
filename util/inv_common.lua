@@ -1,17 +1,17 @@
 
 -- returns a naturally numbered list of ItemStacks
 function logistica.count_items_to_stack(list)
-	local map = {}
-	for _, stack in ipairs(list) do
-		if not stack:is_empty() then
-			local stName = stack:get_name()
+  local map = {}
+  for _, stack in ipairs(list) do
+    if not stack:is_empty() then
+      local stName = stack:get_name()
       if not map[stName] then map[stName] = 0 end
-			map[stName] = map[stName] + stack:get_count()
-		end
-	end
+      map[stName] = map[stName] + stack:get_count()
+    end
+  end
   local items = {}
   local i = 0
-	for name, count in pairs(map) do
+  for name, count in pairs(map) do
     i = i + 1
     local item = ItemStack(name) ; item:set_count(count)
     items[i] = item

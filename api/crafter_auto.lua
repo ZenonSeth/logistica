@@ -62,13 +62,13 @@ local function autocrafter_timer(pos, elapsed)
 end
 
 local function autocrafter_on_construct(pos)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		inv:set_size(INV_SRC, 16)
-		inv:set_size(INV_DST, 12)
-		inv:set_size(INV_CRAFT, 9)
+    local meta = minetest.get_meta(pos)
+    local inv = meta:get_inventory()
+    inv:set_size(INV_SRC, 16)
+    inv:set_size(INV_DST, 12)
+    inv:set_size(INV_CRAFT, 9)
     inv:set_width(INV_CRAFT, 3)
-		inv:set_size(INV_CRAFT_RES, 1)
+    inv:set_size(INV_CRAFT_RES, 1)
     meta:set_string("formspec", get_formspec(pos))
 end
 

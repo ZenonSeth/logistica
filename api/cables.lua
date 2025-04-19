@@ -8,7 +8,7 @@ function logistica.register_cable(desc, name, customNodeBox, customTiles, custom
   local lname = string.lower(name)
   local cable_name = "logistica:" .. lname
   logistica.GROUPS.cables.register(cable_name)
-	local cnb = customNodeBox or {}
+  local cnb = customNodeBox or {}
   local tiles = customTiles or { "logistica_" .. lname .. ".png" }
 
   local node_box = {
@@ -37,7 +37,7 @@ function logistica.register_cable(desc, name, customNodeBox, customTiles, custom
     sounds = logistica.node_sound_metallic(),
     drop = cable_name,
     paramtype = "light",
-		paramtype2 = "facedir",
+    paramtype2 = "facedir",
     sunlight_propagates = true,
     drawtype = cnb.type or "nodebox",
     node_box = node_box,
