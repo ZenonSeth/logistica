@@ -70,9 +70,6 @@ local function get_lists(targetPosition, usePushLists)
     local availableLists = minetest.get_meta(targetPosition):get_inventory():get_lists()
     local lists = {}
     for name, _ in pairs(availableLists) do
-        for _, inventory in pairs(disallowedList) do
-            allowedLists[inventory] = nil
-        end
         if allowedLists[name] and not disallowedList[name] then
             table.insert(lists, name)
         end
