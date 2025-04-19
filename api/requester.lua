@@ -75,7 +75,7 @@ local function on_player_receive_fields(player, formname, fields)
     show_requester_formspec(player:get_player_name(), pos)
   elseif fields[PUSH_LIST_PICKER] then
     local selected = fields[PUSH_LIST_PICKER]
-    if logistica.is_allowed_push_list(selected) then
+    if logistica.is_allowed_push_list(pos, selected) then
       local pos = requesterForms[playerName].position
       if not pos then return false end
       logistica.set_requester_target_list(pos, selected)
