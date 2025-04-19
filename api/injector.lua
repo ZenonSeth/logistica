@@ -75,7 +75,7 @@ local function on_player_receive_fields(player, formname, fields)
     logistica.injector_set_put_into_state(pos, 4, fields[CBX_TRA])
   elseif fields[PULL_LIST_PICKER] then -- this has to be last, because its always sent
     local selected = fields[PULL_LIST_PICKER]
-    if logistica.is_allowed_pull_list(selected) then
+    if logistica.is_allowed_pull_list(pos, selected) then
       logistica.set_injector_target_list(pos, selected)
     end
   end
