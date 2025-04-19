@@ -102,7 +102,6 @@ local function after_place_injector(pos, placer, itemstack)
   end
   local inv = meta:get_inventory()
   inv:set_size("filter", NUM_FILTER_SLOTS)
-  logistica.set_injector_target_list(pos, "main")
   logistica.on_injector_change(pos)
   logistica.start_injector_timer(pos)
   logistica.show_input_at(logistica.get_injector_target(pos))

@@ -103,7 +103,6 @@ local function after_place_requester(pos, placer, itemstack, numRequestSlots)
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
-  logistica.set_requester_target_list(pos, "main")
   local inv = meta:get_inventory()
   inv:set_size("filter", numRequestSlots)
   inv:set_size("actual", numRequestSlots)
