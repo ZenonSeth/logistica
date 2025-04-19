@@ -37,6 +37,7 @@ end
 
 -- public functions 
 
+-- returns nil if the injector or its target node isnt loaded
 function logistica.get_injector_target(pos)
   local node = minetest.get_node_or_nil(pos)
   if not node then return nil end
@@ -51,8 +52,13 @@ function logistica.get_injector_target_list(pos)
 end
 
 function logistica.set_injector_target_list(pos, listName)
-  local meta = get_meta(pos)
-  meta:set_string(META_INJECTOR_LISTNAME, listName)
+  local targetPos = logistica.get_injector_target(pos)
+  if not targetPos then return end
+  local targetNode = minetest.get_node(targetPos)
+  if logistica.is_allowed_pull_list(listName, targetNode.name) then
+    local meta = get_meta(pos)
+    meta:set_string(META_INJECTOR_LISTNAME, listName)
+  end
 end
 
 function logistica.start_injector_timer(pos)
