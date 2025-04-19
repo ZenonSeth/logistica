@@ -78,7 +78,7 @@ minetest.register_craft({
   output = L("storage_upgrade_1"),
   recipe = {
     {L("silverin_slice"), L("standing_wave_box"), L("silverin_slice")},
-    {L("silverin_slice"), L("silverin_circuit"),  L("silverin_slice")},
+    {L("silverin_slice"), "",                     L("silverin_slice")},
   }
 })
 

@@ -30,17 +30,17 @@ logistica.register_lava_furnace_recipe({
 
 logistica.register_lava_furnace_recipe({
   input = L("silverin_slice"),
-  output = L("silverin_circuit"),
-  lava = 60,
+  output = L("silverin_circuit 2"),
+  lava = 30,
   additive = itemstrings.fragment,
   additive_use_chance = 100,
-  time = 10
+  time = 5
 })
 
 logistica.register_lava_furnace_recipe({
   input = itemstrings.glass,
   output = L("silverin_mirror_box"),
-  lava = 50,
+  lava = 30,
   additive = L("silverin_slice 6"),
   additive_use_chance = 100,
   time = 4
