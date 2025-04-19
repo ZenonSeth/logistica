@@ -199,8 +199,13 @@ function logistica.on_requester_timer(pos, elapsed)
 end
 
 function logistica.set_requester_target_list(pos, listName)
-  local meta = get_meta(pos)
-  meta:set_string(META_REQUESTER_LISTNAME, listName)
+  local targetPos = logistica.get_requester_target(pos)
+  if not targetPos then return end
+  local targetNode = minetest.get_node(targetPos)
+  if logistica.is_allowed_push_list(listName, targetNode.name) then
+    local meta = get_meta(pos)
+    meta:set_string(META_REQUESTER_LISTNAME, listName)
+  end
 end
 
 function logistica.get_requester_target_list(pos)
