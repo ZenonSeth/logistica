@@ -32,8 +32,8 @@ function logistica.lava_furnace_get_lava_capacity(pos)
   return nodeDef.logistica.lava_capacity * 1000
 end
 
-function logistica.lava_furnace_fueler_start_timer(pos)
-  logistica.start_node_timer(pos, TIMER_DURATION)
+function logistica.lava_furnace_fueler_start_timer(pos, optAddRandomOffset)
+  logistica.start_node_timer(pos, TIMER_DURATION, optAddRandomOffset)
 end
 
 -- returns the target position of the lava furnace

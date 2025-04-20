@@ -148,7 +148,7 @@ function logistica.register_bucket_emptier(desc, name, tiles)
     logistica = {
       on_power = logistica.emptier_on_power,
       on_connect_to_network = function(pos, networkId)
-        logistica.start_node_timer(pos, 1)
+        logistica.start_node_timer(pos, 1, true)
       end,
     },
     _mcl_hardness = 3,

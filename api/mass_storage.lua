@@ -391,7 +391,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
         if isPoweredOn then logistica.start_mass_storage_timer(pos) end
       end,
       on_connect_to_network = function(pos, networkId)
-        logistica.start_mass_storage_timer(pos)
+        logistica.start_mass_storage_timer(pos, true)
       end
     },
     connect_sides = {"top", "bottom", "left", "back", "right" },

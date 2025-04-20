@@ -61,8 +61,8 @@ function logistica.set_injector_target_list(pos, listName)
   end
 end
 
-function logistica.start_injector_timer(pos)
-  logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
+function logistica.start_injector_timer(pos, optAddRandomOffset)
+  logistica.start_node_timer(pos, TIMER_DURATION_SHORT, optAddRandomOffset)
 end
 
 function logistica.on_injector_timer(pos, elapsed)

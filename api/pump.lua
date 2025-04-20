@@ -163,7 +163,7 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
     logistica = {
       on_power = logistica.pump_on_power,
       on_connect_to_network = function(pos, networkId)
-        logistica.start_node_timer(pos, 1)
+        logistica.start_node_timer(pos, 1, true)
       end,
     },
     _mcl_hardness = 3,

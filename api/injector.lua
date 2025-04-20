@@ -177,7 +177,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
     logistica = {
       injector_transfer_rate = transferRate,
       on_connect_to_network = function(pos, networkId)
-        logistica.start_injector_timer(pos)
+        logistica.start_injector_timer(pos, true)
       end,
       on_power = function(pos, isPoweredOn)
         if isPoweredOn then

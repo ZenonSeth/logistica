@@ -182,7 +182,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
     logistica = {
       requester_transfer_rate = transferRate,
       on_connect_to_network = function(pos, networkId)
-        logistica.start_requester_timer(pos)
+        logistica.start_requester_timer(pos, nil, true)
       end,
       on_power = function(pos, isPoweredOn)
         logistica.set_node_tooltip_from_state(pos, nil, isPoweredOn)

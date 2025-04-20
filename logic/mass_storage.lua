@@ -134,8 +134,8 @@ function logistica.pull_items_from_network_into_mass_storage(pos)
   return true
 end
 
-function logistica.start_mass_storage_timer(pos)
-  logistica.start_node_timer(pos, 1)
+function logistica.start_mass_storage_timer(pos, optAddRandomOffset)
+  logistica.start_node_timer(pos, 1, optAddRandomOffset)
 end
 
 function logistica.on_mass_storage_timer(pos, _)

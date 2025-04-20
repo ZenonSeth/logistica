@@ -140,7 +140,7 @@ function logistica.register_lava_furnace_fueler(description, name, tiles)
     on_rightclick = on_fueler_right_click,
     logistica = {
       on_connect_to_network = function(pos, networkId)
-        logistica.lava_furnace_fueler_start_timer(pos)
+        logistica.lava_furnace_fueler_start_timer(pos, true)
       end,
       on_power = function(pos, isPoweredOn)
         if isPoweredOn then

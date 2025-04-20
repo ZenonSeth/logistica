@@ -79,9 +79,10 @@ function logistica.clamp(v, min, max)
     return v
 end
 
-function logistica.start_node_timer(pos, time)
+function logistica.start_node_timer(pos, time, optAddRandomOffset)
   local timer = minetest.get_node_timer(pos)
   if not timer:is_started() then
+    if optAddRandomOffset then time = time + math.random() / 2 end
     timer:start(time)
     return timer
   end

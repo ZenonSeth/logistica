@@ -172,9 +172,9 @@ end
 -- Storage operation functions
 ----------------------------------------------------------------
 
-function logistica.start_requester_timer(pos, duration)
+function logistica.start_requester_timer(pos, duration, optAddRandomOffset)
   if duration == nil then duration = TIMER_DURATION_SHORT end
-  logistica.start_node_timer(pos, duration)
+  logistica.start_node_timer(pos, duration, optAddRandomOffset)
 end
 
 function logistica.on_requester_timer(pos, elapsed)
