@@ -8,15 +8,7 @@ local INV_HOUT = "hout"
 
 local forms = {}
 
-local function update_craft_output(inv)
-  local inputList = logistica.get_list(inv, INV_CRAFT)
-  local out, _ = minetest.get_craft_result({
-    method = "normal",
-    width = 3,
-    items = inputList
-  })
-  inv:set_stack(INV_MAIN, 1, out.item)
-end
+
 
 local function get_craftsup_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
@@ -38,6 +30,8 @@ local function get_craftsup_formspec(pos)
 end
 
 local function show_craftsup_formspec(playerName, pos)
+  -- make sure we upate the output item
+  logistica.crafting_supplier_update_output(pos)
   forms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_craftsup_formspec(pos))
 end
@@ -87,8 +81,7 @@ local function allow_craftsup_storage_inv_put(pos, listname, index, stack, playe
     else
       inv:set_stack(listname, index, stack)
     end
-    update_craft_output(minetest.get_meta(pos):get_inventory())
-    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+    logistica.crafting_supplier_update_output(pos)
   end
   return 0
 end
@@ -100,8 +93,7 @@ local function allow_craftsup_inv_take(pos, listname, index, stack, player)
     local st = inv:get_stack(listname, index)
     st:take_item(stack:get_count())
     inv:set_stack(listname, index, st)
-    update_craft_output(minetest.get_meta(pos):get_inventory())
-    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+    logistica.crafting_supplier_update_output(pos)
     return 0
   elseif listname == INV_MAIN then
     if index == 1 then return 0
@@ -116,18 +108,15 @@ local function allow_craftsup_inv_move(pos, from_list, from_index, to_list, to_i
 end
 
 local function on_craftsup_inventory_put(pos, listname, index, stack, player)
-  update_craft_output(minetest.get_meta(pos):get_inventory())
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.crafting_supplier_update_output(pos)
 end
 
 local function on_craftsup_inventory_take(pos, listname, index, stack, player)
-  update_craft_output(minetest.get_meta(pos):get_inventory())
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.crafting_supplier_update_output(pos)
 end
 
 local function on_craftsup_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
-  update_craft_output(minetest.get_meta(pos):get_inventory())
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.crafting_supplier_update_output(pos)
 end
 
 local function can_dig_craftsup(pos, player)
@@ -141,7 +130,7 @@ end
 
 local function on_craftsup_power(pos, power)
   logistica.set_node_tooltip_from_state(pos, nil, power)
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.crafting_supplier_update_output(pos)
 end
 
 ----------------------------------------------------------------
