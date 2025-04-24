@@ -85,6 +85,18 @@ local function consume_for_craft(craftItems, craftItemsMult, extrasMadeByCraftin
   return { countCanCraft = 1, newExtrasList = extrasCopy }
 end
 
+local function update_craft_output(inv)
+  local inputList = logistica.get_list(inv, INV_CRAFT)
+  local out, _ = minetest.get_craft_result({
+    method = "normal",
+    width = 3,
+    items = inputList
+  })
+  inv:set_stack(INV_MAIN, 1, out.item)
+end
+
+-- public functions
+
 -- returns a list of ItemStacks to be used for caching, which may be a sublist of INV_MAIN if the machine is off
 function logistica.crafting_supplier_get_main_list(pos)
   local isOn = logistica.is_machine_on(pos)
@@ -109,6 +121,9 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local remaining = takeStack:get_count()
   local takeStackName = takeStack:get_name()
   local inv = minetest.get_meta(pos):get_inventory()
+
+  -- make sure we upate the output item
+  logistica.crafting_supplier_update_output(pos)
 
   -- first try to take from supply, ignore the 1st slot (which is for the crafted item)
   local supplierResult = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, 1)
@@ -195,4 +210,9 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   end
 
   return ret(remaining)
+end
+
+function logistica.crafting_supplier_update_output(pos)
+  update_craft_output(minetest.get_meta(pos):get_inventory())
+  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
 end
