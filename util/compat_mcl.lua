@@ -1,4 +1,5 @@
 local mcl = minetest.get_modpath("mcl_core")
+local mcl_nether = minetest.get_modpath("mcl_nether")
 
 logistica.sound_mod = mcl and mcl_sounds or default
 
@@ -6,6 +7,14 @@ local function get_mcl_river_water_source()
     if minetest.registered_nodes["mcl_core:river_water_source"] then return "mcl_core:river_water_source"
     elseif minetest.registered_nodes["mclx_core:river_water_source"] then return "mclx_core:river_water_source"
     else return "" end
+end
+
+local function get_mcl_lava_source_nether()
+    if minetest.registered_nodes["mcl_nether:nether_lava_source"] then
+        return "mcl_nether:nether_lava_source"
+    else
+        return nil
+    end
 end
 
 -- Returns a player's inventory formspec with the correct width and hotbar position for the current game
@@ -51,6 +60,7 @@ logistica.itemstrings = {
     water_source = mcl and "mcl_core:water_source" or "default:water_source",
     river_water_source = mcl and get_mcl_river_water_source() or "default:river_water_source",
     lava_source = mcl and "mcl_core:lava_source" or "default:lava_source",
+    lava_source_nether = mcl_nether and get_mcl_lava_source_nether() or nil,
     paper = mcl and "mcl_core:paper" or "default:paper"
 }
 

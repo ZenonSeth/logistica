@@ -36,8 +36,9 @@ liq.name_to_texture = {
   [liq.river_water] = river_water_texture,
 }
 
+-- Either to single source block or to list of source blocks.
 liq.name_to_source_block = {
-  [liq.lava] = itemstrings.lava_source,
+  [liq.lava] = {itemstrings.lava_source, itemstrings.lava_source_nether},
   [liq.water] = itemstrings.water_source,
   [liq.river_water] = itemstrings.river_water_source,
 }
