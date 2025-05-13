@@ -7,7 +7,7 @@ local EMPTY_TO_FILLED = {} -- { empty_bucket_name = { liquidName = full_bucket_n
 local NAME_TO_EMPTY_BUCKETS = {} -- { liquidName = { emptyBucket = true, ... } }
 local NAME_TO_DESC = {} -- { liquidName = "Description of liquid" }
 local NAME_TO_TEXTURE = {} -- { liquidName = "texture_of_liquid" }
-local NAME_TO_SOURCE = {} -- { liquidName = source_node_name }
+local NAME_TO_SOURCES = {} -- { liquidName = {[source_node_name_1] = true, [source_node_name_2] = true, ... } }
 local SOURCE_TO_NAME = {} -- { source_node_name = liquid_name }
 
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
@@ -94,7 +94,7 @@ function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName
   return strDescription.."\n"..getStrContains(currBuckets, maxBuckets, liquidName)
 end
 
-function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
+function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture, sourceNodeNames)
   if not emptyBucketName then emptyBucketName = EMPTY_BUCKET end
 
   FILLED_BUCKET_TO_NAME[bucketName] = liquidName
@@ -112,9 +112,15 @@ function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketN
 
   NAME_TO_DESC[liquidName] = liquidDesc
   NAME_TO_TEXTURE[liquidName] = liquidTexture
-  if sourceNodeName then
-    NAME_TO_SOURCE[liquidName] = sourceNodeName
-    SOURCE_TO_NAME[sourceNodeName] = liquidName
+  -- source node names is an array of source nodes associated with this liquid. Add the whole set.
+  if not NAME_TO_SOURCES[liquidName] then NAME_TO_SOURCES[liquidName] = {} end
+  if sourceNodeNames and type(sourceNodeNames) == "table" then
+    for _, sourceNodeName in ipairs(sourceNodeNames) do
+      if type(sourceNodeName) == "string" then
+        NAME_TO_SOURCES[liquidName][sourceNodeName] = true
+        SOURCE_TO_NAME[sourceNodeName] = liquidName
+      end
+    end
   end
 end
 
