@@ -194,12 +194,18 @@ end
   `liquidDesc`: a human readable liquid description, e.g. "Water"<br>
   `bucketItemName` : the name of the bucket that holds the liquid<br>
   `liquidTexture` : a single texture to use for the liquid<br>
-  `sourceBlockName` : the name of the minetest liquid source node
+  `sourceNodeName` : the name of the minetest liquid source node, or an array of them
   `optLight` : optional, if nil assumed 0. How much a non-empty reservoir will glow
   `emptyBucketName` : optional, if nil, bucket:bucket_empty will be used - the "empty" container to use<br>
 ]]
 function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, liquidTexture, sourceNodeName, optLight, optEmptyBucketName)
   local lname = string.lower(liquidName:gsub(" ", "_"))
+  local sourceNodeNames = nil
+  if type(sourceNodeName) == "string" then
+    sourceNodeNames = {sourceNodeName}
+  elseif type(sourceNodeName) == "table" then
+    sourceNodeNames = table.copy(sourceNodeName)
+  end
 
   for _, variantName in ipairs(variants) do
     local nodeName = L("reservoir_"..variantName.."_"..lname)
@@ -220,7 +226,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
         minetest.register_node(nodeName.."_disabled", get_disabled_def(def))
       end
 
-      logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeName)
+      logistica.reservoir_register_names(lname, bucketItemName, optEmptyBucketName, liquidDesc, liquidTexture, sourceNodeNames)
     end
   end
 end
