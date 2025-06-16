@@ -15,6 +15,7 @@ dofile(path.."/inv_list_sorting.lua")
 dofile(path.."/inv_list_filtering.lua")
 dofile(path.."/inv_common.lua")
 dofile(path.."/compat_bucket.lua")
+dofile(path.."/disallowed_lists.lua")
 
 -- bad debug
 local d = {}
