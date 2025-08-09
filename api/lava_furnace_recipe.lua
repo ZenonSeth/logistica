@@ -45,18 +45,20 @@ function logistica.get_lava_furnace_recipes_for(itemName)
 
   if output.time > 0 and decrOut.items[1]:is_empty() then
     local lavaTime = math.max(MIN_TIME, output.time / NORMAL_COOK_REDUCTION_FACTOR)
-    table.insert(presets, {
+    local regularRecipe = {
       input_count = 1,
       output = output.item:to_string(),
       lava = lavaTime * NORMAL_COOK_LAVA_USAGE_PER_SEC,
       time = lavaTime
-    })
+    }
+
+    if presets then table.insert(presets, regularRecipe)
+    else presets = {regularRecipe}
+    end
   end
 
-  if presets then return presets end
-
-  -- nothing found
-  return nil
+  -- returns nil for no matching recipes
+  return presets
 end
 
 -- returns a copy_pointed_thing of internal the internal recipes - for reference
