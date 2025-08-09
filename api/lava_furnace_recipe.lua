@@ -37,22 +37,23 @@ end
 
 function logistica.get_lava_furnace_recipes_for(itemName)
   local presets = lava_furnace_recipes[itemName]
-  if presets then return presets end
 
-  -- else, try to adopt the real one
+  -- also look for regular furnace recipe
   local output, decrOut = minetest.get_craft_result({
     method = "cooking", width = 1, items = { ItemStack(itemName) }
   })
 
   if output.time > 0 and decrOut.items[1]:is_empty() then
     local lavaTime = math.max(MIN_TIME, output.time / NORMAL_COOK_REDUCTION_FACTOR)
-    return {{
+    table.insert(presets, {
       input_count = 1,
       output = output.item:to_string(),
       lava = lavaTime * NORMAL_COOK_LAVA_USAGE_PER_SEC,
       time = lavaTime
-    }}
+    })
   end
+
+  if presets then return presets end
 
   -- nothing found
   return nil
