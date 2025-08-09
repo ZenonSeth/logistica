@@ -1,5 +1,5 @@
 
-local lava_furance_recipes = {}
+local lava_furnace_recipes = {}
 local NORMAL_COOK_LAVA_USAGE_PER_SEC = 2 -- in millibuckets
 local NORMAL_COOK_REDUCTION_FACTOR = 2
 local MIN_TIME = 0.5
@@ -23,8 +23,8 @@ function logistica.register_lava_furnace_recipe(def)
   end
 
   local useChance = (def.additive_use_chance ~= nil and logistica.clamp(def.additive_use_chance, 0, 100)) or 100
-  lava_furance_recipes[def.input] = lava_furance_recipes[def.input] or {}
-  table.insert(lava_furance_recipes[def.input], {
+  lava_furnace_recipes[def.input] = lava_furnace_recipes[def.input] or {}
+  table.insert(lava_furnace_recipes[def.input], {
     input = def.input,
     input_count = def.input_count or 1,
     output = def.output,
@@ -36,7 +36,7 @@ function logistica.register_lava_furnace_recipe(def)
 end
 
 function logistica.get_lava_furnace_recipes_for(itemName)
-  local presets = lava_furance_recipes[itemName]
+  local presets = lava_furnace_recipes[itemName]
   if presets then return presets end
 
   -- else, try to adopt the real one
@@ -60,5 +60,5 @@ end
 
 -- returns a copy_pointed_thing of internal the internal recipes - for reference
 function logistica.get_lava_furnace_internal_recipes()
-  return table.copy(lava_furance_recipes)
+  return table.copy(lava_furnace_recipes)
 end
