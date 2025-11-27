@@ -290,7 +290,7 @@ function logistica.insert_itemstack_for_requester(requesterPos, itemstack, limit
   if toInsertStack:is_empty() then return itemStackCount end
 
   local leftover = targetInventory:add_item(targetList, toInsertStack)
-  local targetNode = minetest.get_node(inventories.targetPos)
+  -- local targetNode = minetest.get_node(inventories.targetPos)
   if leftover:get_count() < toInsertStack:get_count() then -- and TARGET_NODES_REQUIRING_TIMER[targetNode.name] then
     logistica.start_node_timer(inventories.targetPos, 1)
   end

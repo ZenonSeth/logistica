@@ -1,5 +1,6 @@
 local no_push = logistica.add_disallowed_push_list
 local no_pull = logistica.add_disallowed_pull_list
+local do_push = logistica.add_allowed_push_list_for_node
 
 if minetest.get_modpath("techage") then
   -- some nodes in techage have lists that we shouldn't push or pull from
@@ -32,4 +33,11 @@ if minetest.get_modpath("digtron") then
 
   no_pull("digtron:builder",        "main")
   no_pull("digtron:master_builder", "main")
+end
+
+if minetest.get_modpath("pipeworks") then
+  no_push("pipeworks:nodebreaker_off", "main")
+  no_push("pipeworks:nodebreaker_on",  "main")
+  do_push("pipeworks:nodebreaker_off", "pick")
+  do_push("pipeworks:nodebreaker_on",  "pick")
 end
