@@ -40,4 +40,7 @@ if minetest.get_modpath("pipeworks") then
   no_push("pipeworks:nodebreaker_on",  "main")
   do_push("pipeworks:nodebreaker_off", "pick")
   do_push("pipeworks:nodebreaker_on",  "pick")
+
+  no_push("pipeworks:filter", "main")
+  no_pull("pipeworks:filter", "main")
 end
