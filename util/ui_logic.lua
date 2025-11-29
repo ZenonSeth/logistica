@@ -35,6 +35,11 @@ local logisticaBucketEmptierAllowedPush = {
   ["input"] = true,
 }
 
+-- this MUST be a subset of the allowed pull/push list above
+local logisticaSupplyChestsPushPull = {
+  ["main"] = true,
+}
+
 local function get_lists(targetPosition, usePushLists)
   logistica.load_position(targetPosition)
   local node = minetest.get_node(targetPosition)
@@ -47,6 +52,9 @@ local function get_lists(targetPosition, usePushLists)
       allowedLists = logisticaBucketEmptierAllowedPush
       disallowedLists = {}
     else return {} end -- can only push to bucket emptier, it acts as a supplier so no need to pull
+  elseif logistica.GROUPS.suppliers.is(node.name) or logistica.GROUPS.vaccuum_suppliers.is(node.name) then
+    allowedLists = logisticaSupplyChestsPushPull
+    disallowedLists = {}
   elseif logistica.is_machine(node.name) then return {}
   elseif usePushLists then
     allowedLists = allowedPush
