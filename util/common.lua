@@ -119,7 +119,7 @@ function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
   logistica.load_position(pos)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
-  local isOnText = (minetest.registered_nodes[node.name].logistica.on_power and (isOn and "Running" or "Stopped")) or ""
+  local isOnText = (minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].logistica and minetest.registered_nodes[node.name].logistica.on_power and (isOn and "Running" or "Stopped")) or ""
   local text = minetest.registered_nodes[node.name].description..extraText.."\n"..isOnText
   meta:set_string("infotext", text)
 end
