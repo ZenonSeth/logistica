@@ -19,14 +19,18 @@
 - Toggle machines
   - Signals sender/receivers
   - Senders:
+    - Timer (time on, time off)
     - Network content (#items, #liquid)
     - External Content Reader (#items in another node)
-    - External Mesecon connection
     - User Switch and User Button
+    - Mesecon receiver - sends signal if mesecon on/off
+  - Signal Logic Gate
   - Receivers:
     - Toggler: Can toggle other select machines on/off
     - Status Light: Turns on/off based on signal
-    - Mesecon receiver
+    - External Mesecon sender - sends a mesecon on
+    - Digiline output
+    - (Maybe) Display Unit
 - Recycler machine (un-crafts logistica machines)
 - Lava Furnace
   - Fix shift+click on slots
