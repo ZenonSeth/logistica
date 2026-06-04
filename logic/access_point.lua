@@ -128,7 +128,7 @@ local function build_stack_list(pos, playerName)
     if count > 1 and stack:get_stack_max() == 1 then
       stack:get_meta():set_string("count_meta", tostring(count))
     elseif count > STACK_MAX_SIZE then
-      stack:get_meta():set_string("count_meta", "> "..tostring(STACK_MAX_SIZE))
+      stack:get_meta():set_string("count_meta", logistica.format_count(count))
     end
     listSize = listSize + 1
     itemList[listSize] = stack

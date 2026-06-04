@@ -85,14 +85,16 @@ local function consume_for_craft(craftItems, craftItemsMult, extrasMadeByCraftin
   return { countCanCraft = 1, newExtrasList = extrasCopy }
 end
 
-local function update_craft_output(inv)
+local function update_craft_output(pos, inv)
   local inputList = logistica.get_list(inv, INV_CRAFT)
   local out, _ = minetest.get_craft_result({
     method = "normal",
     width = 3,
     items = inputList
   })
-  inv:set_stack(INV_MAIN, 1, out.item)
+  local item = out and out.item or ItemStack("")
+  inv:set_stack(INV_MAIN, 1, item)
+  logistica.append_makes_infotext(pos, item)
 end
 
 -- public functions
@@ -213,6 +215,6 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
 end
 
 function logistica.crafting_supplier_update_output(pos)
-  update_craft_output(minetest.get_meta(pos):get_inventory())
+  update_craft_output(pos, minetest.get_meta(pos):get_inventory())
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
 end

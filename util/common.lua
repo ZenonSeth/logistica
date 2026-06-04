@@ -124,6 +124,14 @@ function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
   meta:set_string("infotext", text)
 end
 
+function logistica.append_makes_infotext(pos, itemstack)
+  local meta = minetest.get_meta(pos)
+  local existing = meta:get_string("infotext")
+  existing = existing:gsub("\nMakes: [^\n]*$", "")
+  local desc = (not itemstack:is_empty()) and ("\nMakes: " .. itemstack:get_short_description()) or ""
+  meta:set_string("infotext", existing .. desc)
+end
+
 -- returns a value in the range [1,#listSize], incrementing the slot each 
 -- time this is called, and returining a slot that has an item
 -- if there's no item in the list, it will return 0
@@ -229,4 +237,17 @@ function logistica.round(x)
     return math.floor(x + 0.5)
   end
   return math.ceil(x - 0.5)
+end
+
+function logistica.format_count(n)
+  if n >= 1000000 then
+    local v = n / 1000000
+    if v >= 10 then return math.floor(v + 0.5).."M" end
+    return string.format("%.1f", v).."M"
+  elseif n >= 1000 then
+    local v = n / 1000
+    if v >= 10 then return math.floor(v + 0.5).."k" end
+    return string.format("%.1f", v).."k"
+  end
+  return tostring(n)
 end

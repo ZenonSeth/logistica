@@ -11,14 +11,16 @@ local TIMER_SHORT = 1.0
 local TIMER_LONG = 3.0
 
 
-local function update_craft_output(inv)
+local function update_craft_output(pos, inv)
   local inputList = logistica.get_list(inv, INV_CRAFT)
   local out, _ = minetest.get_craft_result({
     method = "normal",
     width = 3,
     items = inputList
   })
-  inv:set_stack(INV_CRAFT_RES, 1, out.item)
+  local item = out and out.item or ItemStack("")
+  inv:set_stack(INV_CRAFT_RES, 1, item)
+  logistica.append_makes_infotext(pos, item)
 end
 
 --------------------------------
@@ -92,7 +94,7 @@ local function autocrafter_allow_metadata_inv_put(pos, listname, index, stack, p
     else
       inv:set_stack(listname, index, stack)
     end
-    update_craft_output(inv)
+    update_craft_output(pos, inv)
     return 0
   end
   return stack:get_count()
@@ -106,7 +108,7 @@ local function autocrafter_allow_metadata_inv_take(pos, listname, index, stack, 
     local st = inv:get_stack(listname, index)
     st:take_item(stack:get_count())
     inv:set_stack(listname, index, st)
-    update_craft_output(inv)
+    update_craft_output(pos, inv)
     return 0
   end
   return stack:get_count()
@@ -121,7 +123,7 @@ end
 
 local function autocrafter_on_inv_change(pos)
   local inv = minetest.get_meta(pos):get_inventory()
-  update_craft_output(inv)
+  update_craft_output(pos, inv)
   logistica.start_node_timer(pos, TIMER_SHORT)
 end
 
