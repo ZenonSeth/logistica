@@ -1,6 +1,5 @@
 ## Logistica 2.0 Wishlist
 ### Definitely
-- Lava generator - but slow
 - Mass Storage
   - Make Reserve an input field
   - Add new Demand field instead of Pull switch
@@ -42,7 +41,7 @@
 - Filters on Vacuum chest
 
 ### Maybe
-- Use respec for layout changes
+- Lava generator - but slow
 - Access Point
   - Add tabs to access point
   - Add advanced autocrafting
