@@ -117,30 +117,18 @@ local function update_requester_actual_request(pos)
   local inventories = get_valid_requester_and_target_inventory(pos)
   if not inventories then return end
   local requesterInv = inventories.requesterInventory
-  local actualRequestList = {}
-  local requestStack = nil
-  local nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
-  local startingSlot = nextSlot
-  repeat
-    if nextSlot <= 0 then return nil end
-    local filterStack = logistica.get_list(requesterInv, "filter")[nextSlot]
-    if get_requester_infinite_state(get_meta(pos), nextSlot) then
-      requestStack = filterStack
-    else
-      requestStack = get_target_missing_item_stack(filterStack, inventories)
-    end
-    local demStackCount = requestStack:get_count()
-    if demStackCount > 0 then
-      local prev = actualRequestList[requestStack:get_name()] or 0
-      if demStackCount > prev then
-        actualRequestList[requestStack:get_name()] = demStackCount
+  local newActualRequestList = {}
+  for i = 1, NUM_REQUEST_SLOTS do
+    local filterStack = requesterInv:get_stack("filter", i)
+    local requestStack = ItemStack("")
+    if not filterStack:is_empty() then
+      if get_requester_infinite_state(get_meta(pos), i) then
+        requestStack = filterStack
+      else
+        requestStack = get_target_missing_item_stack(filterStack, inventories)
       end
     end
-    nextSlot = logistica.get_next_filled_item_slot(get_meta(pos), "filter")
-  until( nextSlot == startingSlot ) -- until we get back to the starting slot
-  local newActualRequestList = {}
-  for itemname, count in pairs(actualRequestList) do
-    table.insert(newActualRequestList, ItemStack(itemname.." "..count))
+    newActualRequestList[i] = requestStack
   end
   requesterInv:set_list("actual", newActualRequestList)
 end
@@ -294,5 +282,5 @@ function logistica.insert_itemstack_for_requester(requesterPos, itemstack, limit
   if leftover:get_count() < toInsertStack:get_count() then -- and TARGET_NODES_REQUIRING_TIMER[targetNode.name] then
     logistica.start_node_timer(inventories.targetPos, 1)
   end
-  return leftover:get_count() + itemStackCount - needed
+  return itemStackCount - (toInsertStack:get_count() - leftover:get_count())
 end
