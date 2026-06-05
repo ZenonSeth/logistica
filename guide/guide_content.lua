@@ -49,6 +49,11 @@ local PAGE_WIRELESS_CRYSTAL = "iwrcry"
 
 local PAGE_SERVER_SETTINGS = "servset"
 
+local PAGE_SIGNALS_OVERVIEW = "sigover"
+local PAGE_SIGNAL_SWITCH    = "sigsw"
+local PAGE_SIGNAL_LAMP      = "siglmp"
+local PAGE_SIGNAL_TOGGLER   = "sigtgl"
+
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
 local allLavaFurnRecipes = logistica.get_lava_furnace_internal_recipes()
@@ -137,6 +142,11 @@ local RECIPE_LINKS = {
   [L("silverin_circuit")] = PAGE_SILVERIN_CIRCUIT,
   [L("wireless_antenna")] = PAGE_WIRELESS_ANTENNA,
 
+  -- signals
+  [L("signal_switch")]     = PAGE_SIGNAL_SWITCH,
+  [L("signal_lamp_white")] = PAGE_SIGNAL_LAMP,
+  [L("signal_toggler")]    = PAGE_SIGNAL_TOGGLER,
+
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
   [L("reservoir_silverin_empty")] = PAGE_RESERVOIR,
@@ -202,6 +212,11 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("Autocrafting:"))},
     { name = S("  Crafting Supplier"), id = PAGE_CRAFTING_SUPPLIER },
     { name = S("  Autocrafter"), id = PAGE_AUTOCRAFTER },
+    { name = header(S("Signals:"))},
+    { name = S("  Signals Overview"), id = PAGE_SIGNALS_OVERVIEW },
+    { name = S("  Signal Switch"), id = PAGE_SIGNAL_SWITCH },
+    { name = S("  Signal Lamp"), id = PAGE_SIGNAL_LAMP },
+    { name = S("  Signal Toggler"), id = PAGE_SIGNAL_TOGGLER },
     { name = header(S("Utility Machines:"))},
     { name = S("  Vaccuum Chest"), id = PAGE_VACCUUM_CHEST },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
@@ -545,6 +560,33 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_WRLSANTN,
       recipeLinks = RECIPE_LINKS,
       description = desc.wireless_antenna,
+    },
+
+    -- signals
+
+    [PAGE_SIGNALS_OVERVIEW] = {
+      title = S("Signals"),
+      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_toggler")},
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signals_overview,
+    },
+
+    [PAGE_SIGNAL_SWITCH] = {
+      title = S("Signal Switch"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_switch,
+    },
+
+    [PAGE_SIGNAL_LAMP] = {
+      title = S("Signal Lamp"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_lamp,
+    },
+
+    [PAGE_SIGNAL_TOGGLER] = {
+      title = S("Signal Toggler"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_toggler,
     },
 
     -- Settings
