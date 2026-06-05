@@ -303,6 +303,42 @@ logistica.register_vaccuum_chest(S("Vaccuum Supplier Chest"), "vaccuum_chest", 1
 })
 
 --------------------------------
+-- Signal Lamp
+--------------------------------
+
+logistica.register_signal_lamp(
+  S("White Signal Lamp"),
+  "signal_lamp_white",
+  "logistica_signal_lamp_white_off.png",
+  "logistica_signal_lamp_white_on.png"
+)
+
+--------------------------------
+-- Signal Switch
+--------------------------------
+
+logistica.register_signal_switch(
+  S("Signal Switch"),
+  "signal_switch",
+  {
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_signal_switch_front_off.png",
+  },
+  {
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_signal_switch_front_on.png",
+  }
+)
+
+--------------------------------
 -- Wireless Receiver
 --------------------------------
 

@@ -46,6 +46,8 @@ logistica.NETWORK_GROUPS = {
   reservoirs = "reservoirs",
   wireless_transmitters = "wireless_transmitters",
   wireless_receivers = "wireless_receivers",
+  signal_senders = "signal_senders",
+  signal_receivers = "signal_receivers",
 }
 
 local NETWORK_GROUP_NAMES = {
@@ -60,6 +62,8 @@ local NETWORK_GROUP_NAMES = {
   reservoirs = "Reservoirs",
   wireless_transmitters = "Wireless Transmitter",
   wireless_receivers = "Wireless Receivers",
+  signal_senders = "Signal Senders",
+  signal_receivers = "Signal Receivers",
 }
 
 -- The default node groups of Logistica, with utility shorthand attached.<br>
@@ -82,6 +86,8 @@ logistica.GROUPS = {
   reservoirs = make_group_table("reservoirs", logistica.NETWORK_GROUPS.reservoirs),
   wireless_transmitters = make_group_table("wireless_transmitters", logistica.NETWORK_GROUPS.wireless_transmitters),
   wireless_receivers = make_group_table("wireless_receivers", logistica.NETWORK_GROUPS.wireless_receivers),
+  signal_senders = make_group_table("signal_senders", logistica.NETWORK_GROUPS.signal_senders),
+  signal_receivers = make_group_table("signal_receivers", logistica.NETWORK_GROUPS.signal_receivers),
 }
 
 ----------------------------------------------------------------

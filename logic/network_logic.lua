@@ -136,10 +136,21 @@ local function notify_connected(pos, nodeName, networkId)
   end
 end
 
-local function notify_disconnected(pos, networkId)
-  local def = minetest.registered_nodes[minetest.get_node(pos).name]
+local function notify_disconnected(pos, networkId, oldNodeName)
+  local nodeName = oldNodeName or minetest.get_node(pos).name
+  local def = minetest.registered_nodes[nodeName]
   if def and def.logistica and def.logistica.on_disconnect_from_network then
     def.logistica.on_disconnect_from_network(pos, networkId)
+  end
+end
+
+local function notify_signal_receivers(network, name, isOn)
+  for rcHash, _ in pairs(network.signal_receivers) do
+    local rcPos = h2p(rcHash)
+    local rcDef = minetest.registered_nodes[minetest.get_node(rcPos).name]
+    if rcDef and rcDef.logistica and rcDef.logistica.on_signal_received then
+      rcDef.logistica.on_signal_received(rcPos, name, isOn)
+    end
   end
 end
 
@@ -325,6 +336,7 @@ local function create_network(controllerPosition, oldNetworkName)
   network.storage_cache = {}
   network.supplier_cache = {}
   network.requester_cache = {}
+  network.signals = {}  -- {signal_name -> {sender_hash -> true}} for all active ON senders
   network._num_nodes = 0
 
   local startPos = { [controllerHash] = true }
@@ -405,7 +417,7 @@ local function try_to_add_to_network(pos, ops)
   ops.update_cache_node_added(pos)
 end
 
-local function remove_from_network(pos, oldMeta, ops)
+local function remove_from_network(pos, oldNode, oldMeta, ops)
   local hash = p2h(pos)
   local network = logistica.get_network_or_nil(pos, oldMeta)
   if not network then return end
@@ -416,7 +428,7 @@ local function remove_from_network(pos, oldMeta, ops)
   ops.get_list(network)[hash] = nil
   -- decrement count
   network._num_nodes = network._num_nodes - 1
-  notify_disconnected(pos, networkId)
+  notify_disconnected(pos, networkId, oldNode and oldNode.name)
 end
 
 local function on_node_change(pos, oldNode, oldMeta, ops)
@@ -424,7 +436,7 @@ local function on_node_change(pos, oldNode, oldMeta, ops)
   if placed == true then
     try_to_add_to_network(pos, ops)
   else
-    remove_from_network(pos, oldMeta, ops)
+    remove_from_network(pos, oldNode, oldMeta, ops)
   end
 end
 
@@ -519,6 +531,46 @@ local TRANSMITTER_OPS = {
   update_cache_node_added = function(_)  end,
   update_cache_node_removed = function(_) end,
 }
+
+local SIGNAL_SENDER_OPS = {
+  get_list = function(network) return network.signal_senders end,
+  update_cache_node_added = function(_) end,
+  update_cache_node_removed = function(_) end,
+}
+
+local SIGNAL_RECEIVER_OPS = {
+  get_list = function(network) return network.signal_receivers end,
+  update_cache_node_added = function(_) end,
+  update_cache_node_removed = function(_) end,
+}
+
+local function on_signal_sender_changed(pos, oldNode, oldMeta)
+  if oldNode == nil then
+    try_to_add_to_network(pos, SIGNAL_SENDER_OPS)
+  else
+    -- get_network_or_nil checks the current node name which is already "air" after_dig,
+    -- so look up the network directly from the cached ID in oldMeta instead
+    local cachedId = get_unchecked_cached_network_id(oldMeta)
+    local network = cachedId and cachedId ~= CACHED_NETWORK_ID_ALREADY_TRIED
+      and networks[tonumber(cachedId)]
+    if network then
+      local hash = p2h(pos)
+      for name, senders in pairs(network.signals) do
+        if senders[hash] then
+          senders[hash] = nil
+          local signalIsOn = not logistica.table_is_empty(senders)
+          if not signalIsOn then network.signals[name] = nil end
+          notify_signal_receivers(network, name, signalIsOn)
+        end
+      end
+    end
+    remove_from_network(pos, oldNode, oldMeta, SIGNAL_SENDER_OPS)
+  end
+end
+
+local function on_signal_receiver_changed(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, SIGNAL_RECEIVER_OPS)
+end
 
 local function cable_can_extend_network_from(pos)
   local node = minetest.get_node_or_nil(pos)
@@ -727,4 +779,54 @@ end
 
 function logistica.on_wifi_transmitter_change(pos, oldNode, oldMeta, objRef)
   on_wifi_transmitter_changed(pos, oldNode, oldMeta, objRef)
+end
+
+function logistica.on_signal_sender_change(pos, oldNode, oldMeta)
+  on_signal_sender_changed(pos, oldNode, oldMeta)
+end
+
+function logistica.on_signal_receiver_change(pos, oldNode, oldMeta)
+  on_signal_receiver_changed(pos, oldNode, oldMeta)
+end
+
+-- Send a named signal ON or OFF from pos. Notifies all receivers on the network.
+-- Uses OR semantics: signal is ON as long as any sender has it ON.
+function logistica.signal_send(pos, name, isOn)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return end
+  local hash = p2h(pos)
+  if not network.signals[name] then network.signals[name] = {} end
+  if isOn then
+    network.signals[name][hash] = true
+  else
+    network.signals[name][hash] = nil
+    if logistica.table_is_empty(network.signals[name]) then
+      network.signals[name] = nil
+    end
+  end
+  local signalIsOn = network.signals[name] ~= nil
+  notify_signal_receivers(network, name, signalIsOn)
+end
+
+-- Returns true if the named signal is currently ON in the network, false otherwise.
+function logistica.signal_get_state(networkId, name)
+  local network = networks[networkId]
+  if not network then return false end
+  return network.signals[name] ~= nil
+end
+
+-- Removes all signal contributions from pos. Call this in on_disconnect_from_network
+-- for any signal sender node, passing the networkId from the callback argument.
+function logistica.signal_remove_sender(pos, networkId)
+  local network = networks[networkId]
+  if not network then return end
+  local hash = p2h(pos)
+  for name, senders in pairs(network.signals) do
+    if senders[hash] then
+      senders[hash] = nil
+      local signalIsOn = not logistica.table_is_empty(senders)
+      if not signalIsOn then network.signals[name] = nil end
+      notify_signal_receivers(network, name, signalIsOn)
+    end
+  end
 end
