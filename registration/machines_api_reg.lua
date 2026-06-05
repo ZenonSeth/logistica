@@ -314,6 +314,18 @@ logistica.register_signal_lamp(
 )
 
 --------------------------------
+-- Signal Lamp 2-Color
+--------------------------------
+
+logistica.register_signal_lamp_2c(
+  S("Blue/Red Signal Lamp"),
+  "signal_lamp_2c_br",
+  S("blue"), "logistica_signal_lamp_2c_br_off_top.png", "logistica_signal_lamp_2c_br_blue_side.png",
+  S("red"),  "logistica_signal_lamp_2c_br_off_top.png",  "logistica_signal_lamp_2c_br_red_side.png",
+             "logistica_signal_lamp_2c_br_off_top.png",  "logistica_signal_lamp_2c_br_off_side.png"
+)
+
+--------------------------------
 -- Signal Logic Gate
 --------------------------------
 
