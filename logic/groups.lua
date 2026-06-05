@@ -89,6 +89,7 @@ logistica.GROUPS = {
   signal_senders = make_group_table("signal_senders", logistica.NETWORK_GROUPS.signal_senders),
   signal_receivers = make_group_table("signal_receivers", logistica.NETWORK_GROUPS.signal_receivers),
   signal_togglers = make_group_table("signal_togglers", logistica.NETWORK_GROUPS.signal_receivers),
+  signal_gates = make_group_table("signal_gates", logistica.NETWORK_GROUPS.signal_receivers),
 }
 
 ----------------------------------------------------------------

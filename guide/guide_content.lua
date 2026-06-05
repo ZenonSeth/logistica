@@ -49,10 +49,12 @@ local PAGE_WIRELESS_CRYSTAL = "iwrcry"
 
 local PAGE_SERVER_SETTINGS = "servset"
 
-local PAGE_SIGNALS_OVERVIEW = "sigover"
-local PAGE_SIGNAL_SWITCH    = "sigsw"
-local PAGE_SIGNAL_LAMP      = "siglmp"
-local PAGE_SIGNAL_TOGGLER   = "sigtgl"
+local PAGE_SIGNALS_OVERVIEW  = "sigover"
+local PAGE_SIGNAL_SWITCH     = "sigsw"
+local PAGE_SIGNAL_LAMP       = "siglmp"
+local PAGE_SIGNAL_TOGGLER    = "sigtgl"
+local PAGE_SIGNAL_NOT_GATE   = "signot"
+local PAGE_SIGNAL_LOGIC_GATE = "siglg"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -146,6 +148,8 @@ local RECIPE_LINKS = {
   [L("signal_switch")]     = PAGE_SIGNAL_SWITCH,
   [L("signal_lamp_white")] = PAGE_SIGNAL_LAMP,
   [L("signal_toggler")]    = PAGE_SIGNAL_TOGGLER,
+  [L("signal_not_gate")]   = PAGE_SIGNAL_NOT_GATE,
+  [L("signal_logic_gate")] = PAGE_SIGNAL_LOGIC_GATE,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -217,6 +221,8 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Switch"), id = PAGE_SIGNAL_SWITCH },
     { name = S("  Signal Lamp"), id = PAGE_SIGNAL_LAMP },
     { name = S("  Signal Toggler"), id = PAGE_SIGNAL_TOGGLER },
+    { name = S("  Signal NOT Gate"), id = PAGE_SIGNAL_NOT_GATE },
+    { name = S("  Signal Logic Gate"), id = PAGE_SIGNAL_LOGIC_GATE },
     { name = header(S("Utility Machines:"))},
     { name = S("  Vaccuum Chest"), id = PAGE_VACCUUM_CHEST },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
@@ -566,7 +572,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_SIGNALS_OVERVIEW] = {
       title = S("Signals"),
-      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_toggler")},
+      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate")},
       recipeLinks = RECIPE_LINKS,
       description = desc.signals_overview,
     },
@@ -587,6 +593,18 @@ logistica.GuideApi.register(GUIDE_NAME, {
       title = S("Signal Toggler"),
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_toggler,
+    },
+
+    [PAGE_SIGNAL_NOT_GATE] = {
+      title = S("Signal NOT Gate"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_not_gate,
+    },
+
+    [PAGE_SIGNAL_LOGIC_GATE] = {
+      title = S("Signal Logic Gate"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_logic_gate,
     },
 
     -- Settings

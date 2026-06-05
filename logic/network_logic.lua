@@ -147,9 +147,55 @@ end
 local function notify_signal_receivers(network, name, isOn)
   for rcHash, _ in pairs(network.signal_receivers) do
     local rcPos = h2p(rcHash)
-    local rcDef = minetest.registered_nodes[minetest.get_node(rcPos).name]
+    local nodeName = minetest.get_node(rcPos).name
+    local rcDef = minetest.registered_nodes[nodeName]
     if rcDef and rcDef.logistica and rcDef.logistica.on_signal_received then
-      rcDef.logistica.on_signal_received(rcPos, name, isOn)
+      if logistica.GROUPS.signal_gates.is(nodeName) then
+        if network._propagation then
+          table.insert(network._propagation.pending, {hash = rcHash, name = name, isOn = isOn})
+        end
+      else
+        rcDef.logistica.on_signal_received(rcPos, name, isOn)
+      end
+    end
+  end
+end
+
+-- Runs the BFS gate propagation loop for the given context.
+-- Gates should return true from on_signal_received if they actually processed the signal,
+-- false/nil if they ignored it (e.g. signal name did not match their input).
+-- Cycle detection is per gate+signal-name pair to avoid false positives from
+-- gates receiving signals they don't care about.
+local function run_gate_propagation(network, ctx)
+  while #ctx.pending > 0 do
+    local entry = table.remove(ctx.pending, 1)
+    local gatePos = h2p(entry.hash)
+    local visited = ctx.visited
+    if not visited[entry.hash] then visited[entry.hash] = {} end
+    if visited[entry.hash][entry.name] then
+      minetest.get_meta(gatePos):set_string("infotext", "ERROR: Signal loop detected")
+      minetest.log("warning", "[logistica] signal loop at " .. minetest.pos_to_string(gatePos))
+    else
+      local gateDef = minetest.registered_nodes[minetest.get_node(gatePos).name]
+      if gateDef and gateDef.logistica and gateDef.logistica.on_signal_received then
+        local processed = gateDef.logistica.on_signal_received(gatePos, entry.name, entry.isOn)
+        if processed then
+          visited[entry.hash][entry.name] = true
+        end
+      end
+    end
+  end
+end
+
+-- Removes all signal contributions from hash and notifies receivers.
+-- Assumes network._propagation is already set by the caller.
+local function remove_sender_signals_bfs(network, hash)
+  for name, senders in pairs(network.signals) do
+    if senders[hash] then
+      senders[hash] = nil
+      local signalIsOn = not logistica.table_is_empty(senders)
+      if not signalIsOn then network.signals[name] = nil end
+      notify_signal_receivers(network, name, signalIsOn)
     end
   end
 end
@@ -586,13 +632,14 @@ local function on_signal_sender_changed(pos, oldNode, oldMeta)
       and networks[tonumber(cachedId)]
     if network then
       local hash = p2h(pos)
-      for name, senders in pairs(network.signals) do
-        if senders[hash] then
-          senders[hash] = nil
-          local signalIsOn = not logistica.table_is_empty(senders)
-          if not signalIsOn then network.signals[name] = nil end
-          notify_signal_receivers(network, name, signalIsOn)
-        end
+      local owned = network._propagation == nil
+      if owned then
+        network._propagation = { origin_hash = hash, visited = {}, pending = {} }
+      end
+      remove_sender_signals_bfs(network, hash)
+      if owned then
+        run_gate_propagation(network, network._propagation)
+        network._propagation = nil
       end
     end
     remove_from_network(pos, oldNode, oldMeta, SIGNAL_SENDER_OPS)
@@ -831,6 +878,7 @@ end
 
 -- Send a named signal ON or OFF from pos. Notifies all receivers on the network.
 -- Uses OR semantics: signal is ON as long as any sender has it ON.
+-- Gate receivers are processed breadth-first to prevent unbounded recursion.
 function logistica.signal_send(pos, name, isOn)
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
@@ -845,7 +893,15 @@ function logistica.signal_send(pos, name, isOn)
     end
   end
   local signalIsOn = network.signals[name] ~= nil
+  if network._propagation then
+    notify_signal_receivers(network, name, signalIsOn)
+    return
+  end
+  local ctx = { origin_hash = hash, visited = {}, pending = {} }
+  network._propagation = ctx
   notify_signal_receivers(network, name, signalIsOn)
+  run_gate_propagation(network, ctx)
+  network._propagation = nil
 end
 
 -- Returns true if the named signal is currently ON in the network, false otherwise.
@@ -861,12 +917,13 @@ function logistica.signal_remove_sender(pos, networkId)
   local network = networks[networkId]
   if not network then return end
   local hash = p2h(pos)
-  for name, senders in pairs(network.signals) do
-    if senders[hash] then
-      senders[hash] = nil
-      local signalIsOn = not logistica.table_is_empty(senders)
-      if not signalIsOn then network.signals[name] = nil end
-      notify_signal_receivers(network, name, signalIsOn)
-    end
+  if network._propagation then
+    remove_sender_signals_bfs(network, hash)
+    return
   end
+  local ctx = { origin_hash = hash, visited = {}, pending = {} }
+  network._propagation = ctx
+  remove_sender_signals_bfs(network, hash)
+  run_gate_propagation(network, ctx)
+  network._propagation = nil
 end

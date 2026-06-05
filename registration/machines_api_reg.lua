@@ -314,6 +314,40 @@ logistica.register_signal_lamp(
 )
 
 --------------------------------
+-- Signal Logic Gate
+--------------------------------
+
+logistica.register_signal_logic_gate(
+  S("Signal Logic Gate"),
+  "signal_logic_gate",
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_logic_gate_side.png",
+    "logistica_signal_logic_gate_side.png",
+    "logistica_signal_logic_gate_side.png",
+    "logistica_signal_logic_gate_side.png",
+  }
+)
+
+--------------------------------
+-- Signal NOT Gate
+--------------------------------
+
+logistica.register_signal_not_gate(
+  S("Signal NOT Gate"),
+  "signal_not_gate",
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_side.png",
+    "logistica_signal_not_gate_side.png",
+    "logistica_signal_not_gate_side.png",
+    "logistica_signal_not_gate_side.png",
+  }
+)
+
+--------------------------------
 -- Signal Toggler
 --------------------------------
 
