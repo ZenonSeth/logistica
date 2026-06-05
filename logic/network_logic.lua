@@ -250,7 +250,13 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
       logistica.load_position(otherPos)
       local otherName = minetest.get_node(otherPos).name
       local otherHash = p2h(otherPos)
-      if network.controller ~= otherHash
+      -- block approaching a toggler from its backward (output) side — one-way gate
+      local blockedToggler = logistica.GROUPS.signal_togglers.is(otherName) and (function()
+        local d = logistica.get_rot_directions(minetest.get_node(otherPos).param2)
+        return d ~= nil and offset.x == d.forward.x and offset.y == d.forward.y and offset.z == d.forward.z
+      end)()
+      if not blockedToggler
+          and network.controller ~= otherHash
           and logistica.get_network_group_for_node_name(otherName) ~= nil
           and not has_machine(network, otherHash)
           and network[logistica.NETWORK_GROUPS.cables][otherHash] == nil then
@@ -289,6 +295,12 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           break_logistica_node(otherPos)
           minetest.get_meta(otherPos):set_string("infotext", "ERROR: Receiver cannot be placed connecting to existing networks!")
         elseif nodeNetworkGroup ~= nil then
+          network[nodeNetworkGroup][otherHash] = true
+          valid = true
+          -- if this is a toggler in ON state, treat it as a relay so the scan continues from it
+          if logistica.GROUPS.signal_togglers.is(otherName) and ends_with(otherName, ON_SUFFIX) then
+            connections[otherHash] = true
+          end
           -- all machines, except controllers, should be added to network
           network[nodeNetworkGroup][otherHash] = true
           valid = true
@@ -544,6 +556,25 @@ local SIGNAL_RECEIVER_OPS = {
   update_cache_node_removed = function(_) end,
 }
 
+
+local function on_signal_toggler_changed(pos, oldNode, oldMeta)
+  if oldNode == nil then
+    try_to_add_to_network(pos, SIGNAL_RECEIVER_OPS)
+    -- notify_connected is not called by try_to_add_to_network, so do it manually
+    -- so the toggler can check current signal state via its deferred timer
+    local network = logistica.get_network_or_nil(pos)
+    if network then
+      notify_connected(pos, minetest.get_node(pos).name, network.controller)
+    end
+  else
+    -- rescan rather than simple remove: toggler removal may disconnect the forward side
+    local cachedId = get_unchecked_cached_network_id(oldMeta)
+    if cachedId and cachedId ~= CACHED_NETWORK_ID_ALREADY_TRIED then
+      rescan_network(tonumber(cachedId))
+    end
+  end
+end
+
 local function on_signal_sender_changed(pos, oldNode, oldMeta)
   if oldNode == nil then
     try_to_add_to_network(pos, SIGNAL_SENDER_OPS)
@@ -779,6 +810,15 @@ end
 
 function logistica.on_wifi_transmitter_change(pos, oldNode, oldMeta, objRef)
   on_wifi_transmitter_changed(pos, oldNode, oldMeta, objRef)
+end
+
+function logistica.on_signal_toggler_change(pos, oldNode, oldMeta)
+  on_signal_toggler_changed(pos, oldNode, oldMeta)
+end
+
+function logistica.rescan_network_at_pos(pos)
+  local network = logistica.get_network_or_nil(pos)
+  if network then rescan_network(network.controller) end
 end
 
 function logistica.on_signal_sender_change(pos, oldNode, oldMeta)

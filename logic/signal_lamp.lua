@@ -26,6 +26,7 @@ function logistica.signal_lamp_set_state(pos, shouldBeOn)
   local newName = shouldBeOn and (baseName .. ON_SUFFIX) or baseName
   if minetest.registered_nodes[newName] then
     logistica.swap_node(pos, newName)
+    minetest.get_meta(pos):set_string("infotext", shouldBeOn and "On" or "Off")
   end
 end
 

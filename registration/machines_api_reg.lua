@@ -314,6 +314,31 @@ logistica.register_signal_lamp(
 )
 
 --------------------------------
+-- Signal Toggler
+--------------------------------
+
+logistica.register_signal_toggler(
+  S("Signal Toggler"),
+  "signal_toggler",
+  {
+    "logistica_signal_toggler_side_off.png^[transformR270",
+    "logistica_signal_toggler_side_off.png^[transformR90",
+    "logistica_signal_toggler_side_off.png^[transformR180",
+    "logistica_signal_toggler_side_off.png",
+    "logistica_signal_toggler_back_off.png",
+    "logistica_signal_toggler_front.png",
+  },
+  {
+    "logistica_signal_toggler_side_on.png^[transformR270",
+    "logistica_signal_toggler_side_on.png^[transformR90",
+    "logistica_signal_toggler_side_on.png^[transformR180",
+    "logistica_signal_toggler_side_on.png",
+    "logistica_signal_toggler_back_on.png",
+    "logistica_signal_toggler_front.png",
+  }
+)
+
+--------------------------------
 -- Signal Switch
 --------------------------------
 
