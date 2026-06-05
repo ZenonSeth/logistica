@@ -65,15 +65,15 @@ function logistica.register_signal_switch(desc, name, tiles_off, tiles_on)
   local nodebox_off = {
     type = "fixed",
     fixed = {
-      {-6/16, -5/16, 4/16,  6/16,  5/16, 8/16},  -- backplate
-      {-1/16, -2/16, 3/16,  1/16,  0/16, 4/16},   -- lever (down = off)
+      {-6/16, -5/16, 6/16,  6/16,  5/16, 8/16},  -- backplate
+      {-1/16, -2/16, 5/16,  1/16,  0/16, 6/16},   -- lever (down = off)
     }
   }
   local nodebox_on = {
     type = "fixed",
     fixed = {
-      {-6/16, -5/16, 4/16,  6/16,  5/16, 8/16},  -- backplate
-      {-1/16,  0/16, 3/16,  1/16,  2/16, 4/16},   -- lever (up = on)
+      {-6/16, -5/16, 6/16,  6/16,  5/16, 8/16},  -- backplate
+      {-1/16,  0/16, 5/16,  1/16,  2/16, 6/16},   -- lever (up = on)
     }
   }
   local selection_box = {
@@ -121,6 +121,7 @@ function logistica.register_signal_switch(desc, name, tiles_off, tiles_on)
     tiles = tiles_off,
     node_box = nodebox_off,
     selection_box = selection_box,
+    collision_box = selection_box,
     groups = grps,
     drop = lname,
     sounds = logistica.node_sound_metallic(),
