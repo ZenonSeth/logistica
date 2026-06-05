@@ -6,11 +6,14 @@ local META_IMG_INDEX = "logimginxd"
 local META_SELECTED_RES = "logselres"
 
 local FORMSPEC_NAME = "mass_storage_formspec"
+local SWAP_FORMSPEC_NAME = "mass_storage_swap_formspec"
 local ON_OFF_BTN = "on_off_btn"
+local CLOSE_SWAP_BTN = "close_swap_btn"
 
 local MASS_STORAGE_TIMER = 1
 
 local storageForms = {}
+local swapForms = {}
 
 local RESERVE_TOOLTIP = FS("How many items to reserve.\nReserved items won't be taken by other network machines")
 local IMAGE_TOOLTIP = FS("Pick which slot to use as front image.\nClick the selected slot again to disable the front image.")
@@ -31,6 +34,28 @@ local function upgrade_inv(posForm, numUpgradeSlots, y)
   local upInvX = upIconX + 1.25
   return "image["..upIconX..","..y..";1,1;logistica_icon_upgrade.png]" ..
          "list["..posForm..";upgrade;"..upInvX..","..y..";"..numUpgradeSlots..",1;0]"
+end
+
+local SWAP_BTN_TOOLTIP = FS("Swap")
+
+local function upgrade_swap_buttons(pos, numUpgradeSlots, upgradeY)
+  if numUpgradeSlots <= 0 then return "" end
+  local upIconX = 1.5 + 1.25 * (7 - numUpgradeSlots)
+  local upInvX = upIconX + 1.25
+  local buttonY = upgradeY + 1.1
+  local inv = minetest.get_meta(pos):get_inventory()
+  if inv:get_size("upgrade") == 0 then return "" end
+  local result = ""
+  for i = 1, numUpgradeSlots do
+    if not inv:get_stack("upgrade", i):is_empty() then
+      local bx = upInvX + (i - 1) * 1.25 + 0.25
+      local btnName = "swap_upg_"..i
+      result = result..
+        "image_button["..bx..","..buttonY..";0.5,0.5;logistica_icon_swap.png;"..btnName..";]"..
+        "tooltip["..btnName..";"..SWAP_BTN_TOOLTIP.."]"
+    end
+  end
+  return result
 end
 
 local function image_picker(initialX, y, index, selectedImgIndex, meta)
@@ -67,6 +92,26 @@ local function get_reserve_from_string(name, str)
     ret[i] = vals[i] ~= nil and tonumber(vals[i]) or 0
   end
   return ret
+end
+
+----------------------------------------------------------------
+-- swap helpers
+----------------------------------------------------------------
+
+local function ensure_upgrade_swap_slot(inv)
+  if inv:get_size("upgrade_swap") == 0 then
+    inv:set_size("upgrade_swap", 1)
+  end
+end
+
+local function clear_upgrade_swap_slot_and_return(pos, player)
+  local inv = minetest.get_meta(pos):get_inventory()
+  if inv:get_size("upgrade_swap") == 0 then return end
+  local swapStack = inv:get_stack("upgrade_swap", 1)
+  if swapStack:is_empty() then return end
+  local leftover = player:get_inventory():add_item("main", swapStack)
+  if not leftover:is_empty() then minetest.add_item(player:get_pos(), leftover) end
+  inv:set_stack("upgrade_swap", 1, ItemStack(""))
 end
 
 ----------------------------------------------------------------
@@ -110,10 +155,11 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local valsAsStr = table.concat(vals, ",")
   local imgPickX = 1.65
   local imgPickY = 0.1
+  local swapButtonsString = upgrade_swap_buttons(pos, numUpgradeSlots, 3.8)
   return "formspec_version[4]"..
-    "size["..logistica.inv_size(12, 10.75).."]" ..
+    "size["..logistica.inv_size(12, 11.5).."]" ..
     logistica.ui.background..
-    logistica.player_inv_formspec(1.5,5)..
+    logistica.player_inv_formspec(1.5,5.75)..
     "list["..posForm..";storage;1.5,1.9;8,1;0]" ..
     "list["..posForm..";filter;1.5,0.8;8,1;0]" ..
     "image[0.25,0.8;1,1;logistica_icon_filter.png]" ..
@@ -130,6 +176,8 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "listring[current_player;main]"..
     logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, FS("Pull Items"))..
     upgradeInvString..
+    swapButtonsString..
+    "label[1.55,5.15;"..FS("Slot Storage Capacity: ")..logistica.get_mass_storage_max_size(pos).."]"..
     "tooltip[3.4,4.0;1,1;"..PULL_TOOLTIP.."]"..
     "tooltip[0.25,1.9;1,1;"..STORAGE_TOOLTIP.."]"..
     "tooltip[0.2,3.8;1,1;"..INPUT_TOOLTIP.."]"..
@@ -139,7 +187,17 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "tooltip[0.2,0.1;1,0.5;"..IMAGE_TOOLTIP.."]"
 end
 
-local function show_mass_storage_formspec(pos, name, meta)
+local show_mass_storage_formspec
+
+local function refresh_mass_storage_forms(pos)
+  for playerName, data in pairs(storageForms) do
+    if data and vector.equals(data.position, pos) then
+      show_mass_storage_formspec(pos, playerName)
+    end
+  end
+end
+
+show_mass_storage_formspec = function(pos, name, meta)
   local node = minetest.get_node(pos)
   local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
   storageForms[name] = { position = pos }
@@ -150,13 +208,60 @@ local function show_mass_storage_formspec(pos, name, meta)
   )
 end
 
+local function get_swap_formspec(pos, slotIndex)
+  local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
+  local inv = minetest.get_meta(pos):get_inventory()
+  ensure_upgrade_swap_slot(inv)
+  local currentName = inv:get_stack("upgrade", slotIndex):get_name()
+  return "formspec_version[4]"..
+    "size["..logistica.inv_size(12, 9.0).."]"..
+    logistica.ui.background..
+    logistica.player_inv_formspec(1.5, 3.5)..
+    "button[11.5,0.15;0.65,0.65;"..CLOSE_SWAP_BTN..";X]"..
+    "label[0.25,0.55;"..FS("Swap Upgrade - Slot ")..tostring(slotIndex).."]"..
+    "label[0.25,1.35;"..FS("Current:").."]\n"..
+    "item_image[1.5,1.0;1.25,1.25;"..currentName.."]"..
+    "label[3.75,1.35;"..FS("New:").."]\n"..
+    "list["..posForm..";upgrade_swap;4.75,1.0;1,1;0]"..
+    "label[0.25,2.6;"..FS("Place a valid upgrade to swap.").."]\n"..
+    "listring[current_player;main]"..
+    "listring["..posForm..";upgrade_swap]"..
+    "listring[current_player;main]"
+end
+
+local function show_swap_formspec(pos, playerName, slotIndex)
+  storageForms[playerName] = nil
+  swapForms[playerName] = { position = pos, slotIndex = slotIndex }
+  local inv = minetest.get_meta(pos):get_inventory()
+  ensure_upgrade_swap_slot(inv)
+  minetest.show_formspec(playerName, SWAP_FORMSPEC_NAME, get_swap_formspec(pos, slotIndex))
+end
+
 ----------------------------------------------------------------
 -- callbacks
 ----------------------------------------------------------------
 
-local function on_receive_storage_formspec(player, formname, fields)
-  if formname ~= FORMSPEC_NAME then return end
+local function on_receive_swap_formspec(player, formname, fields)
+  if formname ~= SWAP_FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
+  local swapData = swapForms[playerName]
+  if not swapData then return true end
+  local pos = swapData.position
+  if minetest.is_protected(pos, playerName) then return true end
+  if fields[CLOSE_SWAP_BTN] or (fields.quit and not fields.key_enter_field) then
+    clear_upgrade_swap_slot_and_return(pos, player)
+    swapForms[playerName] = nil
+    if fields[CLOSE_SWAP_BTN] then
+      show_mass_storage_formspec(pos, playerName)
+    end
+  end
+  return true
+end
+
+local function on_receive_storage_formspec(player, formname, fields)
+  if formname ~= FORMSPEC_NAME then return false end
+  local playerName = player:get_player_name()
+  if not storageForms[playerName] then return false end
   local pos = storageForms[playerName].position
   if minetest.is_protected(pos, playerName) then return true end
 
@@ -174,6 +279,14 @@ local function on_receive_storage_formspec(player, formname, fields)
         logistica.on_mass_storage_image_select_change(pos, i)
         show_mass_storage_formspec(pos, playerName)
         return
+      end
+    end
+    local node = minetest.get_node(pos)
+    local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
+    for i = 1, numUpgradeSlots do
+      if fields["swap_upg_"..i] then
+        show_swap_formspec(pos, playerName, i)
+        return true
       end
     end
     for i = 1, 8 do
@@ -263,6 +376,7 @@ local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
       return 0
     end
   end
+  if listname == "upgrade_swap" then return stack:get_count() end
   return stack:get_count()
 end
 
@@ -291,8 +405,29 @@ local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
   if listname == "upgrade" then
     local inv = minetest.get_meta(pos):get_inventory()
     if not logistica.is_valid_storage_upgrade(stack:get_name()) then return 0 end
-    if inv:get_stack(listname, index):is_empty() then return 1 end
-    return 0
+    if not inv:get_stack(listname, index):is_empty() then return 0 end
+    if logistica.is_multiplier_storage_upgrade(stack:get_name()) and logistica.has_multiplier_upgrade_in_inv(inv) then
+      return 0
+    end
+    return 1
+  end
+  if listname == "upgrade_swap" then
+    local swapData = swapForms[player:get_player_name()]
+    if not swapData then return 0 end
+    local slotIndex = swapData.slotIndex
+    if not logistica.is_valid_storage_upgrade(stack:get_name()) then return 0 end
+    local inv = minetest.get_meta(pos):get_inventory()
+    if logistica.is_multiplier_storage_upgrade(stack:get_name()) then
+      for i, st in ipairs(logistica.get_list(inv, "upgrade")) do
+        if i ~= slotIndex and logistica.is_multiplier_storage_upgrade(st:get_name()) then return 0 end
+      end
+    end
+    local maxStored = 0
+    for _, st in ipairs(logistica.get_list(inv, "storage")) do
+      if st:get_count() > maxStored then maxStored = st:get_count() end
+    end
+    if logistica.get_mass_storage_max_after_swap(pos, slotIndex, stack:get_name()) < maxStored then return 0 end
+    return 1
   end
   return stack:get_count()
 end
@@ -321,12 +456,32 @@ local function on_mass_storage_inv_put(pos, listname, index, stack, player)
   elseif listname == "upgrade" then
     local inv = minetest.get_meta(pos):get_inventory()
     logistica.on_mass_storage_upgrade_change(pos, inv:get_stack(listname, index):get_name(), true)
+    refresh_mass_storage_forms(pos)
+  elseif listname == "upgrade_swap" then
+    local playerName = player:get_player_name()
+    local swapData = swapForms[playerName]
+    if not swapData then return end
+    local slotIndex = swapData.slotIndex
+    local inv = minetest.get_meta(pos):get_inventory()
+    local newUpgrade = inv:get_stack("upgrade_swap", 1)
+    local oldUpgrade = inv:get_stack("upgrade", slotIndex)
+    inv:set_stack("upgrade", slotIndex, newUpgrade)
+    inv:set_stack("upgrade_swap", 1, ItemStack(""))
+    if not oldUpgrade:is_empty() then
+      local leftover = player:get_inventory():add_item("main", oldUpgrade)
+      if not leftover:is_empty() then minetest.add_item(player:get_pos(), leftover) end
+    end
+    logistica.update_mass_storage_cap(pos)
+    swapForms[playerName] = nil
+    show_mass_storage_formspec(pos, playerName)
+    refresh_mass_storage_forms(pos)
   end
 end
 
 local function on_mass_storage_inv_take(pos, listname, index, stack, player)
   if listname == "upgrade" then
     logistica.on_mass_storage_upgrade_change(pos, stack:get_name(), false)
+    refresh_mass_storage_forms(pos)
   end
 end
 
@@ -350,11 +505,14 @@ end
 -- register
 ----------------------------------------------------------------
 
+minetest.register_on_player_receive_fields(on_receive_swap_formspec)
 minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 
 minetest.register_on_leaveplayer(function(objRef, timed_out)
   if objRef:is_player() then
-    storageForms[objRef:get_player_name()] = nil
+    local playerName = objRef:get_player_name()
+    storageForms[playerName] = nil
+    swapForms[playerName] = nil
   end
 end)
 

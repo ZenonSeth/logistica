@@ -5,9 +5,13 @@ local g = logistica.Guide.Desc
 g.mass_storage_upgrade = S([[
 Mass Storage upgrades increase the capacity of the Mass Storage machine.
 
-There are two types, as seen above.
+There are three types, as seen above.
+
+The first two upgrades add a fixed amount, while the last multiplies the available storage amount, but only one can be added per mass storage.
 
 Note that you cannot remove Mass Storage upgrades from a Mass Storage machine if removing the upgrade will result in insufficient storage available for any of the stacks stored in the machine.
+
+You can swap storage upgrades with larger ones by pressing the Swap button underneath each storage upgrade slot.
 ]])
 
 g.cobblegen_upgrade = S([[

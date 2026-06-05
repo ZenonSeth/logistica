@@ -91,6 +91,15 @@ minetest.register_craft({
   }
 })
 
+minetest.register_craft({
+  output = L("storage_upgrade_multiplier"),
+  recipe = {
+    {L("photonizer"),  L("standing_wave_box"),               L("photonizer")},
+    {L("standing_wave_box"), L("storage_upgrade_2"),  L("standing_wave_box")},
+    {"",                     L("standing_wave_box"),  ""},
+  }
+})
+
 for filledBucket, _ in pairs(logistica.reservoir_get_full_buckets_for_liquid(logistica.liquids.lava)) do
   local emptyBucket = logistica.reservoir_get_empty_bucket_for_full_bucket(filledBucket)
   if minetest.registered_items[filledBucket] and minetest.registered_items[emptyBucket] then

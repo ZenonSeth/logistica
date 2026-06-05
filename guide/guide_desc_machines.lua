@@ -92,11 +92,16 @@ Mass Storage node provide 1024 item storage for up to 8 different item types by 
 You can collectively access all Mass Storage on a particular network from an Access Point/Wireless Access Pad.
 
 - Can be dug and keeps its Inventory when placed again, allowing easy moving of stored items
-- Can be upgraded to increase inventory size, up to maximum of 5120 items per slot
+- Can be upgraded to increase inventory size, up to maximum of 65,535 maximum
 - Select Front Image: Selects a stored node to display on the front of the storage node
 - Can Reserve a number of items per slot: Reserved items won't be taken by other machines on the network
 - Can quickly deposit items by punching it with a stack or sneak-punching it for deposit all stack items from your inventory
-- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.]])
+- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.
+
+You can swap upgrades by pressing the Swap button under each slot.
+Note that there is a multiplier upgrade, but only one can be inserted into a machine, makign the maximum stack size be 65,535 per slot.
+
+]])
 
 g.tool_chest = S([[
 The Tool Chest provides a large number of storage slots -- but it can only store tools (specifically, items that have a max stack size of 1). The Tool Chest is also accessed by Requesters to provide items. Tool Chest cannot be dug while it contains items (unlike Mass Storage, which will keep its inventory)

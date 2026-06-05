@@ -3,6 +3,7 @@ local S = logistica.TRANSLATOR
 local META_IMG_PIC = "logimgpick"
 local META_RES_VAL = "logresval"
 local META_UPGRADE_ADD = "logstorupgr"
+local META_UPGRADE_MULT = "logstorupgrmult"
 local VALID_RESERVE_VALUES = {}
 for i = 0,5120,128 do VALID_RESERVE_VALUES[i/128 + 1] = i end
 local BASE_TRANSFER_RATE = 10
@@ -52,7 +53,9 @@ function logistica.get_mass_storage_max_size(pos)
   if def and def.logistica and def.logistica.maxItems then
     local meta = minetest.get_meta(pos)
     local storageUpgrade = meta:get_int(META_UPGRADE_ADD)
-    return def.logistica.maxItems + storageUpgrade
+    local mult = meta:get_int(META_UPGRADE_MULT)
+    if mult <= 0 then mult = 1 end
+    return math.min((def.logistica.maxItems + storageUpgrade) * mult, 65535)
   end
   return 0
 end
@@ -258,34 +261,83 @@ end
 function logistica.update_mass_storage_cap(pos, optMeta)
   local meta = optMeta or minetest.get_meta(pos)
   local storageUpgrade = 0
+  local storageMult = 1
   local list = logistica.get_list(meta:get_inventory(), "upgrade")
   for _, item in ipairs(list) do
     local upgradeDef = logistica.craftitem.storage_upgrade[item:get_name()]
-    if upgradeDef and upgradeDef.storage_upgrade then
-      storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
+    if upgradeDef then
+      if upgradeDef.storage_upgrade then
+        storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
+      end
+      if upgradeDef.storage_multiplier then
+        storageMult = upgradeDef.storage_multiplier
+      end
     end
   end
   meta:set_int(META_UPGRADE_ADD, storageUpgrade)
+  meta:set_int(META_UPGRADE_MULT, storageMult)
 end
 
 function logistica.on_mass_storage_upgrade_change(pos, upgradeName, wasAdded)
   local upgradeDef = logistica.craftitem.storage_upgrade[upgradeName]
-  if not upgradeDef or not upgradeDef.storage_upgrade then return true end
+  if not upgradeDef then return true end
   local meta = minetest.get_meta(pos)
-  local storageUpgrade = meta:get_int(META_UPGRADE_ADD)
-  if wasAdded then storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
-  else storageUpgrade = storageUpgrade - upgradeDef.storage_upgrade end
-  meta:set_int(META_UPGRADE_ADD, storageUpgrade)
+  if upgradeDef.storage_upgrade then
+    local storageUpgrade = meta:get_int(META_UPGRADE_ADD)
+    if wasAdded then storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade
+    else storageUpgrade = storageUpgrade - upgradeDef.storage_upgrade end
+    meta:set_int(META_UPGRADE_ADD, storageUpgrade)
+  end
+  if upgradeDef.storage_multiplier then
+    meta:set_int(META_UPGRADE_MULT, wasAdded and upgradeDef.storage_multiplier or 1)
+  end
 end
 
 function logistica.can_remove_mass_storage_upgrade(pos, upgradeName)
   local upgradeDef = logistica.craftitem.storage_upgrade[upgradeName]
-  if not upgradeDef or not upgradeDef.storage_upgrade then return true end
+  if not upgradeDef then return true end
   local inv = minetest.get_meta(pos):get_inventory()
   local maxStored = 0
   for _, st in ipairs(logistica.get_list(inv, "storage")) do
     if st:get_count() > maxStored then maxStored = st:get_count() end
   end
   local currMax = logistica.get_mass_storage_max_size(pos)
-  return (currMax - upgradeDef.storage_upgrade) >= maxStored
+  if upgradeDef.storage_upgrade then
+    return (currMax - upgradeDef.storage_upgrade) >= maxStored
+  end
+  if upgradeDef.storage_multiplier then
+    -- removing the multiplier divides capacity by storage_multiplier
+    return math.floor(currMax / upgradeDef.storage_multiplier) >= maxStored
+  end
+  return true
+end
+
+function logistica.is_multiplier_storage_upgrade(stackName)
+  local upgradeDef = logistica.craftitem.storage_upgrade[stackName]
+  return upgradeDef ~= nil and upgradeDef.storage_multiplier ~= nil
+end
+
+function logistica.has_multiplier_upgrade_in_inv(inv)
+  for _, st in ipairs(logistica.get_list(inv, "upgrade")) do
+    if logistica.is_multiplier_storage_upgrade(st:get_name()) then return true end
+  end
+  return false
+end
+
+-- Returns what get_mass_storage_max_size would return if upgrade at slotIndex were replaced by newUpgradeName
+function logistica.get_mass_storage_max_after_swap(pos, slotIndex, newUpgradeName)
+  local node = minetest.get_node(pos)
+  local def = minetest.registered_nodes[node.name]
+  if not (def and def.logistica and def.logistica.maxItems) then return 0 end
+  local storageUpgrade = 0
+  local storageMult = 1
+  for i, item in ipairs(logistica.get_list(minetest.get_meta(pos):get_inventory(), "upgrade")) do
+    local name = (i == slotIndex) and newUpgradeName or item:get_name()
+    local upgradeDef = logistica.craftitem.storage_upgrade[name]
+    if upgradeDef then
+      if upgradeDef.storage_upgrade then storageUpgrade = storageUpgrade + upgradeDef.storage_upgrade end
+      if upgradeDef.storage_multiplier then storageMult = upgradeDef.storage_multiplier end
+    end
+  end
+  return math.min((def.logistica.maxItems + storageUpgrade) * storageMult, 65535)
 end

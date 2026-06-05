@@ -97,7 +97,7 @@ local RECIPE_TRASHCAN = getrec({L("trashcan")})
 local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
 local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
-local RECIPE_MASSUPGR = getrec({L("storage_upgrade_1"), L("storage_upgrade_2")})
+local RECIPE_MASSUPGR = getrec({L("storage_upgrade_1"), L("storage_upgrade_2"), L("storage_upgrade_multiplier")})
 local RECIPE_COBGENUP = getrec({L("cobblegen_upgrade")})
 local RECIPE_HYPERSPN = getrec({L("hyperspanner")})
 local RECIPE_PHOTONIZ = getrec({L("photonizer"), L("photonizer_reversed")})
@@ -132,6 +132,7 @@ local RECIPE_LINKS = {
   [L("optic_cable_block")] = PAGE_OPTIC_CABLE,
   [L("storage_upgrade_1")] = PAGE_MASS_STORAGE_UPGR,
   [L("storage_upgrade_2")] = PAGE_MASS_STORAGE_UPGR,
+  [L("storage_upgrade_multiplier")] = PAGE_MASS_STORAGE_UPGR,
   [L("cobblegen_upgrade")] = PAGE_COBBLE_GENERATOR_UPGR,
   [L("silverin_circuit")] = PAGE_SILVERIN_CIRCUIT,
   [L("wireless_antenna")] = PAGE_WIRELESS_ANTENNA,
