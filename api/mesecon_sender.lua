@@ -5,7 +5,7 @@ local FS = logistica.FTRANSLATOR
 local FORMSPEC_NAME = "logistica:mesecon_sender"
 local SIZE = logistica.settings.cable_size
 local RULES    = mesecon.rules.default
-local COOLDOWN = 0.3  -- seconds between mesecon API calls; slows oscillation loops
+local COOLDOWN = 0.4  -- seconds between mesecon API calls; slows oscillation loops
 
 local forms = {}
 

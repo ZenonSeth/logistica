@@ -80,7 +80,7 @@ function logistica.register_signal_switch(desc, name, tiles_off, tiles_on)
   }
   local selection_box = {
     type = "fixed",
-    fixed = { {-6/16, -5/16, 4/16, 6/16, 5/16, 8/16} }
+    fixed = { {-6/16, -5/16, 6/16, 6/16, 5/16, 8/16} }
   }
 
   local grps = { oddly_breakable_by_hand = 2, cracky = 2, handy = 1, pickaxey = 1 }
