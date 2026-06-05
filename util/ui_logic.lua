@@ -3,7 +3,7 @@ local allowedPull = {
   --["src"] = true,
   ["dst"] = true,
   ["output"] = true,
-  --["fuel"] = true,
+  ["fuel"] = true,
 }
 
 local allowedPush = {
