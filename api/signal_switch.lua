@@ -14,6 +14,7 @@ local function get_formspec(pos)
     "label[0.5,0.4;"..FS("Signal Switch").."]"..
     "label[0.5,0.9;"..FS("Signal Name:").."]"..
     "field[2.0,0.7;4.5,0.75;signal_name;;"..minetest.formspec_escape(signalName).."]"..
+    "label[2.0,1.6;"..FS("a-z A-Z 0-9 _ only").."]"..
     "label[0.5,1.9;"..FS("State: ")..stateStr.."]"..
     "button[0.5,2.5;3,0.75;toggle;"..toggleLabel.."]"..
     "button_exit[3.75,2.5;2.75,0.75;save;"..FS("Save Name").."]"
@@ -33,7 +34,7 @@ local function on_receive_fields(player, formname, fields)
 
   if fields.save or fields.key_enter_field == "signal_name" then
     if fields.signal_name then
-      logistica.signal_switch_set_name(pos, fields.signal_name)
+      logistica.signal_switch_set_name(pos, logistica.sanitize_signal_name(fields.signal_name))
     end
     forms[playerName] = nil
   elseif fields.toggle then

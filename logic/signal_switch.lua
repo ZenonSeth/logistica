@@ -35,8 +35,7 @@ end
 
 -- Sets the signal name, re-sending signals if state changes.
 function logistica.signal_switch_set_name(pos, newName)
-  newName = newName:gsub("%s+", "_")
-  if newName == "" then return end
+  newName = logistica.sanitize_signal_name(newName)
   local oldName = logistica.signal_switch_get_name(pos)
   if oldName == newName then return end
   if logistica.signal_switch_is_on(pos) then

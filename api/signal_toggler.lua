@@ -14,7 +14,8 @@ local function get_formspec(pos)
     "checkbox[0.5,0.9;signal_not;"..FS("NOT")..";".. (notFlag and "true" or "false") .."]"..
     "label[1.75,0.95;"..FS("Signal Name:").."]"..
     "field[3.25,0.7;3.25,0.75;signal_name;;"..minetest.formspec_escape(signalName).."]"..
-    "button_exit[2.0,2.0;3,0.75;save;"..FS("Save").."]"
+    "label[3.25,1.6;"..FS("a-z A-Z 0-9 _ only").."]"..
+    "button_exit[2.0,2.1;3,0.75;save;"..FS("Save").."]"
 end
 
 local function show_formspec(pos, playerName)
@@ -36,7 +37,7 @@ local function on_receive_fields(player, formname, fields)
   end
   if fields.save or fields.key_enter_field == "signal_name" then
     if fields.signal_name and fields.signal_name ~= "" then
-      minetest.get_meta(pos):set_string("signal_name", fields.signal_name:gsub("%s+", "_"))
+      minetest.get_meta(pos):set_string("signal_name", logistica.sanitize_signal_name(fields.signal_name))
     end
     local network = logistica.get_network_or_nil(pos)
     if network then logistica.signal_toggler_on_connect(pos, network.controller) end

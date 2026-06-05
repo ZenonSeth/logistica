@@ -19,6 +19,14 @@ end
 -- global namespaced functions
 ----------------------------------------------------------------
 
+-- Strips any character that isn't a-z, A-Z, 0-9, or _. Returns "signal" if result is empty.
+function logistica.sanitize_signal_name(name)
+  if not name then return "signal" end
+  local sanitized = name:gsub("[^a-zA-Z0-9_]", "")
+  if sanitized == "" then return "signal" end
+  return sanitized
+end
+
 -- formspec escape translation
 logistica.FTRANSLATOR = function (...)
 return minetest.formspec_escape(logistica.TRANSLATOR(...))
