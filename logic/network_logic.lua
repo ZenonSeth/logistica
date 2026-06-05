@@ -136,6 +136,23 @@ local function notify_connected(pos, nodeName, networkId)
   end
 end
 
+local function notify_disconnected(pos, networkId)
+  local def = minetest.registered_nodes[minetest.get_node(pos).name]
+  if def and def.logistica and def.logistica.on_disconnect_from_network then
+    def.logistica.on_disconnect_from_network(pos, networkId)
+  end
+end
+
+local function collect_network_hashes(network)
+  local hashes = {}
+  for netGroup, _ in pairs(logistica.network_group_get_all()) do
+    for hash, _ in pairs(network[netGroup]) do
+      hashes[hash] = true
+    end
+  end
+  return hashes
+end
+
 ----------------------------------------------------------------
 -- Network operation functions
 ----------------------------------------------------------------
@@ -340,8 +357,15 @@ local function rescan_network(networkId)
   local conHash = network.controller
   local controllerPosition = h2p(conHash)
   local oldNetworkName = network.name
+  local oldHashes = collect_network_hashes(network)
   clear_network(networkId, true)
   create_network(controllerPosition, oldNetworkName)
+  local newNetwork = networks[conHash]
+  for hash, _ in pairs(oldHashes) do
+    if not newNetwork or not network_contains_hash(newNetwork, hash) then
+      notify_disconnected(h2p(hash), conHash)
+    end
+  end
 end
 
 local function find_cable_connections(pos)
@@ -385,12 +409,14 @@ local function remove_from_network(pos, oldMeta, ops)
   local hash = p2h(pos)
   local network = logistica.get_network_or_nil(pos, oldMeta)
   if not network then return end
+  local networkId = network.controller
   -- first clear the cache while the position is still counted as being "in-network"
   ops.update_cache_node_removed(pos)
   -- then remove the position from the network
   ops.get_list(network)[hash] = nil
   -- decrement count
   network._num_nodes = network._num_nodes - 1
+  notify_disconnected(pos, networkId)
 end
 
 local function on_node_change(pos, oldNode, oldMeta, ops)
@@ -634,6 +660,13 @@ function logistica.on_controller_change(pos, oldNode)
   if placed == true then
     try_to_add_network(pos)
   else
+    local network = networks[hashPos]
+    if network then
+      local allHashes = collect_network_hashes(network)
+      for hash, _ in pairs(allHashes) do
+        notify_disconnected(h2p(hash), hashPos)
+      end
+    end
     clear_network(hashPos)
   end
 end
