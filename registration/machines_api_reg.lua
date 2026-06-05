@@ -314,6 +314,36 @@ logistica.register_signal_lamp(
 )
 
 --------------------------------
+-- Mesecon Signal Receiver (mesecon effector -> logistica signal sender)
+--------------------------------
+
+if minetest.get_modpath("mesecons") then
+  logistica.register_mesecon_signaler(
+    S("Logistica Mesecon Signal Receiver"),
+    "mesecon_signaler",
+    "logistica_mesecon_signaler_top_off.png",
+    "logistica_mesecon_signaler_top_on.png",
+    "logistica_cable_toggleable_on.png", -- side
+    "logistica_access_point_bottom.png" -- bottom
+  )
+end
+
+--------------------------------
+-- Mesecon Signal Sender (logistica signal receiver -> mesecon receptor)
+--------------------------------
+
+if minetest.get_modpath("mesecons") then
+  logistica.register_mesecon_sender(
+    S("Logistica Mesecon Signal Sender"),
+    "mesecon_sender",
+    "logistica_mesecon_sender_top_off.png",
+    "logistica_mesecon_sender_top_on.png",
+    "logistica_cable_toggleable_on.png", -- side
+    "logistica_access_point_bottom.png" -- bottom
+  )
+end
+
+--------------------------------
 -- Signal Lamp 2-Color
 --------------------------------
 

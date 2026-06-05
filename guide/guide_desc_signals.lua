@@ -74,6 +74,76 @@ Signal Name: the name of the signal to listen for. Must use only lowercase lette
 Signal Lamps can be crafted in different colors. All colors behave identically, they are purely cosmetic.
 ]])
 
+g.signal_lamp_2c = S([[
+The 2-Color Signal Lamp is a signal receiver that shows one of two colors depending on whether a named signal is active on the network. When no signal name is set, or when the node is not connected to a network, both lights are dark.
+
+# Usage
+
+Right-click to open the settings and configure which color is shown when the signal is ON.
+
+# Configuration
+
+Color dropdown: choose which color lights up when the signal is ON. The other color is shown automatically when the signal is OFF.
+
+Signal Name: the name of the signal to listen for. Must use only lowercase letters, digits, and underscores (a-z 0-9 _). Leave empty to keep both lights dark.
+
+# Notes
+
+The 2-Color Signal Lamp can be crafted in different color pairs. All color pairs behave identically and are purely cosmetic.
+]])
+
+g.mesecon_signal_receiver = S([[
+Only available if the Mesecons mod is present.
+
+The Mesecon Signal Receiver bridges Mesecons wiring into the Logistica signal system. When it receives power from a Mesecon wire, it broadcasts a named Logistica signal as ON. When Mesecon power is removed, the signal is broadcast as OFF.
+
+This allows Mesecon machines, buttons, pressure plates, and other Mesecon devices to trigger Logistica automation.
+
+# Usage
+
+Right-click to configure the signal name and optional NOT mode.
+
+# Configuration
+
+NOT checkbox: when checked, the logic is inverted. The Logistica signal is sent as ON when Mesecon power is ABSENT, and OFF when power is present.
+
+Signal Name: the name of the Logistica signal to broadcast. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+# Notes
+
+The receiver connects to Logistica cables from any face. Mesecon wires can connect from any face independently.
+
+When disconnected from a Logistica network, the node stops broadcasting but still reacts to Mesecon power visually.
+]])
+
+g.mesecon_signal_sender = S([[
+Only available if the Mesecons mod is present.
+
+The Mesecon Signal Sender bridges the Logistica signal system into Mesecons wiring. When a named Logistica signal is ON, the node emits Mesecon power. When the signal is OFF, Mesecon power stops.
+
+This allows Logistica signals to control Mesecon machines, doors, lights, and other Mesecon devices.
+
+# Usage
+
+Right-click to configure the signal name and optional NOT mode.
+
+# Configuration
+
+NOT checkbox: when checked, the logic is inverted. Mesecon power is emitted when the Logistica signal is ABSENT, and stopped when the signal is ON.
+
+Signal Name: the name of the Logistica signal to listen for. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+# Loop protection
+
+If a Mesecon Signal Receiver and a Mesecon Signal Sender are wired together in a loop (e.g. through a NOT configuration), the sender has a built-in cooldown that limits how fast it can change its Mesecon output. This prevents the loop from overloading the server, though the correct fix is to redesign the circuit.
+
+# Notes
+
+The sender connects to Logistica cables from any face. Mesecon wires connect from any face independently.
+
+When disconnected from a Logistica network, the sender turns its Mesecon output off.
+]])
+
 g.signal_not_gate = S([[
 The Signal NOT Gate is both a signal receiver and a signal sender. It reads one input signal and broadcasts the opposite state on a separate output signal.
 
