@@ -101,6 +101,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("leaves_upgrade"),
+  recipe = {
+    {"group:leaves",  itemstrings.glass,        "group:leaves"},
+    {"group:leaves",  L("silverin_plate"),      "group:leaves"},
+    {"",                  L("silverin_slice"),       ""},
+  },
+})
+
+minetest.register_craft({
   output = L("sprinkler_upgrade"),
   recipe = {
     {"",                    itemstrings.glass,        ""},

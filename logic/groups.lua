@@ -84,6 +84,7 @@ logistica.GROUPS = {
   trashcans = make_group_table("trashcans", logistica.NETWORK_GROUPS.trashcans),
   vaccuum_suppliers = make_group_table("vaccuum_suppliers", logistica.NETWORK_GROUPS.suppliers),
   farming_suppliers = make_group_table("farming_suppliers", logistica.NETWORK_GROUPS.suppliers),
+  wood_suppliers = make_group_table("wood_suppliers", logistica.NETWORK_GROUPS.suppliers),
   reservoirs = make_group_table("reservoirs", logistica.NETWORK_GROUPS.reservoirs),
   wireless_transmitters = make_group_table("wireless_transmitters", logistica.NETWORK_GROUPS.wireless_transmitters),
   wireless_receivers = make_group_table("wireless_receivers", logistica.NETWORK_GROUPS.wireless_receivers),

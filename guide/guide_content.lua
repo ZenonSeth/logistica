@@ -26,6 +26,8 @@ local PAGE_AUTOCRAFTER = "mautocrf"
 local PAGE_VACCUUM_CHEST = "mvacchs"
 local PAGE_FARMING_SUPPLIER = "mfarmsup"
 local PAGE_SPRINKLER_UPGRADE = "isprinkup"
+local PAGE_WOODCUTTER = "mwoodcut"
+local PAGE_LEAVES_UPGRADE = "ileavesup"
 local PAGE_LAVA_FUELER = "mlvfuel"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
@@ -111,6 +113,8 @@ local RECIPE_BUCKEMPT = getrec({L("bucket_emptier")})
 local RECIPE_VACCUUMC = getrec({L("vaccuum_chest")})
 local RECIPE_FARMSUP = getrec({L("farming_supplier")})
 local RECIPE_SPRINKUP = getrec({L("sprinkler_upgrade")})
+local RECIPE_WOODCUT  = getrec({L("woodcutter")})
+local RECIPE_LEAVESUP = getrec({L("leaves_upgrade")})
 local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
@@ -202,6 +206,8 @@ local RECIPE_LINKS = {
   [L("cobblegen_supplier")] = PAGE_COBBLE_GENERATOR,
   [L("wireless_transmitter")] = PAGE_WIRELESS_TRANSMITTER,
   [L("wireless_receiver")] = PAGE_WIRELESS_RECEIVER,
+  [L("woodcutter")] = PAGE_WOODCUTTER,
+  [L("leaves_upgrade")] = PAGE_LEAVES_UPGRADE,
 
 }
 
@@ -277,6 +283,8 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
+    { name = S("  Wood Supplier"), id = PAGE_WOODCUTTER },
+    { name = S("  Leafcutter Upgrade"), id = PAGE_LEAVES_UPGRADE },
     { name = header(S("Machine Upgrades:"))},
     { name = S("  Mass Storage Upgrades"), id = PAGE_MASS_STORAGE_UPGR },
     { name = S("  Cobble Generator Upgrades"), id = PAGE_COBBLE_GENERATOR_UPGR },
@@ -501,6 +509,22 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SPRINKUP,
       recipeLinks = RECIPE_LINKS,
       description = desc.sprinkler_upgrade,
+    },
+
+    [PAGE_WOODCUTTER] = {
+      title = S("Wood Supplier"),
+      relatedItems = {L("leaves_upgrade")},
+      recipes = RECIPE_WOODCUT,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.woodcutter,
+    },
+
+    [PAGE_LEAVES_UPGRADE] = {
+      title = S("Leafcutter Upgrade"),
+      relatedItems = {L("woodcutter")},
+      recipes = RECIPE_LEAVESUP,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.leaves_upgrade,
     },
 
     [PAGE_LAVA_FUELER] = {

@@ -17,6 +17,12 @@ items["logistica:storage_upgrade_2"]= {
   stack_max = logistica.stack_max,
 }
 
+items["logistica:leaves_upgrade"] = {
+  description = S("Leaves Upgrade\nInsert into a Wood Supplier to also harvest leaves"),
+  inventory_image = "logistica_leaves_upgrade.png",
+  stack_max = 1,
+}
+
 items["logistica:sprinkler_upgrade"] = {
   description = S("Sprinkler Upgrade\nInsert into a Farming Supplier to enable water-assisted growth"),
   inventory_image = "logistica_sprinkler_upgrade.png",

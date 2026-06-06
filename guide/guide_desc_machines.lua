@@ -288,6 +288,28 @@ If no water is available in the network, the grow pass is skipped entirely for t
 Note: the Sprinkler Upgrade consumes exactly 1 bucket of water per machine cycle, regardless of how many plants are in range.
 ]])
 
+g.woodcutter = S([[
+The Wood Supplier automatically harvests the tree directly in front of it and supplies all collected wood (and optionally leaves) to the network, acting like a passive supply chest that fills itself.
+
+Face the machine toward the base trunk of the tree you want to harvest. Sneak and punch the machine to see a highlight on the target position.
+
+When enabled, the machine will scan upward from the target trunk, collecting all connected trunk nodes of the same type. It works top-down, cutting one node at a time with a short delay between each cut. This prevents the tree from dropping as fallen nodes, and gives time for the inventory to be drained by the network between cuts.
+
+Limits: if the tree is too tall or has too many connected nodes in total, the operation is cancelled and the status field in the inventory shows the reason. The machine will automatically retry on the next cycle.
+
+The inventory is output-only. Items are supplied passively to the network the same way a Passive Supply Chest would. If the inventory fills up mid-cut, cutting stops and the machine shows an "Inventory full" status.
+
+The upgrade slot accepts a Leafcutter Upgrade. When installed, the machine will also harvest the leaves of the tree. It detects the leaf type by checking above the topmost trunk nodes, picks the most common leaf type found, and flood-fills all connected leaves of that type. Leaves are cut before the trunk, also top-down.
+]])
+
+g.leaves_upgrade = S([[
+The Leafcutter Upgrade is inserted into the upgrade slot of a Wood Supplier. When installed, each time the Wood Supplier harvests a tree it will also harvest the tree's leaves.
+
+The upgrade detects the leaf type by checking the nodes directly above the highest points of the trunk. It picks the most common leaf type found and collects all connected leaf nodes of that type. Leaves are cut top-down before the trunk is cut.
+
+If no leaves are detected above the trunk, the cutting proceeds normally with only the trunk being harvested.
+]])
+
 g.vaccuum_chest = S([[
 The Vacuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
 

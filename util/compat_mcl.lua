@@ -61,7 +61,7 @@ logistica.itemstrings = {
     river_water_source = mcl and get_mcl_river_water_source() or "default:river_water_source",
     lava_source = mcl and "mcl_core:lava_source" or "default:lava_source",
     lava_source_nether = mcl_nether and get_mcl_lava_source_nether() or nil,
-    paper = mcl and "mcl_core:paper" or "default:paper"
+    paper = mcl and "mcl_core:paper" or "default:paper",
 }
 
 -- function overrides

@@ -35,11 +35,12 @@
 - Lava Furnace
   - Fix shift+click on slots -- DONE
 - Difficult to make Cooking Crafting Supplier -- (Maybe)
-- Farming node -- DONE (logistica:farming_supplier; api/farming_supplier.lua + logic/farming_supplier.lua; Sprinkler Upgrade item; needs textures: logistica_farming_supplier_{top,bottom,side,front}.png + logistica_water_particle.png + logistica_sprinkler_upgrade.png)
-- Tree cutting node -- in progress
+- Farming node -- DONE (logistica:farming_supplier; api/farming_supplier.lua + logic/farming_supplier.lua; Sprinkler Upgrade item)
+- Tree cutting node -- DONE (logistica:woodcutter; api/woodcutter.lua + logic/woodcutter.lua; Leafcutter Upgrade item)
 - Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
 - Upgrade recipes for Importer and Requester -- DONE
 - Filters on Vacuum chest -- (Maybe not)
+- (Maybe) - Automatic Packer + Unpacker - detect crafting loops (e.g. 9 ingots = 1 block = 9 ingots) at load time, make a machine that enables that conversion by default on a network.
 
 ### Maybe
 - Lava generator - but slow

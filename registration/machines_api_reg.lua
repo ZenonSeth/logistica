@@ -333,6 +333,19 @@ logistica.register_farming_supplier(S("Farming Supplier"), "farming_supplier", 1
 })
 
 --------------------------------
+-- Wood Supplier
+--------------------------------
+
+logistica.register_woodcutter(S("Woodcutting Supplier"), "woodcutter", 16, {
+  "logistica_woodcutter_top.png",
+  "logistica_woodcutter_bottom.png",
+  "logistica_woodcutter_side.png",
+  "logistica_woodcutter_side.png^[transformFX",
+  "logistica_woodcutter_front.png",
+  "logistica_woodcutter_bottom.png", -- back
+})
+
+--------------------------------
 -- Signal Lamp
 --------------------------------
 
