@@ -15,8 +15,10 @@ function logistica.signal_button_get_name(pos)
 end
 
 function logistica.signal_button_update_infotext(pos)
+  local sigName = logistica.signal_button_get_name(pos)
+  local state = is_pressed(pos) and "Pressed" or "Ready"
   minetest.get_meta(pos):set_string("infotext",
-    is_pressed(pos) and "Pressed" or "Ready (punch to press)")
+    "Button [" .. sigName .. "]: " .. state .. "\nUse Hyperspanner to configure")
 end
 
 function logistica.signal_button_press(pos)

@@ -42,6 +42,7 @@ A multipurpose engineering tool.
 
 - Use (right-click on PC) it on Logistica nodes to get information about which network, if any, the node is connected to. This does not use or damage the Hyperspanner.
 - Sneak + Use it on a Logistica node to get more information about the network, if any, to which the machine is connected to.
+- Use it on a Signal Button or Signal Switch to open their configuration screen (to set the signal channel name). These nodes use right-click to activate directly, so the Hyperspanner is the way to configure them after placing.
 
 - Combined with a Photonizer or a Photonizer (Reversed Polarity) in the crafting grid, it will turn one into the other. This does not use or damage the Hyperspanner.
 ]])

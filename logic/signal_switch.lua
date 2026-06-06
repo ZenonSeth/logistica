@@ -4,8 +4,10 @@ local DEFAULT_SIGNAL_NAME = "signal"
 local ON_SUFFIX = "_on"
 
 function logistica.signal_switch_update_infotext(pos)
-  local text = logistica.signal_switch_is_on(pos) and "On" or "Off"
-  minetest.get_meta(pos):set_string("infotext", text)
+  local sigName = logistica.signal_switch_get_name(pos)
+  local state = logistica.signal_switch_is_on(pos) and "On" or "Off"
+  minetest.get_meta(pos):set_string("infotext",
+    "Switch [" .. sigName .. "]: " .. state .. "\nUse Hyperspanner to configure")
 end
 
 function logistica.signal_switch_get_name(pos)

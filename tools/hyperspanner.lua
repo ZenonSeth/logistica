@@ -118,6 +118,12 @@ minetest.register_tool("logistica:hyperspanner",{
     if not placer or not pos or not placer:is_player() then return end
     local node = minetest.get_node_or_nil(pos)
     if not node or not (logistica.is_machine(node.name) or logistica.GROUPS.cables.is(node.name)) then return end
+    local nodeDef = minetest.registered_nodes[node.name]
+    if not placer:get_player_control().sneak
+        and nodeDef and nodeDef.logistica and nodeDef.logistica.on_hyperspanner_use then
+      nodeDef.logistica.on_hyperspanner_use(pos, placer)
+      return
+    end
     if placer:get_player_control().sneak then
       hyperspanner_advanced_use(pos, placer)
     else

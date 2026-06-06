@@ -40,11 +40,7 @@ All machines on the same network that share a signal name will communicate with 
 g.signal_button = S([[
 The Signal Button is a momentary signal sender. When pressed it sends a named signal ON for one second, then automatically releases and sends it OFF again.
 
-# Usage
-
-Punch the button to press it. Right-click to open the settings and configure the signal name.
-
-The infotext shows Ready (punch to press) or Pressed while the button is active.
+Right-click (or use) to press the button. Use the Hyperspanner on it to open the configuration and set the signal name.
 
 # Configuration
 
@@ -52,9 +48,11 @@ Signal Name: the name of the signal this button broadcasts when pressed. Must us
 
 # Behavior
 
-Pressing the button while it is already pressed has no effect - it must complete its 1-second release before it can be pressed again.
+Pressing the button while it is already mid-press has no effect - it must complete its 1-second release before it can be pressed again.
 
 If the button is mid-press when it connects to a network, it re-sends the ON signal to that network. When disconnected, its signal contribution is automatically removed.
+
+The infotext shows the signal name, current state (Ready or Pressed), and a reminder to use the Hyperspanner for configuration.
 
 # Example uses
 
@@ -65,12 +63,7 @@ If the button is mid-press when it connects to a network, it re-sends the ON sig
 g.signal_switch = S([[
 The Signal Switch is a manual signal sender. It broadcasts a named ON or OFF signal to all receivers on the same network.
 
-# Usage
-
-- Punch (left-click) to toggle the switch ON or OFF.
-- Right-click to open the settings and configure the signal name.
-
-The infotext above the node shows the current state: On or Off.
+Right-click to toggle the switch ON or OFF. Use the Hyperspanner on it to open the configuration and set the signal name.
 
 # Configuration
 
@@ -79,6 +72,8 @@ Signal Name: the name of the signal this switch broadcasts. All receivers watchi
 Signal names must use only lowercase letters, digits, and underscores (a-z 0-9 _).
 
 # Notes
+
+The infotext shows the signal name, current state, and a reminder to use the Hyperspanner for configuration.
 
 If the switch is ON when it is disconnected from the network (dug up or isolated by a Toggleable Cable), it will automatically remove its signal contribution from the network. If no other sender is keeping that signal ON, the signal turns OFF.
 ]])

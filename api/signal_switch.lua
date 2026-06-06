@@ -100,17 +100,15 @@ function logistica.register_signal_switch(desc, name, tiles_off, tiles_on)
 
   local function on_rightclick(pos, _, player, _, _)
     if minetest.is_protected(pos, player:get_player_name()) then return end
-    show_switch_formspec(pos, player:get_player_name())
-  end
-
-  local function on_punch(pos, _, player, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
     logistica.signal_switch_toggle(pos)
   end
 
   local logistica_callbacks = {
-    on_connect_to_network = logistica.signal_switch_on_connect,
+    on_connect_to_network      = logistica.signal_switch_on_connect,
     on_disconnect_from_network = logistica.signal_switch_on_disconnect,
+    on_hyperspanner_use        = function(pos, player)
+      show_switch_formspec(pos, player:get_player_name())
+    end,
   }
 
   local def_off = {
@@ -130,7 +128,6 @@ function logistica.register_signal_switch(desc, name, tiles_off, tiles_on)
     after_place_node = after_place,
     after_dig_node = after_dig,
     on_rightclick = on_rightclick,
-    on_punch = on_punch,
     logistica = logistica_callbacks,
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10,

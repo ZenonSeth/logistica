@@ -7,7 +7,7 @@ local forms = {}
 local function get_formspec(pos)
   local sigName = logistica.signal_button_get_name(pos)
   return "formspec_version[4]"..
-    "size[7,2.8]"..
+    "size[7,3.1]"..
     logistica.ui.background..
     logistica.ui.button_style..
     "label[0.5,0.4;"..FS("Signal Button").."]"..
@@ -92,17 +92,15 @@ function logistica.register_signal_button(desc, name, tiles_off, tiles_on)
 
   local function on_rightclick(pos, _, player, _, _)
     if minetest.is_protected(pos, player:get_player_name()) then return end
-    show_formspec(pos, player:get_player_name())
-  end
-
-  local function on_punch(pos, _, player, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
     logistica.signal_button_press(pos)
   end
 
   local logistica_callbacks = {
     on_connect_to_network      = logistica.signal_button_on_connect,
     on_disconnect_from_network = logistica.signal_button_on_disconnect,
+    on_hyperspanner_use        = function(pos, player)
+      show_formspec(pos, player:get_player_name())
+    end,
   }
 
   local def_off = {
@@ -122,7 +120,6 @@ function logistica.register_signal_button(desc, name, tiles_off, tiles_on)
     after_place_node = after_place,
     after_dig_node   = after_dig,
     on_rightclick    = on_rightclick,
-    on_punch         = on_punch,
     on_timer         = logistica.signal_button_timer,
     logistica        = logistica_callbacks,
     _mcl_hardness      = 1.5,
