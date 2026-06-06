@@ -3,6 +3,7 @@ logistica.ui = {}
 logistica.ui.background = "no_prepend[]bgcolor[#0000;true;#0008]background9[0,0;1,1;logistica_formspec_background.png;true;8]"
 logistica.ui.background_lava_furnace = "no_prepend[]bgcolor[#0000;true;#0008]background9[0,0;1,1;logistica_lava_furnace_bg.png;true;8]"
 logistica.ui.button_style = "style_type[button,image_button;border=false;bgimg=logistica_button_bg_64x64_9_20x20.png;bgimg_middle=20,20]"
+logistica.ui.button_only_style = "style_type[button;border=false;bgimg=logistica_button_bg_64x64_9_20x20.png;bgimg_middle=20,20]"
 
 
 local function list_dropdown(name, itemTable, x, y, default, label)

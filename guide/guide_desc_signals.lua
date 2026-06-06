@@ -206,6 +206,47 @@ The gate re-reads all input states fresh each time any one of its inputs changes
 If the gate is disconnected or dug up, its output contribution is automatically removed from the network.
 ]])
 
+g.signal_item_counter = S([[
+The Signal Item Count Sender is a signal sender that monitors how many of a specific item are present across the network and broadcasts a named signal based on whether that count meets a configured condition.
+
+Only items physically stored in Mass Storage nodes and Passive Supply Chests (including Vacuum Suppliers) are counted. Crafting Suppliers are excluded.
+
+# Usage
+
+Right-click to open the settings.
+Use the Enable button to start or pause monitoring.
+
+The infotext above the node shows the item being monitored, the condition, the signal name, and whether the node is Running or Paused.
+
+# Configuration
+
+Item to Monitor: place any item into the slot to select what to count. The slot is a filter only - the item is not consumed. Remove the item to stop monitoring.
+
+Condition: choose >= (greater than or equal) or <= (less than or equal) from the dropdown.
+
+Amount: the threshold number to compare the count against.
+
+Signal Name: the name of the signal this node broadcasts when the condition is met. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Respect Mass Storage Reserve: when checked, items that are reserved in Mass Storage slots are subtracted from the count before comparing. When unchecked, all stored items including reserved amounts are counted.
+
+Enable button: toggles the node between Running and Paused. When Paused, the signal is immediately sent as OFF regardless of the current item count.
+
+# Behavior
+
+The node checks the item count once per second. When the condition is met, the signal is sent as ON. When the condition is not met, the signal is sent as OFF.
+
+If no item is set in the filter slot, the signal is always OFF.
+
+When the node is disconnected from the network (dug up or isolated), its signal contribution is automatically removed.
+
+# Example uses
+
+- Send a signal when iron ingot stock drops below 500 (condition: <= 499).
+- Trigger an alarm when a material exceeds a cap (condition: >= 1000).
+- Gate a machine with a Signal Toggler so it only runs while supplies are available.
+]])
+
 g.signal_toggler = S([[
 The Signal Toggler is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
 

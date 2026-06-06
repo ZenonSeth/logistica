@@ -58,6 +58,7 @@ local PAGE_SIGNAL_NOT_GATE        = "signot"
 local PAGE_SIGNAL_LOGIC_GATE      = "siglg"
 local PAGE_MESECON_SIG_RECEIVER   = "mesrcv"
 local PAGE_MESECON_SIG_SENDER     = "messnd"
+local PAGE_SIGNAL_ITEM_COUNTER    = "sigitmcnt"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -156,6 +157,7 @@ local RECIPE_LINKS = {
   [L("signal_logic_gate")]   = PAGE_SIGNAL_LOGIC_GATE,
   [L("mesecon_signaler")]    = PAGE_MESECON_SIG_RECEIVER,
   [L("mesecon_sender")]      = PAGE_MESECON_SIG_SENDER,
+  [L("signal_item_counter")] = PAGE_SIGNAL_ITEM_COUNTER,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -232,6 +234,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Logic Gate"), id = PAGE_SIGNAL_LOGIC_GATE },
     { name = S("  Mesecon Signal Receiver"), id = PAGE_MESECON_SIG_RECEIVER },
     { name = S("  Mesecon Signal Sender"), id = PAGE_MESECON_SIG_SENDER },
+    { name = S("  Signal Item Count Sender"), id = PAGE_SIGNAL_ITEM_COUNTER },
     { name = header(S("Utility Machines:"))},
     { name = S("  Vaccuum Chest"), id = PAGE_VACCUUM_CHEST },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
@@ -581,7 +584,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_SIGNALS_OVERVIEW] = {
       title = S("Signals"),
-      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender")},
+      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter")},
       recipeLinks = RECIPE_LINKS,
       description = desc.signals_overview,
     },
@@ -632,6 +635,12 @@ logistica.GuideApi.register(GUIDE_NAME, {
       title = S("Mesecon Signal Sender"),
       recipeLinks = RECIPE_LINKS,
       description = desc.mesecon_signal_sender,
+    },
+
+    [PAGE_SIGNAL_ITEM_COUNTER] = {
+      title = S("Signal Item Count Sender"),
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_item_counter,
     },
 
     -- Settings

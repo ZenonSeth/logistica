@@ -2,6 +2,7 @@ local S = logistica.TRANSLATOR
 
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
+local SUPPLIER_LIST_NAME = "main"
 local MAX_NETWORK_DEPTH_SEARCH = 8 -- somewhat arbitrary but prevents stackoverflows
 
 local h2p = minetest.get_position_from_hash
@@ -425,4 +426,51 @@ function logistica.use_bucket_for_liquid_in_network(pos, bucketItemStack, liquid
   elseif isFullBucket then
     return logistica.empty_bucket_into_network(network, bucketItemStack, dryRun)
   end
+end
+
+-- Counts available items across mass storage and passive/vacuum supply chests.
+-- Crafting suppliers and bucket suppliers are excluded.
+-- respectReserve: if true, mass storage slot reserves are subtracted from the count.
+function logistica.count_items_in_network(itemName, network, respectReserve)
+  if not itemName or itemName == "" then return 0 end
+  local count = 0
+
+  local massLocations = network.storage_cache[itemName]
+  if massLocations then
+    for hash, _ in pairs(massLocations) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local meta = minetest.get_meta(pos)
+      local list = logistica.get_list(meta:get_inventory(), MASS_STORAGE_LIST_NAME)
+      for i, stack in ipairs(list) do
+        if stack:get_name() == itemName then
+          local available = stack:get_count()
+          if respectReserve then
+            available = math.max(0, available - logistica.get_mass_storage_reserve(meta, i))
+          end
+          count = count + available
+        end
+      end
+    end
+  end
+
+  local supplierLocations = network.supplier_cache[itemName]
+  if supplierLocations then
+    for hash, _ in pairs(supplierLocations) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local nodeName = minetest.get_node(pos).name
+      if logistica.GROUPS.suppliers.is(nodeName)
+          or logistica.GROUPS.vaccuum_suppliers.is(nodeName) then
+        local list = logistica.get_list(minetest.get_meta(pos):get_inventory(), SUPPLIER_LIST_NAME)
+        for _, stack in ipairs(list) do
+          if stack:get_name() == itemName then
+            count = count + stack:get_count()
+          end
+        end
+      end
+    end
+  end
+
+  return count
 end

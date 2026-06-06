@@ -521,6 +521,17 @@ logistica.register_wireless_transmitter("wireless_transmitter", {
 })
 
 --------------------------------
+-- Signal Item Count Sender
+--------------------------------
+
+logistica.register_signal_item_counter(
+  S("Signal Item Count Sender"),
+  "signal_item_counter",
+  {"logistica_fueler_front.png", "logistica_signal_item_counter_side.png"},
+  {"logistica_fueler_front.png", "logistica_signal_item_counter_side_on.png"}
+)
+
+--------------------------------
 -- Wireless Upgrader
 --------------------------------
 
