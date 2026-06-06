@@ -425,6 +425,27 @@ logistica.register_signal_toggler(
 -- Signal Switch
 --------------------------------
 
+logistica.register_signal_button(
+  S("Signal Button"),
+  "signal_button",
+  {
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_signal_button_front.png",
+  },
+  {
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_back.png",
+    "logistica_signal_button_front_on.png",
+  }
+)
+
 logistica.register_signal_switch(
   S("Signal Switch"),
   "signal_switch",

@@ -51,6 +51,7 @@ local PAGE_SERVER_SETTINGS = "servset"
 
 local PAGE_SIGNALS_OVERVIEW       = "sigover"
 local PAGE_SIGNAL_RELAY           = "sigrelay"
+local PAGE_SIGNAL_BUTTON          = "sigbtn"
 local PAGE_SIGNAL_SWITCH          = "sigsw"
 local PAGE_SIGNAL_LAMP            = "siglmp"
 local PAGE_SIGNAL_LAMP_2C         = "siglmp2c"
@@ -127,6 +128,7 @@ local RECIPE_SILVMIRR = getlavarec(L("silverin_mirror_box"))
 local RECIPE_WRLSCRYS = getlavarec(L("wireless_crystal"))
 
 local RECIPE_SIG_RELAY   = getrec({L("signal_relay")})
+local RECIPE_SIG_BUTTON  = getrec({L("signal_button")})
 local RECIPE_SIG_SWITCH  = getrec({L("signal_switch")})
 local RECIPE_SIG_LAMP    = getrec({L("signal_lamp_white")})
 local RECIPE_SIG_LAMP2C  = getrec({L("signal_lamp_2c_br")})
@@ -166,6 +168,7 @@ local RECIPE_LINKS = {
 
   -- signals
   [L("signal_relay")]        = PAGE_SIGNAL_RELAY,
+  [L("signal_button")]       = PAGE_SIGNAL_BUTTON,
   [L("signal_switch")]       = PAGE_SIGNAL_SWITCH,
   [L("signal_lamp_white")]   = PAGE_SIGNAL_LAMP,
   [L("signal_lamp_2c_br")]   = PAGE_SIGNAL_LAMP_2C,
@@ -244,6 +247,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Autocrafter"), id = PAGE_AUTOCRAFTER },
     { name = header(S("Signals:"))},
     { name = S("  Signals Overview"), id = PAGE_SIGNALS_OVERVIEW },
+    { name = S("  Signal Button"), id = PAGE_SIGNAL_BUTTON },
     { name = S("  Signal Switch"), id = PAGE_SIGNAL_SWITCH },
     { name = S("  Signal Lamp"), id = PAGE_SIGNAL_LAMP },
     { name = S("  Signal Lamp (2-Color)"), id = PAGE_SIGNAL_LAMP_2C },
@@ -604,7 +608,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_SIGNALS_OVERVIEW] = {
       title = S("Signals"),
-      relatedItems = {L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_timer")},
+      relatedItems = {L("signal_button"), L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_timer")},
       recipeLinks = RECIPE_LINKS,
       description = desc.signals_overview,
     },
@@ -614,6 +618,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_RELAY,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_relay,
+    },
+
+    [PAGE_SIGNAL_BUTTON] = {
+      title = S("Signal Button"),
+      recipes = RECIPE_SIG_BUTTON,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_button,
     },
 
     [PAGE_SIGNAL_SWITCH] = {

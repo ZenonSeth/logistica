@@ -37,6 +37,31 @@ Signal names are scoped to the network. Two machines on different networks canno
 All machines on the same network that share a signal name will communicate with each other.
 ]])
 
+g.signal_button = S([[
+The Signal Button is a momentary signal sender. When pressed it sends a named signal ON for one second, then automatically releases and sends it OFF again.
+
+# Usage
+
+Punch the button to press it. Right-click to open the settings and configure the signal name.
+
+The infotext shows Ready (punch to press) or Pressed while the button is active.
+
+# Configuration
+
+Signal Name: the name of the signal this button broadcasts when pressed. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+# Behavior
+
+Pressing the button while it is already pressed has no effect - it must complete its 1-second release before it can be pressed again.
+
+If the button is mid-press when it connects to a network, it re-sends the ON signal to that network. When disconnected, its signal contribution is automatically removed.
+
+# Example uses
+
+- Trigger a one-shot action in a Logic Gate.
+- Manually fire a timed pulse without needing a timer sender.
+]])
+
 g.signal_switch = S([[
 The Signal Switch is a manual signal sender. It broadcasts a named ON or OFF signal to all receivers on the same network.
 

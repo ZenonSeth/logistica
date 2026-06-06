@@ -268,6 +268,15 @@ local CIRC   = L("silverin_circuit")
 local CABLE  = L("optic_cable")
 
 minetest.register_craft({
+  output = L("signal_button"),
+  recipe = {
+    {PLATE, ""               , PLATE},
+    {"",    RELAY,             ""},
+    {PLATE, itemstrings.steel, PLATE},
+  }
+})
+
+minetest.register_craft({
   output = L("signal_switch"),
   recipe = {
     {PLATE, itemstrings.steel, PLATE},
