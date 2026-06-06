@@ -8,8 +8,8 @@
   - Max Storage readout -- DONE
   - Filled up indicators -- (Maybe not)
 - Passive Supply Chest
-  - Increase size of inventory
-  - Split: Allow Storing From Machines and Allow Storing From Access Point
+  - Increase size of inventory -- DONE (16 -> 32 slots, 4x8; existing chests resize on open)
+  - Split: Allow Storing From Machines and Allow Storing From Access Point -- DONE (two separate toggles, isAutomated flag through insert_item_in_network)
   - (Maybe) Allow storing rules (e.g. what items to be allowed to be stored in it)
 - Change injectors to use numbers and not items, allowing larger supply requests
 - Vacuum Chest
