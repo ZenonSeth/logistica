@@ -123,9 +123,16 @@ You can also choose to sort the stored tools by Name, Mod or Wear.
 ]])
 
 g.passive_supplier = S([[
-A Passive Supplier Chest acts as a regular chest, and a source for items for network requests.
+A Passive Supplier Chest acts as a regular chest and a source of items for network requests.
 
-It has a small inventory, as it is not meant to be used for regular storage, but any item can be put in it. Passive Supplier Chests won't actively push items into the network, but Demanders and Mass Storage nodes can both take items from Suppliers when needed. Passive Supplier Chests have a toggle if they should also accept items to be stored in them from Network Importers.
+Any item can be placed in it. Passive Supplier Chests won't actively push items into the network, but Demanders and Mass Storage nodes can pull items from them when needed.
+
+Two toggles control what may store items into the chest:
+
+- Allow Storing from Machines: when enabled, Network Importers and other automated machines can deposit items into this chest.
+- Allow Storing from Access Point: when enabled, items inserted via an Access Point are stored here if there is no other suitable storage.
+
+Both are enabled by default. Disabling both effectively makes the chest read-only from the network's point of view, supplying items out but accepting nothing in automatically.
 ]])
 
 g.network_importer = S([[

@@ -285,7 +285,8 @@ function logistica.insert_item_into_item_storage(pos, inv, inputStack, dryRun)
 end
 
 -- attempts to insert the given itemstack in the network, returns how many items remain
-function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRequesters, ignoreStorages, ignoreSuppliers, ignoreTrashcans)
+-- isAutomated: true if called by a machine (injector etc.), false if called by a user (access point)
+function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRequesters, ignoreStorages, ignoreSuppliers, ignoreTrashcans, isAutomated)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not itemstack or itemstack:is_empty() then return 0 end
   if not network then return itemstack:get_count() end
@@ -331,7 +332,7 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRe
     for hash, _ in pairs(suppliers) do
       local pos = h2p(hash)
       logistica.load_position(pos)
-      local leftover = logistica.put_item_in_supplier(pos, workingStack)
+      local leftover = logistica.put_item_in_supplier(pos, workingStack, isAutomated)
       if leftover:is_empty() then return 0 end
       workingStack = leftover
     end

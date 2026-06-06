@@ -274,7 +274,7 @@ logistica.compat_bucket_register_buckets()
 -- Passive Supply Chest
 --------------------------------
 
-logistica.register_supplier(S("Passive Supplier Chest"), "passive_supplier", 16, {
+logistica.register_supplier(S("Passive Supplier Chest"), "passive_supplier", 32, {
       "logistica_passive_supplier_top.png",
       "logistica_passive_supplier_bottom.png",
       "logistica_passive_supplier_side.png^[transformFX",

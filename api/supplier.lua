@@ -1,27 +1,43 @@
 local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_supplier"
-local ON_OFF_BUTTON = "on_off_btn"
+local BTN_ALLOW_MACHINES = "allow_machines_btn"
+local BTN_ALLOW_AP       = "allow_ap_btn"
+local META_ALLOW_MACHINES = "supplier_allow_machines"
+local META_ALLOW_AP       = "supplier_allow_ap"
 
 local supplierForms = {}
 
 local function get_supplier_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
-  local isOn = logistica.is_machine_on(pos)
+  local meta = minetest.get_meta(pos)
+  local allowMachines = meta:get_string(META_ALLOW_MACHINES) ~= "0"
+  local allowAp       = meta:get_string(META_ALLOW_AP) ~= "0"
 
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.5, 10).."]" ..
+    "size["..logistica.inv_size(10.5, 13).."]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, logistica.inv_width - 1.5, 0.5, ON_OFF_BUTTON, FS("Allow Storing from Network"))..
     "label[0.6,0.4;"..FS("Passive Supplier\nItems become available to network requests.").."]"..
-    "list["..posForm..";main;0.4,1.4;8,2;0]"..
-    logistica.player_inv_formspec(0.4,4.5)..
+    "list["..posForm..";main;0.4,1.4;8,4;0]"..
+    logistica.ui.on_off_btn(allowMachines, 0.4,  6.50, BTN_ALLOW_MACHINES, FS("Allow Storing from Machines"))..
+    logistica.ui.on_off_btn(allowAp,       5.0,  6.50, BTN_ALLOW_AP,       FS("Allow Storing from Access Point"))..
+    logistica.player_inv_formspec(0.4, 7.8)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end
 
 local function show_supplier_formspec(playerName, pos)
   supplierForms[playerName] = {position = pos}
+  local meta = minetest.get_meta(pos)
+  -- resize inventory for existing chests placed before the size increase
+  local inv = meta:get_inventory()
+  if inv:get_size("main") < logistica.get_supplier_inv_size(pos) then
+    inv:set_size("main", logistica.get_supplier_inv_size(pos))
+  end
+  -- migrate from old power-based toggle: power is no longer used for suppliers
+  if logistica.is_machine_on(pos) then
+    logistica.toggle_machine_on_off(pos)
+  end
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_supplier_formspec(pos))
 end
 
@@ -35,9 +51,16 @@ local function on_player_receive_fields(player, formname, fields)
 
   if fields.quit then
     supplierForms[playerName] = nil
-  elseif fields[ON_OFF_BUTTON] then
-    logistica.toggle_machine_on_off(pos)
-    show_supplier_formspec(player:get_player_name(), pos)
+  elseif fields[BTN_ALLOW_MACHINES] then
+    local meta = minetest.get_meta(pos)
+    local current = meta:get_string(META_ALLOW_MACHINES) ~= "0"
+    meta:set_string(META_ALLOW_MACHINES, current and "0" or "1")
+    show_supplier_formspec(playerName, pos)
+  elseif fields[BTN_ALLOW_AP] then
+    local meta = minetest.get_meta(pos)
+    local current = meta:get_string(META_ALLOW_AP) ~= "0"
+    meta:set_string(META_ALLOW_AP, current and "0" or "1")
+    show_supplier_formspec(playerName, pos)
   end
   return true
 end
@@ -99,8 +122,7 @@ end)
 ----------------------------------------------------------------
 -- Public Registration API
 ----------------------------------------------------------------
--- `simpleName` is used for the description and for the name (can contain spaces)
--- `inventorySize` should be 16 at max
+-- `inventorySize` is the number of inventory slots
 function logistica.register_supplier(desc, name, inventorySize, tiles)
   local lname = string.lower(name:gsub(" ", "_"))
   local supplier_name = "logistica:"..lname
@@ -128,7 +150,6 @@ function logistica.register_supplier(desc, name, inventorySize, tiles)
     can_dig = can_dig_supplier,
     logistica = {
       inventory_size = inventorySize,
-      on_power = function(pos, power) logistica.set_node_tooltip_from_state(pos, nil, power) end,
       supplierMayAccept = true,
     },
     _mcl_hardness = 1.5,

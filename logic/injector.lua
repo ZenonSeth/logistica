@@ -103,7 +103,8 @@ function logistica.on_injector_timer(pos, elapsed)
       not get_put_into_state(meta, 1),
       not get_put_into_state(meta, 2),
       not get_put_into_state(meta, 3),
-      not get_put_into_state(meta, 4)
+      not get_put_into_state(meta, 4),
+      true
     )
   numRemaining = targetStackSize - numToTake + numRemaining
   copyStack:set_count(numRemaining)

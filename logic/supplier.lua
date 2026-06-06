@@ -1,6 +1,8 @@
 local S = logistica.TRANSLATOR
 
-local META_SUPPLIER_LIST = "main"
+local META_SUPPLIER_LIST  = "main"
+local META_ALLOW_MACHINES = "supplier_allow_machines"
+local META_ALLOW_AP       = "supplier_allow_ap"
 
 local function ret(remaining, optError)
   return { remaining = remaining, error = optError and S(optError) or nil }
@@ -18,14 +20,20 @@ function logistica.get_supplier_inv_size(pos)
 end
 
 -- tries to put the given item in this supplier, returns what's leftover
-function logistica.put_item_in_supplier(pos, stack)
+-- isAutomated: true if called by a machine, false if called by a user (access point)
+function logistica.put_item_in_supplier(pos, stack, isAutomated)
   local nodeName = minetest.get_node(pos).name
   if not logistica.GROUPS.suppliers.is(nodeName) then return stack end
   local nodeDef = minetest.registered_nodes[nodeName]
   if not nodeDef or not nodeDef.logistica then return stack end
   if not nodeDef.logistica.supplierMayAccept then return stack end
-  -- only insert if its enabled
-  if not logistica.is_machine_on(pos) then return stack end
+  -- check per-source allow flags
+  local meta = minetest.get_meta(pos)
+  if isAutomated then
+    if meta:get_string(META_ALLOW_MACHINES) == "0" then return stack end
+  else
+    if meta:get_string(META_ALLOW_AP) == "0" then return stack end
+  end
   local origCount = stack:get_count()
   local inv = minetest.get_meta(pos):get_inventory()
   local leftover = inv:add_item(META_SUPPLIER_LIST, stack)
