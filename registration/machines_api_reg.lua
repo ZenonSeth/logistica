@@ -539,6 +539,17 @@ logistica.register_signal_item_counter(
 )
 
 --------------------------------
+-- Signal Timer Sender
+--------------------------------
+
+logistica.register_signal_timer(
+  S("Signal Timer Sender"),
+  "signal_timer",
+  {"logistica_fueler_front.png", "logistica_signal_timer_side.png"},
+  {"logistica_fueler_front.png", "logistica_signal_timer_side_on.png"}
+)
+
+--------------------------------
 -- Wireless Upgrader
 --------------------------------
 

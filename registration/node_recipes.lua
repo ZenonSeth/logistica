@@ -330,6 +330,15 @@ minetest.register_craft({
   }
 })
 
+minetest.register_craft({
+  output = L("signal_timer"),
+  recipe = {
+    {PLATE, itemstrings.steel, PLATE},
+    {"",    RELAY,             ""},
+    {PLATE, itemstrings.steel, PLATE},
+  }
+})
+
 if minetest.get_modpath("mesecons") then
   local WIRE = "mesecons:wire_00000000_off"
   minetest.register_craft({

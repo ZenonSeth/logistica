@@ -212,6 +212,41 @@ The gate re-reads all input states fresh each time any one of its inputs changes
 If the gate is disconnected or dug up, its output contribution is automatically removed from the network.
 ]])
 
+g.signal_timer = S([[
+The Signal Timer Sender is a signal sender that automatically cycles a named signal ON and OFF on a repeating timer. Configure the ON duration and OFF duration independently, each as a multiple of 0.5 seconds.
+
+# Usage
+
+Right-click to open the settings.
+Use the Enable button to start or stop the timer.
+
+The infotext above the node shows the signal name, the configured durations, and whether the node is Running or Paused, along with the current phase (ON or OFF).
+
+# Configuration
+
+Signal Name: the name of the signal this node broadcasts. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+ON duration: how long the signal stays ON each cycle, in seconds. Must be a multiple of 0.5 (minimum 0.5).
+
+OFF duration: how long the signal stays OFF each cycle, in seconds. Must be a multiple of 0.5 (minimum 0.5).
+
+Enable button: toggles the node between Running and Paused. When Paused, the signal is immediately sent as OFF and the timer stops.
+
+# Behavior
+
+When enabled, the timer starts immediately in the ON phase. After the ON duration elapses, it switches to OFF, then back to ON, and so on indefinitely.
+
+If the node is not connected to a network, the timer continues ticking internally. The signal is sent as soon as the node joins a network.
+
+When the node is disconnected (dug up or isolated), its signal contribution is automatically removed.
+
+# Example uses
+
+- Flash a lamp at a regular interval.
+- Create a pulsed signal to periodically trigger another sender via a Logic Gate.
+- Run a machine for a set time then pause it, repeatedly.
+]])
+
 g.signal_item_counter = S([[
 The Signal Item Count Sender is a signal sender that monitors how many of a specific item are present across the network and broadcasts a named signal based on whether that count meets a configured condition.
 
