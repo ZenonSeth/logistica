@@ -24,6 +24,8 @@ local PAGE_WIRELESS_UPGRADER = "mwrlup"
 local PAGE_CRAFTING_SUPPLIER = "mcrftsup"
 local PAGE_AUTOCRAFTER = "mautocrf"
 local PAGE_VACCUUM_CHEST = "mvacchs"
+local PAGE_FARMING_SUPPLIER = "mfarmsup"
+local PAGE_SPRINKLER_UPGRADE = "isprinkup"
 local PAGE_LAVA_FUELER = "mlvfuel"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
@@ -107,6 +109,8 @@ local RECIPE_AUTOCRFT = getrec({L("autocrafter")})
 local RECIPE_BUCKFILL = getrec({L("bucket_filler")})
 local RECIPE_BUCKEMPT = getrec({L("bucket_emptier")})
 local RECIPE_VACCUUMC = getrec({L("vaccuum_chest")})
+local RECIPE_FARMSUP = getrec({L("farming_supplier")})
+local RECIPE_SPRINKUP = getrec({L("sprinkler_upgrade")})
 local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
@@ -270,6 +274,9 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
     { name = S("  Trashcan"), id = PAGE_TRASHCAN },
     { name = S("  Machine Disassembler"), id = PAGE_DISASSEMBLER },
+    { name = header(S("Resource Gathering:"))},
+    { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
+    { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
     { name = header(S("Machine Upgrades:"))},
     { name = S("  Mass Storage Upgrades"), id = PAGE_MASS_STORAGE_UPGR },
     { name = S("  Cobble Generator Upgrades"), id = PAGE_COBBLE_GENERATOR_UPGR },
@@ -479,6 +486,21 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_VACCUUMC,
       recipeLinks = RECIPE_LINKS,
       description = desc.vaccuum_chest,
+    },
+
+    [PAGE_FARMING_SUPPLIER] = {
+      title = S("Farming Supplier"),
+      recipes = RECIPE_FARMSUP,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.farming_supplier,
+    },
+
+    [PAGE_SPRINKLER_UPGRADE] = {
+      title = S("Sprinkler Upgrade"),
+      relatedItems = {L("farming_supplier")},
+      recipes = RECIPE_SPRINKUP,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.sprinkler_upgrade,
     },
 
     [PAGE_LAVA_FUELER] = {

@@ -123,6 +123,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("farming_supplier"),
+  recipe = {
+    {itemstrings.glass,  itemstrings.steel,    itemstrings.crystal},
+    {L("optic_cable"),   L("silverin_block"),  L("photonizer")},
+    {"",                 itemstrings.chest,    ""},
+  }
+})
+
+logistica.register_craft({
   output = L("autocrafter"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest,     L("silverin_plate")},

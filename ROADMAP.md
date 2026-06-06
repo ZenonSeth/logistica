@@ -33,12 +33,12 @@
     - (Maybe) Display Unit -- not built
 - Recycler machine (un-crafts logistica machines) -- DONE (Logistica Machine Disassembler: logistica:disassembler, api/disassembler.lua + api/disassembler_machine.lua)
 - Lava Furnace
-  - Fix shift+click on slots
-- Difficult to make Cooking Crafting Supplier
-- Farming node -- (maybe yes) similar to vacuum chest, but for plants
-- Tree cutting node -- (maybe yes)
+  - Fix shift+click on slots -- DONE
+- Difficult to make Cooking Crafting Supplier -- (Maybe)
+- Farming node -- DONE (logistica:farming_supplier; api/farming_supplier.lua + logic/farming_supplier.lua; Sprinkler Upgrade item; needs textures: logistica_farming_supplier_{top,bottom,side,front}.png + logistica_water_particle.png + logistica_sprinkler_upgrade.png)
+- Tree cutting node -- in progress
 - Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
-- Upgrade recipes for Importer and Requester
+- Upgrade recipes for Importer and Requester -- DONE
 - Filters on Vacuum chest -- (Maybe not)
 
 ### Maybe

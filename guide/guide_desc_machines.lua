@@ -262,6 +262,32 @@ g.autocrafter = S([[
 The Autocrafter is simple a non-network machine that simply crafts from its input to the output. It does not interface directly with a network but can be accessed by both Network Importers and Request Inserters to feed it to/from the network.
 ]])
 
+g.farming_supplier = S([[
+The Farming Supplier automatically harvests fully-grown crops in an area around it and supplies the collected items to the network, acting like a passive supply chest that fills itself.
+
+It scans for nodes in the "plant" group and only harvests those that are at their final growth stage. After harvesting, it replants each crop at stage 1. All drops from the harvested crop (including seeds) are collected into the node's inventory.
+
+Configuration options:
+- Farm Range: how many blocks in each horizontal direction to scan (1-3).
+- Height Mode: controls which vertical layer(s) to scan.
+  - Farm At Level: scans only at the same height as the farming node.
+  - Farm Below: scans 1-2 nodes below the farming node.
+
+The Enable button turns harvesting on or off. When enabled, the node runs on a fixed timer. Harvesting pauses if the inventory is full.
+
+The upgrade slot accepts a Sprinkler Upgrade. See the Sprinkler Upgrade page for details.
+]])
+
+g.sprinkler_upgrade = S([[
+The Sprinkler Upgrade is inserted into the upgrade slot of a Farming Supplier. When installed, each time the Farming Supplier runs it will attempt to consume 1 bucket of water from any Reservoir connected to the same network.
+
+If water is available, each plant in the scan area has a small chance to be advanced one growth stage before the harvest check. This means crops can go from seed to fully grown faster, and crops that were not yet mature may become harvestable in the same cycle they were watered.
+
+If no water is available in the network, the grow pass is skipped entirely for that cycle and harvesting proceeds as normal.
+
+Note: the Sprinkler Upgrade consumes exactly 1 bucket of water per machine cycle, regardless of how many plants are in range.
+]])
+
 g.vaccuum_chest = S([[
 The Vacuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
 

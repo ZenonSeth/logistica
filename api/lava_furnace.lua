@@ -160,6 +160,8 @@ local function common_formspec(pos, meta)
       "listring[current_player;main]"..
       "listring[context;fuel]"..
       "listring[current_player;main]"..
+      "listring[context;input]"..
+      "listring[current_player;main]"..
       "button[9.2,0.4;0.8,0.8;"..GUIDE_BTN..";?]"..
       "tooltip["..GUIDE_BTN..";"..FS("Recipes").."]"..
       get_lava_img(currLava, lavaPercent)

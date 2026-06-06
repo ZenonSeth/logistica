@@ -100,6 +100,16 @@ minetest.register_craft({
   }
 })
 
+minetest.register_craft({
+  output = L("sprinkler_upgrade"),
+  recipe = {
+    {"",                    itemstrings.glass,        ""},
+    {itemstrings.glass,     itemstrings.water_bucket, itemstrings.glass},
+    {"",                    L("silverin_plate"),      ""},
+  },
+  replacements = {{itemstrings.water_bucket, itemstrings.empty_bucket}},
+})
+
 for filledBucket, _ in pairs(logistica.reservoir_get_full_buckets_for_liquid(logistica.liquids.lava)) do
   local emptyBucket = logistica.reservoir_get_empty_bucket_for_full_bucket(filledBucket)
   if minetest.registered_items[filledBucket] and minetest.registered_items[emptyBucket] then

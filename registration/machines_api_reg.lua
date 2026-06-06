@@ -320,6 +320,19 @@ logistica.register_vaccuum_chest(S("Vacuum Supplier Chest"), "vaccuum_chest", 16
 })
 
 --------------------------------
+-- Farming Supplier
+--------------------------------
+
+logistica.register_farming_supplier(S("Farming Supplier"), "farming_supplier", 16, {
+  "logistica_farming_supplier_top.png",
+  "logistica_farming_supplier_bottom.png",
+  "logistica_farming_supplier_side.png",
+  "logistica_farming_supplier_side.png",
+  "logistica_farming_supplier_side.png",
+  "logistica_farming_supplier_side.png",
+})
+
+--------------------------------
 -- Signal Lamp
 --------------------------------
 
