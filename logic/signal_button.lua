@@ -25,6 +25,7 @@ function logistica.signal_button_press(pos)
   if is_pressed(pos) then return end
   local newName = minetest.get_node(pos).name .. ON_SUFFIX
   if not minetest.registered_nodes[newName] then return end
+  minetest.sound_play("on", {pos = pos, gain = 0.4 })
   logistica.swap_node(pos, newName)
   logistica.signal_send(pos, logistica.signal_button_get_name(pos), true)
   minetest.get_node_timer(pos):start(PRESS_DURATION)
@@ -36,6 +37,7 @@ function logistica.signal_button_timer(pos)
   local newName = minetest.get_node(pos).name:sub(1, -#ON_SUFFIX - 1)
   if not minetest.registered_nodes[newName] then return false end
   logistica.swap_node(pos, newName)
+  minetest.sound_play("off", {pos = pos, gain = 0.4 })
   logistica.signal_send(pos, logistica.signal_button_get_name(pos), false)
   logistica.signal_button_update_infotext(pos)
   return false

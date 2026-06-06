@@ -50,3 +50,4 @@ if minetest.get_modpath("basic_machines") then
   no_push("basic_machines:autocrafter", "output")
   no_pull("basic_machines:autocrafter", "output")
 end
+

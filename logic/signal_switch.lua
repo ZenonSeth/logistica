@@ -30,6 +30,11 @@ function logistica.signal_switch_toggle(pos)
     or  node.name .. ON_SUFFIX
   if not minetest.registered_nodes[newName] then return isOn end
   logistica.swap_node(pos, newName)
+  if isOn then
+    minetest.sound_play("off", {pos = pos, gain = 0.4 })
+  else
+    minetest.sound_play("on", {pos = pos, gain = 0.4 })
+  end
   logistica.signal_send(pos, logistica.signal_switch_get_name(pos), not isOn)
   logistica.signal_switch_update_infotext(pos)
   return not isOn
