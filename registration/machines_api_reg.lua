@@ -563,6 +563,19 @@ logistica.register_signal_item_counter(
 -- Signal Timer Sender
 --------------------------------
 
+logistica.register_signal_ext_reader(
+  S("External Content Reader"),
+  "signal_ext_reader",
+  {
+    "logistica_signal_ext_reader_side.png^[transformR270",
+    "logistica_signal_ext_reader_side.png^[transformR90",
+    "logistica_signal_ext_reader_side.png^[transformR180",
+    "logistica_signal_ext_reader_side.png",
+    "logistica_signal_ext_reader_back.png",
+    "logistica_fueler_front.png", -- front
+  }
+)
+
 logistica.register_signal_timer(
   S("Signal Timer Sender"),
   "signal_timer",

@@ -93,6 +93,19 @@ function logistica.get_pull_lists(targetPosition)
   return get_lists(targetPosition, false)
 end
 
+-- returns a deduplicated array of lists allowed to either push or pull at the given position
+function logistica.get_readable_lists(targetPosition)
+  local seen = {}
+  local result = {}
+  for _, name in ipairs(logistica.get_pull_lists(targetPosition)) do
+    if not seen[name] then seen[name] = true ; table.insert(result, name) end
+  end
+  for _, name in ipairs(logistica.get_push_lists(targetPosition)) do
+    if not seen[name] then seen[name] = true ; table.insert(result, name) end
+  end
+  return result
+end
+
 -- nodeName is used to check against mod-specific disallowed lists
 -- returns true if list is allowed pull list for this node, false if not
 function logistica.is_allowed_pull_list(listName, nodeName)

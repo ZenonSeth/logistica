@@ -1,7 +1,7 @@
 
 local META_INPUT  = "signal_input"
 local META_OUTPUT = "signal_output"
-local DEFAULT_INPUT  = "signal"
+local DEFAULT_INPUT  = ""
 local DEFAULT_OUTPUT = "signal_out"
 
 function logistica.signal_not_gate_get_input(pos)

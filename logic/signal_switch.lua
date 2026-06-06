@@ -1,6 +1,6 @@
 
 local META_SIGNAL_NAME = "signal_name"
-local DEFAULT_SIGNAL_NAME = "signal"
+local DEFAULT_SIGNAL_NAME = ""
 local ON_SUFFIX = "_on"
 
 function logistica.signal_switch_update_infotext(pos)

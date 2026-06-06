@@ -6,7 +6,7 @@ local META_OUTPUT    = "gate_output"
 
 local DEFAULT_MODE      = "and"
 local DEFAULT_THRESHOLD = 1
-local DEFAULT_INPUTS    = "signal"
+local DEFAULT_INPUTS    = ""
 local DEFAULT_OUTPUT    = "signal_out"
 local MAX_THRESHOLD     = 100000
 

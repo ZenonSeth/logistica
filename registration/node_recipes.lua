@@ -331,6 +331,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("signal_ext_reader"),
+  recipe = {
+    {PLATE,            CIRC,  PLATE},
+    {L("photonizer"),  RELAY, CIRC},
+    {PLATE,            CIRC,  PLATE},
+  }
+})
+
+minetest.register_craft({
   output = L("signal_item_counter"),
   recipe = {
     {PLATE, "",    PLATE},

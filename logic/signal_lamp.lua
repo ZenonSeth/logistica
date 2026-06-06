@@ -1,7 +1,7 @@
 
 local META_SIGNAL_NAME = "signal_name"
 local META_SIGNAL_NOT  = "signal_not"
-local DEFAULT_SIGNAL_NAME = "signal"
+local DEFAULT_SIGNAL_NAME = ""
 local ON_SUFFIX = "_on"
 
 function logistica.signal_lamp_get_name(pos)

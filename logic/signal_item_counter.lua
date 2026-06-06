@@ -3,7 +3,7 @@ local META_SIGNAL_NAME = "signal_name"
 local META_THRESHOLD = "threshold"
 local META_COMPARISON = "comparison"
 local META_RESPECT_RESERVE = "respect_reserve"
-local DEFAULT_SIGNAL_NAME = "signal"
+local DEFAULT_SIGNAL_NAME = ""
 local POLL_INTERVAL = 1.0
 local ON_SUFFIX = "_on"
 

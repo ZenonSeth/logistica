@@ -19,12 +19,10 @@ end
 -- global namespaced functions
 ----------------------------------------------------------------
 
--- Lowercases, strips any character that isn't a-z, 0-9, or _. Returns "signal" if result is empty.
+-- Lowercases, strips any character that isn't a-z, 0-9, or _.
 function logistica.sanitize_signal_name(name)
-  if not name then return "signal" end
-  local sanitized = name:lower():gsub("[^a-z0-9_]", "")
-  if sanitized == "" then return "signal" end
-  return sanitized
+  if not name then return "" end
+  return name:lower():gsub("[^a-z0-9_]", "")
 end
 
 -- formspec escape translation

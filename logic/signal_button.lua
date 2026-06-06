@@ -1,6 +1,6 @@
 
 local META_SIGNAL_NAME = "signal_name"
-local DEFAULT_SIGNAL_NAME = "signal"
+local DEFAULT_SIGNAL_NAME = ""
 local ON_SUFFIX = "_on"
 local PRESS_DURATION = 1.0
 

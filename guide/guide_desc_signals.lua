@@ -232,6 +232,48 @@ The gate re-reads all input states fresh each time any one of its inputs changes
 If the gate is disconnected or dug up, its output contribution is automatically removed from the network.
 ]])
 
+g.signal_ext_reader = S([[
+The External Content Reader is a signal sender that monitors the inventory of a non-Logistica node placed directly behind it and broadcasts up to 4 named signals based on item count conditions.
+
+Place the reader facing a chest, furnace, or any other node with an inventory. The node behind its back face is its target.
+
+# Usage
+
+Right-click to open the settings. Use the Enable button to start or stop monitoring.
+
+Sneak+punch the reader to highlight its target node.
+
+The infotext shows the target node name and whether the reader is Running or Paused.
+
+# Configuration
+
+Each of the 4 rows works independently:
+
+Item slot: place an item to identify what to count. The slot is a filter only - the item is not consumed.
+
+Condition: choose >= or <= to compare the count against the threshold.
+
+Amount: the threshold number to compare the count against.
+
+Signal Name: the name of the signal this row broadcasts when its condition is met. Leave blank to disable that row.
+
+# Behavior
+
+When enabled, the reader scans the target's inventory every second. It combines all inventory lists that Logistica is allowed to push to or pull from on that node.
+
+Logistica machine nodes cannot be used as targets (with the exception of Bucket Emptiers).
+
+If the target slot has no item set, or the signal name is blank, that row sends no signal. If the item is removed from the slot while the machine is running, that row's signal is sent as OFF.
+
+When disconnected or dug up, all signal contributions are automatically removed.
+
+# Example uses
+
+- Send a signal when a furnace output reaches a certain count.
+- Monitor a chest shared with another mod and gate a machine when it fills up.
+- Watch 4 different items in the same chest with independent thresholds.
+]])
+
 g.signal_timer = S([[
 The Signal Timer Sender is a signal sender that automatically cycles a named signal ON and OFF on a repeating timer. Configure the ON duration and OFF duration independently, each as a multiple of 0.5 seconds.
 
