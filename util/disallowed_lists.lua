@@ -44,6 +44,9 @@ if minetest.get_modpath("pipeworks") then
 
   no_push("pipeworks:filter", "main")
   no_pull("pipeworks:filter", "main")
+
+  no_pull("pipeworks:mese_filter", "main")
+  no_push("pipeworks:mese_filter", "main")
 end
 
 if minetest.get_modpath("basic_machines") then
