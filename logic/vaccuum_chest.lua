@@ -2,9 +2,16 @@
 local TIMER_INTERVAL = 0.8
 local TIMER_INTERVAL_LONG = 2.0
 local DEF_RADIUS = 3
+local META_RADIUS = "pickup_radius"
 local INV_MAIN = "main"
 local ITEM_TAKE_PER_CYCLE_LIMIT = 10
 local NUM_PARTICLES_PER_COLLECT = 3
+
+local function get_radius(pos)
+  local r = minetest.get_meta(pos):get_int(META_RADIUS)
+  if r < 1 then return DEF_RADIUS end
+  return r
+end
 
 local function random_offset()
   return vector.new((math.random() - 0.5)/4, (math.random()  - 0.5)/4, (math.random()  - 0.5)/4)
@@ -75,7 +82,7 @@ end
 
 function logistica.vaccuum_chest_on_timer(pos, elapsed)
   if not logistica.is_machine_on(pos) then return false end
-  local inserted = collect_items_into(pos, DEF_RADIUS)
+  local inserted = collect_items_into(pos, get_radius(pos))
   if inserted then
     logistica.start_node_timer(pos, TIMER_INTERVAL)
   else

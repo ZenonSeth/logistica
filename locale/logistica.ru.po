@@ -389,7 +389,7 @@ msgid "Last deleted item"
 msgstr "Последний удаленный предмет"
 
 #: api/vaccuum_chest.lua:15
-msgid "Vaccuum items:"
+msgid "Vacuum items:"
 msgstr "Засасывать предметы:"
 
 #: api/vaccuum_chest.lua:16
@@ -579,7 +579,7 @@ msgid "Utility Machines:"
 msgstr "Вспомогательные машины:"
 
 #: guide/guide_content.lua:205
-msgid "  Vaccuum Chest"
+msgid "  Vacuum Chest"
 msgstr "  Вакуумный сундук"
 
 #: guide/guide_content.lua:206
@@ -737,7 +737,7 @@ msgid "Autocrafter"
 msgstr "Автокрафтер"
 
 #: guide/guide_content.lua:413
-msgid "Vaccuum Chest"
+msgid "Vacuum Chest"
 msgstr "Вакуумный сундук"
 
 #: guide/guide_content.lua:420 registration/machines_api_reg.lua:204
@@ -1650,7 +1650,7 @@ msgid ""
 "\n"
 "Request Inserters check for to obtain the items in the following order:\n"
 "\n"
-"- Any Suppliers (e.g. Passive Supply Chest, Vaccuum Chest, Cobble Gen "
+"- Any Suppliers (e.g. Passive Supply Chest, Vacuum Chest, Cobble Gen "
 "Supplier or Crafting Supplier)\n"
 "- Mass Storage or Tool Box nodes (depending on the item needed)\n"
 "\n"
@@ -1861,17 +1861,17 @@ msgstr ""
 
 #: guide/guide_desc_machines.lua:241
 msgid ""
-"The Vaccuum Supply Chest acts like a regular Supply chest, providing items "
+"The Vacuum Supply Chest acts like a regular Supply chest, providing items "
 "to the network when there's requests or storage pulls items. There are two "
 "differences:\n"
 "\n"
-"- As the name indicates, the Vaccuum chest will collect nearby dropped "
+"- As the name indicates, the Vacuum chest will collect nearby dropped "
 "items, up to a distance of 3 blocks, into its inventory, automatically "
 "making them available for the Network.\n"
 "- It cannot be used by the Network to store items in it (unlike regular "
 "Supply Chests which can be configured to allow storing from the Network)\n"
 "\n"
-"The on/off switch in the Vaccuum Chests's inventory enables whether the "
+"The on/off switch in the Vacuum Chests's inventory enables whether the "
 "chest will be collecting nearby items or not.\n"
 msgstr ""
 "Вакуумный Сундук работает как обычный сундук снабжения, предоставляя предметы в сеть, когда есть запросы или хранилища забирают предметы. Однако есть два отличия:\n"
@@ -2399,7 +2399,7 @@ msgid "Passive Supplier Chest"
 msgstr "Сундук для пассивного снабжения"
 
 #: registration/machines_api_reg.lua:296
-msgid "Vaccuum Supplier Chest"
+msgid "Vacuum Supplier Chest"
 msgstr "Вакуумный сундук снабжения"
 
 #: registration/machines_api_reg.lua:352

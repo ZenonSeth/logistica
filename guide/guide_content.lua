@@ -263,7 +263,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
     { name = header(S("Utility Machines:"))},
-    { name = S("  Vaccuum Chest"), id = PAGE_VACCUUM_CHEST },
+    { name = S("  Vacuum Chest"), id = PAGE_VACCUUM_CHEST },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
     { name = S("  Trashcan"), id = PAGE_TRASHCAN },
@@ -472,7 +472,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     -- utiltiy nodes
 
     [PAGE_VACCUUM_CHEST] = {
-      title = S("Vaccuum Chest"),
+      title = S("Vacuum Chest"),
       recipes = RECIPE_VACCUUMC,
       recipeLinks = RECIPE_LINKS,
       description = desc.vaccuum_chest,

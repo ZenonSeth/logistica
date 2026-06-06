@@ -13,8 +13,8 @@
   - (Maybe) Allow storing rules (e.g. what items to be allowed to be stored in it)
 - Change injectors to use numbers and not items, allowing larger supply requests
 - Vacuum Chest
-  - Fix name
-  - Add pushing option
+  - Fix name -- DONE (display name only)
+  - Add pushing option -- skipped
 - Toggle machines -- DONE
   - Signals sender/receivers -- DONE
   - Senders:
@@ -37,7 +37,7 @@
 - Difficult to make Cooking Crafting Supplier
 - Farming node -- deferred (similar to vacuum chest, but for plants)
 - Tree cutting node -- deferred
-- Allow configuration of distance of pickup for vacuum chest
+- Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
 - Upgrade recipes for Importer and Requester
 - Filters on Vacuum chest
 

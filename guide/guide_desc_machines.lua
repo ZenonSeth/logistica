@@ -185,7 +185,7 @@ When the "Inf" checkbox below a slot is checked, then the Inserter won't check h
 
 Request Inserters check for to obtain the items in the following order:
 
-- Any Suppliers (e.g. Passive Supply Chest, Vaccuum Chest, Cobble Gen Supplier or Crafting Supplier)
+- Any Suppliers (e.g. Passive Supply Chest, Vacuum Chest, Cobble Gen Supplier or Crafting Supplier)
 - Mass Storage or Tool Box nodes (depending on the item needed)
 
 There's two variation of the Request Inserter, and as mentioned above in almost all cases you only need the item-wise Inserter.
@@ -264,12 +264,12 @@ The Autocrafter is simple a non-network machine that simply crafts from its inpu
 ]])
 
 g.vaccuum_chest = S([[
-The Vaccuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
+The Vacuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
 
-- As the name indicates, the Vaccuum chest will collect nearby dropped items, up to a distance of 3 blocks, into its inventory, automatically making them available for the Network.
+- As the name indicates, the Vacuum chest will collect nearby dropped items, up to a distance of 3 blocks, into its inventory, automatically making them available for the Network.
 - It cannot be used by the Network to store items in it (unlike regular Supply Chests which can be configured to allow storing from the Network)
 
-The on/off switch in the Vaccuum Chests's inventory enables whether the chest will be collecting nearby items or not.
+The on/off switch in the Vacuum Chests's inventory enables whether the chest will be collecting nearby items or not.
 ]])
 
 g.lava_furnace_fueler = S([[

@@ -2,20 +2,35 @@ local FS = logistica.FTRANSLATOR
 
 local FORMSPEC_NAME = "logistica_vaccuum_chest"
 local ON_OFF_BUTTON = "on_off_btn"
+local META_RADIUS = "pickup_radius"
+local MIN_RADIUS = 1
+local MAX_RADIUS = 3
+
+local function get_radius(pos)
+  local r = minetest.get_meta(pos):get_int(META_RADIUS)
+  if r < 1 then return MAX_RADIUS end
+  return r
+end
 
 local forms = {}
 
 local function get_vaccuum_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local isOn = logistica.is_machine_on(pos)
+  local radius = get_radius(pos)
 
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.5, 10).."]" ..
+    "size["..logistica.inv_size(10.5, 11).."]" ..
     logistica.ui.background..
-    logistica.ui.on_off_btn(isOn, 7.0, 0.5, ON_OFF_BUTTON, FS("Vaccuum items:"))..
-    "label[0.6,1.0;"..FS("Supplies collected items to the network.").."]"..
-    "list["..posForm..";main;0.4,1.4;8,2;0]"..
-    logistica.player_inv_formspec(0.4,4.5)..
+    logistica.ui.button_only_style..
+    logistica.ui.on_off_btn(isOn, 6.0, 3.7, ON_OFF_BUTTON, FS("Enable"))..
+    "label[0.6,0.6;"..FS("Supplies collected items to the network.").."]"..
+    "list["..posForm..";main;0.4,1.2;8,2;0]"..
+    "label[0.6,4.05;"..FS("Vacuum Range:").."]"..
+    "button[3.1,3.75;0.65,0.65;range_dec;-]"..
+    "label[3.95,4.05;"..tostring(radius).."]"..
+    "button[4.3,3.75;0.65,0.65;range_inc;+]"..
+    logistica.player_inv_formspec(0.4,4.8)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end
@@ -37,6 +52,11 @@ local function on_player_receive_fields(player, formname, fields)
     forms[playerName] = nil
   elseif fields[ON_OFF_BUTTON] then
     logistica.toggle_machine_on_off(pos)
+    show_vaccuum_formspec(player:get_player_name(), pos)
+  elseif fields.range_inc or fields.range_dec then
+    local delta = fields.range_inc and 1 or -1
+    local new_radius = logistica.clamp(get_radius(pos) + delta, MIN_RADIUS, MAX_RADIUS)
+    minetest.get_meta(pos):set_int(META_RADIUS, new_radius)
     show_vaccuum_formspec(player:get_player_name(), pos)
   end
   return true

@@ -297,10 +297,10 @@ logistica.register_trashcan(S("Trashcan"), "trashcan", {
 })
 
 --------------------------------
--- Vaccuum Supply Chest
+-- Vacuum Supply Chest
 --------------------------------
 
-logistica.register_vaccuum_chest(S("Vaccuum Supplier Chest"), "vaccuum_chest", 16, {
+logistica.register_vaccuum_chest(S("Vacuum Supplier Chest"), "vaccuum_chest", 16, {
   "logistica_vaccuum_top.png",
   "logistica_vaccuum_bottom.png",
   "logistica_vaccuum_side.png",
