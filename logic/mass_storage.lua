@@ -2,10 +2,10 @@ local S = logistica.TRANSLATOR
 
 local META_IMG_PIC = "logimgpick"
 local META_RES_VAL = "logresval"
+local META_DEMAND_VAL = "logdemandval"
+local META_DEMAND_CRAFTING = "logdemandcraft"
 local META_UPGRADE_ADD = "logstorupgr"
 local META_UPGRADE_MULT = "logstorupgrmult"
-local VALID_RESERVE_VALUES = {}
-for i = 0,5120,128 do VALID_RESERVE_VALUES[i/128 + 1] = i end
 local BASE_TRANSFER_RATE = 10
 
 local function mass_storage_room_for_item(pos, meta, stack)
@@ -27,15 +27,16 @@ local function show_deposited_item_popup(player, numDeposited, name)
 end
 
 -- returns an ItemStack of how many items were taken
-local function take_item_from_supplier_for_mass_storage(pos, stack)
+local function take_item_from_supplier_for_mass_storage(pos, stack, allowCrafting)
   logistica.load_position(pos)
   local node = minetest.get_node(pos)
   local removed = ItemStack("")
   local network = logistica.get_network_or_nil(pos)
   local collectFunc = function(st) removed:add_item(st); return 0 end
   if logistica.GROUPS.crafting_suppliers.is(node.name) then
-    -- no-op: it doesn't really make sense for mass storages too pull from crafting suppliers
-    -- logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
+    if allowCrafting then
+      logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
+    end
   else
     logistica.take_item_from_supplier(pos, stack, network, collectFunc, false, false)
   end
@@ -112,27 +113,38 @@ end
 
 function logistica.pull_items_from_network_into_mass_storage(pos)
   local network = logistica.get_network_or_nil(pos)
-  if not network then return false end -- don't run timer when no nework - connecting to network will start it
+  if not network then return false end
   local meta = minetest.get_meta(pos)
-  local stackPos = logistica.get_next_filled_item_slot(meta, "filter")
-  if stackPos <= 0 then return true end
-
-  local filterStack = meta:get_inventory():get_stack("filter", stackPos)
-  local spaceForItems = mass_storage_room_for_item(pos, meta, filterStack)
-
-  if spaceForItems == 0 then return true end
-
-  spaceForItems = math.min(spaceForItems, logistica.get_supplier_transfer_rate(meta))
-  local requestStack = ItemStack(filterStack)
-  requestStack:set_count(spaceForItems)
-
-  local numTaken = 0
-  for hash, _ in pairs(network.supplier_cache[requestStack:get_name()] or {}) do
-    local taken = take_item_from_supplier_for_mass_storage(minetest.get_position_from_hash(hash), requestStack)
-    numTaken = numTaken + taken:get_count()
-    logistica.insert_item_into_mass_storage(pos, meta:get_inventory(), taken)
-    if numTaken >= spaceForItems then return true end -- everything isnerted, return
-    requestStack:set_count(spaceForItems - numTaken)
+  local inv = meta:get_inventory()
+  local maxSize = logistica.get_mass_storage_max_size(pos)
+  local numSlots = logistica.get_mass_storage_num_slots(pos)
+  local transferRate = logistica.get_supplier_transfer_rate(meta)
+  for i = 1, numSlots do
+    local demand = math.min(logistica.get_mass_storage_demand(meta, i), maxSize)
+    if demand > 0 then
+      local filterStack = inv:get_stack("filter", i)
+      if not filterStack:is_empty() then
+        local currentCount = inv:get_stack("storage", i):get_count()
+        local needed = math.min(demand - currentCount, transferRate)
+        if needed > 0 then
+          local itemName = filterStack:get_name()
+          local allowCrafting = logistica.get_mass_storage_demand_crafting(meta, i)
+          local requestStack = ItemStack(itemName)
+          requestStack:set_count(needed)
+          for hash, _ in pairs(network.supplier_cache[itemName] or {}) do
+            local taken = take_item_from_supplier_for_mass_storage(
+              minetest.get_position_from_hash(hash), requestStack, allowCrafting)
+            local takenCount = taken:get_count()
+            if takenCount > 0 then
+              local remainder = logistica.insert_item_into_mass_storage(pos, inv, taken)
+              local inserted = takenCount - remainder:get_count()
+              requestStack:set_count(requestStack:get_count() - inserted)
+              if requestStack:get_count() <= 0 then break end
+            end
+          end
+        end
+      end
+    end
   end
   return true
 end
@@ -182,30 +194,47 @@ function logistica.try_to_add_player_wield_item_to_mass_storage(pos, player)
   show_deposited_item_popup(player, numDesposited, wieldStack:get_short_description())
 end
 
--- returns a table of {0,128,256,512...} up to the max this box supports
-function logistica.get_mass_storage_valid_reserve_list(pos)
-  local max = logistica.get_mass_storage_max_size(pos)
-  local vals = {}
-  for _, v in ipairs(VALID_RESERVE_VALUES) do
-    if v <= max then 
-      table.insert(vals, v)
-    end
-  end
-  return vals
-end
-
 function logistica.set_mass_storage_reserve(meta, i, value)
   meta:set_int(META_RES_VAL..tostring(i), value)
 end
 
-function logistica.on_mass_storage_reserve_changed(pos, i, value)
-  local meta = minetest.get_meta(pos)
-  local intVal = tonumber(value)
-  if type(intVal) ~= "number" then return end
-  local invalid = true
-  for _, v in ipairs(VALID_RESERVE_VALUES) do if v == intVal then invalid = false end end
-  if invalid then return end
-  meta:set_int(META_RES_VAL..tostring(i), intVal)
+function logistica.get_mass_storage_demand(meta, i)
+  return meta:get_int(META_DEMAND_VAL..tostring(i))
+end
+
+function logistica.set_mass_storage_demand(meta, i, value)
+  meta:set_int(META_DEMAND_VAL..tostring(i), value)
+end
+
+function logistica.get_mass_storage_demand_crafting(meta, i)
+  return meta:get_string(META_DEMAND_CRAFTING..tostring(i)) == "1"
+end
+
+function logistica.set_mass_storage_demand_crafting(meta, i, value)
+  meta:set_string(META_DEMAND_CRAFTING..tostring(i), value and "1" or "0")
+end
+
+function logistica.get_mass_storage_demand_as_string(name, meta)
+  local numSlots = minetest.registered_nodes[name].logistica.numSlots
+  local parts = {}
+  for i = 1, numSlots do
+    parts[i] = logistica.get_mass_storage_demand(meta, i)..","..
+               (logistica.get_mass_storage_demand_crafting(meta, i) and "1" or "0")
+  end
+  return table.concat(parts, ";")
+end
+
+function logistica.set_mass_storage_demand_from_string(name, str, meta)
+  if not str or str == "" then return end
+  local numSlots = minetest.registered_nodes[name].logistica.numSlots
+  local slots = string.split(str, ";", false)
+  for i = 1, numSlots do
+    if slots[i] then
+      local parts = string.split(slots[i], ",", false)
+      logistica.set_mass_storage_demand(meta, i, tonumber(parts[1]) or 0)
+      logistica.set_mass_storage_demand_crafting(meta, i, parts[2] == "1")
+    end
+  end
 end
 
 function logistica.on_mass_storage_image_select_change(pos, i)

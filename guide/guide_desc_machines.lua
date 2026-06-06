@@ -96,19 +96,23 @@ The Wireless Upgrader also has a "Hard Mode" toggleable via settings - see the "
 ]])
 
 g.mass_storage = S([[
-Mass Storage node provide 1024 item storage for up to 8 different item types by default. This capacity can be upgraded with 4 upgrade lots and 2 different upgrades. Mass Storage needs to be configured with the exact items to store.
+Mass Storage nodes provide 1024 item storage for up to 8 different item types by default. This capacity can be upgraded with 4 upgrade slots and 2 different upgrades. Mass Storage needs to be configured with the exact items to store.
 
 You can collectively access all Mass Storage on a particular network from an Access Point/Wireless Access Pad.
 
-- Can be dug and keeps its Inventory when placed again, allowing easy moving of stored items
-- Can be upgraded to increase inventory size, up to maximum of 65,535 maximum
-- Select Front Image: Selects a stored node to display on the front of the storage node
-- Can Reserve a number of items per slot: Reserved items won't be taken by other machines on the network
-- Can quickly deposit items by punching it with a stack or sneak-punching it for deposit all stack items from your inventory
-- Pull items on/off: When On this storage will actively try to pull from any Supplier machines (e.g. Passive Supply Chests, Cobblegen Suppliers), except Crafting Suppliers.
+- Can be dug and keeps its inventory when placed again, allowing easy moving of stored items
+- Can be upgraded to increase inventory size, up to a maximum of 65,535 per slot
+- Select Front Image: selects a stored item to display on the front of the storage node
+- Can quickly deposit items by punching it with a stack, or sneak-punching to deposit all matching stacks from your inventory
 
-You can swap upgrades by pressing the Swap button under each slot.
-Note that there is a multiplier upgrade, but only one can be inserted into a machine, makign the maximum stack size be 65,535 per slot.
+Each storage slot has a Configure button (the small button below each slot). Pressing it opens the slot config:
+
+- Reserve: items the network will not take from this slot. Useful to keep a buffer for personal use.
+- Demand: if the stored count is below this number, the storage will actively pull from Supplier machines until it is reached. Set to 0 to disable pulling for that slot.
+- Include Crafting Suppliers: if checked, the Demand pull will also request items from Crafting Suppliers for this slot.
+
+You can swap upgrades by pressing the Swap button under each upgrade slot.
+Note that there is a multiplier upgrade, but only one can be inserted into a machine, making the maximum stack size 65,535 per slot.
 
 ]])
 

@@ -1,12 +1,12 @@
 ## Logistica 2.0 Wishlist
 ### Definitely
 - Mass Storage
-  - Make Reserve an input field
-  - Add new Demand field instead of Pull switch
-  - Add Demand from Crafting Suppliers
-  - Add Multiplexer Upgrade (one per machine, x8 storage cap)
-  - Max Storage readout
-  - Filled up indicators
+  - Make Reserve an input field -- DONE (per-slot config sub-formspec)
+  - Add new Demand field instead of Pull switch -- DONE (per-slot demand target)
+  - Add Demand from Crafting Suppliers -- DONE (per-slot "Include Crafting Suppliers" checkbox)
+  - Add Multiplexer Upgrade (one per machine, x16 storage cap) -- DONE
+  - Max Storage readout -- DONE
+  - Filled up indicators -- (Maybe not)
 - Passive Supply Chest
   - Increase size of inventory
   - Split: Allow Storing From Machines and Allow Storing From Access Point
@@ -15,27 +15,28 @@
 - Vacuum Chest
   - Fix name
   - Add pushing option
-- Toggle machines
-  - Signals sender/receivers
+- Toggle machines -- DONE
+  - Signals sender/receivers -- DONE
   - Senders:
-    - Timer (time on, time off)
-    - Network content (#items, #liquid)
-    - External Content Reader (#items in another node)
-    - User Switch and User Button
-    - Mesecon receiver - sends signal if mesecon on/off
-  - Signal Logic Gate
+    - Timer (time on, time off) -- DONE (signal_timer)
+    - Network content (#items) -- DONE (signal_item_counter)
+    - Network content (#liquid) -- not built (Maybe)
+    - External Content Reader (#items in another node) -- DONE (signal_ext_reader)
+    - User Switch and User Button -- DONE (signal_switch, signal_button)
+    - Mesecon receiver - sends signal if mesecon on/off -- DONE (mesecon_signaler)
+  - Signal Logic Gate -- DONE (signal_logic_gate + signal_not_gate)
   - Receivers:
-    - Toggler: Can toggle other select machines on/off
-    - Status Light: Turns on/off based on signal
-    - External Mesecon sender - sends a mesecon on
-    - Digiline output
-    - (Maybe) Display Unit
+    - Toggler: Can toggle other select machines on/off -- DONE (signal_toggler)
+    - Status Light: Turns on/off based on signal -- DONE (signal_lamp_white, signal_lamp_2c_br)
+    - External Mesecon sender - sends a mesecon on -- DONE (mesecon_sender)
+    - Digiline output -- not built (Maybe)
+    - (Maybe) Display Unit -- not built
 - Recycler machine (un-crafts logistica machines)
 - Lava Furnace
   - Fix shift+click on slots
 - Difficult to make Cooking Crafting Supplier
-- Farming node (similar to vacuum chest, but for plants)
-- Tree cutting node
+- Farming node -- deferred (similar to vacuum chest, but for plants)
+- Tree cutting node -- deferred
 - Allow configuration of distance of pickup for vacuum chest
 - Upgrade recipes for Importer and Requester
 - Filters on Vacuum chest

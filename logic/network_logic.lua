@@ -151,8 +151,14 @@ local function notify_signal_receivers(network, name, isOn)
     local rcDef = minetest.registered_nodes[nodeName]
     if rcDef and rcDef.logistica and rcDef.logistica.on_signal_received then
       if logistica.GROUPS.signal_gates.is(nodeName) then
-        if network._propagation then
-          table.insert(network._propagation.pending, {hash = rcHash, name = name, isOn = isOn})
+        local ctx = network._propagation
+        if ctx then
+          -- deduplicate: only enqueue if this gate+signal pair is not already queued
+          if not ctx.queued[rcHash] then ctx.queued[rcHash] = {} end
+          if not ctx.queued[rcHash][name] then
+            ctx.queued[rcHash][name] = true
+            table.insert(ctx.pending, {hash = rcHash, name = name, isOn = isOn})
+          end
         end
       else
         rcDef.logistica.on_signal_received(rcPos, name, isOn)
@@ -164,15 +170,18 @@ end
 -- Runs the BFS gate propagation loop for the given context.
 -- Gates should return true from on_signal_received if they actually processed the signal,
 -- false/nil if they ignored it (e.g. signal name did not match their input).
--- Cycle detection is per gate+signal-name pair to avoid false positives from
--- gates receiving signals they don't care about.
+-- Cycle detection is per gate+signal-name pair. Entries are deduplicated at enqueue
+-- so the same gate+signal can only appear once in pending at a time.
 local function run_gate_propagation(network, ctx)
-  while #ctx.pending > 0 do
-    local entry = table.remove(ctx.pending, 1)
+  local head = 1
+  while head <= #ctx.pending do
+    local entry = ctx.pending[head]
+    head = head + 1
     local gatePos = h2p(entry.hash)
-    local visited = ctx.visited
-    if not visited[entry.hash] then visited[entry.hash] = {} end
-    if visited[entry.hash][entry.name] then
+    -- clear queued flag so the gate can be re-enqueued if it receives a different signal later
+    if ctx.queued[entry.hash] then ctx.queued[entry.hash][entry.name] = nil end
+    if not ctx.visited[entry.hash] then ctx.visited[entry.hash] = {} end
+    if ctx.visited[entry.hash][entry.name] then
       minetest.get_meta(gatePos):set_string("infotext", "ERROR: Signal loop detected")
       minetest.log("warning", "[logistica] signal loop at " .. minetest.pos_to_string(gatePos))
     else
@@ -180,7 +189,7 @@ local function run_gate_propagation(network, ctx)
       if gateDef and gateDef.logistica and gateDef.logistica.on_signal_received then
         local processed = gateDef.logistica.on_signal_received(gatePos, entry.name, entry.isOn)
         if processed then
-          visited[entry.hash][entry.name] = true
+          ctx.visited[entry.hash][entry.name] = true
         end
       end
     end
@@ -194,8 +203,11 @@ local function remove_sender_signals_bfs(network, hash)
     if senders[hash] then
       senders[hash] = nil
       local signalIsOn = not logistica.table_is_empty(senders)
-      if not signalIsOn then network.signals[name] = nil end
-      notify_signal_receivers(network, name, signalIsOn)
+      if not signalIsOn then
+        network.signals[name] = nil
+        notify_signal_receivers(network, name, false)
+      end
+      -- if signalIsOn: other senders keep it alive, state unchanged, no notify needed
     end
   end
 end
@@ -683,7 +695,7 @@ local function on_signal_sender_changed(pos, oldNode, oldMeta)
       local hash = p2h(pos)
       local owned = network._propagation == nil
       if owned then
-        network._propagation = { origin_hash = hash, visited = {}, pending = {} }
+        network._propagation = { origin_hash = hash, visited = {}, pending = {}, queued = {} }
       end
       remove_sender_signals_bfs(network, hash)
       if owned then
@@ -948,6 +960,7 @@ end
 -- Uses OR semantics: signal is ON as long as any sender has it ON.
 -- Gate receivers are processed breadth-first to prevent unbounded recursion.
 function logistica.signal_send(pos, name, isOn)
+  if not name or name == "" then return end
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
   local hash = p2h(pos)
@@ -965,7 +978,7 @@ function logistica.signal_send(pos, name, isOn)
     notify_signal_receivers(network, name, signalIsOn)
     return
   end
-  local ctx = { origin_hash = hash, visited = {}, pending = {} }
+  local ctx = { origin_hash = hash, visited = {}, pending = {}, queued = {} }
   network._propagation = ctx
   notify_signal_receivers(network, name, signalIsOn)
   run_gate_propagation(network, ctx)
@@ -974,6 +987,7 @@ end
 
 -- Returns true if the named signal is currently ON in the network, false otherwise.
 function logistica.signal_get_state(networkId, name)
+  if not name or name == "" then return false end
   local network = networks[networkId]
   if not network then return false end
   return network.signals[name] ~= nil
@@ -989,7 +1003,7 @@ function logistica.signal_remove_sender(pos, networkId)
     remove_sender_signals_bfs(network, hash)
     return
   end
-  local ctx = { origin_hash = hash, visited = {}, pending = {} }
+  local ctx = { origin_hash = hash, visited = {}, pending = {}, queued = {} }
   network._propagation = ctx
   remove_sender_signals_bfs(network, hash)
   run_gate_propagation(network, ctx)

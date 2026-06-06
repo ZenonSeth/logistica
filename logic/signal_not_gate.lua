@@ -50,6 +50,5 @@ end
 
 function logistica.signal_not_gate_on_disconnect(pos, networkId)
   logistica.signal_remove_sender(pos, networkId)
-  local input = logistica.signal_not_gate_get_input(pos)
-  minetest.get_meta(pos):set_string("infotext", "NOT: " .. input .. "\nOutput: Off")
+  update_infotext(pos, false)
 end

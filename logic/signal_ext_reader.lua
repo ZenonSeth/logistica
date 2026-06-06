@@ -83,11 +83,11 @@ end
 local function do_evaluate(pos)
   local targetPos  = get_target_pos(pos)
   local targetList = logistica.ext_reader_get_target_list(pos)
+  local networkId  = logistica.get_network_id_or_nil(pos)
   for i = 1, NUM_SLOTS do
     local itemName = logistica.ext_reader_get_item(pos, i)
     local sigName  = logistica.ext_reader_get_signal_name(pos, i)
     if itemName == "" or sigName == "" or targetList == "" then
-      local networkId = logistica.get_network_id_or_nil(pos)
       if networkId and sigName ~= "" then
         logistica.signal_send(pos, sigName, false)
       end

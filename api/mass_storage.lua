@@ -4,24 +4,25 @@ local FS = logistica.FTRANSLATOR
 local META_SERIALIZED_INV = "logserlist"
 local META_IMG_INDEX = "logimginxd"
 local META_SELECTED_RES = "logselres"
+local META_SERIALIZED_DEMAND = "logdemandser"
 
 local FORMSPEC_NAME = "mass_storage_formspec"
 local SWAP_FORMSPEC_NAME = "mass_storage_swap_formspec"
-local ON_OFF_BTN = "on_off_btn"
+local SLOT_CONFIG_FORMSPEC_NAME = "mass_storage_slot_config"
 local CLOSE_SWAP_BTN = "close_swap_btn"
 
 local MASS_STORAGE_TIMER = 1
 
 local storageForms = {}
 local swapForms = {}
+local slotConfigForms = {}
 
-local RESERVE_TOOLTIP = FS("How many items to reserve.\nReserved items won't be taken by other network machines")
 local IMAGE_TOOLTIP = FS("Pick which slot to use as front image.\nClick the selected slot again to disable the front image.")
 local FILTER_TOOLTIP = FS("Place item to select what kind of item to store in each slot.")
 local UPGRADE_TOOLTIP = FS("Upgrade slots: The 4 slots to the right are for placing mass storage upgrades.")
 local STORAGE_TOOLTIP = FS("Storage slots: items can be taken from them. To add items, put them in the input slot below.")
 local INPUT_TOOLTIP = FS("Input slot: Place items here (or shift+click items to send them here) to put them in storage")
-local PULL_TOOLTIP = FS("If ON, this mass storage will try to take stored items from Suppliers (except Crafting Suppliers) if it can store them.")
+local CFG_TOOLTIP = FS("Configure reserve and demand for this slot")
 
 local function get_sel_index(vals, selectedValue)
   for i, v in ipairs(vals) do if v == selectedValue then return i end end
@@ -65,11 +66,6 @@ local function image_picker(initialX, y, index, selectedImgIndex, meta)
     itemName = meta:get_inventory():get_stack("filter", index):get_name()
   end
   return "item_image_button["..x..","..y..";0.7,0.7;"..itemName..";ico"..index..";]"
-end
-
-local function reserve_dropdown(x, y, index, vals, valsAsStr, selectedValue)
-  local selectedIndex = get_sel_index(vals, selectedValue)
-  return "dropdown["..x..","..y..";1.2,0.6;res"..index..";"..valsAsStr..";"..selectedIndex..";false]"
 end
 
 local get_sr = logistica.get_mass_storage_reserve
@@ -131,28 +127,30 @@ local function formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, 
     "label[0.2,0.4;"..FS("Front Img").."]"
 end
 
-local function formspec_get_reserve_dropdowns(vals, valsAsStr, meta)
-  return
-    reserve_dropdown( 1.40, 3, 1, vals, valsAsStr, get_sr(meta, 1))..
-    reserve_dropdown( 2.65, 3, 2, vals, valsAsStr, get_sr(meta, 2))..
-    reserve_dropdown( 3.90, 3, 3, vals, valsAsStr, get_sr(meta, 3))..
-    reserve_dropdown( 5.15, 3, 4, vals, valsAsStr, get_sr(meta, 4))..
-    reserve_dropdown( 6.40, 3, 5, vals, valsAsStr, get_sr(meta, 5))..
-    reserve_dropdown( 7.65, 3, 6, vals, valsAsStr, get_sr(meta, 6))..
-    reserve_dropdown( 8.90, 3, 7, vals, valsAsStr, get_sr(meta, 7))..
-    reserve_dropdown(10.15, 3, 8, vals, valsAsStr, get_sr(meta, 8))..
-    "label[0.2,3.3;"..FS("Res (?)").."]"
+local CFG_BTN_Y   = 3.0
+local CFG_BTN_W   = 0.6
+local CFG_BTN_H   = 0.6
+local CFG_BTN_OFF = (1.25 - CFG_BTN_W) / 2  -- center in slot width
+
+local function formspec_get_cfg_buttons()
+  local result = ""
+  for i = 1, 8 do
+    local bx = 1.4 + (i - 1) * 1.25 + CFG_BTN_OFF
+    local btnName = "cfg_slot_"..i
+    result = result..
+      "image_button["..bx..","..CFG_BTN_Y..";"..CFG_BTN_W..","..CFG_BTN_H..
+      ";logistica_icon_last.png^[transformR90;"..btnName..";]"..
+      "tooltip["..btnName..";"..CFG_TOOLTIP.."]"
+  end
+  return result
 end
 
 -- `meta` is optional
 local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local upgradeInvString = upgrade_inv(posForm, numUpgradeSlots, 3.8)
-  local isOn = logistica.is_machine_on(pos)
   local meta = optionalMeta or minetest.get_meta(pos)
   local selectedImgIndex = logistica.get_mass_storage_image_slot(meta)
-  local vals = logistica.get_mass_storage_valid_reserve_list(pos)
-  local valsAsStr = table.concat(vals, ",")
   local imgPickX = 1.65
   local imgPickY = 0.1
   local swapButtonsString = upgrade_swap_buttons(pos, numUpgradeSlots, 3.8)
@@ -160,6 +158,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "size["..logistica.inv_size(12, 11.5).."]" ..
     logistica.ui.background..
     logistica.player_inv_formspec(1.5,5.75)..
+    logistica.ui.button_style..
     "list["..posForm..";storage;1.5,1.9;8,1;0]" ..
     "list["..posForm..";filter;1.5,0.8;8,1;0]" ..
     "image[0.25,0.8;1,1;logistica_icon_filter.png]" ..
@@ -167,23 +166,20 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "image[0.25,1.9;1,1;logistica_icon_mass_storage.png]" ..
     "image[0.2,3.8;1,1;logistica_icon_input.png]" ..
     formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, meta)..
-    formspec_get_reserve_dropdowns(vals, valsAsStr, meta)..
+    formspec_get_cfg_buttons()..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring["..posForm..";storage]"..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring[current_player;main]"..
-    logistica.ui.on_off_btn(isOn, 3.4, 4.0, ON_OFF_BTN, FS("Pull Items"))..
     upgradeInvString..
     swapButtonsString..
     "label[1.55,5.15;"..FS("Slot Storage Capacity: ")..logistica.get_mass_storage_max_size(pos).."]"..
-    "tooltip[3.4,4.0;1,1;"..PULL_TOOLTIP.."]"..
     "tooltip[0.25,1.9;1,1;"..STORAGE_TOOLTIP.."]"..
     "tooltip[0.2,3.8;1,1;"..INPUT_TOOLTIP.."]"..
     "tooltip[0.25,0.8;1,1;"..FILTER_TOOLTIP.."]"..
     "tooltip["..tostring(1.5 + 1.25 * (7 - numUpgradeSlots))..",3.8;1,1;"..UPGRADE_TOOLTIP.."]"..
-    "tooltip[0.2,3.0;1,0.5;"..RESERVE_TOOLTIP.."]"..
     "tooltip[0.2,0.1;1,0.5;"..IMAGE_TOOLTIP.."]"
 end
 
@@ -206,6 +202,38 @@ show_mass_storage_formspec = function(pos, name, meta)
     FORMSPEC_NAME,
     get_mass_storage_formspec(pos, numUpgradeSlots, meta)
   )
+end
+
+local function get_slot_config_formspec(pos, slotIndex)
+  local meta = minetest.get_meta(pos)
+  local inv = meta:get_inventory()
+  local maxSize = logistica.get_mass_storage_max_size(pos)
+  local filterStack = inv:get_stack("filter", slotIndex)
+  local itemDesc = filterStack:is_empty() and FS("(empty)") or filterStack:get_short_description()
+  local currentCount = inv:get_stack("storage", slotIndex):get_count()
+  local reserve = logistica.clamp(get_sr(meta, slotIndex), 0, maxSize)
+  local demand  = logistica.clamp(logistica.get_mass_storage_demand(meta, slotIndex), 0, maxSize)
+  local crafting = logistica.get_mass_storage_demand_crafting(meta, slotIndex)
+  return "formspec_version[4]"..
+    "size["..logistica.inv_size(6.5, 6.5).."]"..
+    logistica.ui.background..
+    "label[0.4,0.4;"..FS("Slot ")..slotIndex.."]"..
+    "label[0.4,0.9;"..FS("Item: ")..minetest.formspec_escape(itemDesc).."]"..
+    "label[0.4,1.4;"..FS("Stored: ")..currentCount.." / "..maxSize.."]"..
+    "label[0.4,2.2;"..FS("Reserve").."]"..
+    "field[2.5,1.95;3.6,0.75;reserve;;"..reserve.."]"..
+    "label[0.4,2.95;"..FS("Items the network will not take from this slot.").."]"..
+    "label[0.4,3.75;"..FS("Demand up to").."]"..
+    "field[2.5,3.5;3.6,0.75;demand;;"..demand.."]"..
+    "label[0.4,4.5;"..FS("Pull from suppliers until this count is reached.").."]"..
+    "checkbox[0.4,4.9;demand_crafting;"..FS("Include Crafting Suppliers")..";"..tostring(crafting).."]"..
+    "button_exit[2.0,5.4;2.5,0.75;save;"..FS("Save").."]"
+end
+
+local function show_slot_config_formspec(pos, playerName, slotIndex)
+  storageForms[playerName] = nil
+  slotConfigForms[playerName] = { position = pos, slotIndex = slotIndex }
+  minetest.show_formspec(playerName, SLOT_CONFIG_FORMSPEC_NAME, get_slot_config_formspec(pos, slotIndex))
 end
 
 local function get_swap_formspec(pos, slotIndex)
@@ -258,6 +286,35 @@ local function on_receive_swap_formspec(player, formname, fields)
   return true
 end
 
+local function on_receive_slot_config_formspec(player, formname, fields)
+  if formname ~= SLOT_CONFIG_FORMSPEC_NAME then return false end
+  local playerName = player:get_player_name()
+  local data = slotConfigForms[playerName]
+  if not data then return false end
+  local pos = data.position
+  local slotIndex = data.slotIndex
+  if minetest.is_protected(pos, playerName) then return true end
+
+  if fields.demand_crafting ~= nil then
+    -- checkboxes fire immediately on click and don't resend on button press
+    logistica.set_mass_storage_demand_crafting(minetest.get_meta(pos), slotIndex, fields.demand_crafting == "true")
+  end
+  if fields.save or fields.key_enter_field then
+    local maxSize = logistica.get_mass_storage_max_size(pos)
+    local meta = minetest.get_meta(pos)
+    local reserve = logistica.clamp(math.floor(tonumber(fields.reserve) or 0), 0, maxSize)
+    local demand  = logistica.clamp(math.floor(tonumber(fields.demand)  or 0), 0, maxSize)
+    logistica.set_mass_storage_reserve(meta, slotIndex, reserve)
+    logistica.set_mass_storage_demand(meta, slotIndex, demand)
+    slotConfigForms[playerName] = nil
+    show_mass_storage_formspec(pos, playerName)
+  elseif fields.quit then
+    slotConfigForms[playerName] = nil
+    show_mass_storage_formspec(pos, playerName)
+  end
+  return true
+end
+
 local function on_receive_storage_formspec(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return false end
   local playerName = player:get_player_name()
@@ -268,11 +325,6 @@ local function on_receive_storage_formspec(player, formname, fields)
   if fields.quit and not fields.key_enter_field then
     logistica.update_mass_storage_front_image(pos)
     storageForms[playerName] = nil
-  elseif fields[ON_OFF_BTN] then
-    if logistica.toggle_machine_on_off(pos) then
-      logistica.start_node_timer(pos, MASS_STORAGE_TIMER)
-    end
-    show_mass_storage_formspec(pos, playerName)
   else
     for i = 1, 8 do
       if fields["ico"..i] then
@@ -281,19 +333,18 @@ local function on_receive_storage_formspec(player, formname, fields)
         return
       end
     end
+    for i = 1, 8 do
+      if fields["cfg_slot_"..i] then
+        show_slot_config_formspec(pos, playerName, i)
+        return true
+      end
+    end
     local node = minetest.get_node(pos)
     local numUpgradeSlots = minetest.registered_nodes[node.name].logistica.numUpgradeSlots
     for i = 1, numUpgradeSlots do
       if fields["swap_upg_"..i] then
         show_swap_formspec(pos, playerName, i)
         return true
-      end
-    end
-    for i = 1, 8 do
-      if fields["res"..i] then
-        logistica.on_mass_storage_reserve_changed(pos, i, fields["res"..i])
-        show_mass_storage_formspec(pos, playerName)
-        return
       end
     end
     return true
@@ -327,6 +378,7 @@ local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpg
 
   logistica.set_mass_storage_image_slot(meta, selImgIndex)
   for i, v in ipairs(reserves) do logistica.set_mass_storage_reserve(meta, i, v) end
+  logistica.set_mass_storage_demand_from_string(nodeName, itemMeta:get_string(META_SERIALIZED_DEMAND), meta)
   logistica.update_mass_storage_front_image(pos)
   logistica.update_mass_storage_cap(pos, meta)
   logistica.on_mass_storage_change(pos)
@@ -347,6 +399,7 @@ local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
   dropMeta:set_string(META_SERIALIZED_INV, serialized)
   dropMeta:set_int(META_IMG_INDEX, logistica.get_mass_storage_image_slot(meta))
   dropMeta:set_string(META_SELECTED_RES, get_reserve_as_string(oldnode.name, meta))
+  dropMeta:set_string(META_SERIALIZED_DEMAND, logistica.get_mass_storage_demand_as_string(oldnode.name, meta))
   -- update description
   local name = minetest.registered_nodes[oldnode.name].logistica.baseName
   name = name..logistica.get_mass_storage_imgname_or_first_item(meta)
@@ -486,7 +539,7 @@ local function on_mass_storage_inv_take(pos, listname, index, stack, player)
 end
 
 local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
-  if not puncher and not puncher:is_player() then return end
+  if not puncher or not puncher:is_player() then return end
   if minetest.is_protected(pos, puncher:get_player_name()) then return end
   logistica.try_to_add_player_wield_item_to_mass_storage(pos, puncher)
 end
@@ -506,6 +559,7 @@ end
 ----------------------------------------------------------------
 
 minetest.register_on_player_receive_fields(on_receive_swap_formspec)
+minetest.register_on_player_receive_fields(on_receive_slot_config_formspec)
 minetest.register_on_player_receive_fields(on_receive_storage_formspec)
 
 minetest.register_on_leaveplayer(function(objRef, timed_out)
@@ -513,6 +567,7 @@ minetest.register_on_leaveplayer(function(objRef, timed_out)
     local playerName = objRef:get_player_name()
     storageForms[playerName] = nil
     swapForms[playerName] = nil
+    slotConfigForms[playerName] = nil
   end
 end)
 
@@ -538,16 +593,13 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
     end,
     after_dig_node = after_mass_storage_destruct,
     drop = storageName,
-    on_timer = logistica.on_timer_powered(logistica.on_mass_storage_timer),
+    on_timer = logistica.on_mass_storage_timer,
     paramtype2 = "facedir",
     logistica = {
       baseName = description,
       maxItems = numItemsPerSlot,
       numSlots = numSlots,
       numUpgradeSlots = numUpgradeSlots,
-      on_power = function(pos, isPoweredOn)
-        if isPoweredOn then logistica.start_mass_storage_timer(pos) end
-      end,
       on_connect_to_network = function(pos, networkId)
         logistica.start_mass_storage_timer(pos, true)
       end
@@ -578,6 +630,7 @@ function logistica.register_mass_storage(simpleName, description, numSlots, numI
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { cracky = 3, choppy = 3, oddly_breakable_by_hand = 3, not_in_creative_inventory = 1, pickaxey = 1, axey = 1, handy = 1 }
   def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
+  def_disabled.on_timer = nil
 
   minetest.register_node(storageName.."_disabled", def_disabled)
 
