@@ -3,25 +3,19 @@ local FS = logistica.FTRANSLATOR
 local NUM_REQUEST_SLOTS = 4 -- maybe at some point make this a param, but why?
 local PUSH_LIST_PICKER = "push_pick"
 local ON_OFF_BUTTON = "on_off_btn"
-local INF_CHECKBOX_PREFIX = "infchk"
+local AMOUNT_FIELD_PREFIX = "reqamt"
+local SAVE_BUTTON = "save_btn"
 local FORMSPEC_NAME = "logistica_requester"
 
 local requesterForms = {}
 
-local function get_checkbox_name_from_index(index)
-  return INF_CHECKBOX_PREFIX..tostring(index)
-end
-
-local function get_filter_list_inf_checkboxes(checkboxStates, x, y)
-  local checkboxes = {}
+local function get_amount_fields(amounts, x, y)
+  local fields = {}
   for i = 1, NUM_REQUEST_SLOTS do
-    local checkboxName = get_checkbox_name_from_index(i)
-    local ticked = "false" ; if checkboxStates[i] then ticked = "true" end
-    checkboxes[i] =
-      "checkbox["..(x + 0.1 + (i - 1) * 1.25)..","..y..";"..checkboxName..";Inf;"..ticked.."]"..
-      "tooltip["..checkboxName..";"..FS("Tick this to always try to insert the item above into the target inventory,\nregardless of how many of that item the target inventory contains.\nThe number of items put above is then requested every second.").."]"
+    local fx = x + (i - 1) * 1.25
+    fields[i] = "field["..(fx)..","..y..";1.1,0.6;"..AMOUNT_FIELD_PREFIX..i..";;"..(amounts[i] or 0).."]"
   end
-  return table.concat(checkboxes)
+  return table.concat(fields)
 end
 
 local function get_requester_formspec(pos)
@@ -29,24 +23,36 @@ local function get_requester_formspec(pos)
   local pushPos = logistica.get_requester_target(pos)
   local selectedList = logistica.get_requester_target_list(pos)
   local isOn = logistica.is_machine_on(pos)
-  local checkboxStates = logistica.get_requester_inf_state(pos)
+  local amounts = logistica.get_requester_slot_amounts(pos)
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.6, 8.45).."]" ..
+    "size["..logistica.inv_size(10.6, 9.0).."]" ..
     logistica.ui.background..
+    logistica.ui.button_only_style..
     logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.5, pushPos, selectedList, FS("Put items in:"))..
     logistica.ui.on_off_btn(isOn, 9.3, 1.3, ON_OFF_BUTTON, FS("Enable"))..
-    "label[0.5,0.4;"..FS("Configure items and count to put, and keep a minimium of, in target's inventory").."]"..
-    "label[0.5,0.7;"..FS("Or tick the \"Inf\" (infinite) checkbox below a slot to always keep inserting the item.").."]"..
-    "list["..posForm..";filter;0.5,1.2;"..NUM_REQUEST_SLOTS..",1;0]"..
-    get_filter_list_inf_checkboxes(checkboxStates, 0.5, 2.5)..
-    logistica.player_inv_formspec(0.5, 3.0)..
+    "label[0.5,0.4;"..FS("Request items from network and put them into the target inventory").."]"..
+    "list["..posForm..";filter;0.5,1.0;"..NUM_REQUEST_SLOTS..",1;0]"..
+    "label[0.5,2.3;"..FS("Request up to:").."]"..
+    get_amount_fields(amounts, 0.5, 2.5)..
+    "button[5.55,2.5;1.0,0.6;"..SAVE_BUTTON..";Save]"..
+    logistica.player_inv_formspec(0.5, 3.5)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"
 end
 
 local function show_requester_formspec(playerName, pos)
+  logistica.migrate_requester_slot_amounts(pos)
   requesterForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_requester_formspec(pos))
+end
+
+local function save_slot_amounts(pos, fields)
+  for i = 1, NUM_REQUEST_SLOTS do
+    local fieldName = AMOUNT_FIELD_PREFIX..i
+    if fields[fieldName] ~= nil then
+      logistica.set_requester_slot_amount(pos, i, tonumber(fields[fieldName]) or 0)
+    end
+  end
 end
 
 local function on_player_receive_fields(player, formname, fields)
@@ -58,15 +64,7 @@ local function on_player_receive_fields(player, formname, fields)
   if not pos then return false end
   if minetest.is_protected(pos, playerName) then return true end
 
-  local reshow = false
-  -- infinite checkboxes check
-  for i = 1, NUM_REQUEST_SLOTS do
-    local checkboxName = get_checkbox_name_from_index(i)
-    if fields[checkboxName] ~= nil then
-      logistica.requester_on_infinite_request_toggle(pos, i, fields[checkboxName] == "true")
-      reshow = true
-    end
-  end
+  save_slot_amounts(pos, fields)
 
   if fields.quit then
     requesterForms[playerName] = nil
@@ -78,7 +76,6 @@ local function on_player_receive_fields(player, formname, fields)
     local selected = fields[PUSH_LIST_PICKER]
     logistica.set_requester_target_list(pos, selected)
   end
-  if reshow then show_requester_formspec(player:get_player_name(), pos) end
   return true
 end
 
@@ -113,9 +110,14 @@ local function allow_requester_storage_inv_put(pos, listname, index, stack, play
   if listname ~= "filter" then return 0 end
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
-  local slotStack = inv:get_stack(listname, index)
-  slotStack:add_item(stack)
-  inv:set_stack(listname, index, slotStack)
+  local copyStack = ItemStack(stack:get_name())
+  copyStack:set_count(1)
+  inv:set_stack("filter", index, copyStack)
+  -- default amount to 1 when placing into an empty slot with no amount set
+  local meta = minetest.get_meta(pos)
+  if meta:get_int(AMOUNT_FIELD_PREFIX..index) == 0 then
+    meta:set_int(AMOUNT_FIELD_PREFIX..index, 1)
+  end
   logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER)
   logistica.start_requester_timer(pos, 1)
   return 0
@@ -126,7 +128,7 @@ local function allow_requester_inv_take(pos, listname, index, stack, player)
   if minetest.is_protected(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local slotStack = inv:get_stack(listname, index)
-  slotStack:take_item(stack:get_count())
+  slotStack:clear()
   inv:set_stack(listname, index, slotStack)
   logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER)
   return 0

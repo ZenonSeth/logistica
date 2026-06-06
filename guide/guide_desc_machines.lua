@@ -168,30 +168,29 @@ Note that how many items can be sent at one time to a Requester is still limited
 g.request_inserter = S([[
 The Request Inserter is used to put items in other nodes outside the network.
 
-Note that while there item-wise and stack-wise Inserters, in ALMOST ALL you only need the item-wise Inserter.
+Note that while there are item-wise and stack-wise Inserters, in ALMOST ALL cases you only need the item-wise Inserter.
 
 To use an Inserter, you must:
 
 - Place it facing a node that has an inventory it can target. Sneak + punching an inserter will show its output location.
-- Pick an inventory to place items into. Some nodes have multiple input inventories (e.g. a furnace)
-- Configure exactly which items to put in the target and how many - in the 4 upper slots. If not configured, nothing will be inserted.
-- Make sure you press the Enable button to enable operation
-- Request Inserters will request the configured items from the Network and try to keep its target's inventory full of at the minimum the specific items and the exact count. For example, a Request Inserter might be configured to target a Furnace's "fuel" inventory and always try to keep 2 Coal in it, while another request inserter targeting the same furnace, but it's "src" inventory can be configured to try and always keep 2 Iron Ore in it.
-- You can also check the "Inf" (short for "Infinite") checkbox to make the Request Inserter always request the item
+- Pick an inventory to place items into. Some nodes have multiple input inventories (e.g. a furnace).
+- Place items in the 4 filter slots to set which item types to request. Each slot holds 1 item to identify the type.
+- Set the "Request up to" amount below each filter slot. This is the target count to keep in the destination inventory. Setting it to 0 disables that slot.
+- Make sure you press the Enable button to enable operation.
 
-When the "Inf" checkbox below a slot is not checked, then the Inserter checks if the target inventory has at least as many items as the configured Inserter slot contains, and if there are fewer, then the requester will request the difference to try and reach the configured number.
+The Inserter checks how many of the configured item are already in the target inventory. If fewer than the "Request up to" amount are present, it requests the difference from the network and inserts them.
 
-When the "Inf" checkbox below a slot is checked, then the Inserter won't check how many of that item are contained in the target inventory, but instead will request that amount of items every time interval (roughly every 1 second) and will attempt to put them in the target inventory, until there is no more room in that inventory.
+For example, configure a slot with Coal and amount 4, pointing at a furnace's fuel inventory: the Inserter will keep requesting Coal until there are 4 in the furnace, then stop until some are consumed.
 
-Request Inserters check for to obtain the items in the following order:
+Request Inserters obtain items in the following order:
 
 - Any Suppliers (e.g. Passive Supply Chest, Vacuum Chest, Cobble Gen Supplier or Crafting Supplier)
 - Mass Storage or Tool Box nodes (depending on the item needed)
 
-There's two variation of the Request Inserter, and as mentioned above in almost all cases you only need the item-wise Inserter.
+There are two variations of the Request Inserter, and in almost all cases you only need the item-wise Inserter.
 
-- Item Request Inserter: Moves 1 item at a time to fulfil the requested items.
-- Stack Request Inserter: Moves up to 99 items at a time to fulfil the requested items. Note that this does not mean it will insert 99 items, but rather it can insert up to 99 - it will still only insert as many as are necessary to meet the target number set by the filter list.
+- Item Request Inserter: Moves 1 item at a time to fulfil the requested amounts.
+- Stack Request Inserter: Moves up to 99 items at a time to fulfil the requested amounts.
 ]])
 
 g.reservoir = S([[

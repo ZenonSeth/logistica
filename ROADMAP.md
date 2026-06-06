@@ -11,7 +11,7 @@
   - Increase size of inventory -- DONE (16 -> 32 slots, 4x8; existing chests resize on open)
   - Split: Allow Storing From Machines and Allow Storing From Access Point -- DONE (two separate toggles, isAutomated flag through insert_item_in_network)
   - (Maybe) Allow storing rules (e.g. what items to be allowed to be stored in it)
-- Change injectors to use numbers and not items, allowing larger supply requests
+- Change Request Inserter filter slots to use numbers instead of item stacks -- DONE (per-slot "Request up to" amount fields, max 9999; inf checkbox removed; migration on open and on timer)
 - Vacuum Chest
   - Fix name -- DONE (display name only)
   - Add pushing option -- skipped
@@ -39,7 +39,7 @@
 - Tree cutting node -- deferred
 - Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
 - Upgrade recipes for Importer and Requester
-- Filters on Vacuum chest
+- Filters on Vacuum chest -- (Maybe not)
 
 ### Maybe
 - Lava generator - but slow
