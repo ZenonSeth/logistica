@@ -198,6 +198,10 @@ minetest.register_craft({
   }
 })
 
+minetest.register_craft({ output = L("cable_insulating"),   type = "shapeless", recipe = {L("optic_cable")} })
+minetest.register_craft({ output = L("cable_insulating_l"), type = "shapeless", recipe = {L("cable_insulating")} })
+minetest.register_craft({ output = L("optic_cable"),        type = "shapeless", recipe = {L("cable_insulating_l")} })
+
 minetest.register_craft({
   output = L("silverin_block"),
   recipe = {

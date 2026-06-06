@@ -89,7 +89,7 @@ end
 local RECIPE_LAVAFURN = getrec({L("lava_furnace")})
 local RECIPE_NETCONTR = getrec({L("simple_controller")})
 local RECIPE_ACCESSPT = getrec({L("access_point")})
-local RECIPE_OPTICCBL = getrec({L("optic_cable"), L("optic_cable_toggleable_off"), L("optic_cable_block")})
+local RECIPE_OPTICCBL = getrec({L("optic_cable"), L("optic_cable_toggleable_off"), L("optic_cable_block"), L("cable_insulating"), L("cable_insulating_l")})
 local RECIPE_MASSSTOR = getrec({L("mass_storage_basic")})
 local RECIPE_TOOLCHST = getrec({L("item_storage")})
 local RECIPE_PASSSUPP = getrec({L("passive_supplier")})
@@ -153,6 +153,8 @@ local RECIPE_LINKS = {
   [L("optic_cable")] = PAGE_OPTIC_CABLE,
   [L("optic_cable_toggleable_off")] = PAGE_OPTIC_CABLE,
   [L("optic_cable_block")] = PAGE_OPTIC_CABLE,
+  [L("cable_insulating")] = PAGE_OPTIC_CABLE,
+  [L("cable_insulating_l")] = PAGE_OPTIC_CABLE,
   [L("storage_upgrade_1")] = PAGE_MASS_STORAGE_UPGR,
   [L("storage_upgrade_2")] = PAGE_MASS_STORAGE_UPGR,
   [L("storage_upgrade_multiplier")] = PAGE_MASS_STORAGE_UPGR,

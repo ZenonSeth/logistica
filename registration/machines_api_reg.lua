@@ -74,6 +74,13 @@ logistica.register_cable_toggleable(S("Toggleable Cable"), "optic_cable_toggleab
   {"logistica_cable_toggleable_off.png"}
 )
 
+-- insulating (directional, front-to-back only)
+logistica.register_insulating_cable(S("Insulated Optic Cable"), "cable_insulating")
+
+-- insulating L-shape (front arm + right arm), same textures
+logistica.register_insulating_cable(S("Insulated Optic Cable (L-Shape)"), "cable_insulating_l",
+  {"logistica_cable_insulating.png"}, "l_shape")
+
 --------------------------------
 -- Cobble Generator
 --------------------------------

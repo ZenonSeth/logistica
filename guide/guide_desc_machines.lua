@@ -67,8 +67,17 @@ Note that Cables are the only way to extend a network's reach - meaning, machine
 # Toggleable Cables
 The Toggleable Cable works exactly like a regular cable, but can be right-clicked (aka used) to disconnect it from all other surrounding cables or machines. This allows you to make parts of your network easy to disconnect when you don't want to use them (For example, a disconnecting an auto-furnace setup when you don't need it anymore)
 
-#Embedded Cables
+# Embedded Cables
 The Embedded Cable is a full block that acts like a regular Optic Cable, allowing cables to be run through walls without leaving visible gaps.
+
+# Insulated Cables
+Insulated Cables are directional cables that only carry the network connection along specific faces. All other faces are blocked, even if another cable or machine is touching them. This lets you run cables past machines or junctions without accidentally connecting them.
+
+The Insulated Optic Cable (straight) connects front-to-back only. Place it so its front and back faces align with the cable run you want.
+
+The Insulated Optic Cable (L-Shape) connects the front face to the right face, allowing a 90-degree turn while still insulating the remaining four faces.
+
+Both insulated cable types can be cycled from a regular Optic Cable by crafting them alone (shapeless). Crafting: Optic Cable -> Straight -> L-Shape -> back to Optic Cable.
 ]])
 
 g.wireless_upgrader = S([[

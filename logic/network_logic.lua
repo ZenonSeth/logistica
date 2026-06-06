@@ -279,6 +279,42 @@ local function find_adjacent_networks(pos)
   return numNetworks, currNetwork
 end
 
+-- Returns 1 for straight insulating cable, 2 for L-shape, 0 for not insulating.
+local function get_insul_type(nodeName)
+  return minetest.get_item_group(nodeName, "logistica_insulating")
+end
+
+local function vec_eq(a, b)
+  return a.x == b.x and a.y == b.y and a.z == b.z
+end
+
+-- Can the cable propagate the scan OUT in this offset direction?
+-- Type 1 (straight): forward or backward axis only.
+-- Type 2 (L-shape): forward or right only.
+local function insul_allows_exit(offset, d, insulType)
+  if not d then return true end
+  if insulType == 1 then
+    return vec_eq(offset, d.forward) or vec_eq(offset, d.backward)
+  elseif insulType == 2 then
+    return vec_eq(offset, d.forward) or vec_eq(offset, d.right)
+  end
+  return true
+end
+
+-- Can the scan enter the cable FROM this offset direction?
+-- Entry direction is the negative of the arm direction (approaching from outside the arm end).
+-- Type 1 (straight): same as exit (symmetric).
+-- Type 2 (L-shape): backward or left (the negative of forward/right).
+local function insul_allows_entry(offset, d, insulType)
+  if not d then return true end
+  if insulType == 1 then
+    return vec_eq(offset, d.forward) or vec_eq(offset, d.backward)
+  elseif insulType == 2 then
+    return vec_eq(offset, d.backward) or vec_eq(offset, d.left)
+  end
+  return true
+end
+
 local function recursive_scan_for_nodes_for_controller(network, positionHashes, numScanned)
   if not numScanned then numScanned = 0 end
 
@@ -291,17 +327,30 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
   for posHash, _ in pairs(positionHashes) do
     local pos = h2p(posHash)
     logistica.load_position(pos)
+    local posNode = minetest.get_node(pos)
+    local posInsulType = get_insul_type(posNode.name)
+    local posInsulDirs = (posInsulType > 0) and logistica.get_rot_directions(posNode.param2) or nil
     for _, offset in pairs(adjacent) do
       local otherPos = vector.add(pos, offset)
       logistica.load_position(otherPos)
-      local otherName = minetest.get_node(otherPos).name
+      local otherNode = minetest.get_node(otherPos)
+      local otherName = otherNode.name
       local otherHash = p2h(otherPos)
       -- block approaching a toggler from its backward (output) side — one-way gate
       local blockedToggler = logistica.GROUPS.signal_togglers.is(otherName) and (function()
-        local d = logistica.get_rot_directions(minetest.get_node(otherPos).param2)
+        local d = logistica.get_rot_directions(otherNode.param2)
         return d ~= nil and offset.x == d.forward.x and offset.y == d.forward.y and offset.z == d.forward.z
       end)()
-      if not blockedToggler
+      -- block propagation out of an insulating cable on a non-permitted face
+      local blockedFromInsulating = posInsulType > 0
+        and not insul_allows_exit(offset, posInsulDirs, posInsulType)
+      -- block entry into an insulating cable from a non-permitted face
+      local otherInsulType = get_insul_type(otherName)
+      local blockedIntoInsulating = otherInsulType > 0 and (function()
+        local d = logistica.get_rot_directions(otherNode.param2)
+        return not insul_allows_entry(offset, d, otherInsulType)
+      end)()
+      if not blockedToggler and not blockedFromInsulating and not blockedIntoInsulating
           and network.controller ~= otherHash
           and logistica.get_network_group_for_node_name(otherName) ~= nil
           and not has_machine(network, otherHash)
@@ -874,6 +923,25 @@ end
 
 function logistica.on_signal_receiver_change(pos, oldNode, oldMeta)
   on_signal_receiver_changed(pos, oldNode, oldMeta)
+end
+
+function logistica.on_cable_insulating_change(pos, oldNode, oldMeta)
+  if oldNode then
+    -- removed: rescan the network this cable belonged to
+    local cachedId = get_unchecked_cached_network_id(oldMeta or minetest.get_meta(pos))
+    if cachedId and cachedId ~= CACHED_NETWORK_ID_ALREADY_TRIED then
+      rescan_network(tonumber(cachedId))
+    end
+  else
+    -- placed: find any adjacent network and rescan so the cable can be picked up
+    for _, offset in ipairs(adjacent) do
+      local adjNetwork = logistica.get_network_or_nil(vector.add(pos, offset))
+      if adjNetwork then
+        rescan_network(adjNetwork.controller)
+        return
+      end
+    end
+  end
 end
 
 -- Send a named signal ON or OFF from pos. Notifies all receivers on the network.
