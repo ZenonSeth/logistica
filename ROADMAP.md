@@ -31,12 +31,12 @@
     - External Mesecon sender - sends a mesecon on -- DONE (mesecon_sender)
     - Digiline output -- not built (Maybe)
     - (Maybe) Display Unit -- not built
-- Recycler machine (un-crafts logistica machines)
+- Recycler machine (un-crafts logistica machines) -- DONE (Logistica Machine Disassembler: logistica:disassembler, api/disassembler.lua + api/disassembler_machine.lua)
 - Lava Furnace
   - Fix shift+click on slots
 - Difficult to make Cooking Crafting Supplier
-- Farming node -- deferred (similar to vacuum chest, but for plants)
-- Tree cutting node -- deferred
+- Farming node -- (maybe yes) similar to vacuum chest, but for plants
+- Tree cutting node -- (maybe yes)
 - Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
 - Upgrade recipes for Importer and Requester
 - Filters on Vacuum chest -- (Maybe not)

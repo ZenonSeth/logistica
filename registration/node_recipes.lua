@@ -1,7 +1,7 @@
 local itemstrings = logistica.itemstrings
 local function L(s) return "logistica:"..s end
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("lava_furnace"),
   recipe = {
     {itemstrings.clay,  itemstrings.obsidian,     itemstrings.clay},
@@ -10,7 +10,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("mass_storage_basic"),
   recipe = {
     {L("silverin_plate"),      L("optic_cable"),         L("silverin_plate")},
@@ -19,7 +19,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("item_storage"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
@@ -28,7 +28,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("passive_supplier"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest, L("silverin_plate")},
@@ -37,7 +37,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("requester_item"),
   recipe = {
     {L("silverin_plate"), "",              L("silverin_plate")},
@@ -46,7 +46,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("requester_stack"),
   recipe = {
     {L("silverin_plate"), L("silverin_circuit"), L("silverin_plate")},
@@ -55,13 +55,13 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("requester_stack"),
   recipe = {
     {L("requester_item"), L("silverin_circuit"), ""},
   }
 })
-minetest.register_craft({
+logistica.register_craft({
   output = L("injector_slow"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
@@ -70,7 +70,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("injector_fast"),
   recipe = {
     {L("silverin_plate"), L("silverin_circuit"),    L("silverin_plate")},
@@ -79,14 +79,14 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("injector_fast"),
   recipe = {
     {L("injector_slow"), L("silverin_circuit"),""},
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("simple_controller"),
   recipe = {
     {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
@@ -95,7 +95,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("access_point"),
   recipe = {
     {L("silverin_plate"),   L("silverin_circuit"), L("silverin_plate")},
@@ -104,7 +104,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("trashcan"),
   recipe = {
     {L("silverin_plate"), L("optic_cable"),   L("silverin_plate")},
@@ -113,7 +113,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("vaccuum_chest"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest,   L("silverin_plate")},
@@ -122,7 +122,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("autocrafter"),
   recipe = {
     {L("silverin_plate"), itemstrings.chest,     L("silverin_plate")},
@@ -131,7 +131,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("crafting_supplier"),
   recipe = {
     {L("silverin_plate"),   itemstrings.chest, L("silverin_plate")},
@@ -140,7 +140,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("cobblegen_supplier"),
   recipe = {
     {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
@@ -153,7 +153,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("wireless_synchronizer"),
   recipe = {
     {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
@@ -162,7 +162,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("reservoir_silverin_empty"),
   recipe = {
     {L("silverin_plate"), "",                    L("silverin_plate")},
@@ -171,7 +171,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("reservoir_obsidian_empty"),
   recipe = {
     {itemstrings.obsidian, L("silverin_plate"),   itemstrings.obsidian},
@@ -180,7 +180,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("lava_furnace_fueler"),
   recipe = {
     {L("silverin_plate"), itemstrings.clay, L("silverin_plate")},
@@ -189,27 +189,24 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
-  output = L("optic_cable_block"),
-  recipe = {
-    {L("silverin_plate")},
-    {L("optic_cable")},
-    {L("silverin_plate")},
-  }
-})
+logistica.register_craft({ no_recycle = true, output = L("optic_cable_block"), recipe = {
+  {L("silverin_plate")},
+  {L("optic_cable")},
+  {L("silverin_plate")},
+}})
 
-minetest.register_craft({ output = L("cable_insulating"),   type = "shapeless", recipe = {L("optic_cable")} })
-minetest.register_craft({ output = L("cable_insulating_l"), type = "shapeless", recipe = {L("cable_insulating")} })
-minetest.register_craft({ output = L("optic_cable"),        type = "shapeless", recipe = {L("cable_insulating_l")} })
+logistica.register_craft({ no_recycle = true, output = L("cable_insulating"),   type = "shapeless", recipe = {L("optic_cable")} })
+logistica.register_craft({ no_recycle = true, output = L("cable_insulating_l"), type = "shapeless", recipe = {L("cable_insulating")} })
+logistica.register_craft({ no_recycle = true, output = L("optic_cable"),        type = "shapeless", recipe = {L("cable_insulating_l")} })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("silverin_block"),
   recipe = {
     {L("silverin_plate"), L("silverin_plate"), L("silverin_plate")}
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("silverin_plate 3"),
   type = "shapeless",
   recipe = {
@@ -217,7 +214,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("bucket_filler"),
   recipe = {
     {L("silverin_plate"), "",                       L("silverin_plate")},
@@ -226,7 +223,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("bucket_emptier"),
   recipe = {
     {L("silverin_plate"), itemstrings.empty_bucket, L("silverin_plate")},
@@ -235,7 +232,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("pump"),
   recipe = {
     {L("silverin_plate"), itemstrings.empty_bucket, L("silverin_plate")},
@@ -244,7 +241,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("wireless_receiver"),
   recipe = {
     {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
@@ -253,7 +250,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("wireless_transmitter"),
   recipe = {
     {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
@@ -267,7 +264,7 @@ local RELAY  = L("signal_relay")
 local CIRC   = L("silverin_circuit")
 local CABLE  = L("optic_cable")
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_button"),
   recipe = {
     {PLATE, ""               , PLATE},
@@ -276,7 +273,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_switch"),
   recipe = {
     {PLATE, itemstrings.steel, PLATE},
@@ -285,7 +282,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_lamp_white"),
   recipe = {
     {PLATE, itemstrings.glass, PLATE},
@@ -294,7 +291,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_lamp_2c_br"),
   recipe = {
     {PLATE, itemstrings.glass, PLATE},
@@ -303,7 +300,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_toggler"),
   recipe = {
     {PLATE, CABLE, PLATE},
@@ -312,7 +309,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_not_gate"),
   recipe = {
     {PLATE, CIRC,  PLATE},
@@ -321,7 +318,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_logic_gate"),
   recipe = {
     {PLATE, CIRC,  PLATE},
@@ -330,7 +327,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_ext_reader"),
   recipe = {
     {PLATE,            CIRC,  PLATE},
@@ -339,7 +336,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_item_counter"),
   recipe = {
     {PLATE, "",    PLATE},
@@ -348,7 +345,7 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
+logistica.register_craft({
   output = L("signal_timer"),
   recipe = {
     {PLATE, itemstrings.steel, PLATE},
@@ -357,9 +354,18 @@ minetest.register_craft({
   }
 })
 
+logistica.register_craft({
+  output = L("disassembler"),
+  recipe = {
+    {"",              CABLE,                ""},
+    {L("photonizer"), L("silverin_block"),  L("photonizer_reversed")},
+    {"",              CABLE,                ""},
+  }
+})
+
 if minetest.get_modpath("mesecons") then
   local WIRE = "mesecons:wire_00000000_off"
-  minetest.register_craft({
+  logistica.register_craft({
     output = L("mesecon_signaler"),
     recipe = {
       {PLATE, WIRE,  PLATE},
@@ -367,7 +373,7 @@ if minetest.get_modpath("mesecons") then
       {PLATE, "",    PLATE},
     }
   })
-  minetest.register_craft({
+  logistica.register_craft({
     output = L("mesecon_sender"),
     recipe = {
       {PLATE, "",    PLATE},

@@ -1,5 +1,7 @@
 local path = logistica.MODPATH.."/api"
 
+dofile(path.."/disassembler.lua")
+dofile(path.."/disassembler_machine.lua")
 dofile(path.."/cables.lua")
 dofile(path.."/cables_toggleable.lua")
 dofile(path.."/cable_insulating.lua")

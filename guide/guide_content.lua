@@ -27,6 +27,7 @@ local PAGE_VACCUUM_CHEST = "mvacchs"
 local PAGE_LAVA_FUELER = "mlvfuel"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
+local PAGE_DISASSEMBLER = "mdisasm"
 local PAGE_WIRELESS_TRANSMITTER = "wrltrn"
 local PAGE_WIRELESS_RECEIVER = "wrlrec"
 local PAGE_WIRELESS_ANTENNA = "wrlant"
@@ -109,6 +110,7 @@ local RECIPE_VACCUUMC = getrec({L("vaccuum_chest")})
 local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
+local RECIPE_DISASSEMBLER = getrec({L("disassembler")})
 local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
 local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
@@ -267,6 +269,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
     { name = S("  Trashcan"), id = PAGE_TRASHCAN },
+    { name = S("  Machine Disassembler"), id = PAGE_DISASSEMBLER },
     { name = header(S("Machine Upgrades:"))},
     { name = S("  Mass Storage Upgrades"), id = PAGE_MASS_STORAGE_UPGR },
     { name = S("  Cobble Generator Upgrades"), id = PAGE_COBBLE_GENERATOR_UPGR },
@@ -499,6 +502,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_TRASHCAN,
       recipeLinks = RECIPE_LINKS,
       description = desc.trashcan,
+    },
+
+    [PAGE_DISASSEMBLER] = {
+      title = S("Logistica Machine Disassembler"),
+      recipes = RECIPE_DISASSEMBLER,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.disassembler,
     },
 
     -- node upgrades

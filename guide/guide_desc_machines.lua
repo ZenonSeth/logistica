@@ -293,6 +293,19 @@ Alternatively, you can also connect the Trashcan to a network. When connected it
 If you only want to delete specific items from the network (instead of all excess items) you can configure that with the filter slot - the the Trashcan will delete only items configured in its filter list.
 ]])
 
+g.disassembler = S([[
+The Logistica Machine Disassembler breaks down Logistica machines back into their base ingredients. It does not connect to a network, but its input and output slots are accessible by Network Importers and Request Inserters.
+
+To use it, place a Logistica machine into the input slot. The preview grid on the right shows the ingredients you will receive. Press Disassemble to recover them into the output slots below.
+
+A few things to keep in mind:
+- Only Logistica machines can be placed in the input slot. Other items are rejected.
+- If the output slots are full, the Disassemble button does nothing - clear some space first.
+- Ingredients are calculated per output item: if a recipe produces 3 of something, disassembling 1 of it returns one third of the ingredients (rounded down).
+- Items with multiple crafting recipes will always use the base recipe when calculating what to return.
+- Can be automated: a Request Inserter can feed machines into the input slot, and a Network Importer can collect the recovered ingredients.
+]])
+
 g.wireless_transmitter = S([[
 The Wireless Transmitter is a node that allows a network to be extended wirelessly, by connecting to a Wireless Receiver. It isn't necessary to use a Wireless Access Pad, as that synchronizes to an Access Point instead.
 

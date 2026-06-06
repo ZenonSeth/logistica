@@ -25,6 +25,16 @@ logistica.register_autocrafter(S("Autocrafter"), "autocrafter", {
 })
 
 --------------------------------
+-- Disassembler
+--------------------------------
+
+logistica.register_disassembler(S("Logistica Machine Disassembler"), "disassembler", {
+  "logistica_lava_furnace_side.png",
+  "logistica_lava_furnace_side.png",
+  "logistica_disassembler_side.png",
+})
+
+--------------------------------
 -- Bucket Emptier
 --------------------------------
 
