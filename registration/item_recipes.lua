@@ -142,6 +142,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("signal_relay 4"),
+  recipe = {
+    {SILV_SLICE},
+    {itemstrings.fragment},
+    {SILV_SLICE},
+  }
+})
+
+minetest.register_craft({
   output = L("wireless_antenna 2"),
   recipe = {
     {"", L("silverin_plate"),   ""},

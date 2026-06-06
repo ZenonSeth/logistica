@@ -257,3 +257,91 @@ minetest.register_craft({
     {L("wireless_antenna"),    L("silverin_circuit"), L("wireless_antenna")},
   }
 })
+
+local PLATE  = L("silverin_plate")
+local RELAY  = L("signal_relay")
+local CIRC   = L("silverin_circuit")
+local CABLE  = L("optic_cable")
+
+minetest.register_craft({
+  output = L("signal_switch"),
+  recipe = {
+    {PLATE, itemstrings.steel, PLATE},
+    {"",    RELAY,             ""},
+    {PLATE, "",                PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_lamp_white"),
+  recipe = {
+    {PLATE, itemstrings.glass, PLATE},
+    {"",    RELAY,             ""},
+    {PLATE, "",                PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_lamp_2c_br"),
+  recipe = {
+    {PLATE, itemstrings.glass, PLATE},
+    {"",    RELAY,             ""},
+    {PLATE, itemstrings.glass, PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_toggler"),
+  recipe = {
+    {PLATE, CABLE, PLATE},
+    {"",    RELAY, ""},
+    {PLATE, "",    PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_not_gate"),
+  recipe = {
+    {PLATE, CIRC,  PLATE},
+    {"",    RELAY, ""},
+    {PLATE, "",    PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_logic_gate"),
+  recipe = {
+    {PLATE, CIRC,  PLATE},
+    {"",    RELAY, ""},
+    {PLATE, CIRC,  PLATE},
+  }
+})
+
+minetest.register_craft({
+  output = L("signal_item_counter"),
+  recipe = {
+    {PLATE, "",    PLATE},
+    {CIRC,  RELAY, CIRC},
+    {PLATE, "",    PLATE},
+  }
+})
+
+if minetest.get_modpath("mesecons") then
+  local WIRE = "mesecons:wire_00000000_off"
+  minetest.register_craft({
+    output = L("mesecon_signaler"),
+    recipe = {
+      {PLATE, WIRE,  PLATE},
+      {"",    RELAY, ""},
+      {PLATE, "",    PLATE},
+    }
+  })
+  minetest.register_craft({
+    output = L("mesecon_sender"),
+    recipe = {
+      {PLATE, "",    PLATE},
+      {"",    RELAY, ""},
+      {PLATE, WIRE,  PLATE},
+    }
+  })
+end

@@ -50,6 +50,7 @@ local PAGE_WIRELESS_CRYSTAL = "iwrcry"
 local PAGE_SERVER_SETTINGS = "servset"
 
 local PAGE_SIGNALS_OVERVIEW       = "sigover"
+local PAGE_SIGNAL_RELAY           = "sigrelay"
 local PAGE_SIGNAL_SWITCH          = "sigsw"
 local PAGE_SIGNAL_LAMP            = "siglmp"
 local PAGE_SIGNAL_LAMP_2C         = "siglmp2c"
@@ -124,6 +125,17 @@ local RECIPE_SILVCIRC = getlavarec(L("silverin_circuit"))
 local RECIPE_SILVMIRR = getlavarec(L("silverin_mirror_box"))
 local RECIPE_WRLSCRYS = getlavarec(L("wireless_crystal"))
 
+local RECIPE_SIG_RELAY   = getrec({L("signal_relay")})
+local RECIPE_SIG_SWITCH  = getrec({L("signal_switch")})
+local RECIPE_SIG_LAMP    = getrec({L("signal_lamp_white")})
+local RECIPE_SIG_LAMP2C  = getrec({L("signal_lamp_2c_br")})
+local RECIPE_SIG_TOGGLER = getrec({L("signal_toggler")})
+local RECIPE_SIG_NOT     = getrec({L("signal_not_gate")})
+local RECIPE_SIG_LOGIC   = getrec({L("signal_logic_gate")})
+local RECIPE_SIG_MESR    = getrec({L("mesecon_signaler")})
+local RECIPE_SIG_MESS    = getrec({L("mesecon_sender")})
+local RECIPE_SIG_COUNTER = getrec({L("signal_item_counter")})
+
 local RECIPE_LINKS = {
   -- items
   [L("lava_furnace")] = PAGE_START,
@@ -149,6 +161,7 @@ local RECIPE_LINKS = {
   [L("wireless_antenna")] = PAGE_WIRELESS_ANTENNA,
 
   -- signals
+  [L("signal_relay")]        = PAGE_SIGNAL_RELAY,
   [L("signal_switch")]       = PAGE_SIGNAL_SWITCH,
   [L("signal_lamp_white")]   = PAGE_SIGNAL_LAMP,
   [L("signal_lamp_2c_br")]   = PAGE_SIGNAL_LAMP_2C,
@@ -256,6 +269,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Wave Function Maintainer"), id = PAGE_WAVE_FUN_MAIN },
     { name = S("  Wireless Crystal"), id = PAGE_WIRELESS_CRYSTAL },
     { name = S("  Wireless Antenna"), id = PAGE_WIRELESS_ANTENNA },
+    { name = S("  Signal Relay"), id = PAGE_SIGNAL_RELAY },
     { name = header(S("Misc:"))},
     { name = S("  Server Settings"), id = PAGE_SERVER_SETTINGS },
   },
@@ -589,56 +603,72 @@ logistica.GuideApi.register(GUIDE_NAME, {
       description = desc.signals_overview,
     },
 
+    [PAGE_SIGNAL_RELAY] = {
+      title = S("Signal Relay"),
+      recipes = RECIPE_SIG_RELAY,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_relay,
+    },
+
     [PAGE_SIGNAL_SWITCH] = {
       title = S("Signal Switch"),
+      recipes = RECIPE_SIG_SWITCH,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_switch,
     },
 
     [PAGE_SIGNAL_LAMP] = {
       title = S("Signal Lamp"),
+      recipes = RECIPE_SIG_LAMP,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_lamp,
     },
 
     [PAGE_SIGNAL_LAMP_2C] = {
       title = S("Signal Lamp (2-Color)"),
+      recipes = RECIPE_SIG_LAMP2C,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_lamp_2c,
     },
 
     [PAGE_SIGNAL_TOGGLER] = {
       title = S("Signal Toggler"),
+      recipes = RECIPE_SIG_TOGGLER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_toggler,
     },
 
     [PAGE_SIGNAL_NOT_GATE] = {
       title = S("Signal NOT Gate"),
+      recipes = RECIPE_SIG_NOT,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_not_gate,
     },
 
     [PAGE_SIGNAL_LOGIC_GATE] = {
       title = S("Signal Logic Gate"),
+      recipes = RECIPE_SIG_LOGIC,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_logic_gate,
     },
 
     [PAGE_MESECON_SIG_RECEIVER] = {
       title = S("Mesecon Signal Receiver"),
+      recipes = RECIPE_SIG_MESR,
       recipeLinks = RECIPE_LINKS,
       description = desc.mesecon_signal_receiver,
     },
 
     [PAGE_MESECON_SIG_SENDER] = {
       title = S("Mesecon Signal Sender"),
+      recipes = RECIPE_SIG_MESS,
       recipeLinks = RECIPE_LINKS,
       description = desc.mesecon_signal_sender,
     },
 
     [PAGE_SIGNAL_ITEM_COUNTER] = {
       title = S("Signal Item Count Sender"),
+      recipes = RECIPE_SIG_COUNTER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_item_counter,
     },

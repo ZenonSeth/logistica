@@ -70,6 +70,12 @@ items[L("wireless_antenna")] = {
   stack_max = 8,
 }
 
+items[L("signal_relay")] = {
+  description = S("Signal Relay"),
+  inventory_image = "logistica_signal_relay.png",
+  stack_max = logistica.stack_max,
+}
+
 for name, info in pairs(items) do
   minetest.register_craftitem(name, {
     description = info.description,

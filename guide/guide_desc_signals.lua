@@ -2,6 +2,12 @@ local S = logistica.TRANSLATOR
 
 local g = logistica.Guide.Desc
 
+g.signal_relay = S([[
+The Signal Relay is a crafting component used in all signal machine recipes.
+
+It is made from two Silverin Slices sandwiching a Mese Crystal Fragment, and yields 4 relays per craft.
+]])
+
 g.signals_overview = S([[
 Signals are a named on/off messaging system that works within a single Logistica network.
 
