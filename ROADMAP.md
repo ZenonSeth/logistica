@@ -34,7 +34,6 @@
 - Recycler machine (un-crafts logistica machines) -- DONE (Logistica Machine Disassembler: logistica:disassembler, api/disassembler.lua + api/disassembler_machine.lua)
 - Lava Furnace
   - Fix shift+click on slots -- DONE
-- Difficult to make Cooking Crafting Supplier -- (Maybe)
 - Farming node -- DONE (logistica:farming_supplier; api/farming_supplier.lua + logic/farming_supplier.lua; Sprinkler Upgrade item)
 - Tree cutting node -- DONE (logistica:woodcutter; api/woodcutter.lua + logic/woodcutter.lua; Leafcutter Upgrade item)
 - Allow configuration of distance of pickup for vacuum chest -- DONE (+/- in formspec, range 1-3)
@@ -58,13 +57,8 @@
 
 ## Low priority
 - Add compatibility with on_move_node - used by mods that teleport nodes
-- Demander modes: AND/OR 
-  - Mode AND: supply target with "item 1 AND item 2..."
-  - Mode OR: supply target with "item 1" OR (if not available) "item 2"
-- Add tabs to Access Point GUI, split and extend funcionality
 
 ## Other changes to consider
-- Mesecons compat
 - Direct pipeworks compatibility
 - Direct tubelib compatibility
 - API improvements
