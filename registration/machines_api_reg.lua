@@ -585,6 +585,23 @@ logistica.register_wireless_transmitter("wireless_transmitter", {
 })
 
 --------------------------------
+-- Item Monitor
+--------------------------------
+
+logistica.register_item_monitor(
+  S("Item Monitor"),
+  "item_monitor",
+  {
+      "logistica_item_monitor_top.png",
+      "logistica_access_point_bottom.png",
+      "logistica_item_monitor_side.png^[transformFX",
+      "logistica_item_monitor_side.png",
+      "logistica_item_monitor_back.png",
+      "logistica_item_monitor_front.png",
+  }
+)
+
+--------------------------------
 -- Signal Item Count Sender
 --------------------------------
 

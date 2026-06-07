@@ -47,7 +47,7 @@
   - Add tabs to access point -- DONE (Items tab + Storage Management tab)
   - Add advanced autocrafting
   - Make allocating mass storage slots possible from access point -- DONE (Storage Management tab)
-- Item monitoring station
+- Item monitoring station -- DONE (logistica:item_monitor; logic/item_monitor.lua + api/item_monitor.lua; tracks up to 8 items, configurable interval, rolling graph with per-point tooltips, monitor-stand nodebox, custom textures)
 - Digilines compat
 - On-demand node-breaker
 - On-demand node cracker

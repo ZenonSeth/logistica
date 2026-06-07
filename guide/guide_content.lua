@@ -32,6 +32,7 @@ local PAGE_LAVA_FUELER = "mlvfuel"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
 local PAGE_DISASSEMBLER = "mdisasm"
+local PAGE_ITEM_MONITOR = "mitmoni"
 local PAGE_WIRELESS_TRANSMITTER = "wrltrn"
 local PAGE_WIRELESS_RECEIVER = "wrlrec"
 local PAGE_WIRELESS_ANTENNA = "wrlant"
@@ -119,6 +120,7 @@ local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
 local RECIPE_DISASSEMBLER = getrec({L("disassembler")})
+local RECIPE_ITEM_MONITOR = getrec({L("item_monitor")})
 local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
 local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
@@ -280,6 +282,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
     { name = S("  Trashcan"), id = PAGE_TRASHCAN },
     { name = S("  Machine Disassembler"), id = PAGE_DISASSEMBLER },
+    { name = S("  Item Monitor"), id = PAGE_ITEM_MONITOR },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -555,6 +558,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_DISASSEMBLER,
       recipeLinks = RECIPE_LINKS,
       description = desc.disassembler,
+    },
+
+    [PAGE_ITEM_MONITOR] = {
+      title = S("Item Monitor"),
+      recipes = RECIPE_ITEM_MONITOR,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.item_monitor,
     },
 
     -- node upgrades

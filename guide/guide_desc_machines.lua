@@ -366,6 +366,18 @@ A few things to keep in mind:
 - Can be automated: a Request Inserter can feed machines into the input slot, and a Network Importer can collect the recovered ingredients.
 ]])
 
+g.item_monitor = S([[
+The Item Monitor is a network-connected machine that records item counts over time and displays them as a graph.
+
+Up to 8 items can be tracked simultaneously, each shown in a distinct color. Drag any item into a filter slot to start tracking it - the item is used only as a type identifier and is not consumed. Removing an item from a slot clears that slot's recorded history.
+
+The recording interval can be set to 5 seconds, 1 minute, 10 minutes, or 1 hour using the button in the formspec. Up to 60 data points are kept per item; older readings are discarded as new ones are recorded.
+
+The graph automatically scales its Y axis to the range of the recorded data, so small fluctuations are visible even when counts are large. The current min and max values are shown on the left edge of the graph.
+
+Use the Refresh button to update the graph display with the latest data, or Clear History to wipe all recorded data and start fresh.
+]])
+
 g.wireless_transmitter = S([[
 The Wireless Transmitter is a node that allows a network to be extended wirelessly, by connecting to a Wireless Receiver. It isn't necessary to use a Wireless Access Pad, as that synchronizes to an Access Point instead.
 
