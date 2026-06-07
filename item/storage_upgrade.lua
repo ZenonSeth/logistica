@@ -29,6 +29,12 @@ items["logistica:sprinkler_upgrade"] = {
   stack_max = 1,
 }
 
+items["logistica:autocrafting_upgrade"] = {
+  description = S("Autocrafting Upgrade\nInsert into an Access Point to enable autocrafting"),
+  inventory_image = "logistica_autocrafting_upgrade.png",
+  stack_max = 1,
+}
+
 items["logistica:storage_upgrade_multiplier"] = {
   description = S("Mass Storage Capacity Multiplier\nMultiplies Mass Storage Slot Capacity by 16\nOnly 1 can be inserted per Mass Storage"),
   storage_multiplier = 16,

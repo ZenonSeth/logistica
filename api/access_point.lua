@@ -4,6 +4,7 @@ local function after_place_access_point(pos, placer, itemstack, numSlots, numUpg
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
+  meta:get_inventory():set_size(logistica.AP_UPGRADE_LIST, 1)
   logistica.access_point_after_place(pos, meta)
   logistica.on_access_point_change(pos)
 end
@@ -19,7 +20,24 @@ local function after_dig_access_point(pos, oldnode, oldmeta, digger)
 end
 
 local function can_dig_access_point(pos, player)
-  return true
+  return minetest.get_meta(pos):get_inventory():is_empty(logistica.AP_UPGRADE_LIST)
+end
+
+local function allow_access_point_inv_put(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if listname ~= logistica.AP_UPGRADE_LIST then return 0 end
+  if stack:get_name() ~= logistica.AP_UPGRADE_ITEM then return 0 end
+  if not minetest.get_meta(pos):get_inventory():get_stack(listname, index):is_empty() then return 0 end
+  return 1
+end
+
+local function allow_access_point_inv_take(pos, listname, index, stack, player)
+  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  return stack:get_count()
+end
+
+local function allow_access_point_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+  return 0
 end
 
 ----------------------------------------------------------------
@@ -69,12 +87,9 @@ function logistica.register_access_point(desc, name, tiles)
     after_place_node = after_place_access_point,
     after_dig_node = after_dig_access_point,
     on_rightclick = on_access_point_rightclick,
-    -- on_metadata_inventory_move = on_access_point_inv_move,
-    -- on_metadata_inventory_put = on_access_point_inv_put,
-    -- on_metadata_inventory_take = on_access_point_inv_take,
-    -- allow_metadata_inventory_put = allow_access_point_inv_put,
-    -- allow_metadata_inventory_take = allow_access_point_inv_take,
-    -- allow_metadata_inventory_move = allow_access_point_inv_move,
+    allow_metadata_inventory_put  = allow_access_point_inv_put,
+    allow_metadata_inventory_take = allow_access_point_inv_take,
+    allow_metadata_inventory_move = allow_access_point_inv_move,
     logistica = {},
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10

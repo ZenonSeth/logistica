@@ -102,10 +102,7 @@ local function on_wireless_pad_secondary(itemstack, placer, pointed_thing)
     return
   end
 
-  local nodeDef = minetest.registered_nodes[node.name]
-  nodeDef.on_rightclick(targetPos, node, placer, itemstack, pointed_thing)
-
-  -- logistica.access_point_on_rightclick(targetPos, node, placer, itemstack, pointed_thing)
+  logistica.access_point_open_from_wap(targetPos, placer:get_player_name())
 end
 
 -- registration

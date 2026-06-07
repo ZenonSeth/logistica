@@ -63,6 +63,28 @@ local STOR_PER_PAGE = 2
 local STOR_BLOCK_H  = 3.0   -- vertical space per mass-storage block
 local STOR_START_Y  = 1.75  -- y where first block begins
 
+local AC_SEARCH_FIELD  = "ac_srch"
+local AC_SEARCH_BTN    = "ac_srch_go"
+local AC_PREV_RES_BTN  = "ac_res_p"
+local AC_NEXT_RES_BTN  = "ac_res_n"
+local AC_RESULT_BTN    = "ac_res_"
+local AC_PREV_RCP_BTN  = "ac_rcp_p"
+local AC_NEXT_RCP_BTN  = "ac_rcp_n"
+local AC_RECIPE_BTN    = "ac_rcp_"
+local AC_CRAFT_BTN     = "ac_craft1"
+local AC_CRAFT10_BTN   = "ac_craft10"
+local AC_BACK_BTN      = "ac_bk"
+local AC_FWD_BTN       = "ac_fw"
+local AC_USE_PLR_INV   = "ac_plrinv"
+
+local AC_RESULTS_PER_PAGE = 5
+local AC_SLOT_SIZE    = 1.0
+local AC_SLOT_STEP    = 1.1
+local AC_GRID_X       = 6.6
+local AC_GRID_Y       = 1.5
+local AC_COLOR_HAVE   = "#2255EE88"
+local AC_COLOR_MISS   = "#EE333388"
+
 local detachedInventories = {}
 local accessPointForms = {}
 -- per-player detached inventories mirroring the visible mass-storage filter slots
@@ -343,6 +365,183 @@ local function get_storage_tab_content(pos, playerName)
 end
 
 ----------------------------------------------------------------
+-- autocrafting tab
+----------------------------------------------------------------
+
+local function ac_navigate_to(data, name, recipe_idx)
+  local hist = data.ac_history
+  while #hist > data.ac_hist_pos do hist[#hist] = nil end
+  hist[#hist + 1] = { name = name, recipe_idx = recipe_idx or 1 }
+  data.ac_hist_pos = #hist
+  data.ac_error = nil
+end
+
+local function ac_handle_craft(pos, data, player, count)
+  local hist_pos = data.ac_hist_pos or 0
+  local current  = hist_pos > 0 and data.ac_history[hist_pos] or nil
+  if not current then data.ac_error = S("No item selected"); return end
+  local entry = logistica.ac_get_entry(current.name)
+  if not entry or #entry.recipes == 0 then data.ac_error = S("No craftable recipe"); return end
+  local recipe_idx = logistica.clamp(current.recipe_idx or 1, 1, #entry.recipes)
+  local recipe = entry.recipes[recipe_idx]
+  local networkId = logistica.get_network_id_or_nil(pos)
+  if not networkId then data.ac_error = S("No network connected"); return end
+  local crafted, err = logistica.ac_craft(recipe, networkId, player, count, data.ac_use_player_inv)
+  if err then
+    data.ac_error = err
+  elseif crafted == 0 then
+    data.ac_error = S("Not enough materials")
+  else
+    data.ac_error = S("Crafted: ")..crafted
+  end
+end
+
+local function get_autocrafting_tab_content(pos, playerName)
+  local data     = accessPointForms[playerName]
+  local posStr   = pos.x..","..pos.y..","..pos.z
+  local history  = data.ac_history  or {}
+  local hist_pos = data.ac_hist_pos or 0
+  local current  = hist_pos > 0 and history[hist_pos] or nil
+
+  local out = {}
+  local function add(s) out[#out + 1] = s end
+
+  -- upgrade slot: hidden when accessed via Wireless Access Pad
+  if not data.from_wap then
+    add("label[12.8,0.72;"..S("Upgrade:").." ]")
+    add("list[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST..";13.5,0.9;1,1;0]")
+    add("listring[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST.."]")
+    add("listring[current_player;main]")
+  end
+
+  -- vertical separator between result list and recipe panel
+  add("box[5.85,0.8;0.05,7.5;#FFFFFF25]")
+
+  -- left panel: search results
+  local search_term = data.ac_search  or ""
+  local results     = data.ac_results or {}
+  local res_page    = data.ac_res_page or 1
+  local total_pages = math.max(1, math.ceil(#results / AC_RESULTS_PER_PAGE))
+  res_page = logistica.clamp(res_page, 1, total_pages)
+  data.ac_res_page = res_page
+
+  for i = 1, AC_RESULTS_PER_PAGE do
+    local idx   = (res_page - 1) * AC_RESULTS_PER_PAGE + i
+    local entry = results[idx]
+    local y     = 1.0 + (i - 1) * 1.1
+    if entry then
+      add("item_image[0.2,"..y..";0.9,0.9;"..entry.name.."]")
+      add("button[1.2,"..y..";4.3,0.9;"..AC_RESULT_BTN..i..";"..
+        minetest.formspec_escape(entry.desc).."]")
+    end
+  end
+
+  if #results == 0 and #search_term < 2 then
+    add("label[0.2,6.6;"..S("Enter 2+ characters to search").."]")
+  elseif #results == 0 then
+    add("label[0.2,6.6;"..S("No results found").."]")
+  else
+    add("image_button[0.2,6.5;0.65,0.65;logistica_icon_prev.png;"..
+      AC_PREV_RES_BTN..";;false;false;]")
+    add("label[1.0,6.72;"..S("Page").." "..res_page.." / "..total_pages.."]")
+    add("image_button[3.0,6.5;0.65,0.65;logistica_icon_next.png;"..
+      AC_NEXT_RES_BTN..";;false;false;]")
+  end
+
+  add("field[0.2,7.45;4.3,0.65;"..AC_SEARCH_FIELD..";;"..(minetest.formspec_escape(search_term)).."]")
+  add("field_close_on_enter["..AC_SEARCH_FIELD..";false]")
+  add("image_button[4.6,7.45;0.65,0.65;logistica_icon_search.png;"..
+    AC_SEARCH_BTN..";;false;false;]")
+  add("tooltip["..AC_SEARCH_BTN..";"..S("Search (min. 2 characters)").."]")
+
+  -- right panel: gated behind upgrade
+  if not logistica.ac_has_upgrade(pos) then
+    add("label[7.3,4.0;"..S("Insert Autocrafting Upgrade to enable").."]")
+    return table.concat(out)
+  end
+
+  if not current then
+    add("label[7.0,4.0;"..S("Click an item to view its recipe").."]")
+  else
+    local entry = logistica.ac_get_entry(current.name)
+    if not entry or #entry.recipes == 0 then
+      add("label[6.6,0.95;"..minetest.formspec_escape(current.name).."]")
+      add("label[7.0,3.5;"..S("No craftable recipe found").."]")
+    else
+      local recipe_idx = logistica.clamp(current.recipe_idx or 1, 1, #entry.recipes)
+      current.recipe_idx = recipe_idx
+      local recipe     = entry.recipes[recipe_idx]
+      local network    = logistica.get_network_or_nil(pos)
+      local use_pi     = data.ac_use_player_inv
+      local cur_player = use_pi and minetest.get_player_by_name(playerName) or nil
+
+      add("label[6.6,0.95;"..minetest.formspec_escape(entry.desc).."]")
+
+      -- 3x3 recipe grid: colored box behind each occupied slot
+      for i = 1, 9 do
+        local col      = (i - 1) % 3
+        local row      = math.floor((i - 1) / 3)
+        local x        = AC_GRID_X + col * AC_SLOT_STEP
+        local y        = AC_GRID_Y + row * AC_SLOT_STEP
+        local item_str = recipe.raw_items[i]
+        if item_str and item_str ~= "" then
+          local item_name  = ItemStack(item_str):get_name()
+          local total_need = recipe.items[item_name] or 1
+          local have = network and
+            logistica.count_items_in_network(item_name, network, true) or 0
+          if use_pi and cur_player then
+            have = have + logistica.ac_count_in_player_inv(cur_player, item_name)
+          end
+          local color = (have >= total_need) and AC_COLOR_HAVE or AC_COLOR_MISS
+          add(string.format("box[%.2f,%.2f;%.2f,%.2f;%s]",
+            x - 0.06, y - 0.06, AC_SLOT_SIZE + 0.12, AC_SLOT_SIZE + 0.12, color))
+          add(string.format("item_image_button[%.2f,%.2f;%.2f,%.2f;%s;%s%d;]",
+            x, y, AC_SLOT_SIZE, AC_SLOT_SIZE, item_str, AC_RECIPE_BTN, i))
+        end
+      end
+
+      -- recipe pagination
+      add("image_button[6.6,5.05;0.65,0.65;logistica_icon_prev.png;"..
+        AC_PREV_RCP_BTN..";;false;false;]")
+      add("label[7.35,5.23;"..S("Recipe").." "..recipe_idx.." / "..(#entry.recipes).."]")
+      add("image_button[9.15,5.05;0.65,0.65;logistica_icon_next.png;"..
+        AC_NEXT_RCP_BTN..";;false;false;]")
+
+      if network then
+        local max_n = logistica.ac_get_max_craftable(recipe, network, cur_player, use_pi)
+        add("label[10.2,5.23;"..S("Can craft: ")..max_n.."]")
+      end
+    end
+  end
+
+  -- error / status line (shown below recipe area)
+  local err = data.ac_error or ""
+  if err ~= "" then
+    add("label[6.6,5.9;"..minetest.formspec_escape(err).."]")
+  end
+
+  -- player inventory checkbox + craft + history navigation buttons
+  local use_pi_str = data.ac_use_player_inv and "true" or "false"
+  add("checkbox[6.6,6.85;"..AC_USE_PLR_INV..";"..
+    S("Also use player inventory")..";"..use_pi_str.."]")
+  add("button[6.6,7.45;1.8,0.65;"..AC_CRAFT_BTN..";"..S("Craft").."]")
+  add("button[8.5,7.45;1.0,0.65;"..AC_CRAFT10_BTN..";"..S("x10").."]")
+
+  if hist_pos > 1 then
+    add("image_button[10.0,7.45;0.65,0.65;logistica_icon_prev.png;"..
+      AC_BACK_BTN..";;false;false;]")
+    add("tooltip["..AC_BACK_BTN..";"..S("Back").."]")
+  end
+  if hist_pos < #history then
+    add("image_button[10.75,7.45;0.65,0.65;logistica_icon_next.png;"..
+      AC_FWD_BTN..";;false;false;]")
+    add("tooltip["..AC_FWD_BTN..";"..S("Forward").."]")
+  end
+
+  return table.concat(out)
+end
+
+----------------------------------------------------------------
 -- main formspec builder
 ----------------------------------------------------------------
 
@@ -353,11 +552,13 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
   local currentNetwork = logistica.get_network_name_or_nil(pos) or S("<NONE>")
 
   local tabHeader =
-    "tabheader[0,0;"..TAB_BTN..";"..S(" Main ")..","..S("Mass Storage")..";"..tab..";false;true]"
+    "tabheader[0,0;"..TAB_BTN..";"..S(" Main ")..","..S("Mass Storage")..","..S("Easy Crafting")..";"..tab..";false;true]"
 
   local topContent
   if tab == 2 then
     topContent = get_storage_tab_content(pos, playerName)
+  elseif tab == 3 then
+    topContent = get_autocrafting_tab_content(pos, playerName)
   else
     local filterHighImg = logistica.access_point_get_filter_highlight_images(meta, IMG_HIGHLGIHT, IMG_BLANK)
     local sortHighImg = logistica.access_point_get_sort_highlight_images(meta, IMG_HIGHLGIHT, IMG_BLANK)
@@ -406,12 +607,20 @@ local function show_access_point_formspec(pos, playerName, optError)
   -- preserve tab and storage page across re-shows
   local prev = accessPointForms[playerName] or {}
   accessPointForms[playerName] = {
-    position       = pos,
-    invName        = invName,
+    position          = pos,
+    invName           = invName,
     storFilterInvName = get_or_create_storage_filter_inv(playerName),
-    tab            = prev.tab or 1,
-    storPage       = prev.storPage or 1,
-    storMapping    = prev.storMapping or {},
+    tab               = prev.tab or 1,
+    storPage          = prev.storPage or 1,
+    storMapping       = prev.storMapping or {},
+    ac_search         = prev.ac_search  or "",
+    ac_results        = prev.ac_results or {},
+    ac_res_page       = prev.ac_res_page or 1,
+    ac_history        = prev.ac_history or {},
+    ac_hist_pos       = prev.ac_hist_pos or 0,
+    ac_error          = prev.ac_error,
+    ac_use_player_inv = prev.ac_use_player_inv or false,
+    from_wap          = prev.from_wap or false,
   }
 
   logistica.access_point_refresh_fake_inv(pos, invName, INV_FAKE, FAKE_INV_SIZE, playerName)
@@ -497,12 +706,108 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     logistica.access_point_set_sort_method(pos, playerName, 4)
   elseif fields[CLEAR_BTN] then
     logistica.access_point_on_search_clear(pos)
-  elseif fields[SEARCH_BTN] or fields.key_enter_field then
+  elseif fields[SEARCH_BTN] or fields.key_enter_field == SEARCH_FIELD then
     logistica.access_point_on_search_change(pos, fields[SEARCH_FIELD])
   elseif fields[LIQUID_PREV_BTN] then
     if not logistica.access_point_change_liquid(minetest.get_meta(pos),-1, playerName) then return true end
   elseif fields[LIQUID_NEXT_BTN] then
     if not logistica.access_point_change_liquid(minetest.get_meta(pos), 1, playerName) then return true end
+  else
+    -- autocrafting tab handlers
+    local data = accessPointForms[playerName]
+
+    local res_clicked = nil
+    for i = 1, AC_RESULTS_PER_PAGE do
+      if fields[AC_RESULT_BTN..i] then res_clicked = i; break end
+    end
+
+    local rcp_clicked = nil
+    for i = 1, 9 do
+      if fields[AC_RECIPE_BTN..i] then rcp_clicked = i; break end
+    end
+
+    if fields[AC_SEARCH_BTN] or fields.key_enter_field == AC_SEARCH_FIELD then
+      local term = fields[AC_SEARCH_FIELD] or ""
+      data.ac_search  = term
+      data.ac_results = #term >= 2 and logistica.ac_search(term) or {}
+      data.ac_res_page = 1
+      data.ac_error    = nil
+
+    elseif fields[AC_PREV_RES_BTN] then
+      local total = math.max(1, math.ceil(#(data.ac_results) / AC_RESULTS_PER_PAGE))
+      data.ac_res_page = (((data.ac_res_page or 1) - 2) % total) + 1
+      data.ac_error = nil
+
+    elseif fields[AC_NEXT_RES_BTN] then
+      local total = math.max(1, math.ceil(#(data.ac_results) / AC_RESULTS_PER_PAGE))
+      data.ac_res_page = ((data.ac_res_page or 1) % total) + 1
+      data.ac_error = nil
+
+    elseif res_clicked then
+      local idx   = ((data.ac_res_page or 1) - 1) * AC_RESULTS_PER_PAGE + res_clicked
+      local entry = (data.ac_results or {})[idx]
+      if entry then ac_navigate_to(data, entry.name, 1) end
+
+    elseif fields[AC_PREV_RCP_BTN] then
+      local cur = data.ac_history[data.ac_hist_pos]
+      if cur then
+        local e = logistica.ac_get_entry(cur.name)
+        if e and #e.recipes > 0 then
+          cur.recipe_idx = ((cur.recipe_idx - 2) % #e.recipes) + 1
+        end
+      end
+      data.ac_error = nil
+
+    elseif fields[AC_NEXT_RCP_BTN] then
+      local cur = data.ac_history[data.ac_hist_pos]
+      if cur then
+        local e = logistica.ac_get_entry(cur.name)
+        if e and #e.recipes > 0 then
+          cur.recipe_idx = (cur.recipe_idx % #e.recipes) + 1
+        end
+      end
+      data.ac_error = nil
+
+    elseif rcp_clicked then
+      local cur = data.ac_history[data.ac_hist_pos]
+      if cur then
+        local e = logistica.ac_get_entry(cur.name)
+        if e then
+          local recipe = e.recipes[cur.recipe_idx]
+          if recipe then
+            local item_str = recipe.raw_items[rcp_clicked]
+            if item_str and item_str ~= "" then
+              local item_name = ItemStack(item_str):get_name()
+              if logistica.ac_get_entry(item_name) then
+                ac_navigate_to(data, item_name, 1)
+              end
+            end
+          end
+        end
+      end
+
+    elseif fields[AC_BACK_BTN] then
+      if (data.ac_hist_pos or 0) > 1 then
+        data.ac_hist_pos = data.ac_hist_pos - 1
+        data.ac_error = nil
+      end
+
+    elseif fields[AC_FWD_BTN] then
+      if (data.ac_hist_pos or 0) < #(data.ac_history or {}) then
+        data.ac_hist_pos = data.ac_hist_pos + 1
+        data.ac_error = nil
+      end
+
+    elseif fields[AC_USE_PLR_INV] then
+      data.ac_use_player_inv = fields[AC_USE_PLR_INV] == "true"
+      data.ac_error = nil
+
+    elseif fields[AC_CRAFT_BTN] then
+      ac_handle_craft(pos, data, player, 1)
+
+    elseif fields[AC_CRAFT10_BTN] then
+      ac_handle_craft(pos, data, player, 10)
+    end
   end
   show_access_point_formspec(pos, playerName)
   return true
@@ -647,7 +952,16 @@ end
 
 function logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
   logistica.try_to_wake_up_network(pos)
-  show_access_point_formspec(pos, clicker:get_player_name())
+  local pname = clicker:get_player_name()
+  if accessPointForms[pname] then accessPointForms[pname].from_wap = false end
+  show_access_point_formspec(pos, pname)
+end
+
+function logistica.access_point_open_from_wap(pos, playerName)
+  logistica.try_to_wake_up_network(pos)
+  if not accessPointForms[playerName] then accessPointForms[playerName] = {} end
+  accessPointForms[playerName].from_wap = true
+  show_access_point_formspec(pos, playerName)
 end
 
 function logistica.access_point_on_player_leave(playerName)
