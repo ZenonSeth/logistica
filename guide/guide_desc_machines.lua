@@ -53,6 +53,18 @@ To withdraw a liquid, first select which liquid you want, then put an Empty Buck
 # Taking items from the Network
 
 The Access Point shows a snapshot of available items, or items supplied by crafting suppliers. When you try to take an item, the Access Point makes a real request to the network. If the items are no longer available, you won't receive anything. In most cases the Access Point will try to show an error message informing what went wrong.
+
+# Storage Management
+
+The Storage tab lets you allocate and de-allocate slots on Mass Storage units across the entire network without having to visit each one individually.
+
+Each Mass Storage on the network is shown with its name, position, and per-slot capacity. The 8 filter slots are displayed for each unit, with the current stored count shown below each assigned slot.
+
+To allocate a slot, drag any item from your inventory into an empty filter slot. The item is used only as a type identifier - it is not consumed.
+
+To de-allocate a slot, take the item out of a filter slot. This only works if that slot currently holds 0 stored items.
+
+Use the Prev and Next buttons at the bottom to page through all Mass Storages on the network.
 ]])
 
 g.optic_cable = S([[

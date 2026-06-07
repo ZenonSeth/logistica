@@ -44,9 +44,9 @@
 ### Maybe
 - Lava generator - but slow
 - Access Point
-  - Add tabs to access point
+  - Add tabs to access point -- DONE (Items tab + Storage Management tab)
   - Add advanced autocrafting
-  - Make allocating mass storage slots possible from access point
+  - Make allocating mass storage slots possible from access point -- DONE (Storage Management tab)
 - Item monitoring station
 - Digilines compat
 - On-demand node-breaker
