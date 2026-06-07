@@ -29,6 +29,16 @@ local PREFIX_RELATED_BTN_LEN = string.len(PREFIX_RELATED)
 local RECIPE_GUIDE_HEIGHT = 3.3 -- since coords are hardcoded, so is this
 local RELATED_HEIGHT = 0.9
 
+local IMG_SEARCH = "logistica_icon_search.png"
+local IMG_CLEAR  = "logistica_icon_cancel.png"
+local GUI_SEARCH_FIELD = "gsrchfld"
+local GUI_SEARCH_BTN   = "gsrchbtn"
+local GUI_CLEAR_BTN    = "gsrchclr"
+local SEARCH_BTN_SZ    = 0.8
+local SEARCH_ROW_H     = 0.8  -- height of the search row itself
+local SEARCH_GAP       = 0.1  -- gap above and below the search row
+local LIST_START_Y     = 0.8  -- y where the textlist begins
+
 -- Utility
 
 local function convert_item_recipes(items)
@@ -104,25 +114,64 @@ local function get_related_button_index_from_name(relatedButtonName)
 end
 
 
-local function get_guide_common_formspec(guideData, history)
-  local selIndex = 0
-  local currPageId = history.get_current()
+local function build_filtered_toc(guideData, playerName, searchTerm)
+  local currPageId = get_history(playerName).get_current()
   local itemsTbl = {}
+  local filteredIndices = {}
+  local selIndex = 0
+  local term = searchTerm and string.lower(searchTerm) or ""
+  local searching = term ~= ""
+
   for i, entry in ipairs(guideData.tableOfContent) do
-    itemsTbl[i] = entry.name
-    if entry.id == currPageId then
-      selIndex = i
+    local match = true
+    if searching then
+      if not entry.id then
+        match = false -- hide section headers when filtering
+      else
+        local titleMatch = string.find(string.lower(entry.name), term, 1, true)
+        local descMatch = false
+        if not titleMatch then
+          local pageData = guideData.pageText[entry.id]
+          if pageData and pageData.description then
+            descMatch = string.find(string.lower(pageData.description), term, 1, true)
+          end
+        end
+        match = titleMatch or descMatch
+      end
+    end
+    if match then
+      table.insert(itemsTbl, entry.name)
+      table.insert(filteredIndices, i)
+      if entry.id == currPageId then
+        selIndex = #itemsTbl
+      end
     end
   end
 
+  if formsData[playerName] then
+    formsData[playerName].filteredIndices = filteredIndices
+  end
+  return itemsTbl, selIndex
+end
+
+local function get_guide_common_formspec(guideData, history, playerName)
   local tocWidth = guideData.tableOfContentWidth
   local contentWidth = guideData.contentWidth
   local formWidth = tocWidth + contentWidth
   local formHeight = guideData.totalHeight
 
+  local searchTerm = (formsData[playerName] and formsData[playerName].searchTerm) or ""
+  local itemsTbl, selIndex = build_filtered_toc(guideData, playerName, searchTerm)
+  local itemsStr = table.concat(itemsTbl, ",")
+
   local pnXOff = tocWidth / 2 - 1.4
   local pnY = formHeight - 1
-  local itemsStr = table.concat(itemsTbl, ",")
+  -- search row sits just above the prev/next buttons
+  local searchY   = pnY - SEARCH_ROW_H - SEARCH_GAP
+  -- textlist fills from LIST_START_Y up to the search row with a small gap
+  local listHeight = searchY - LIST_START_Y - SEARCH_GAP
+  local fieldW = tocWidth - 2 * SEARCH_BTN_SZ - 0.2
+
   local prevBtn = ""
   local nextBtn = ""
   if history.has_prev() then
@@ -132,15 +181,23 @@ local function get_guide_common_formspec(guideData, history)
   if history.has_next() then
     nextBtn = "image_button["..(pnXOff + 2)..","..pnY..";1,0.8;logistica_icon_highlight.png;"..GUI_NEXT_BTN..";>;false;true]"..
               "tooltip["..GUI_NEXT_BTN..";"..S("Go forward").."]"
-
   end
+
+  local searchRow =
+    "field[0.2,"..searchY..";"..fieldW..","..SEARCH_ROW_H..";"..GUI_SEARCH_FIELD..";;"..minetest.formspec_escape(searchTerm).."]"..
+    "image_button["..(0.2 + fieldW)..","..searchY..";"..SEARCH_BTN_SZ..","..SEARCH_ROW_H..";"..IMG_SEARCH..";"..GUI_SEARCH_BTN..";;false;false;]"..
+    "tooltip["..GUI_SEARCH_BTN..";"..S("Search").."]"..
+    "image_button["..(0.2 + fieldW + SEARCH_BTN_SZ)..","..searchY..";"..SEARCH_BTN_SZ..","..SEARCH_ROW_H..";"..IMG_CLEAR..";"..GUI_CLEAR_BTN..";;false;false;]"..
+    "tooltip["..GUI_CLEAR_BTN..";"..S("Clear search").."]"..
+    "field_close_on_enter["..GUI_SEARCH_FIELD..";false]"
 
   return
     "formspec_version[4]"..
     "size["..formWidth..","..formHeight.."]"..
     (guideData.formspecBackgroundStr or "")..
     "label["..(tocWidth + 3.9)..",0.4;"..(guideData.title or "").."]"..
-    "textlist[0.2,0.8;"..tocWidth..","..(pnY - 1)..";"..GUI_TABLE_OF_CONTENT..";"..itemsStr..";"..selIndex..";false]"..
+    "textlist[0.2,"..LIST_START_Y..";"..tocWidth..","..listHeight..";"..GUI_TABLE_OF_CONTENT..";"..itemsStr..";"..selIndex..";false]"..
+    searchRow..
     "image_button_exit["..(formWidth - 1)..",0.2;0.8,0.8;"..EXIT_BUTTON_TEXTURE..";;;false;false;]"..
     prevBtn..nextBtn
 end
@@ -252,7 +309,7 @@ local function get_curr_page_formspec(guideName, playerName)
   local formWidth = contentWidth + tocWidth
   local formHeight = guideData.totalHeight
 
-  local commonFormspec = get_guide_common_formspec(guideData, history)
+  local commonFormspec = get_guide_common_formspec(guideData, history, playerName)
 
   local pageHeader = get_page_header(pageData, tocWidth)
 
@@ -291,7 +348,9 @@ local function handle_table_of_content_clicked(playerName, textListString)
 
     local history = get_history(playerName)
 
-    local selectedPageInfo = guideData.tableOfContent[eventTable.index] or {}
+    local filteredIndices = formData.filteredIndices
+    local realIndex = filteredIndices and filteredIndices[eventTable.index] or eventTable.index
+    local selectedPageInfo = guideData.tableOfContent[realIndex] or {}
     local pageId = selectedPageInfo.id
     local currId = history.get_current()
     if not pageId then return end
@@ -350,7 +409,13 @@ local function on_player_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   if not formsData[playerName] then return false end
 
-  if fields.quit then
+  if fields[GUI_CLEAR_BTN] then
+    formsData[playerName].searchTerm = ""
+    show_guide(playerName, formsData[playerName].guideName)
+  elseif fields[GUI_SEARCH_BTN] or fields.key_enter_field == GUI_SEARCH_FIELD then
+    formsData[playerName].searchTerm = fields[GUI_SEARCH_FIELD] or ""
+    show_guide(playerName, formsData[playerName].guideName)
+  elseif fields.quit and not fields.key_enter_field then
     formsData[playerName] = nil
   elseif fields[GUI_TABLE_OF_CONTENT] then
     handle_table_of_content_clicked(playerName, fields[GUI_TABLE_OF_CONTENT])
