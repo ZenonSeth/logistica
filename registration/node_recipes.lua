@@ -409,3 +409,12 @@ if minetest.get_modpath("mesecons") then
     }
   })
 end
+
+logistica.register_craft({
+  output = L("autocrafting_upgrade"),
+  recipe = {
+    {PLATE,                    L("crafting_supplier"),    PLATE},
+    {L("photonizer"),          PLATE,                    L("photonizer_reversed")},
+    {PLATE,                    L("crafting_supplier"),    PLATE},
+  }
+})

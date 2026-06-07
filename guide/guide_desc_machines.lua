@@ -53,10 +53,10 @@ To withdraw a liquid, first select which liquid you want, then put an Empty Buck
 # Taking items from the Network
 
 The Access Point shows a snapshot of available items, or items supplied by crafting suppliers. When you try to take an item, the Access Point makes a real request to the network. If the items are no longer available, you won't receive anything. In most cases the Access Point will try to show an error message informing what went wrong.
+]])
 
-# Storage Management
-
-The Storage tab lets you allocate and de-allocate slots on Mass Storage units across the entire network without having to visit each one individually.
+g.access_point_storage = S([[
+The Storage Management tab on the Access Point lets you allocate and de-allocate slots on Mass Storage units across the entire network without having to visit each one individually.
 
 Each Mass Storage on the network is shown with its name, position, and per-slot capacity. The 8 filter slots are displayed for each unit, with the current stored count shown below each assigned slot.
 
@@ -65,6 +65,41 @@ To allocate a slot, drag any item from your inventory into an empty filter slot.
 To de-allocate a slot, take the item out of a filter slot. This only works if that slot currently holds 0 stored items.
 
 Use the Prev and Next buttons at the bottom to page through all Mass Storages on the network.
+]])
+
+g.access_point_crafting = S([[
+The Easy Crafting tab on the Access Point lets you search for any craftable item and craft it directly from your network's stored items.
+
+To unlock this tab, insert an Access Point Crafting Upgrade into the upgrade slot in the top-right corner of the tab.
+
+# Searching
+
+Type at least 2 characters into the search field and press Search. Results match on item name parts and description words. For example, "logis" finds all Logistica items, and "no br" finds Node Breaker.
+
+Click a result on the left to view its recipe on the right.
+
+# Recipe view
+
+The 3x3 recipe grid shows each ingredient. Each slot is highlighted:
+
+- Blue: enough of this ingredient is available in the network (or player inventory if enabled)
+- Red: not enough available
+
+The "Can craft: N" label shows how many times the recipe can currently be completed.
+
+# Crafting
+
+Use the [Craft] button to craft one batch, or [x10] to craft ten at once.
+
+If "Also use player inventory" is checked, items are first drawn from the network and the remainder taken from your inventory.
+
+# History navigation
+
+The [ < ] and [ > ] buttons navigate back and forward through recipes you have viewed, similar to browser history. Clicking an ingredient in the recipe grid also navigates to that ingredient's own recipe.
+
+# Wireless Access Pad
+
+When accessing the Easy Crafting tab through a Wireless Access Pad, the upgrade slot is hidden. The upgrade must be inserted by opening the Access Point directly.
 ]])
 
 g.optic_cable = S([[

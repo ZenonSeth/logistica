@@ -10,6 +10,8 @@ local PAGE_MOVE_ITEMS = "mvitms"
 
 local PAGE_NET_CONTROLLER = "mnetcon"
 local PAGE_ACCESS_POINT = "maccpt"
+local PAGE_ACCESS_POINT_STORAGE = "maccptst"
+local PAGE_ACCESS_POINT_CRAFTING = "maccptcr"
 local PAGE_OPTIC_CABLE = "moptcab"
 local PAGE_MASS_STORAGE = "mmasstr"
 local PAGE_TOOL_CHEST = "mtoolch"
@@ -121,6 +123,7 @@ local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
 local RECIPE_DISASSEMBLER = getrec({L("disassembler")})
 local RECIPE_ITEM_MONITOR = getrec({L("item_monitor")})
+local RECIPE_ACUPGRD = getrec({L("autocrafting_upgrade")})
 local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
 local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
@@ -241,6 +244,8 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("General Machines:"))},
     { name = S("  Network Controller"), id = PAGE_NET_CONTROLLER },
     { name = S("  Access Point"), id = PAGE_ACCESS_POINT },
+    { name = S("  Access Point Mass Storage"), id = PAGE_ACCESS_POINT_STORAGE },
+    { name = S("  Access Point Crafting"), id = PAGE_ACCESS_POINT_CRAFTING },
     { name = S("  Optic Cables"), id = PAGE_OPTIC_CABLE },
     { name = header(S("Storage:"))},
     { name = S("  Mass Storage"), id = PAGE_MASS_STORAGE },
@@ -356,6 +361,20 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_ACCESSPT,
       recipeLinks = RECIPE_LINKS,
       description = desc.access_point,
+    },
+
+    [PAGE_ACCESS_POINT_STORAGE] = {
+      title = S("Access Point Mass Storage"),
+      recipes = RECIPE_ACCESSPT,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.access_point_storage,
+    },
+
+    [PAGE_ACCESS_POINT_CRAFTING] = {
+      title = S("Access Point Crafting"),
+      recipes = RECIPE_ACUPGRD,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.access_point_crafting,
     },
 
     [PAGE_OPTIC_CABLE] = {

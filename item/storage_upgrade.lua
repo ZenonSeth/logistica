@@ -30,7 +30,7 @@ items["logistica:sprinkler_upgrade"] = {
 }
 
 items["logistica:autocrafting_upgrade"] = {
-  description = S("Autocrafting Upgrade\nInsert into an Access Point to enable autocrafting"),
+  description = S("Access Point Crafting Upgrade\nInsert into an Access Point to enable autocrafting"),
   inventory_image = "logistica_autocrafting_upgrade.png",
   stack_max = 1,
 }

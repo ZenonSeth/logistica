@@ -55,6 +55,13 @@
 - Named interactors?
   - Allow you to remotely place and get things from other blocks, e.g. furnaces
 
+- Network Access Control -- DONE
+  - Network Controller stores owner (set on place; migrates from wireless transmitter on first scan for existing networks)
+  - Controller formspec: "Give Access To" field (comma-separated players), "Hide network content based on area protection" checkbox (off by default)
+  - Owner always has full access regardless of area protection
+  - All machines: formspec visible to all by default; take/move/put blocked for players without owner status, area access, or access list entry
+  - Non-network machines (Disassembler, Autocrafter) fall back to area-protection-only
+
 ## Low priority
 - Add compatibility with on_move_node - used by mods that teleport nodes
 
