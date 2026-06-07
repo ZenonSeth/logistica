@@ -14,13 +14,23 @@ local function get_controller_formspec(pos)
   local name = minetest.formspec_escape(logistica.get_network_name_or_nil(pos) or "<ERROR>")
   local accessPlayers = minetest.formspec_escape(meta:get_string("access_players"))
   local hideProtection = meta:get_int("hide_with_protection") == 1
+  local owner = meta:get_string("owner")
+  local ownerLabel
+  if owner == "" then
+    ownerLabel = "label[0.5,4.6;" ..
+      minetest.colorize("#FF4444", FS("Owner not set - dig up network controller and place it to set it!")) .. "]"
+  else
+    ownerLabel = "label[0.5,4.6;" .. FS("Owner: ") .. minetest.formspec_escape(owner) .. "]"
+  end
   return "formspec_version[4]" ..
-    "size[10.5,5]" ..
+    "size[10.5,5.5]" ..
     logistica.ui.background..
+    logistica.ui.button_only_style..
     "field[0.5,0.6;7,0.8;"..NAME_FIELD..";"..FS("Network Name")..";"..name.."]" ..
     "button[7.6,0.6;2.5,0.8;"..SET_BUTTON..";"..FS("Set").."]" ..
     "field[0.5,2.0;9.5,0.8;"..ACCESS_PLAYERS_FIELD..";"..FS("Give Access To (comma-separated player names)")..";"..accessPlayers.."]" ..
-    "checkbox[0.5,3.4;"..HIDE_PROTECTION_CHECKBOX..";"..FS("Hide network content based on area protection")..";"..tostring(hideProtection).."]"
+    "checkbox[0.5,3.4;"..HIDE_PROTECTION_CHECKBOX..";"..FS("Hide network content based on area protection")..";"..tostring(hideProtection).."]" ..
+    ownerLabel
 end
 
 local function show_controller_formspec(pos, playerName)
@@ -62,7 +72,10 @@ local function on_controller_receive_fields(player, formname, fields)
   return true
 end
 
-local function after_controller_place(pos)
+local function after_controller_place(pos, placer)
+  if placer and placer:is_player() then
+    minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+  end
   logistica.start_controller_timer(pos)
 end
 
