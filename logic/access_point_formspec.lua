@@ -443,7 +443,7 @@ local function get_autocrafting_tab_content(pos, playerName)
   else
     add("image_button[0.2,6.5;0.65,0.65;logistica_icon_prev.png;"..
       AC_PREV_RES_BTN..";;false;false;]")
-    add("label[1.0,6.72;"..S("Page").." "..res_page.." / "..total_pages.."]")
+    add("label[1.2,6.90;"..S("Page").." "..res_page.." / "..total_pages.."]")
     add("image_button[3.0,6.5;0.65,0.65;logistica_icon_next.png;"..
       AC_NEXT_RES_BTN..";;false;false;]")
   end
@@ -503,13 +503,13 @@ local function get_autocrafting_tab_content(pos, playerName)
       -- recipe pagination
       add("image_button[6.6,5.05;0.65,0.65;logistica_icon_prev.png;"..
         AC_PREV_RCP_BTN..";;false;false;]")
-      add("label[7.35,5.23;"..S("Recipe").." "..recipe_idx.." / "..(#entry.recipes).."]")
+      add("label[7.45,5.43;"..S("Recipe").." "..recipe_idx.." / "..(#entry.recipes).."]")
       add("image_button[9.15,5.05;0.65,0.65;logistica_icon_next.png;"..
         AC_NEXT_RCP_BTN..";;false;false;]")
 
       if network then
         local max_n = logistica.ac_get_max_craftable(recipe, network, cur_player, use_pi)
-        add("label[10.2,5.23;"..S("Can craft: ")..max_n.."]")
+        add("label[10.2,5.43;"..S("Can craft: ")..max_n.."]")
       end
     end
   end
