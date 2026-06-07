@@ -139,7 +139,8 @@ local function apply_to_wap(pos, playerName)
     local newRange = currRange + WAP_RANGE_UPGRADE
     if newRange > WAP_MAX_RANGE then newRange = WAP_MAX_RANGE end
     itemMeta:set_int(logistica.tools.wap.meta_range_key, newRange)
-    itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(newRange))
+    local networkName = logistica.tools.wap.get_network_name_from_item(itemMeta)
+    itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(newRange, networkName))
     inv:set_stack(INV_UPGRADE, 1, item)
     inv:set_stack(INV_C1, 1, ItemStack(""))
     inv:set_stack(INV_C2, 1, ItemStack(""))

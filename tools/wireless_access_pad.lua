@@ -8,9 +8,19 @@ local STR_INIT_TIP = S("Use in a Wireless Upgrader to initialize")
 logistica.tools.wap = {
   meta_range_key = META_RANGE,
   description_default = S("Wireless Access Pad").."\n"..STR_INIT_TIP,
-  get_description_with_range = function (range, isMax)
-    return S("Wireless Access Pad\nSneak+Punch an Access Point to Sync\nRange: @1", range)
-  end
+  get_description_with_range = function (range, networkName)
+    local base = S("Wireless Access Pad\nSneak+Punch an Access Point to Sync\nRange: @1", range)
+    if networkName and networkName ~= "" then
+      return base.."\n"..S("Network: @1", networkName)
+    end
+    return base
+  end,
+  get_network_name_from_item = function(itemMeta)
+    local posHashStr = itemMeta:get_string(META_ACCESS_POINT_POSITION)
+    if not posHashStr or posHashStr == "" then return nil end
+    local targetPos = minetest.get_position_from_hash(tonumber(posHashStr))
+    return logistica.get_network_name_or_nil(targetPos)
+  end,
 }
 
 -- we need this because default tostring(number) function returns scientific representation which loses accuracy
@@ -42,6 +52,9 @@ local function on_wireless_pad_primary(itemstack, user, pointed_thing)
 
   local posHashStr = str(minetest.hash_node_position(pos))
   itemMeta:set_string(META_ACCESS_POINT_POSITION, posHashStr)
+
+  local networkName = logistica.get_network_name_or_nil(pos) or ""
+  itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(range, networkName))
 
   logistica.show_popup(playerName, S("Synced to Access Point at").." ("..pos.x..","..pos.y..","..pos.z..")")
 
@@ -102,7 +115,11 @@ local function on_wireless_pad_secondary(itemstack, placer, pointed_thing)
     return
   end
 
+  local networkName = logistica.get_network_name_or_nil(targetPos) or ""
+  itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(range, networkName))
+
   logistica.access_point_open_from_wap(targetPos, placer:get_player_name())
+  return itemstack
 end
 
 -- registration
