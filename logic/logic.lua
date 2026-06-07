@@ -3,6 +3,7 @@ local path = logistica.MODPATH .. "/logic"
 dofile(path.."/groups.lua")
 dofile(path.."/network_cache.lua")
 dofile(path.."/network_logic.lua")
+dofile(path.."/network_access.lua")
 dofile(path.."/network_storage.lua")
 dofile(path.."/controller.lua")
 dofile(path.."/mass_storage.lua")

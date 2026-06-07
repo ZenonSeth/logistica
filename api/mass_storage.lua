@@ -275,7 +275,7 @@ local function on_receive_swap_formspec(player, formname, fields)
   local swapData = swapForms[playerName]
   if not swapData then return true end
   local pos = swapData.position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
   if fields[CLOSE_SWAP_BTN] or (fields.quit and not fields.key_enter_field) then
     clear_upgrade_swap_slot_and_return(pos, player)
     swapForms[playerName] = nil
@@ -293,7 +293,7 @@ local function on_receive_slot_config_formspec(player, formname, fields)
   if not data then return false end
   local pos = data.position
   local slotIndex = data.slotIndex
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.demand_crafting ~= nil then
     -- checkboxes fire immediately on click and don't resend on button press
@@ -320,7 +320,7 @@ local function on_receive_storage_formspec(player, formname, fields)
   local playerName = player:get_player_name()
   if not storageForms[playerName] then return false end
   local pos = storageForms[playerName].position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit and not fields.key_enter_field then
     logistica.update_mass_storage_front_image(pos)
@@ -408,7 +408,7 @@ local function on_mass_storage_preserve_metadata(pos, oldnode, oldmeta, drops)
 end
 
 local function allow_mass_storage_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == "storage" then
     return logistica.clamp(stack:get_count(), 0, stack:get_stack_max())
   end
@@ -438,7 +438,7 @@ local function allow_mass_storage_inv_move(pos, from_list, from_index, to_list, 
 end
 
 local function allow_mass_storage_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == "storage" then return 0 end
   if listname == "main" then
     local inv = minetest.get_meta(pos):get_inventory()
@@ -487,7 +487,7 @@ end
 
 
 local function on_mass_storage_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return 0
 end
 
@@ -540,13 +540,13 @@ end
 
 local function on_mass_storage_punch(pos, node, puncher, pointed_thing)
   if not puncher or not puncher:is_player() then return end
-  if minetest.is_protected(pos, puncher:get_player_name()) then return end
+  if not logistica.player_has_network_access(pos, puncher:get_player_name()) then return end
   logistica.try_to_add_player_wield_item_to_mass_storage(pos, puncher)
 end
 
 local function on_mass_storage_right_click(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_mass_storage_formspec(pos, clicker:get_player_name())
 end
 

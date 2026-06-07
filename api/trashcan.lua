@@ -31,7 +31,7 @@ local function after_place_trashcan(pos, _, _)
 end
 
 local function allow_trashcan_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_UNDO then return 0 end
   if listname == INV_FILT then
     local inv = minetest.get_meta(pos):get_inventory()
@@ -43,7 +43,7 @@ local function allow_trashcan_inv_put(pos, listname, index, stack, player)
 end
 
 local function allow_trashcan_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if  listname == INV_FILT then
     local inv = minetest.get_meta(pos):get_inventory()
     inv:set_stack(listname, index, ItemStack(""))

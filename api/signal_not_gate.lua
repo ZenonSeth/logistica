@@ -31,7 +31,7 @@ local function on_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   local pos = (forms[playerName] or {}).position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.save or fields.key_enter_field == "input_signal"
       or fields.key_enter_field == "output_signal" then
@@ -91,7 +91,7 @@ function logistica.register_signal_not_gate(desc, name, tiles)
   end
 
   local function on_rightclick(pos, _, player, _, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
+    if logistica.should_hide_from_player(pos, player:get_player_name()) then return end
     show_formspec(pos, player:get_player_name())
   end
 

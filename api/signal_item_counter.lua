@@ -48,7 +48,7 @@ local function on_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   local pos = (forms[playerName] or {}).position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.save
       or fields.key_enter_field == "signal_name"
@@ -99,7 +99,7 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
   grps[logistica.TIER_ALL] = 1
 
   local function allow_inv_put(pos, listname, _, stack, player)
-    if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+    if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
     if listname ~= "filter" then return 0 end
     if stack:get_stack_max() == 1 then return 0 end
     local copyStack = ItemStack(stack:get_name())
@@ -110,7 +110,7 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
   end
 
   local function allow_inv_take(pos, listname, _, _, player)
-    if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+    if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
     if listname ~= "filter" then return 0 end
     minetest.get_meta(pos):get_inventory():set_stack("filter", 1, ItemStack(""))
     logistica.signal_item_counter_reconfigure(pos)
@@ -135,7 +135,7 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
   end
 
   local function on_rightclick(pos, _, player, _, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
+    if logistica.should_hide_from_player(pos, player:get_player_name()) then return end
     show_formspec(pos, player:get_player_name())
   end
 

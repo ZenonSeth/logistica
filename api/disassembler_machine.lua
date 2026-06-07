@@ -76,7 +76,7 @@ local function disassembler_can_dig(pos)
 end
 
 local function disassembler_allow_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_DST then return 0 end
   if listname == INV_SRC then
     local recipes = logistica.get_disassemble_recipes(stack:get_name())
@@ -87,12 +87,12 @@ local function disassembler_allow_inv_put(pos, listname, index, stack, player)
 end
 
 local function disassembler_allow_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function disassembler_allow_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if from_list == INV_DST and to_list == INV_DST then return count end
   return 0
 end
@@ -144,7 +144,7 @@ end
 
 local function disassembler_receive_fields(pos, formname, fields, sender)
   if not sender or not sender:is_player() then return end
-  if minetest.is_protected(pos, sender:get_player_name()) then return end
+  if not logistica.player_has_network_access(pos, sender:get_player_name()) then return end
   if fields[DISASSEMBLE_BTN] then do_disassemble(pos) end
 end
 

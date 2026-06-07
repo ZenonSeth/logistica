@@ -5,7 +5,7 @@
 
 local function on_rightclick_sync(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   logistica.sync_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 
@@ -14,12 +14,12 @@ local function after_place_sync(pos, placer, itemstack)
 end
 
 local function allow_storage_inv_put_sync(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return logistica.sync_allow_storage_inv_put(pos, listname, index, stack, player)
 end
 
 local function allow_inv_take_sync(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return logistica.sync_allow_inv_take(pos, listname, index, stack, player)
 end
 

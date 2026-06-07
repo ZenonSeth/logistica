@@ -10,7 +10,7 @@ local function after_place_access_point(pos, placer, itemstack, numSlots, numUpg
 end
 
 local function on_access_point_rightclick(pos, node, clicker, itemstack, pointed_thing)
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   logistica.access_point_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
 end
 
@@ -24,7 +24,7 @@ local function can_dig_access_point(pos, player)
 end
 
 local function allow_access_point_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= logistica.AP_UPGRADE_LIST then return 0 end
   if stack:get_name() ~= logistica.AP_UPGRADE_ITEM then return 0 end
   if not minetest.get_meta(pos):get_inventory():get_stack(listname, index):is_empty() then return 0 end
@@ -32,7 +32,7 @@ local function allow_access_point_inv_put(pos, listname, index, stack, player)
 end
 
 local function allow_access_point_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 

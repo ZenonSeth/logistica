@@ -38,7 +38,7 @@ local function on_player_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   if not itemStorageForms[playerName] then return false end
   local pos = itemStorageForms[playerName].position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
   local meta = minetest.get_meta(pos)
 
   if fields.quit then
@@ -56,7 +56,7 @@ end
 
 local function on_item_storage_rightclick(pos, _, clicker, _, _)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_item_storage_formspec(clicker:get_player_name(), pos)
 end
 
@@ -69,18 +69,18 @@ local function after_place_item_storage(pos, _, _)
 end
 
 local function allow_item_storage_storage_inv_put(pos, _, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if stack:get_stack_max() > 1 then return 0 end
   return stack:get_count()
 end
 
 local function allow_item_storage_inv_take(pos, _, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_item_storage_inv_move(pos, _, _, _, _, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return count
 end
 

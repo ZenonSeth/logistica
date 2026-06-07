@@ -112,7 +112,7 @@ local function preserve_metadata(pos, oldnode, oldmeta, drops)
 end
 
 local function on_rightclick(pos, node, player, itemstack, pointed_thing, max)
-  if not player or not player:is_player() or minetest.is_protected(pos, player:get_player_name()) then return end
+  if not player or not player:is_player() or not logistica.player_has_network_access(pos, player:get_player_name()) then return end
 
     local usedItem = logistica.reservoir_use_item_on(pos, itemstack, node)
 

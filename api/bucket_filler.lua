@@ -47,7 +47,7 @@ local function on_player_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   if not forms[playerName] then return false end
   local pos = forms[playerName].position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit then
     forms[playerName] = nil
@@ -63,7 +63,7 @@ end
 
 local function on_filler_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_filler_formspec(clicker:get_player_name(), pos)
 end
 
@@ -78,7 +78,7 @@ local function after_place_filler(pos, placer, itemstack)
 end
 
 local function allow_filler_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_MAIN then return 0 end
   if listname == INV_INPUT then
     if logistica.reservoir_is_empty_bucket(stack:get_name()) then return stack:get_count()
@@ -88,7 +88,7 @@ end
 
 local function allow_filler_inv_take(pos, listname, index, stack, player)
   local playerName = player:get_player_name()
-  if minetest.is_protected(pos, playerName) then return 0 end
+  if not logistica.player_has_network_access(pos, playerName) then return 0 end
   if listname == INV_MAIN then
     local numTaken = 0
     local takeFunc = function(takenStack) numTaken = takenStack:get_count() ; return 0 end

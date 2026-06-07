@@ -42,7 +42,7 @@ local function on_player_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   if not forms[playerName] then return false end
   local pos = forms[playerName].position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit then
     forms[playerName] = nil
@@ -55,7 +55,7 @@ end
 
 local function on_craftsup_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_craftsup_formspec(clicker:get_player_name(), pos)
 end
 
@@ -71,7 +71,7 @@ local function after_place_craftsup(pos, placer, itemstack)
 end
 
 local function allow_craftsup_storage_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
     local st = inv:get_stack(listname, index)
@@ -87,7 +87,7 @@ local function allow_craftsup_storage_inv_put(pos, listname, index, stack, playe
 end
 
 local function allow_craftsup_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
     local st = inv:get_stack(listname, index)
@@ -103,6 +103,7 @@ local function allow_craftsup_inv_take(pos, listname, index, stack, player)
 end
 
 local function allow_craftsup_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if from_list == INV_CRAFT and to_list == INV_CRAFT then return count end
   return 0
 end

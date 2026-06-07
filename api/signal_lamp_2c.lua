@@ -63,7 +63,7 @@ local function on_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   local pos = (forms[playerName] or {}).position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   local dropdownChanged = fields.active_color ~= nil
 
@@ -152,7 +152,7 @@ function logistica.register_signal_lamp_2c(desc, name,
   end
 
   local function on_rightclick(pos, _, player, _, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
+    if logistica.should_hide_from_player(pos, player:get_player_name()) then return end
     show_formspec(pos, player:get_player_name())
   end
 

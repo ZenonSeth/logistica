@@ -226,7 +226,7 @@ function logistica.item_monitor_on_player_receive_fields(player, formname, field
   if not forms[playerName] then return false end
   local pos = forms[playerName].position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit then
     forms[playerName] = nil
@@ -257,7 +257,7 @@ end
 function logistica.item_monitor_on_rightclick(pos, _, player, _, _)
   if not player or not player:is_player() then return end
   local playerName = player:get_player_name()
-  if minetest.is_protected(pos, playerName) then return end
+  if logistica.should_hide_from_player(pos, playerName) then return end
   forms[playerName] = { position = pos }
   show_formspec(playerName, pos)
 end
@@ -283,7 +283,7 @@ function logistica.item_monitor_after_place(pos, placer)
 end
 
 function logistica.item_monitor_allow_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
   if stack:get_stack_max() == 1 then return 0 end
   local meta = minetest.get_meta(pos)
@@ -302,7 +302,7 @@ function logistica.item_monitor_allow_inv_put(pos, listname, index, stack, playe
 end
 
 function logistica.item_monitor_allow_inv_take(pos, listname, index, _, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
   local meta = minetest.get_meta(pos)
   meta:get_inventory():set_stack(listname, index, ItemStack(""))

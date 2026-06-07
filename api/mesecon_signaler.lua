@@ -33,7 +33,7 @@ local function on_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   local pos = (forms[playerName] or {}).position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.signal_not ~= nil then
     minetest.get_meta(pos):set_string("signal_not", fields.signal_not == "true" and "1" or "0")
@@ -114,7 +114,7 @@ function logistica.register_mesecon_signaler(desc, name, tile_top_off, tile_top_
   end
 
   local function on_rightclick(pos, _, player, _, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
+    if logistica.should_hide_from_player(pos, player:get_player_name()) then return end
     show_formspec(pos, player:get_player_name())
   end
 

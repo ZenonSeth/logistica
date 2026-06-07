@@ -59,7 +59,7 @@ local function on_fueler_recieve_fields(player, formname, fields)
   if not forms[playerName] then return false end
   local pos = forms[playerName].position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit then
     forms[playerName] = nil
@@ -85,7 +85,7 @@ end
 
 local function on_fueler_right_click(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_fueler_formspec(clicker:get_player_name(), pos)
 end
 

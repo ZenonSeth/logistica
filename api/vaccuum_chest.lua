@@ -46,7 +46,7 @@ local function on_player_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   if not forms[playerName] then return false end
   local pos = forms[playerName].position
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit then
     forms[playerName] = nil
@@ -64,7 +64,7 @@ end
 
 local function on_vaccuum_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_vaccuum_formspec(clicker:get_player_name(), pos)
 end
 
@@ -77,17 +77,17 @@ local function after_place_vaccuum(pos, placer, itemstack)
 end
 
 local function allow_vaccuum_storage_inv_put(pos, _, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_vaccuum_inv_take(pos, _, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_vaccuum_inv_move(pos, _, _, _, _, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return count
 end
 

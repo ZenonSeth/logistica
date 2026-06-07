@@ -54,7 +54,7 @@ local function on_player_receive_fields(player, formname, fields)
   local player_name = player:get_player_name()
   if not forms[player_name] then return false end
   local pos = forms[player_name].position
-  if minetest.is_protected(pos, player_name) then return true end
+  if not logistica.player_has_network_access(pos, player_name) then return true end
 
   if fields.quit then
     forms[player_name] = nil
@@ -67,7 +67,7 @@ end
 
 local function on_woodcutter_rightclick(pos, _node, clicker, _itemstack, _pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_woodcutter_formspec(clicker:get_player_name(), pos)
 end
 
@@ -98,7 +98,7 @@ local function after_place_woodcutter(pos, _placer, _itemstack)
 end
 
 local function allow_woodcutter_inv_put(pos, listname, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_UPGRADE then
     if stack:get_name() ~= LEAVES_UPGRADE then return 0 end
     return 1
@@ -107,12 +107,12 @@ local function allow_woodcutter_inv_put(pos, listname, _, stack, player)
 end
 
 local function allow_woodcutter_inv_take(pos, _, _, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return stack:get_count()
 end
 
 local function allow_woodcutter_inv_move(pos, _, _, _, _, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return count
 end
 

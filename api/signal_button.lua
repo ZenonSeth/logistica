@@ -27,7 +27,7 @@ local function on_receive_fields(player, formname, fields)
   local playerName = player:get_player_name()
   local pos = (forms[playerName] or {}).position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.save or fields.key_enter_field == "signal_name" then
     if fields.signal_name then
@@ -91,7 +91,7 @@ function logistica.register_signal_button(desc, name, tiles_off, tiles_on)
   end
 
   local function on_rightclick(pos, _, player, _, _)
-    if minetest.is_protected(pos, player:get_player_name()) then return end
+    if not logistica.player_has_network_access(pos, player:get_player_name()) then return end
     logistica.signal_button_press(pos)
   end
 

@@ -308,7 +308,7 @@ function logistica.sync_on_player_receive_fields(player, formname, fields)
   local info = forms[playerName]
   local pos = info.position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
   local meta = get_meta(pos)
 
   if fields.quit then forms[playerName] = nil; return true
@@ -351,6 +351,7 @@ function logistica.sync_after_place(pos, placer, itemstack)
 end
 
 function logistica.sync_allow_storage_inv_put(pos, listname, index, stack, player)
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   if listname == INV_C1 or listname == INV_C2 then
     if not inv:get_stack(listname, index):is_empty() then return 0 end
@@ -364,6 +365,7 @@ function logistica.sync_allow_storage_inv_put(pos, listname, index, stack, playe
 end
 
 function logistica.sync_allow_inv_take(pos, listname, index, stack, player)
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   return 1
 end
 

@@ -7,7 +7,7 @@ local function ends_with(str, ending)
 end
 
 local function toggle_cable(pos, node, clicker, itemstack, pointed_thing)
-  if clicker:is_player() and minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if clicker:is_player() and not logistica.player_has_network_access(pos, clicker:get_player_name()) then return end
   local nodeName = node.name
   if ends_with(nodeName, "_on") then
     nodeName = nodeName:sub(1, #nodeName - 3).."_off"

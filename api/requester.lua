@@ -62,7 +62,7 @@ local function on_player_receive_fields(player, formname, fields)
   if not requesterForms[playerName] then return false end
   local pos = requesterForms[playerName].position
   if not pos then return false end
-  if minetest.is_protected(pos, playerName) then return true end
+  if not logistica.player_has_network_access(pos, playerName) then return true end
 
   save_slot_amounts(pos, fields)
 
@@ -88,7 +88,7 @@ end
 
 local function on_requester_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
-  if minetest.is_protected(pos, clicker:get_player_name()) then return end
+  if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_requester_formspec(clicker:get_player_name(), pos)
 end
 
@@ -108,7 +108,7 @@ end
 
 local function allow_requester_storage_inv_put(pos, listname, index, stack, player)
   if listname ~= "filter" then return 0 end
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local copyStack = ItemStack(stack:get_name())
   copyStack:set_count(1)
@@ -125,7 +125,7 @@ end
 
 local function allow_requester_inv_take(pos, listname, index, stack, player)
   if listname ~= "filter" then return 0 end
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   local inv = minetest.get_meta(pos):get_inventory()
   local slotStack = inv:get_stack(listname, index)
   slotStack:clear()

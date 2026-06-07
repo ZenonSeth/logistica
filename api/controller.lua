@@ -3,17 +3,24 @@ local FS = logistica.FTRANSLATOR
 
 local SET_BUTTON = "logsetbtn"
 local NAME_FIELD = "namef"
+local ACCESS_PLAYERS_FIELD = "access_players"
+local HIDE_PROTECTION_CHECKBOX = "hide_with_protection"
 local FORMSPEC_NAME = "logconren"
 local MAX_NETWORK_NAME_LENGTH = 30
 local controllerForms = {}
 
 local function get_controller_formspec(pos)
+  local meta = minetest.get_meta(pos)
   local name = minetest.formspec_escape(logistica.get_network_name_or_nil(pos) or "<ERROR>")
+  local accessPlayers = minetest.formspec_escape(meta:get_string("access_players"))
+  local hideProtection = meta:get_int("hide_with_protection") == 1
   return "formspec_version[4]" ..
-    "size[10.5,2]" ..
+    "size[10.5,5]" ..
     logistica.ui.background..
-    "field[2.5,0.6;3,0.8;"..NAME_FIELD..";"..FS("Network Name")..";"..name.."]" ..
-    "button[5.6,0.6;3,0.8;"..SET_BUTTON..";"..FS("Set").."]"
+    "field[0.5,0.6;7,0.8;"..NAME_FIELD..";"..FS("Network Name")..";"..name.."]" ..
+    "button[7.6,0.6;2.5,0.8;"..SET_BUTTON..";"..FS("Set").."]" ..
+    "field[0.5,2.0;9.5,0.8;"..ACCESS_PLAYERS_FIELD..";"..FS("Give Access To (comma-separated player names)")..";"..accessPlayers.."]" ..
+    "checkbox[0.5,3.4;"..HIDE_PROTECTION_CHECKBOX..";"..FS("Hide network content based on area protection")..";"..tostring(hideProtection).."]"
 end
 
 local function show_controller_formspec(pos, playerName)
@@ -29,6 +36,10 @@ local function on_controller_receive_fields(player, formname, fields)
   if not pos then return false end
   if minetest.is_protected(pos, playerName) then return true end
 
+  -- checkbox fires immediately and does not resend on button press
+  if fields[HIDE_PROTECTION_CHECKBOX] ~= nil then
+    minetest.get_meta(pos):set_int("hide_with_protection", fields[HIDE_PROTECTION_CHECKBOX] == "true" and 1 or 0)
+  end
   if fields.quit and not fields.key_enter_field then
     controllerForms[playerName] = nil
   elseif (fields[SET_BUTTON] or fields.key_enter_field) and fields[NAME_FIELD] then
@@ -41,6 +52,9 @@ local function on_controller_receive_fields(player, formname, fields)
     local meta = minetest.get_meta(pos)
     meta:set_string("infotext", S("Controller of Network: ")..readNetworkName)
     meta:set_string("name", readNetworkName)
+    if fields[ACCESS_PLAYERS_FIELD] then
+      meta:set_string("access_players", fields[ACCESS_PLAYERS_FIELD])
+    end
     if readNetworkName ~= newNetworkName then
       show_controller_formspec(pos, playerName)
     end

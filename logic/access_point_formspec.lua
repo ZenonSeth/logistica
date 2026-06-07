@@ -106,7 +106,7 @@ local function get_or_create_storage_filter_inv(playerName)
       local mapping = data.storMapping[index]
       if not mapping then return 0 end
       local msPos, msSlot = mapping.pos, mapping.slot
-      if minetest.is_protected(msPos, pName) then return 0 end
+      if not logistica.player_has_network_access(msPos, pName) then return 0 end
       if stack:get_stack_max() == 1 then return 0 end  -- tools not assignable
       logistica.load_position(msPos)
       local msInv = minetest.get_meta(msPos):get_inventory()
@@ -126,7 +126,7 @@ local function get_or_create_storage_filter_inv(playerName)
       local mapping = data.storMapping[index]
       if not mapping then return 0 end
       local msPos, msSlot = mapping.pos, mapping.slot
-      if minetest.is_protected(msPos, pName) then return 0 end
+      if not logistica.player_has_network_access(msPos, pName) then return 0 end
       logistica.load_position(msPos)
       local msInv = minetest.get_meta(msPos):get_inventory()
       if not msInv:get_stack("storage", msSlot):is_empty() then return 0 end
@@ -661,7 +661,7 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
   local playerName = player:get_player_name()
   if not accessPointForms[playerName] then return true end
   local pos = accessPointForms[playerName].position
-  if not pos or minetest.is_protected(pos, playerName) then return true end
+  if not pos or not logistica.player_has_network_access(pos, playerName) then return true end
 
   if fields.quit and not fields.key_enter_field then
     return true
@@ -823,7 +823,7 @@ function logistica.access_point_allow_put(inv, listname, index, stack, player)
   local pos = get_curr_pos(player)
   if not pos then return 0 end
   if not logistica.get_network_or_nil(pos) then return 0 end
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
 
   if listname == INV_LIQUID then
     if logistica.reservoir_is_known_bucket(stack:get_name()) then
@@ -839,7 +839,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
   local stack = ItemStack(_stack)
   local pos = get_curr_pos(player)
   if not pos then return 0 end
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
 
   logistica.load_position(pos)
   if listname == INV_FAKE then

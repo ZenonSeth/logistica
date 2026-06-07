@@ -83,7 +83,7 @@ local function autocrafter_can_dig(pos)
 end
 
 local function autocrafter_allow_metadata_inv_put(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_CRAFT_RES then return 0 end
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
@@ -101,7 +101,7 @@ local function autocrafter_allow_metadata_inv_put(pos, listname, index, stack, p
 end
 
 local function autocrafter_allow_metadata_inv_take(pos, listname, index, stack, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == INV_CRAFT_RES then return 0 end
   if listname == INV_CRAFT then
     local inv = minetest.get_meta(pos):get_inventory()
@@ -115,7 +115,7 @@ local function autocrafter_allow_metadata_inv_take(pos, listname, index, stack, 
 end
 
 local function autocrafter_allow_metadata_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
-  if minetest.is_protected(pos, player:get_player_name()) then return 0 end
+  if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if from_list == INV_DST and to_list == INV_SRC then return count end
   if from_list == INV_CRAFT and to_list == INV_CRAFT then return count end
   return 0
@@ -129,7 +129,7 @@ end
 
 local function autocrafter_receive_fields(pos, formname, fields, sender)
   if not sender:is_player() then return end
-  if minetest.is_protected(pos, sender:get_player_name()) then return end
+  if not logistica.player_has_network_access(pos, sender:get_player_name()) then return end
   if fields[ON_OFF_BTN] then
     logistica.toggle_machine_on_off(pos)
   end
