@@ -16,8 +16,8 @@ local HEIGHT_MODE_NAMES = {
 }
 
 local HEIGHT_MODE_DESCS = {
-  FS("Scans at the same height as the farming node.\nPlace node at same level as plants."),
-  FS("Scans 2 nodes below the farming node.\nPlace node above crops."),
+  FS("At Level: Scans at the same height as this node.\nPlace node at same level as plants."),
+  FS("Below: Scans 2 nodes below this node.\nPlace node above crops."),
 }
 
 -- maps dropdown index (1,2) to the mode constant stored in meta (2=LEVEL, 3=BELOW)
@@ -40,6 +40,23 @@ local function get_height_mode(pos)
   return m
 end
 
+local LAVA_MAX = 1000
+
+local function get_lava_indicator(pos, x, y, h)
+  local lava = logistica.farming_supplier_get_lava(pos)
+  local pct = logistica.round(lava / LAVA_MAX * 100)
+  local img
+  if pct > 0 then
+    img = "image["..x..","..y..";0.8,"..h..
+      ";logistica_lava_furnace_tank_bg.png^[lowpart:"..pct..":logistica_lava_furnace_tank.png]"
+  else
+    img = "image["..x..","..y..";0.8,"..h..";logistica_lava_furnace_tank_bg.png]"
+  end
+  return "label["..x..","..(y - 0.35)..";"..FS("Lava").."]"..
+    img..
+    "tooltip["..x..","..y..";0.8,"..h..";"..FS("Lava reserve: ")..(lava).."/"..LAVA_MAX.."\nTaken From Network\nUses 1/1000th per harvest or watering cycle]"
+end
+
 local forms = {}
 
 local function get_farming_formspec(pos)
@@ -51,14 +68,14 @@ local function get_farming_formspec(pos)
   local mode_desc = HEIGHT_MODE_DESCS[dropdown_idx]
 
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.5, 13.0).."]" ..
+    "size["..logistica.inv_size(10.5, 13.2).."]" ..
     logistica.ui.background..
     logistica.ui.button_only_style..
-    "label[0.5,0.6;"..FS("Harvests nearby fully-grown crops and supplies them to the network.").."]"..
-    "list["..posForm..";main;0.4,1.2;8,2;0]"..
-    logistica.ui.on_off_btn(isOn, 6.0, 3.7, ON_OFF_BUTTON, FS("Enable"))..
-    "label[7.8,4.2;"..FS("Upgrade:").."]"..
-    "list["..posForm..";"..INV_UPGRADE..";7.8,4.55;1,1;0]"..
+    "label[0.5,0.3;"..FS("Harvests nearby fully-grown crops\nand supplies them to the network.").."]"..
+    "list["..posForm..";main;0.4,1.2;7,2;0]"..
+    logistica.ui.on_off_btn(isOn, 7.5, 5.7, ON_OFF_BUTTON, FS("Enable"))..
+    "label[6.8,4.0;"..FS("Sprnkler Upgrade").."]"..
+    "list["..posForm..";"..INV_UPGRADE..";7.5,4.2;1,1;0]"..
     "label[0.6,4.05;"..FS("Hor. Range:").."]"..
     "button[2.8,3.75;0.65,0.65;range_dec;-]"..
     "label[3.65,4.05;"..tostring(radius).."]"..
@@ -66,9 +83,10 @@ local function get_farming_formspec(pos)
     "label[0.5,5.0;"..FS("Height Mode:").."]"..
     "dropdown[2.5,4.55;4.0;height_mode;"..
       table.concat(HEIGHT_MODE_NAMES, ",")..";"..dropdown_idx.."]"..
-    "label[2.5,5.85;"..mode_desc.."]"..
-    "label[0.5,6.7;"..FS("Requires network connection to function").."]"..
-    logistica.player_inv_formspec(0.4, 7.1)..
+    "label[0.5,5.85;"..mode_desc.."]"..
+    get_lava_indicator(pos, 9.3, 1.0, 5.8)..
+    "label[2.5,7.0;"..FS("Requires Lava in the Network to function").."]"..
+    logistica.player_inv_formspec(0.4, 7.3)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end
@@ -95,6 +113,7 @@ local function on_player_receive_fields(player, formname, fields)
     local delta = fields.range_inc and 1 or -1
     local new_radius = logistica.clamp(get_radius(pos) + delta, MIN_RADIUS, MAX_RADIUS)
     minetest.get_meta(pos):set_int(META_RADIUS, new_radius)
+    logistica.farming_supplier_show_scan_area(pos)
     show_farming_formspec(playerName, pos)
   elseif fields.height_mode then
     for i, name in ipairs(HEIGHT_MODE_NAMES) do
@@ -103,6 +122,7 @@ local function on_player_receive_fields(player, formname, fields)
         break
       end
     end
+    logistica.farming_supplier_show_scan_area(pos)
     show_farming_formspec(playerName, pos)
   end
   return true
@@ -114,13 +134,22 @@ local function on_farming_rightclick(pos, _node, clicker, _itemstack, _pointed_t
   show_farming_formspec(clicker:get_player_name(), pos)
 end
 
+local function on_farming_punch(pos, _node, puncher, _pointed_thing)
+  if not puncher or not puncher:is_player() then return end
+  if puncher:get_player_control().sneak then
+    logistica.farming_supplier_show_scan_area(pos)
+  end
+end
+
 local function after_place_farming(pos, _placer, _itemstack)
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
   inv:set_size("main", logistica.get_supplier_inv_size(pos))
   inv:set_size(INV_UPGRADE, 1)
+  meta:set_int(META_HEIGHT_MODE, 3) -- default to Farm Below
   logistica.set_node_tooltip_from_state(pos)
   logistica.on_supplier_change(pos)
+  logistica.farming_supplier_show_scan_area(pos)
 end
 
 local function allow_farming_inv_put(pos, listname, _, stack, player)
@@ -200,6 +229,7 @@ function logistica.register_farming_supplier(desc, name, inventorySize, tiles)
     sounds = logistica.node_sound_metallic(),
     after_place_node = after_place_farming,
     after_dig_node = logistica.on_supplier_change,
+    on_punch = on_farming_punch,
     on_rightclick = on_farming_rightclick,
     allow_metadata_inventory_put = allow_farming_inv_put,
     allow_metadata_inventory_take = allow_farming_inv_take,

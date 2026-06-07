@@ -323,6 +323,8 @@ Configuration options:
 The Enable button turns harvesting on or off. When enabled, the node runs on a fixed timer. Harvesting pauses if the inventory is full.
 
 The upgrade slot accepts a Sprinkler Upgrade. See the Sprinkler Upgrade page for details.
+
+Requires Lava in the Network to function. Uses roughly 1/1000th of a bucket of lava per crop harvested, and 1/1000th per watering cycle when the Sprinkler Upgrade is active.
 ]])
 
 g.sprinkler_upgrade = S([[
@@ -347,6 +349,8 @@ Limits: if the tree is too tall or has too many connected nodes in total, the op
 The inventory is output-only. Items are supplied passively to the network the same way a Passive Supply Chest would. If the inventory fills up mid-cut, cutting stops and the machine shows an "Inventory full" status.
 
 The upgrade slot accepts a Leafcutter Upgrade. When installed, the machine will also harvest the leaves of the tree. It detects the leaf type by checking above the topmost trunk nodes, picks the most common leaf type found, and flood-fills all connected leaves of that type. Leaves are cut before the trunk, also top-down.
+
+Requires Lava in the Network to function. Uses roughly 1/1000th of a bucket of lava per trunk node cut, and 1/1000th per every 10 leaf nodes cut.
 ]])
 
 g.leaves_upgrade = S([[

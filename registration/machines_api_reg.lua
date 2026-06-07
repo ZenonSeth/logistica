@@ -323,7 +323,7 @@ logistica.register_vaccuum_chest(S("Vacuum Supplier Chest"), "vaccuum_chest", 16
 -- Farming Supplier
 --------------------------------
 
-logistica.register_farming_supplier(S("Farming Supplier"), "farming_supplier", 16, {
+logistica.register_farming_supplier(S("Farming Supplier"), "farming_supplier", 14, {
   "logistica_farming_supplier_top.png",
   "logistica_farming_supplier_bottom.png",
   "logistica_farming_supplier_side.png",
@@ -336,7 +336,7 @@ logistica.register_farming_supplier(S("Farming Supplier"), "farming_supplier", 1
 -- Wood Supplier
 --------------------------------
 
-logistica.register_woodcutter(S("Woodcutting Supplier"), "woodcutter", 16, {
+logistica.register_woodcutter(S("Woodcutting Supplier"), "woodcutter", 14, {
   "logistica_woodcutter_top.png",
   "logistica_woodcutter_bottom.png",
   "logistica_woodcutter_side.png",

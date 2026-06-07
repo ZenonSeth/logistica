@@ -13,6 +13,23 @@ local RESULT_MSGS = {
   [4] = FS("Inventory full."),
 }
 
+local LAVA_MAX = 1000
+
+local function get_lava_indicator(pos, x, y, h)
+  local lava = logistica.woodcutter_get_lava(pos)
+  local pct = logistica.round(lava / LAVA_MAX * 100)
+  local img
+  if pct > 0 then
+    img = "image["..x..","..y..";0.8,"..h..
+      ";logistica_lava_furnace_tank_bg.png^[lowpart:"..pct..":logistica_lava_furnace_tank.png]"
+  else
+    img = "image["..x..","..y..";0.8,"..h..";logistica_lava_furnace_tank_bg.png]"
+  end
+  return "label["..x..","..(y - 0.35)..";"..FS("Lava").."]"..
+    img..
+    "tooltip["..x..","..y..";0.8,"..h..";"..FS("Lava reserve: ")..(lava).."/"..LAVA_MAX.."\nTaken From Network\nUses 1/1000th per harvest]"
+end
+
 local forms = {}
 
 local function get_woodcutter_formspec(pos)
@@ -33,12 +50,13 @@ local function get_woodcutter_formspec(pos)
     logistica.ui.background ..
     logistica.ui.button_only_style ..
     "label[0.5,0.6;" .. FS("Harvests the tree it faces, and supplies wood to the network.") .. "]" ..
-    "list[" .. posForm .. ";main;0.4,1.2;8,2;0]" ..
+    "list[" .. posForm .. ";main;0.4,1.2;7,2;0]" ..
     (status ~= "" and ("label[0.4,3.7;" .. minetest.formspec_escape(status) .. "]") or "") ..
-    logistica.ui.on_off_btn(isOn, 6.0, 4.2, ON_OFF_BUTTON, FS("Enable")) ..
-    "label[7.8,4.1;" .. FS("Leafcutter Upgrade:") .. "]" ..
-    "list[" .. posForm .. ";" .. INV_UPGRADE .. ";7.8,4.45;1,1;0]" ..
-    "label[0.5,5.1;" .. FS("Requires network connection to function") .. "]" ..
+    logistica.ui.on_off_btn(isOn, 4.0, 4.0, ON_OFF_BUTTON, FS("Enable")) ..
+    "label[6.1,4.0;" .. FS("Leafcutter Upgrade") .. "]" ..
+    "list[" .. posForm .. ";" .. INV_UPGRADE .. ";6.65,4.3;1,1;0]" ..
+    get_lava_indicator(pos, 9.3, 1.0, 4.2) ..
+    "label[0.5,5.1;" .. FS("Requires Lava in the Network to function") .. "]" ..
     logistica.player_inv_formspec(0.4, 5.6) ..
     "listring[current_player;main]" ..
     "listring[" .. posForm .. ";main]"

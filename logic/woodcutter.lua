@@ -6,6 +6,11 @@ local META_HARVEST_RESULT = "lastHarvestSuccess"
 local META_CUT_GEN = "cut_gen"
 local META_IS_CUTTING = "is_cutting"
 
+local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
+local LAVA_LIQUID_NAME = logistica.liquids.lava
+local META_LAVA = "lava_reserve"
+local LAVA_MAX = 1000
+
 local MAX_TRUNK_HEIGHT = 30
 local MAX_TOTAL_NODES = 500
 local CUT_DELAY = 0.6
@@ -32,6 +37,20 @@ local LEAF_DIRS = {
   vector.new( 0, 1, 0),
   vector.new( 0,-1, 0),
 }
+
+local function get_lava(meta) return meta:get_int(META_LAVA) end
+
+local function has_lava(pos, meta, amount)
+  if get_lava(meta) >= amount then return true end
+  local result = logistica.use_bucket_for_liquid_in_network(pos, ItemStack(EMPTY_BUCKET), LAVA_LIQUID_NAME)
+  if not result then return false end
+  meta:set_int(META_LAVA, math.min(LAVA_MAX, get_lava(meta) + 1000))
+  return get_lava(meta) >= amount
+end
+
+local function consume_lava(meta, amount)
+  meta:set_int(META_LAVA, math.max(0, get_lava(meta) - amount))
+end
 
 local function pkey(p)
   return p.x .. "," .. p.y .. "," .. p.z
@@ -138,7 +157,8 @@ local function scan_leaves(endpoints, leaf_node_name, trunk_count)
 end
 
 local schedule_next_cut
-schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_name, leaf_name)
+schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_name, leaf_name, leaves_cut)
+  leaves_cut = leaves_cut or 0
   if idx > #nodes then
     local meta = minetest.get_meta(machine_pos)
     meta:set_int(META_HARVEST_RESULT, 0)
@@ -163,12 +183,28 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
     local cut_name = minetest.get_node(cut_pos).name
 
     if cut_name == "air" or cut_name == "ignore" then
-      schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name)
+      schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, leaves_cut)
       return
     end
 
     -- node changed to something unexpected; abort and let timer restart
     if cut_name ~= trunk_name and cut_name ~= leaf_name then
+      meta:set_int(META_IS_CUTTING, 0)
+      logistica.start_node_timer(machine_pos, CYCLE_TIME)
+      return
+    end
+
+    -- determine lava cost: 1 per trunk, 1 per 10 leaves
+    local is_leaf = leaf_name ~= nil and cut_name == leaf_name
+    local new_leaves_cut = leaves_cut + (is_leaf and 1 or 0)
+    local lava_cost = 0
+    if is_leaf then
+      if new_leaves_cut % 10 == 0 then lava_cost = 1 end
+    else
+      lava_cost = 1
+    end
+
+    if lava_cost > 0 and not has_lava(machine_pos, meta, lava_cost) then
       meta:set_int(META_IS_CUTTING, 0)
       logistica.start_node_timer(machine_pos, CYCLE_TIME)
       return
@@ -184,12 +220,13 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
       end
     end
 
+    if lava_cost > 0 then consume_lava(meta, lava_cost) end
     for _, drop in ipairs(drops) do
       if drop and drop ~= "" then inv:add_item(INV_MAIN, ItemStack(drop)) end
     end
     minetest.set_node(cut_pos, {name = "air"})
 
-    schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name)
+    schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, new_leaves_cut)
   end)
 end
 
@@ -264,7 +301,7 @@ local function start_harvest(machine_pos, enabled_name)
   meta:set_int(META_IS_CUTTING, 1)
   meta:set_int(META_HARVEST_RESULT, 0)
 
-  schedule_next_cut(machine_pos, enabled_name, gen, all_nodes, 1, tree_name, expected_leaf_name)
+  schedule_next_cut(machine_pos, enabled_name, gen, all_nodes, 1, tree_name, expected_leaf_name, 0)
 end
 
 ----------------------------------------------------------------
@@ -291,4 +328,8 @@ end
 
 function logistica.woodcutter_is_cutting(pos)
   return minetest.get_meta(pos):get_int(META_IS_CUTTING) == 1
+end
+
+function logistica.woodcutter_get_lava(pos)
+  return minetest.get_meta(pos):get_int(META_LAVA)
 end

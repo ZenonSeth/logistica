@@ -43,7 +43,7 @@ outputDef.textures =
   {"logistica_entity_output.png", "logistica_entity_output.png", "logistica_entity_output.png", "logistica_entity_output.png", "logistica_entity_output.png", "logistica_entity_output.png"}
 minetest.register_entity(OUTPUT_ENAME, outputDef)
 
-local function show_entity(pos, optionalKey, name)
+local function show_entity(pos, optionalKey, name, optVisualSize)
   if not pos then return end
   local key = optionalKey or logistica.get_rand_string_for(pos)
   local entity = entityTable[key]
@@ -52,6 +52,9 @@ local function show_entity(pos, optionalKey, name)
     entityTable[key] = nil
   end
   entity = minetest.add_entity(pos, name, key)
+  if entity and optVisualSize then
+    entity:set_properties({visual_size = optVisualSize})
+  end
   entityTable[key] = entity
 end
 
@@ -65,4 +68,19 @@ end
 -- key is an optional string, if not passed, the position's hash is used
 function logistica.show_output_at(pos, optionalKey)
   show_entity(pos, optionalKey, OUTPUT_ENAME)
+end
+
+-- Shows a single scaled IN entity covering the box from pos1 to pos2.
+-- For cube visuals, x and z scale together, so the larger of the two spans is used.
+-- key is an optional string for deduplication; if not passed, derived from pos1.
+function logistica.show_input_area(pos1, pos2, optionalKey)
+  local center = vector.new(
+    (pos1.x + pos2.x) / 2,
+    (pos1.y + pos2.y) / 2,
+    (pos1.z + pos2.z) / 2
+  )
+  local sx = pos2.x - pos1.x + 1.1
+  local sz = pos2.z - pos1.z + 1.1
+  local sy = pos2.y - pos1.y + 1.1
+  show_entity(center, optionalKey, INPUT_ENAME, {x = math.max(sx, sz), y = sy})
 end
