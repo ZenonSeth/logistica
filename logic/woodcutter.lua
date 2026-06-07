@@ -152,6 +152,12 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
     if minetest.get_node(machine_pos).name ~= enabled_name then return end
     local meta = minetest.get_meta(machine_pos)
     if meta:get_int(META_CUT_GEN) ~= gen then return end
+    if not logistica.get_network_or_nil(machine_pos) then
+      meta:set_int(META_IS_CUTTING, 0)
+      meta:set_int(META_CUT_GEN, meta:get_int(META_CUT_GEN) + 1)
+      logistica.start_node_timer(machine_pos, CYCLE_TIME)
+      return
+    end
 
     local cut_pos  = nodes[idx]
     local cut_name = minetest.get_node(cut_pos).name
@@ -188,6 +194,11 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
 end
 
 local function start_harvest(machine_pos, enabled_name)
+  if not logistica.get_network_or_nil(machine_pos) then
+    logistica.start_node_timer(machine_pos, CYCLE_TIME)
+    return
+  end
+
   local meta = minetest.get_meta(machine_pos)
   local inv  = meta:get_inventory()
 

@@ -38,6 +38,7 @@ local function get_woodcutter_formspec(pos)
     logistica.ui.on_off_btn(isOn, 6.0, 4.2, ON_OFF_BUTTON, FS("Enable")) ..
     "label[7.8,4.1;" .. FS("Leafcutter Upgrade:") .. "]" ..
     "list[" .. posForm .. ";" .. INV_UPGRADE .. ";7.8,4.45;1,1;0]" ..
+    "label[0.5,5.1;" .. FS("Requires network connection to function") .. "]" ..
     logistica.player_inv_formspec(0.4, 5.6) ..
     "listring[current_player;main]" ..
     "listring[" .. posForm .. ";main]"

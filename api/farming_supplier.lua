@@ -67,6 +67,7 @@ local function get_farming_formspec(pos)
     "dropdown[2.5,4.55;4.0;height_mode;"..
       table.concat(HEIGHT_MODE_NAMES, ",")..";"..dropdown_idx.."]"..
     "label[2.5,5.85;"..mode_desc.."]"..
+    "label[0.5,6.7;"..FS("Requires network connection to function").."]"..
     logistica.player_inv_formspec(0.4, 7.1)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"

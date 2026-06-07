@@ -162,6 +162,7 @@ local function try_harvest(crop_pos, inv)
 end
 
 local function do_farming(pos)
+  if not logistica.get_network_or_nil(pos) then return false end
   local inv = minetest.get_meta(pos):get_inventory()
 
   local radius = get_radius(pos)
