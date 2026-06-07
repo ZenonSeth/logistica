@@ -133,7 +133,7 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   if remaining <= 0 then return ret(0) end -- everything was taken from existing supply, we're done
 
   -- only craft if machine is on
-  if not logistica.is_machine_on(pos) then return ret(_takeStack:get_count()) end
+  if not logistica.is_machine_on(pos) then return ret(remaining) end
 
   -- if we still have a number of requested itsm to fulfil, try crafting them
   takeStack:set_count(remaining)
@@ -149,8 +149,9 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   local isEnough = false
 
   local recipeItems = logistica.get_smart_craft_output_results(logistica.get_list(inv, INV_CRAFT)).requiredItems
-  if not recipeItems then ret(remaining) end
+  if not recipeItems then return ret(remaining) end
 
+  local craftOutputCount = craftStack:get_count()
   local craftItemMult = 0
   repeat
     craftItemMult = craftItemMult + 1
@@ -174,15 +175,19 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
       logistica.autocrafting_produce_single_item(inv, INV_CRAFT, nil, INV_HOUT)
     end
 
-    isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
+    if dryRun then
+      isEnough = (numCrafted * craftOutputCount >= remaining) or numCanCraft == 0 or numCrafted >= 99
+    else
+      isEnough = inv:contains_item(INV_HOUT, takeStack) or numCanCraft == 0 or numCrafted >= 99
+    end
   until (isEnough)
 
   if numCrafted == 0 then return ret(remaining, "Not enough materials available to craft items from crafting supplier") end -- nothing could be crafted
-  remaining = math.max(0, remaining - numCrafted)
 
-  -- give the item to the collector
+  -- give the item to the collector (dry run conjures items into HOUT without consuming network, for the AP allow_take flow)
   local taken = inv:remove_item(INV_HOUT, takeStack)
   local leftover = collectorFunc(taken)
+  remaining = math.max(0, remaining - (taken:get_count() - leftover))
 
   -- now move any extras from the hidden to the main inventory - deleting extras (TODO: maybe drop them)
   if not dryRun then
