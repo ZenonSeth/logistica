@@ -5,6 +5,7 @@ minetest.register_tool("logistica:wand",{
   inventory_image = "logistica_wand.png",
   wield_image = "logistica_wand.png",
   stack_max = 1,
+  groups = {not_in_creative_inventory=1},
   on_place = function(itemstack, placer, pointed_thing)
     local pos = pointed_thing.under
     if not placer or not pos then return end
