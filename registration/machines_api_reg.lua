@@ -188,6 +188,29 @@ logistica.register_item_storage(S("Tool Chest\nStores Tools Only"), "item_storag
 })
 
 --------------------------------
+-- Rock Melter
+--------------------------------
+
+logistica.register_rock_melter(S("Rock Melter").."\n"..S("Melts stone-type blocks to produce lava"), "rock_melter", {
+  inactive = {
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_front.png",
+  },
+  active = {
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_side.png",
+    "logistica_rock_melter_front_active.png",
+  },
+})
+
+--------------------------------
 -- Lava Furnace
 --------------------------------
 
