@@ -158,7 +158,7 @@ local function allow_farming_inv_put(pos, listname, _, stack, player)
     if stack:get_name() ~= SPRINKLER_UPGRADE then return 0 end
     return 1
   end
-  return stack:get_count()
+  return 0 -- main list is output-only
 end
 
 local function allow_farming_inv_take(pos, _, _, stack, player)
