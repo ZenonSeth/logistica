@@ -54,3 +54,12 @@ logistica.register_lava_furnace_recipe({
   additive_use_chance = 100,
   time = 12
 })
+
+logistica.register_lava_furnace_recipe({
+  input = L("silverin_block"),
+  output = L("hardened_silverin_block"),
+  lava = 40,
+  additive = itemstrings.obsidian,
+  additive_use_chance = 100,
+  time = 4
+})

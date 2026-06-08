@@ -13,3 +13,15 @@ minetest.register_node(L("silverin_block"), {
   _mcl_hardness = 1.5,
   _mcl_blast_resistance = 40
 })
+
+minetest.register_node(L("hardened_silverin_block"), {
+  drawtype = "normal",
+  description = S("Hardened Silverin Block"),
+  tiles = {"logistica_hardened_silverin_block.png"},
+  paramtype2 = "facedir",
+  groups = { cracky = 1, pickaxey = 3 },
+  sounds = logistica.sound_mod.node_sound_stone_defaults(),
+  stack_max = logistica.stack_max,
+  _mcl_hardness = 3,
+  _mcl_blast_resistance = 70
+})
