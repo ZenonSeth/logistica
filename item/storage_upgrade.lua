@@ -35,6 +35,12 @@ items["logistica:autocrafting_upgrade"] = {
   stack_max = 1,
 }
 
+items["logistica:autocrafting_recursive_upgrade"] = {
+  description = S("Recursive Crafting Upgrade\nInsert into an Access Point to enable autocrafting and recursive crafting"),
+  inventory_image = "logistica_autocrafting_recursive_upgrade.png",
+  stack_max = 1,
+}
+
 items["logistica:storage_upgrade_multiplier"] = {
   description = S("Mass Storage Capacity Multiplier\nMultiplies Mass Storage Slot Capacity by 16\nOnly 1 can be inserted per Mass Storage"),
   storage_multiplier = 16,

@@ -85,10 +85,38 @@ local AC_GRID_Y       = 1.5
 local AC_COLOR_HAVE   = "#2255EE88"
 local AC_COLOR_MISS   = "#EE333388"
 
+local AC_REC_CHECK_BTN   = "ac_rec_chk"
+local AC_REC_CRAFT_BTN   = "ac_rec_cft"
+local AC_REC_TEXTLIST    = "ac_rec_tl"
+local AC_REC_X           = 10.1
+local AC_OUTPUT_LIST     = "ac_output"
+local AC_QUEUE_W         = 4
+local AC_FORM_H_AC       = 16.05
+local AC_PLAYER_INV_Y_AC = 10.8
+local AC_QUEUE_INTERVAL  = 0.2
+
 local detachedInventories = {}
 local accessPointForms = {}
 -- per-player detached inventories mirroring the visible mass-storage filter slots
 local storFilterInventories = {}  -- [playerName] = invName
+-- per-player no-interact queue display inventories for recursive crafting
+local queueInventories = {}  -- [playerName] = invName
+
+local function get_or_create_queue_inv(playerName)
+  if queueInventories[playerName] then return queueInventories[playerName] end
+  local invName = "Logistica_AP_Q_"..playerName
+  local inv = minetest.create_detached_inventory(invName, {
+    allow_move = function() return 0 end,
+    allow_put  = function() return 0 end,
+    allow_take = function() return 0 end,
+    on_move = function() end,
+    on_put  = function() end,
+    on_take = function() end,
+  }, playerName)
+  inv:set_size("queue", AC_QUEUE_W)
+  queueInventories[playerName] = invName
+  return invName
+end
 
 local function get_or_create_storage_filter_inv(playerName)
   if storFilterInventories[playerName] then
@@ -368,6 +396,192 @@ end
 -- autocrafting tab
 ----------------------------------------------------------------
 
+local function ac_get_current_recipe(data)
+  local hist_pos = data.ac_hist_pos or 0
+  local current = hist_pos > 0 and data.ac_history[hist_pos] or nil
+  if not current then return nil end
+  local entry = logistica.ac_get_entry(current.name)
+  if not entry or #entry.recipes == 0 then return nil end
+  return entry.recipes[logistica.clamp(current.recipe_idx or 1, 1, #entry.recipes)]
+end
+
+-- display_items: list of {name, count} up to AC_QUEUE_W entries, or nil to clear
+local function ac_populate_queue_display(data, display_items)
+  local q_inv = minetest.get_inventory({type = "detached", name = data.ac_queue_inv_name})
+  if not q_inv then return end
+  for i = 1, AC_QUEUE_W do
+    local item = display_items and display_items[i]
+    if item then
+      local st = ItemStack(item.name)
+      st:set_count(item.count)
+      q_inv:set_stack("queue", i, st)
+    else
+      q_inv:set_stack("queue", i, ItemStack(""))
+    end
+  end
+end
+
+local function compact_queue(raw_queue)
+  local out = {}
+  for _, name in ipairs(raw_queue) do
+    if #out > 0 and out[#out].name == name then
+      out[#out].count = out[#out].count + 1
+    else
+      out[#out + 1] = {name = name, count = 1}
+    end
+  end
+  return out
+end
+
+-- builds the display_items list from a compacted queue, given current front position and
+-- remaining count for the front entry
+local function ac_queue_display_items(queue, pos_idx, cur_count)
+  local items = {}
+  for i = 1, AC_QUEUE_W do
+    local entry = queue[pos_idx + i - 1]
+    if not entry then break end
+    items[i] = {name = entry.name, count = (i == 1) and cur_count or entry.count}
+  end
+  return items
+end
+
+local function ac_item_desc(item_name)
+  local def = minetest.registered_items[item_name]
+  if not def or not def.description then return item_name end
+  return (def.description:match("^([^\n]+)") or def.description):gsub(",", ";")
+end
+
+local function ac_handle_recursive_check(pos, data)
+  local recipe = ac_get_current_recipe(data)
+  if not recipe then
+    data.ac_rec_lines = {"No item selected or no craftable recipe"}
+    data.ac_rec_plan  = nil
+    return
+  end
+  local network = logistica.get_network_or_nil(pos)
+  if not network then
+    data.ac_rec_lines = {"No network connected"}
+    data.ac_rec_plan  = nil
+    return
+  end
+
+  local plan, err = logistica.ac_plan_recursive(recipe.output_name, 1, network)
+  data.ac_rec_plan = plan
+
+  if not plan then
+    data.ac_rec_lines = {"Cannot craft: "..(err or "unknown")}
+    return
+  end
+
+  local lines = {"Will craft: "..ac_item_desc(plan.output:get_name()).." x"..plan.output:get_count()}
+  for item_name, count in pairs(plan.to_take) do
+    lines[#lines + 1] = count.."x "..ac_item_desc(item_name)
+  end
+  table.sort(lines, function(a, b) return a < b end)
+  -- move the "Will craft" summary back to position 1 after sort
+  for i, l in ipairs(lines) do
+    if l:sub(1, 10) == "Will craft" then
+      table.remove(lines, i)
+      table.insert(lines, 1, l)
+      break
+    end
+  end
+  data.ac_rec_lines = lines
+end
+
+local function ac_handle_recursive_craft(pos, data)
+  local recipe = ac_get_current_recipe(data)
+  if not recipe then
+    data.ac_rec_lines = {"No item selected or no craftable recipe"}
+    return
+  end
+  local network = logistica.get_network_or_nil(pos)
+  if not network then
+    data.ac_rec_lines = {"No network connected"}
+    return
+  end
+
+  local plan, err = logistica.ac_plan_recursive(recipe.output_name, 1, network)
+  data.ac_rec_plan = plan
+
+  if not plan then
+    data.ac_rec_lines = {"Cannot craft: "..(err or "unknown")}
+    return
+  end
+
+  local meta = minetest.get_meta(pos)
+  local meta_inv = meta:get_inventory()
+  if not meta_inv:room_for_item(AC_OUTPUT_LIST, plan.output) then
+    data.ac_rec_lines = {"No room in output inventory"}
+    return
+  end
+
+  local networkId = logistica.get_network_id_or_nil(pos)
+  if not networkId then
+    data.ac_rec_lines = {"No network"}
+    return
+  end
+
+  local output, execErr = logistica.ac_execute_plan(plan, networkId, pos)
+  data.ac_rec_plan = nil
+
+  if not output then
+    ac_populate_queue_display(data, nil)
+    data.ac_rec_lines = {"Failed: "..(execErr or "unknown")}
+    return
+  end
+
+  local cq = compact_queue(plan.queue)
+  local first_count = #cq > 0 and cq[1].count or 0
+  meta:set_string("ac_queue", minetest.serialize(cq))
+  meta:set_string("ac_pending_output", output:to_string())
+  meta:set_int("ac_queue_pos", 1)
+  meta:set_int("ac_queue_cur_count", first_count)
+  ac_populate_queue_display(data, ac_queue_display_items(cq, 1, first_count))
+  minetest.get_node_timer(pos):start(AC_QUEUE_INTERVAL)
+  data.ac_rec_lines = {"Crafted: "..ac_item_desc(output:get_name()).." x"..output:get_count()}
+end
+
+function logistica.access_point_queue_timer(pos)
+  local meta = minetest.get_meta(pos)
+  local queue_str = meta:get_string("ac_queue")
+  if queue_str == "" then return false end
+  local queue = minetest.deserialize(queue_str)
+  if not queue then meta:set_string("ac_queue", ""); return false end
+
+  local pos_idx   = meta:get_int("ac_queue_pos")
+  local cur_count = meta:get_int("ac_queue_cur_count") - 1
+
+  if cur_count <= 0 then
+    pos_idx = pos_idx + 1
+    if pos_idx > #queue then
+      meta:set_string("ac_queue", "")
+      local pending = meta:get_string("ac_pending_output")
+      if pending ~= "" then
+        meta:set_string("ac_pending_output", "")
+        meta:get_inventory():add_item(AC_OUTPUT_LIST, ItemStack(pending))
+      end
+      for _, pData in pairs(accessPointForms) do
+        if vector.equals(pData.position, pos) then
+          ac_populate_queue_display(pData, nil)
+        end
+      end
+      return false
+    end
+    meta:set_int("ac_queue_pos", pos_idx)
+    cur_count = queue[pos_idx].count
+  end
+
+  meta:set_int("ac_queue_cur_count", cur_count)
+  local display = ac_queue_display_items(queue, pos_idx, cur_count)
+  for _, pData in pairs(accessPointForms) do
+    if vector.equals(pData.position, pos) then
+      ac_populate_queue_display(pData, display)
+    end
+  end
+  return true
+end
+
 local function ac_navigate_to(data, name, recipe_idx)
   local hist = data.ac_history
   while #hist > data.ac_hist_pos do hist[#hist] = nil end
@@ -386,7 +600,7 @@ local function ac_handle_craft(pos, data, player, count)
   local recipe = entry.recipes[recipe_idx]
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then data.ac_error = S("No network connected"); return end
-  local crafted, err = logistica.ac_craft(recipe, networkId, player, count, data.ac_use_player_inv)
+  local crafted, err = logistica.ac_craft(recipe, networkId, player, count, data.ac_use_player_inv, pos)
   if err then
     data.ac_error = err
   elseif crafted == 0 then
@@ -398,6 +612,11 @@ end
 
 local function get_autocrafting_tab_content(pos, playerName)
   local data     = accessPointForms[playerName]
+
+  if data.from_wap then
+    return "label[4.5,4.0;"..S("Easy Crafting\nnot available via\nWireless Access Pad").."]"
+  end
+
   local posStr   = pos.x..","..pos.y..","..pos.z
   local history  = data.ac_history  or {}
   local hist_pos = data.ac_hist_pos or 0
@@ -406,13 +625,10 @@ local function get_autocrafting_tab_content(pos, playerName)
   local out = {}
   local function add(s) out[#out + 1] = s end
 
-  -- upgrade slot: hidden when accessed via Wireless Access Pad
-  if not data.from_wap then
-    add("label[12.8,0.72;"..S("Upgrade:").." ]")
-    add("list[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST..";13.5,0.9;1,1;0]")
-    add("listring[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST.."]")
-    add("listring[current_player;main]")
-  end
+  add("label[12.8,0.72;"..S("Upgrade:").." ]")
+  add("list[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST..";13.5,0.9;1,1;0]")
+  add("listring[nodemeta:"..posStr..";"..logistica.AP_UPGRADE_LIST.."]")
+  add("listring[current_player;main]")
 
   -- vertical separator between result list and recipe panel
   add("box[5.85,0.8;0.05,7.5;#FFFFFF25]")
@@ -461,7 +677,7 @@ local function get_autocrafting_tab_content(pos, playerName)
   end
 
   if not current then
-    add("label[7.0,4.0;"..S("Click an item to view its recipe").."]")
+    add("label[6.2,4.0;"..S("Click an item to view its recipe").."]")
   else
     local entry = logistica.ac_get_entry(current.name)
     if not entry or #entry.recipes == 0 then
@@ -509,7 +725,7 @@ local function get_autocrafting_tab_content(pos, playerName)
 
       if network then
         local max_n = logistica.ac_get_max_craftable(recipe, network, cur_player, use_pi)
-        add("label[10.2,5.43;"..S("Can craft: ")..max_n.."]")
+        add("label[6.8,6.6;"..S("Can craft: ")..max_n.."]")
       end
     end
   end
@@ -528,15 +744,42 @@ local function get_autocrafting_tab_content(pos, playerName)
   add("button[8.5,7.45;1.0,0.65;"..AC_CRAFT10_BTN..";"..S("x10").."]")
 
   if hist_pos > 1 then
-    add("image_button[10.0,7.45;0.65,0.65;logistica_icon_prev.png;"..
+    add("image_button[7.0,8.45;0.65,0.65;logistica_icon_prev.png;"..
       AC_BACK_BTN..";;false;false;]")
     add("tooltip["..AC_BACK_BTN..";"..S("Back").."]")
   end
   if hist_pos < #history then
-    add("image_button[10.75,7.45;0.65,0.65;logistica_icon_next.png;"..
+    add("image_button[7.75,8.45;0.65,0.65;logistica_icon_next.png;"..
       AC_FWD_BTN..";;false;false;]")
     add("tooltip["..AC_FWD_BTN..";"..S("Forward").."]")
   end
+
+  -- recursive crafting section (right of recipe grid, below upgrade slot)
+  add("label["..AC_REC_X..",2.2;"..S("Recursive Crafting").."]")
+
+  if not logistica.ac_has_recursive_upgrade(pos) then
+    add("label["..AC_REC_X..",3.0;"..S("Insert Recursive Crafting Upgrade to enable").."]")
+  else
+    add("button["..AC_REC_X..",2.7;2.3,0.65;"..AC_REC_CHECK_BTN..";"..S("Check").."]")
+    add("button[12.5,2.7;2.3,0.65;"..AC_REC_CRAFT_BTN..";"..S("Craft").."]")
+
+    local rec_lines = data.ac_rec_lines or {}
+    local lines_strs = {}
+    for _, l in ipairs(rec_lines) do lines_strs[#lines_strs + 1] = l end
+    add("textlist["..AC_REC_X..",3.45;4.9,1.3;"..AC_REC_TEXTLIST..";"..
+      table.concat(lines_strs, ",")..";0;false]")
+
+    -- queue display: green highlight behind first slot
+    add("box["..(AC_REC_X - 0.125)..",4.725;1.25,1.25;#00AA0066]")
+    local q_inv_name = data.ac_queue_inv_name or ""
+    add("list[detached:"..q_inv_name..";queue;"..AC_REC_X..",4.85;4,1;0]")
+  end
+
+  -- output inventory (normal slots, always visible when any upgrade is installed)
+  add("label["..AC_REC_X..",6.3;"..S("Output:").."]")
+  add("list[nodemeta:"..posStr..";"..AC_OUTPUT_LIST..";"..AC_REC_X..",6.5;4,3;0]")
+  add("listring[nodemeta:"..posStr..";"..AC_OUTPUT_LIST.."]")
+  add("listring[current_player;main]")
 
   return table.concat(out)
 end
@@ -580,18 +823,29 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
       get_search_and_page_section(searchTerm, pageInfo, TAB_Y)
   end
 
+  local formH   = (tab == 3) and AC_FORM_H_AC       or AP_FORM_H
+  local plrInvY = (tab == 3) and AC_PLAYER_INV_Y_AC or AP_PLAYER_INV_Y
+
   return "formspec_version[4]"..
-    "size["..logistica.inv_size(15.2, AP_FORM_H).."]"..
+    "size["..logistica.inv_size(15.2, formH).."]"..
     logistica.ui.background..
+    logistica.ui.button_only_style..
     tabHeader..
     topContent..
-    logistica.player_inv_formspec(AP_PLAYER_INV_X, AP_PLAYER_INV_Y)..
+    logistica.player_inv_formspec(AP_PLAYER_INV_X, plrInvY)..
     "label[1.4,"..(12.7+TAB_Y)..";"..S("Crafting").."]"..
     "list[current_player;craft;0.2,"..(9.0+TAB_Y)..";3,3;]"..
     "list[current_player;craftpreview;3.9,"..(9.0+TAB_Y)..";1,1;]"
 end
 
+local function ensure_ap_inventories(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  if inv:get_size(logistica.AP_UPGRADE_LIST) < 1 then inv:set_size(logistica.AP_UPGRADE_LIST, 1) end
+  if inv:get_size(AC_OUTPUT_LIST) < 12 then inv:set_size(AC_OUTPUT_LIST, 12) end
+end
+
 local function show_access_point_formspec(pos, playerName, optError)
+  ensure_ap_inventories(pos)
   if minetest.get_modpath("mcl_core") then
     local player = minetest.get_player_by_name(playerName)
     if not player then return end
@@ -610,6 +864,7 @@ local function show_access_point_formspec(pos, playerName, optError)
     position          = pos,
     invName           = invName,
     storFilterInvName = get_or_create_storage_filter_inv(playerName),
+    ac_queue_inv_name = get_or_create_queue_inv(playerName),
     tab               = prev.tab or 1,
     storPage          = prev.storPage or 1,
     storMapping       = prev.storMapping or {},
@@ -621,7 +876,20 @@ local function show_access_point_formspec(pos, playerName, optError)
     ac_error          = prev.ac_error,
     ac_use_player_inv = prev.ac_use_player_inv or false,
     from_wap          = prev.from_wap or false,
+    ac_rec_lines      = prev.ac_rec_lines or {},
+    ac_rec_plan       = prev.ac_rec_plan,
   }
+
+  local ac_meta = minetest.get_meta(pos)
+  local queue_str = ac_meta:get_string("ac_queue")
+  if queue_str ~= "" then
+    local queue = minetest.deserialize(queue_str)
+    if queue then
+      local q_pos   = ac_meta:get_int("ac_queue_pos")
+      local q_count = ac_meta:get_int("ac_queue_cur_count")
+      ac_populate_queue_display(accessPointForms[playerName], ac_queue_display_items(queue, q_pos, q_count))
+    end
+  end
 
   logistica.access_point_refresh_fake_inv(pos, invName, INV_FAKE, FAKE_INV_SIZE, playerName)
   logistica.access_point_refresh_liquids(pos, playerName)
@@ -807,6 +1075,12 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
 
     elseif fields[AC_CRAFT10_BTN] then
       ac_handle_craft(pos, data, player, 10)
+
+    elseif fields[AC_REC_CHECK_BTN] then
+      ac_handle_recursive_check(pos, data)
+
+    elseif fields[AC_REC_CRAFT_BTN] then
+      ac_handle_recursive_craft(pos, data)
     end
   end
   show_access_point_formspec(pos, playerName)
@@ -988,6 +1262,10 @@ function logistica.access_point_on_player_leave(playerName)
     minetest.remove_detached_inventory(storFilterInventories[playerName])
     storFilterInventories[playerName] = nil
   end
+  if queueInventories[playerName] then
+    minetest.remove_detached_inventory(queueInventories[playerName])
+    queueInventories[playerName] = nil
+  end
   accessPointForms[playerName] = nil
   logistica.access_point_on_player_close(playerName)
 end
@@ -1008,4 +1286,8 @@ end
 
 function logistica.access_point_is_player_using_ap(playerName)
   return accessPointForms[playerName] ~= nil
+end
+
+function logistica.access_point_show_for_player(pos, playerName)
+  show_access_point_formspec(pos, playerName)
 end

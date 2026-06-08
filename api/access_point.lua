@@ -4,7 +4,9 @@ local function after_place_access_point(pos, placer, itemstack, numSlots, numUpg
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
-  meta:get_inventory():set_size(logistica.AP_UPGRADE_LIST, 1)
+  local inv = meta:get_inventory()
+  inv:set_size(logistica.AP_UPGRADE_LIST, 1)
+  inv:set_size("ac_output", 12)
   logistica.access_point_after_place(pos, meta)
   logistica.on_access_point_change(pos)
 end
@@ -20,24 +22,43 @@ local function after_dig_access_point(pos, oldnode, oldmeta, digger)
 end
 
 local function can_dig_access_point(pos, player)
-  return minetest.get_meta(pos):get_inventory():is_empty(logistica.AP_UPGRADE_LIST)
+  local meta = minetest.get_meta(pos)
+  if meta:get_string("ac_queue") ~= "" then return false end
+  local inv = meta:get_inventory()
+  return inv:is_empty(logistica.AP_UPGRADE_LIST) and inv:is_empty("ac_output")
 end
 
 local function allow_access_point_inv_put(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= logistica.AP_UPGRADE_LIST then return 0 end
-  if stack:get_name() ~= logistica.AP_UPGRADE_ITEM then return 0 end
+  local name = stack:get_name()
+  if name ~= logistica.AP_UPGRADE_ITEM and name ~= logistica.AP_RECURSIVE_UPGRADE_ITEM then return 0 end
   if not minetest.get_meta(pos):get_inventory():get_stack(listname, index):is_empty() then return 0 end
   return 1
 end
 
 local function allow_access_point_inv_take(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
+  if listname == logistica.AP_UPGRADE_LIST then
+    if not minetest.get_meta(pos):get_inventory():is_empty("ac_output") then return 0 end
+  end
   return stack:get_count()
 end
 
 local function allow_access_point_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   return 0
+end
+
+local function on_access_point_inv_put(pos, listname, index, stack, player)
+  if listname == logistica.AP_UPGRADE_LIST then
+    logistica.access_point_show_for_player(pos, player:get_player_name())
+  end
+end
+
+local function on_access_point_inv_take(pos, listname, index, stack, player)
+  if listname == logistica.AP_UPGRADE_LIST then
+    logistica.access_point_show_for_player(pos, player:get_player_name())
+  end
 end
 
 ----------------------------------------------------------------
@@ -83,6 +104,7 @@ function logistica.register_access_point(desc, name, tiles)
     drop = access_point_name,
     sounds = logistica.node_sound_metallic(),
     can_dig = can_dig_access_point,
+    on_timer = logistica.access_point_queue_timer,
     connect_sides = {"top", "bottom", "left", "back", "right" },
     after_place_node = after_place_access_point,
     after_dig_node = after_dig_access_point,
@@ -90,6 +112,8 @@ function logistica.register_access_point(desc, name, tiles)
     allow_metadata_inventory_put  = allow_access_point_inv_put,
     allow_metadata_inventory_take = allow_access_point_inv_take,
     allow_metadata_inventory_move = allow_access_point_inv_move,
+    on_metadata_inventory_put  = on_access_point_inv_put,
+    on_metadata_inventory_take = on_access_point_inv_take,
     logistica = {},
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10

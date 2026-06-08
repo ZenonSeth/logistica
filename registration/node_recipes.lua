@@ -418,3 +418,12 @@ logistica.register_craft({
     {PLATE,                    L("crafting_supplier"),    PLATE},
   }
 })
+
+logistica.register_craft({
+  output = L("autocrafting_recursive_upgrade"),
+  recipe = {
+    {L("autocrafting_upgrade"), L("crafting_supplier"),   L("autocrafting_upgrade")},
+    {L("crafting_supplier"),    CIRC,                     L("crafting_supplier")},
+    {L("autocrafting_upgrade"), L("crafting_supplier"),   L("autocrafting_upgrade")},
+  }
+})

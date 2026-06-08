@@ -70,7 +70,7 @@ Use the Prev and Next buttons at the bottom to page through all Mass Storages on
 g.access_point_crafting = S([[
 The Easy Crafting tab on the Access Point lets you search for any craftable item and craft it directly from your network's stored items.
 
-To unlock this tab, insert an Access Point Crafting Upgrade into the upgrade slot in the top-right corner of the tab.
+To unlock this tab, insert an Access Point Crafting Upgrade (for basic crafting) or a Recursive Crafting Upgrade (for basic crafting and recursive crafting) into the upgrade slot in the top-right corner of the tab.
 
 # Searching
 
@@ -100,6 +100,10 @@ The [ < ] and [ > ] buttons navigate back and forward through recipes you have v
 # Wireless Access Pad
 
 When accessing the Easy Crafting tab through a Wireless Access Pad, the upgrade slot is hidden. The upgrade must be inserted by opening the Access Point directly.
+
+# Recipe limitations
+
+Recipes that use group ingredients (e.g. "group:stick") are supported. Each unique group in a recipe is expanded to all items belonging to that group, and one recipe variant is created per combination. For example, a recipe with group:wood and group:stick will appear as a separate variant for each (wood item, stick item) pair. Crafting each variant requires those exact items from your network.
 ]])
 
 g.optic_cable = S([[

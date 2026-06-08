@@ -6,6 +6,8 @@
 - Use new Hardned Silverin Block in construction of a Rock Melter node (was mentioned below too) - a furnace that burns regular items and makes lava. TODO: Check how much burn time a lava bucket provides. That's exactly how much time making a single lava node should take. The Rock Melter takes Cobblestone or Stone (todo: make itemstrings for those if not present). This should have an output tank of say 16 buckets of lava, which it can provide to the network, the same way Reservoirs provide lava to network. It should also have a slot to fill (but not empty) a bucket with Lava from the tank.
 - Access Point Migration - ensure upgrade inv (and any others we may add due to recursive crafting) exist when formspec is opened
 
+- New idea: Two machines - network bridgers - a Network Bridge Provider and a Network Bridge Recevier. Provider has either push mode or passive supply mode. Recevier simply connects to the bridger and either tries to fulfil requests when they come or accepts things being pushed by the receiver. They are part of different networks but they have to face each other (well their backsides have to face each other)
+
 
 ### Definitely
 - Mass Storage
