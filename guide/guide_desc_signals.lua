@@ -377,6 +377,35 @@ The detector checks once per second. The signal is ON when the node at the targe
 When the node is disconnected from the network (dug up or isolated), its signal contribution is automatically removed.
 ]])
 
+g.signal_node_digger = S([[
+The Signal Node Digger is a signal receiver that digs a node at a set distance directly behind it when it receives a rising signal edge (OFF to ON). Dug items are stored inside the digger and made available to the network as a passive supplier (take-only). The network cannot push items into a digger.
+
+# Usage
+
+Right-click to open the settings.
+Sneak+punch to highlight the target position.
+
+The infotext shows the current filter state, distance, signal name, and status.
+
+# Configuration
+
+Filter slots: place up to 8 node items to restrict digging to only those node types. Leave all slots empty to dig any node at the target position regardless of type.
+
+Tool slot: place a tool to use when digging. Details to be documented.
+
+Dig distance: the number of blocks behind the digger to target. Use the - and + buttons to adjust.
+
+Signal Name: the name of the signal this node listens for. The digger fires once each time this signal transitions from OFF to ON. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+# Behavior
+
+The digger stores an owner. The owner must be online for digging to work. If a different player opens the formspec, they can press Take Ownership to become the new owner.
+
+Dug items fill the digger's internal buffer (16 slots). If the buffer is full, excess drops fall at the target position. The network can pull from the buffer at any time. The digger cannot be picked up while its buffer contains items.
+
+When disconnected from the network (dug up or isolated), the digger stops reacting to signals.
+]])
+
 g.signal_node_placer = S([[
 The Signal Node Placer is a signal receiver that places a configured node at a set distance directly behind it when it receives a rising signal edge (OFF to ON). Items are drawn from network storage automatically.
 

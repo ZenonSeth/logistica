@@ -684,6 +684,19 @@ logistica.register_signal_node_detector(
   }
 )
 
+logistica.register_signal_node_digger(
+  S("Signal Node Digger"),
+  "signal_node_digger",
+  {
+    "logistica_signal_node_digger_side.png^[transformR270",
+    "logistica_signal_node_digger_side.png^[transformR90",
+    "logistica_signal_node_digger_side.png^[transformR180",
+    "logistica_signal_node_digger_side.png",
+    "logistica_signal_node_digger_back.png",
+    "logistica_signal_toggler_front.png",
+  }
+)
+
 logistica.register_signal_node_placer(
   S("Signal Node Placer"),
   "signal_node_placer",
