@@ -55,7 +55,18 @@ local function get_lists(targetPosition, usePushLists)
   elseif logistica.GROUPS.suppliers.is(node.name) or logistica.GROUPS.vaccuum_suppliers.is(node.name) then
     allowedLists = logisticaSupplyChestsPushPull
     disallowedLists = {}
-  elseif logistica.is_machine(node.name) then return {}
+  elseif logistica.is_machine(node.name) then
+    local nodeDef = minetest.registered_nodes[node.name]
+    if not (nodeDef and nodeDef.logistica and nodeDef.logistica.automatable) then return {} end
+    if usePushLists then
+      allowedLists = allowedPush
+      disallowedLists = disallowedPushLists
+      allowedForNode = allowedPushListsByNode[node.name] or {}
+    else
+      allowedLists = allowedPull
+      disallowedLists = disallowedPullLists
+      allowedForNode = allowedPullListsByNode[node.name] or {}
+    end
   elseif usePushLists then
     allowedLists = allowedPush
     disallowedLists = disallowedPushLists

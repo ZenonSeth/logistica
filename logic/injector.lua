@@ -78,7 +78,10 @@ function logistica.on_injector_timer(pos, elapsed)
   end
   local targetList = logistica.get_injector_target_list(pos)
   local targetPos = logistica.get_injector_target(pos)
-  if targetPos == nil or logistica.is_machine(minetest.get_node(targetPos).name) then
+  local targetNodeName = targetPos and minetest.get_node(targetPos).name
+  local targetDef = targetNodeName and minetest.registered_nodes[targetNodeName]
+  local targetAutomatable = targetDef and targetDef.logistica and targetDef.logistica.automatable
+  if targetPos == nil or (logistica.is_machine(targetNodeName) and not targetAutomatable) then
     logistica.start_node_timer(pos, TIMER_DURATION_LONG)
     return false
   end

@@ -11,6 +11,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("rock_melter"),
+  recipe = {
+    {L("hardened_silverin_block"), itemstrings.clay,           L("hardened_silverin_block")},
+    {L("optic_cable"),             L("compression_tank"),      L("photonizer")},
+    {L("hardened_silverin_block"), itemstrings.clay,           L("hardened_silverin_block")},
+  }
+})
+
+logistica.register_craft({
   output = L("mass_storage_basic"),
   recipe = {
     {L("silverin_plate"),      L("optic_cable"),         L("silverin_plate")},

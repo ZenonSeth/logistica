@@ -83,6 +83,14 @@ In addition to being used for the construction of almost all machines, the Silve
 See the Lava Furnace's built-in guide.
 ]])
 
+g.hardened_silverin_block = S([[
+A Silverin Block that has been baked with Obsidian in the Lava Furnace, producing a block with exceptional heat resistance. Used in the construction of the Rock Melter.
+
+It can also be placed as a decorative block.
+
+See the Lava Furnace's built-in guide.
+]])
+
 g.compression_tank = S([[
 A tank capable of compressing liquids when used in the right machine. Used for creation of Reservoirs.
 ]])

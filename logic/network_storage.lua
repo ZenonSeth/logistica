@@ -58,18 +58,21 @@ function logistica.empty_bucket_into_network(network, bucketItemStack, dryRun)
   for hash, _ in pairs(network.reservoirs or {}) do
     local pos = h2p(hash)
     logistica.load_position(pos)
-    local liquidInReservoir = logistica.reservoir_get_liquid_name(pos)
-    if liquidInReservoir == liquidName then
-      local levels = logistica.reservoir_get_liquid_level(pos)
-      if levels and levels[1] < levels[2] and levels[1] > highestReservoirLvl then
-        highestReservoirPos = pos
-        highestReservoirLvl = levels[1]
-      end
-    elseif liquidInReservoir == "" then
-      local levels = logistica.reservoir_get_liquid_level(pos)
-      if levels and levels[2] < emptyResrvoirMinCap then
-        emptyResrvoirMinCap = levels[2]
-        emptyReservoirPos = pos
+    local nodeDef = minetest.registered_nodes[minetest.get_node(pos).name]
+    if not (nodeDef and nodeDef.logistica and nodeDef.logistica.liquid_source_only) then
+      local liquidInReservoir = logistica.reservoir_get_liquid_name(pos)
+      if liquidInReservoir == liquidName then
+        local levels = logistica.reservoir_get_liquid_level(pos)
+        if levels and levels[1] < levels[2] and levels[1] > highestReservoirLvl then
+          highestReservoirPos = pos
+          highestReservoirLvl = levels[1]
+        end
+      elseif liquidInReservoir == "" then
+        local levels = logistica.reservoir_get_liquid_level(pos)
+        if levels and levels[2] < emptyResrvoirMinCap then
+          emptyResrvoirMinCap = levels[2]
+          emptyReservoirPos = pos
+        end
       end
     end
   end

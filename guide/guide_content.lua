@@ -31,6 +31,7 @@ local PAGE_SPRINKLER_UPGRADE = "isprinkup"
 local PAGE_WOODCUTTER = "mwoodcut"
 local PAGE_LEAVES_UPGRADE = "ileavesup"
 local PAGE_LAVA_FUELER = "mlvfuel"
+local PAGE_ROCK_MELTER = "mrockmelt"
 local PAGE_COBBLE_GENERATOR = "mcobgen"
 local PAGE_TRASHCAN = "mtrash"
 local PAGE_DISASSEMBLER = "mdisasm"
@@ -50,6 +51,7 @@ local PAGE_SILVERIN_SLICE = "isilsli"
 local PAGE_SILVERIN_CIRCUIT = "isilcir"
 local PAGE_SILVERIN_MIRRORBOX = "isilmbx"
 local PAGE_SILVERIN_PLATE = "isilplt"
+local PAGE_HARDENED_SILVERIN_BLOCK = "ihardsilblk"
 local PAGE_COMPRESSION_TANK = "icomptnk"
 local PAGE_PHOTONIZERS = "iphtns"
 local PAGE_WAVE_FUN_MAIN = "iwvfnm"
@@ -119,6 +121,7 @@ local RECIPE_SPRINKUP = getrec({L("sprinkler_upgrade")})
 local RECIPE_WOODCUT  = getrec({L("woodcutter")})
 local RECIPE_LEAVESUP = getrec({L("leaves_upgrade")})
 local RECIPE_LVFRFUEL = getrec({L("lava_furnace_fueler")})
+local RECIPE_ROCKMELT = getrec({L("rock_melter")})
 local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
 local RECIPE_DISASSEMBLER = getrec({L("disassembler")})
@@ -139,6 +142,7 @@ local RECIPE_WRLSANTN = getrec({L("wireless_antenna")})
 
 local RECIPE_SILVERIN = getlavarec(L("silverin"))
 local RECIPE_SILVPLAT = getlavarec(L("silverin_plate"))
+local RECIPE_HARDSILBLK = getlavarec(L("hardened_silverin_block"))
 local RECIPE_SILVCIRC = getlavarec(L("silverin_circuit"))
 local RECIPE_SILVMIRR = getlavarec(L("silverin_mirror_box"))
 local RECIPE_WRLSCRYS = getlavarec(L("wireless_crystal"))
@@ -164,6 +168,7 @@ local RECIPE_LINKS = {
   [L("silverin_slice")] = PAGE_SILVERIN_SLICE,
   [L("silverin_mirror_box")] = PAGE_SILVERIN_MIRRORBOX,
   [L("silverin_plate")] = PAGE_SILVERIN_PLATE,
+  [L("hardened_silverin_block")] = PAGE_HARDENED_SILVERIN_BLOCK,
   [L("compression_tank")] = PAGE_COMPRESSION_TANK,
   [L("photonizer")] = PAGE_PHOTONIZERS,
   [L("photonizer_reversed")] = PAGE_PHOTONIZERS,
@@ -200,6 +205,7 @@ local RECIPE_LINKS = {
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
+  [L("rock_melter")] = PAGE_ROCK_MELTER,
   [L("reservoir_silverin_empty")] = PAGE_RESERVOIR,
   [L("reservoir_obsidian_empty")] = PAGE_RESERVOIR,
   [L("wireless_synchronizer")] = PAGE_WIRELESS_UPGRADER,
@@ -284,6 +290,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("Utility Machines:"))},
     { name = S("  Vacuum Chest"), id = PAGE_VACCUUM_CHEST },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
+    { name = S("  Rock Melter"), id = PAGE_ROCK_MELTER },
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
     { name = S("  Trashcan"), id = PAGE_TRASHCAN },
     { name = S("  Machine Disassembler"), id = PAGE_DISASSEMBLER },
@@ -304,6 +311,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Silverin Circuit"), id = PAGE_SILVERIN_CIRCUIT },
     { name = S("  Silverin Mirror Box"), id = PAGE_SILVERIN_MIRRORBOX },
     { name = S("  Silverin Plate"), id = PAGE_SILVERIN_PLATE },
+    { name = S("  Hardened Silverin Block"), id = PAGE_HARDENED_SILVERIN_BLOCK },
     { name = S("  Compression Tank"), id = PAGE_COMPRESSION_TANK },
     { name = S("  Photonizer/Reverse Polarity"), id = PAGE_PHOTONIZERS },
     { name = S("  Wave Function Maintainer"), id = PAGE_WAVE_FUN_MAIN },
@@ -557,6 +565,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
       description = desc.lava_furnace_fueler,
     },
 
+    [PAGE_ROCK_MELTER] = {
+      title = S("Rock Melter"),
+      relatedItems = {L("lava_furnace_fueler"), L("hardened_silverin_block")},
+      recipes = RECIPE_ROCKMELT,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.rock_melter,
+    },
+
     [PAGE_COBBLE_GENERATOR] = {
       title = S("Cobble Generator"),
       relatedItems = {L("cobblegen_upgrade")},
@@ -653,6 +669,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SILVPLAT,
       recipeLinks = RECIPE_LINKS,
       description = desc.silverin_plate,
+    },
+
+    [PAGE_HARDENED_SILVERIN_BLOCK] = {
+      title = S("Hardened Silverin Block"),
+      relatedItems = {L("rock_melter"), L("lava_furnace")},
+      recipes = RECIPE_HARDSILBLK,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.hardened_silverin_block,
     },
 
     [PAGE_COMPRESSION_TANK] = {

@@ -31,7 +31,11 @@ local function get_meta(pos)
 end
 
 local function is_prohibited_logistica_machine(name)
-  return logistica.is_machine(name) and not logistica.GROUPS.bucket_emptiers.is(name)
+  if not logistica.is_machine(name) then return false end
+  if logistica.GROUPS.bucket_emptiers.is(name) then return false end
+  local def = minetest.registered_nodes[name]
+  if def and def.logistica and def.logistica.automatable then return false end
+  return true
 end
 
 local function get_requester_slot_amount(meta, i)

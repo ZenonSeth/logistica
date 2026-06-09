@@ -374,6 +374,18 @@ The Vacuum Supply Chest acts like a regular Supply chest, providing items to the
 The on/off switch in the Vacuum Chests's inventory enables whether the chest will be collecting nearby items or not.
 ]])
 
+g.rock_melter = S([[
+The Rock Melter is a network-connected machine that melts stone-type blocks into Lava, storing up to 16 buckets in its internal tank. The stored Lava is available to the network as a read-only Reservoir - a Lava Furnace Fueler on the same network can draw Lava from it. Unlike regular Reservoirs, the network cannot store Lava into the Rock Melter; it only provides Lava outward.
+
+Place any full-block stone-type item (such as Cobblestone or Stone) in the Input slot and a valid fuel in the Fuel slot. The machine burns through fuel while slowly melting the stone. Lava Buckets can also be used as fuel.
+
+To collect Lava manually, place an Empty Bucket in the slot below the tank - it will be filled automatically once enough Lava is available.
+
+The Fuel and Input slots can be automated with a Request Inserter, and the Output slot can be automated with a Network Importer.
+
+Requires a Hardened Silverin Block to craft, which is produced in the Lava Furnace.
+]])
+
 g.lava_furnace_fueler = S([[
 The Lava Furnace Fueler is a Network-connected machine that will attempt to re-fuel a Lava Furnace from any Reservoirs containing Lava that are connected to the network, thus allowing Automation of the Lava Furnace.
 

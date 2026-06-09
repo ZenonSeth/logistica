@@ -160,10 +160,12 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
     if not fullBucket then return nil end
 
     nodeLiquidLevel = nodeLiquidLevel - 1
-    if nodeLiquidLevel == 0 then
-      node.param2 = 0
-    else
-      node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
+    if nodeDef.paramtype2 ~= "facedir" then
+      if nodeLiquidLevel == 0 then
+        node.param2 = 0
+      else
+        node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
+      end
     end
     if not dryRun then
       minetest.swap_node(pos, node)

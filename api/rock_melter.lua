@@ -5,10 +5,10 @@ local get_meta = minetest.get_meta
 local META_FUEL_TIME       = "fuel_time"
 local META_FUEL_TOTALTIME  = "fuel_totaltime"
 local META_SRC_TIME        = "src_time"
-local META_LAVA_STORED     = "lava_stored"
+local META_LAVA_STORED     = "liquidLevel"  -- matches reservoir meta key so network can read it
 
-local LAVA_CAP         = 16000  -- 16 buckets
-local LAVA_PER_COBBLE  = 1000   -- 1 bucket per cobble
+local LAVA_CAP         = 16  -- 16 buckets
+local LAVA_PER_COBBLE  = 1   -- 1 bucket per cobble
 
 local INV_FUEL   = "fuel"
 local INV_SRC    = "src"
@@ -50,8 +50,7 @@ local function get_tank_img(lava_stored)
   else
     img = "image[8.7,1.2;1,3;logistica_lava_furnace_tank_bg.png]"
   end
-  local buckets = lava_stored / 1000
-  return img.."tooltip[8.7,1.2;1,3;"..FS("Stored: ")..buckets..FS(" / 16 Buckets").."]"
+  return img.."tooltip[8.7,1.2;1,3;"..FS("Stored: ")..lava_stored..FS(" / 16 Buckets").."]"
 end
 
 local function common_formspec(meta)
@@ -108,7 +107,7 @@ end
 --------------------------------
 
 local function update_infotext(meta)
-  local units = math.floor(meta:get_int(META_LAVA_STORED) / 1000)
+  local units = meta:get_int(META_LAVA_STORED)
   meta:set_string("infotext", S("Has: ")..units.."/16 "..S("Units of Lava"))
 end
 
@@ -272,7 +271,7 @@ local function can_dig(pos)
 end
 
 local function on_destruct(pos)
-  local buckets = math.floor(get_meta(pos):get_int(META_LAVA_STORED) / 1000)
+  local buckets = get_meta(pos):get_int(META_LAVA_STORED)
   for i = 1, buckets do
     minetest.item_drop(
       ItemStack("logistica:lava_unit"), nil,
@@ -335,7 +334,7 @@ function logistica.register_rock_melter(desc, name, tiles)
     description = desc,
     tiles = tiles.inactive,
     paramtype2 = "facedir",
-    groups = { cracky = 2 },
+    groups = { cracky = 2, [logistica.TIER_ALL] = 1 },
     sounds = logistica.sound_mod.node_sound_stone_defaults(),
     stack_max = logistica.stack_max,
     _mcl_hardness = 3,
@@ -350,16 +349,22 @@ function logistica.register_rock_melter(desc, name, tiles)
     on_metadata_inventory_put = on_inv_change,
     on_metadata_inventory_take = on_inv_take,
     on_metadata_inventory_move = on_inv_change,
+    after_place_node = function(pos) logistica.on_reservoir_change(pos) end,
+    after_dig_node = logistica.on_reservoir_change,
+    logistica = { liquidName = logistica.liquids.lava, maxBuckets = LAVA_CAP, automatable = true, liquid_source_only = true },
   }
 
   minetest.register_node(lname, def)
+  logistica.GROUPS.reservoirs.register(lname)
 
   local def_active = table.copy(def)
   def_active.tiles = tiles.active
   def_active.on_construct = nil
+  def_active.after_place_node = nil
   def_active.light_source = 9
   def_active.drop = lname
-  def_active.groups = { cracky = 2, not_in_creative_inventory = 1 }
+  def_active.groups = { cracky = 2, not_in_creative_inventory = 1, [logistica.TIER_ALL] = 1 }
 
   minetest.register_node(lname.."_active", def_active)
+  logistica.GROUPS.reservoirs.register(lname.."_active")
 end
