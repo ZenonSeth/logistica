@@ -1,7 +1,7 @@
 ## Logistica 2.0 Wishlist
 
 ## TODO - fixes + improvements on new features
-- RECURSIVE CRAFTING RECIPE SELECTION IMPROVEMENT: Prefer using items that are in network over crafting an item - so for items with multiple recipes first scan the network for each recipe's ingredients, if its craftable, prefer it, otherwise fall back to sub-crafting the item.
+- RECURSIVE CRAFTING RECIPE SELECTION IMPROVEMENT: Prefer using recipes that have the most # of their ingredients available directly in storage. E.g. if an item has 3 recipes, let's say 1 stone + 1 woodA, then woodB then woodC - and we have woodC in storage, but not woodA or woodB - then prefer the recipe with woodC. Basically count how many items from the recipe are available to fulfil this craft and then use the recipe that has the most number
 - Make sure Harvester doesn't allow storing from network - it's a take-only inventory, filled only by its machine harvesting plants/seeds. -- DONE
 - Add new decorative/for-crafting node: Hardened Silverin Block (Silvering Block + Obsidian additive in the Lava Furnace) -- DONE
 - Use new Hardened Silverin Block in construction of a Rock Melter node -- DONE (read-only lava reservoir on the network; fuel/src/dst slots automatable; nodebox visuals; guide entry)
