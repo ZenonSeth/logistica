@@ -93,6 +93,16 @@ Use the [Craft] button to craft one batch, or [x10] to craft ten at once.
 
 If "Also use player inventory" is checked, items are first drawn from the network and the remainder taken from your inventory.
 
+# Recursive Crafting
+
+The Recursive Crafting Upgrade works the same as the regular Access Point Crafting Upgrade, but also enables recursive (deep) crafting.
+
+With recursive crafting enabled, you can craft an item even when its direct ingredients are not all in storage - as long as the ingredients needed to make those ingredients are available. The system plans the full crafting chain automatically, crafting any missing sub-components from the network first, then assembling the final item.
+
+Handles normal crafting grid recipes only. It is most useful when crafting complex machines whose ingredients themselves have multi-step crafting recipes.
+
+The Recursive Crafting Upgrade can replace the regular Access Point Crafting Upgrade; you do not need both.
+
 # History navigation
 
 The [ < ] and [ > ] buttons navigate back and forward through recipes you have viewed, similar to browser history. Clicking an ingredient in the recipe grid also navigates to that ingredient's own recipe.

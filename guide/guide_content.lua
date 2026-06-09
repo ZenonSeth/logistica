@@ -126,7 +126,7 @@ local RECIPE_COBBLGEN = getrec({L("cobblegen_supplier")})
 local RECIPE_TRASHCAN = getrec({L("trashcan")})
 local RECIPE_DISASSEMBLER = getrec({L("disassembler")})
 local RECIPE_ITEM_MONITOR = getrec({L("item_monitor")})
-local RECIPE_ACUPGRD = getrec({L("autocrafting_upgrade")})
+local RECIPE_ACUPGRD = getrec({L("autocrafting_upgrade"), L("autocrafting_recursive_upgrade")})
 local RECIPE_WRLSTRNS = getrec({L("wireless_transmitter")})
 local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 
@@ -185,6 +185,8 @@ local RECIPE_LINKS = {
   [L("storage_upgrade_2")] = PAGE_MASS_STORAGE_UPGR,
   [L("storage_upgrade_multiplier")] = PAGE_MASS_STORAGE_UPGR,
   [L("cobblegen_upgrade")] = PAGE_COBBLE_GENERATOR_UPGR,
+  [L("autocrafting_upgrade")] = PAGE_ACCESS_POINT_CRAFTING,
+  [L("autocrafting_recursive_upgrade")] = PAGE_ACCESS_POINT_CRAFTING,
   [L("silverin_circuit")] = PAGE_SILVERIN_CIRCUIT,
   [L("wireless_antenna")] = PAGE_WIRELESS_ANTENNA,
 
@@ -380,6 +382,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_ACCESS_POINT_CRAFTING] = {
       title = S("Access Point Crafting"),
+      relatedItems = {L("autocrafting_upgrade"), L("autocrafting_recursive_upgrade")},
       recipes = RECIPE_ACUPGRD,
       recipeLinks = RECIPE_LINKS,
       description = desc.access_point_crafting,
