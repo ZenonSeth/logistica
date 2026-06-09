@@ -147,7 +147,9 @@ local function build_index()
   ac_index = {}
   build_group_lookup()
   for name, def in pairs(minetest.registered_items) do
-    process_item_recipes(name, def)
+    if not (def.groups and (def.groups.not_in_creative_inventory or 0) > 0) then
+      process_item_recipes(name, def)
+    end
   end
 end
 

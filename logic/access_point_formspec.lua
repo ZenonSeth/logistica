@@ -647,6 +647,8 @@ local function get_autocrafting_tab_content(pos, playerName)
     local y     = 1.0 + (i - 1) * 1.1
     if entry then
       add("item_image[0.2,"..y..";0.9,0.9;"..entry.name.."]")
+      add("tooltip[0.2,"..y..";0.9,0.9;"..
+        minetest.formspec_escape(ItemStack(entry.name):get_description()).."]")
       add("button[1.2,"..y..";4.3,0.9;"..AC_RESULT_BTN..i..";"..
         minetest.formspec_escape(entry.desc).."]")
     end
