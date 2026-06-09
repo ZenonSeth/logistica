@@ -333,7 +333,33 @@ function logistica.register_rock_melter(desc, name, tiles)
   local def = {
     description = desc,
     tiles = tiles.inactive,
+    drawtype = "nodebox",
+    paramtype = "light",
     paramtype2 = "facedir",
+    node_box = {
+      type = "fixed",
+      fixed = {
+        -- main body, inset 1/16 from each face
+        {-7/16, -7/16, -7/16,  7/16,  7/16,  7/16},
+        -- 4 edges parallel to X (top/bottom × front/back)
+        {-8/16,  7/16, -8/16,  8/16,  8/16, -7/16},
+        {-8/16,  7/16,  7/16,  8/16,  8/16,  8/16},
+        {-8/16, -8/16, -8/16,  8/16, -7/16, -7/16},
+        {-8/16, -8/16,  7/16,  8/16, -7/16,  8/16},
+        -- 4 edges parallel to Y (left/right × front/back)
+        {-8/16, -8/16, -8/16, -7/16,  8/16, -7/16},
+        { 7/16, -8/16, -8/16,  8/16,  8/16, -7/16},
+        {-8/16, -8/16,  7/16, -7/16,  8/16,  8/16},
+        { 7/16, -8/16,  7/16,  8/16,  8/16,  8/16},
+        -- 4 edges parallel to Z (top/bottom × left/right)
+        {-8/16,  7/16, -8/16, -7/16,  8/16,  8/16},
+        { 7/16,  7/16, -8/16,  8/16,  8/16,  8/16},
+        {-8/16, -8/16, -8/16, -7/16, -7/16,  8/16},
+        { 7/16, -8/16, -8/16,  8/16, -7/16,  8/16},
+      },
+    },
+    selection_box = { type = "regular" },
+    collision_box = { type = "regular" },
     groups = { cracky = 2, [logistica.TIER_ALL] = 1 },
     sounds = logistica.sound_mod.node_sound_stone_defaults(),
     stack_max = logistica.stack_max,
