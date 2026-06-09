@@ -74,6 +74,7 @@ local PAGE_SIGNAL_ITEM_COUNTER    = "sigitmcnt"
 local PAGE_SIGNAL_EXT_READER      = "sigextrd"
 local PAGE_SIGNAL_TIMER           = "sigtimer"
 local PAGE_SIGNAL_NODE_DETECTOR   = "signodedet"
+local PAGE_SIGNAL_NODE_PLACER     = "signodeplacer"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -162,6 +163,7 @@ local RECIPE_SIG_COUNTER  = getrec({L("signal_item_counter")})
 local RECIPE_SIG_EXTRD    = getrec({L("signal_ext_reader")})
 local RECIPE_SIG_TIMER    = getrec({L("signal_timer")})
 local RECIPE_SIG_NODEDET  = getrec({L("signal_node_detector")})
+local RECIPE_SIG_NODEPLACER = getrec({L("signal_node_placer")})
 
 local RECIPE_LINKS = {
   -- items
@@ -207,6 +209,7 @@ local RECIPE_LINKS = {
   [L("signal_ext_reader")]     = PAGE_SIGNAL_EXT_READER,
   [L("signal_timer")]          = PAGE_SIGNAL_TIMER,
   [L("signal_node_detector")]  = PAGE_SIGNAL_NODE_DETECTOR,
+  [L("signal_node_placer")]    = PAGE_SIGNAL_NODE_PLACER,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -293,6 +296,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
     { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
+    { name = S("  Signal Node Placer"),   id = PAGE_SIGNAL_NODE_PLACER },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -829,6 +833,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_NODEDET,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_node_detector,
+    },
+
+    [PAGE_SIGNAL_NODE_PLACER] = {
+      title = S("Signal Node Placer"),
+      recipes = RECIPE_SIG_NODEPLACER,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_node_placer,
     },
 
     -- Settings

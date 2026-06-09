@@ -377,6 +377,35 @@ The detector checks once per second. The signal is ON when the node at the targe
 When the node is disconnected from the network (dug up or isolated), its signal contribution is automatically removed.
 ]])
 
+g.signal_node_placer = S([[
+The Signal Node Placer is a signal receiver that places a configured node at a set distance directly behind it when it receives a rising signal edge (OFF to ON). Items are drawn from network storage automatically.
+
+# Usage
+
+Right-click to open the settings.
+Sneak+punch to highlight the target position.
+
+The infotext shows the configured node, distance, signal name, and current state.
+
+# Configuration
+
+Node to place: put any placeable node item into the filter slot to set what the placer will place. Only registered nodes are accepted. Leave the slot empty and the placer will do nothing when triggered.
+
+Place distance: the number of blocks behind the placer to target. Distance 1 means the node directly behind it; distance 2 means one block further back, and so on. Use the - and + buttons to adjust.
+
+Signal Name: the name of the signal this node listens for. The placer fires once each time this signal transitions from OFF to ON. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+# Behavior
+
+When triggered, the placer checks the target position. If it is occupied (not air or otherwise not buildable), the trigger is silently ignored and no item is consumed. If the position is free, the placer takes one item of the configured node from the network and places it at the target.
+
+The status line in the formspec turns red if the last placement attempt failed because the item was not available in the network. The status clears when placement succeeds or when the filter slot is changed.
+
+The placer stores an owner - the player who placed it (or last took ownership). The owner must be online for placement to work, since the placement is performed as that player. This ensures protection mods are respected. If a different player opens the formspec, they can press Take Ownership to become the new owner.
+
+When disconnected from the network (dug up or isolated), the placer stops reacting to signals.
+]])
+
 g.signal_toggler = S([[
 The Signal Toggler is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
 
