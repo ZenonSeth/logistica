@@ -391,6 +391,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("signal_node_detector"),
+  recipe = {
+    {PLATE,            "",               PLATE},
+    {itemstrings.glass, RELAY,           L("silverin_block")},
+    {PLATE,            CIRC,             PLATE},
+  }
+})
+
+logistica.register_craft({
   output = L("disassembler"),
   recipe = {
     {"",              CABLE,                ""},

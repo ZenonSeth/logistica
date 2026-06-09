@@ -660,6 +660,31 @@ logistica.register_signal_timer(
 )
 
 --------------------------------
+-- Signal Node Detector
+--------------------------------
+
+logistica.register_signal_node_detector(
+  S("Signal Node Detector"),
+  "signal_node_detector",
+  {
+    "logistica_signal_node_detector_side.png^[transformR270",
+    "logistica_signal_node_detector_side.png^[transformR90",
+    "logistica_signal_node_detector_side.png^[transformR180",
+    "logistica_signal_node_detector_side.png",
+    "logistica_signal_node_detector_back.png",
+    "logistica_signal_toggler_front.png",
+  },
+  {
+    "logistica_signal_node_detector_side_on.png^[transformR270",
+    "logistica_signal_node_detector_side_on.png^[transformR90",
+    "logistica_signal_node_detector_side_on.png^[transformR180",
+    "logistica_signal_node_detector_side_on.png",
+    "logistica_signal_node_detector_back.png",
+    "logistica_signal_toggler_front.png",
+  }
+)
+
+--------------------------------
 -- Wireless Upgrader
 --------------------------------
 

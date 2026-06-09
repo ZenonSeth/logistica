@@ -350,6 +350,33 @@ When the node is disconnected from the network (dug up or isolated), its signal 
 - Gate a machine with a Signal Toggler so it only runs while supplies are available.
 ]])
 
+g.signal_node_detector = S([[
+The Signal Node Detector is a signal sender that checks whether a specific node (or any non-air node) is present at a configured distance directly behind it, and broadcasts a named signal accordingly.
+
+# Usage
+
+Right-click to open the settings.
+Use the Enable button to start or pause detection.
+
+The infotext above the node shows the configured filter, distance, signal name, and current state.
+
+# Configuration
+
+Node to detect: place any node item into the filter slot to restrict detection to that specific node type. Leave the slot empty to detect ANY non-air node regardless of type.
+
+Detect distance: the number of blocks behind the detector to check. Distance 1 means the node directly behind it; distance 2 means one block further back, and so on. Use the - and + buttons to adjust.
+
+Signal Name: the name of the signal this node broadcasts when the target node is detected. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Enable button: toggles the node between Running and Paused. When Paused, the signal is immediately sent as OFF.
+
+# Behavior
+
+The detector checks once per second. The signal is ON when the node at the target position matches the filter (or is any non-air node if the filter is empty). The signal is OFF when the target position is air, unloaded, or does not match the filter.
+
+When the node is disconnected from the network (dug up or isolated), its signal contribution is automatically removed.
+]])
+
 g.signal_toggler = S([[
 The Signal Toggler is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
 

@@ -73,6 +73,7 @@ local PAGE_MESECON_SIG_SENDER     = "messnd"
 local PAGE_SIGNAL_ITEM_COUNTER    = "sigitmcnt"
 local PAGE_SIGNAL_EXT_READER      = "sigextrd"
 local PAGE_SIGNAL_TIMER           = "sigtimer"
+local PAGE_SIGNAL_NODE_DETECTOR   = "signodedet"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -159,7 +160,8 @@ local RECIPE_SIG_MESR    = getrec({L("mesecon_signaler")})
 local RECIPE_SIG_MESS    = getrec({L("mesecon_sender")})
 local RECIPE_SIG_COUNTER  = getrec({L("signal_item_counter")})
 local RECIPE_SIG_EXTRD    = getrec({L("signal_ext_reader")})
-local RECIPE_SIG_TIMER   = getrec({L("signal_timer")})
+local RECIPE_SIG_TIMER    = getrec({L("signal_timer")})
+local RECIPE_SIG_NODEDET  = getrec({L("signal_node_detector")})
 
 local RECIPE_LINKS = {
   -- items
@@ -201,9 +203,10 @@ local RECIPE_LINKS = {
   [L("signal_logic_gate")]   = PAGE_SIGNAL_LOGIC_GATE,
   [L("mesecon_signaler")]    = PAGE_MESECON_SIG_RECEIVER,
   [L("mesecon_sender")]      = PAGE_MESECON_SIG_SENDER,
-  [L("signal_item_counter")] = PAGE_SIGNAL_ITEM_COUNTER,
-  [L("signal_ext_reader")]   = PAGE_SIGNAL_EXT_READER,
-  [L("signal_timer")]        = PAGE_SIGNAL_TIMER,
+  [L("signal_item_counter")]   = PAGE_SIGNAL_ITEM_COUNTER,
+  [L("signal_ext_reader")]     = PAGE_SIGNAL_EXT_READER,
+  [L("signal_timer")]          = PAGE_SIGNAL_TIMER,
+  [L("signal_node_detector")]  = PAGE_SIGNAL_NODE_DETECTOR,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -289,6 +292,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Item Count Sender"), id = PAGE_SIGNAL_ITEM_COUNTER },
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
+    { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -818,6 +822,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_TIMER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_timer,
+    },
+
+    [PAGE_SIGNAL_NODE_DETECTOR] = {
+      title = S("Signal Node Detector"),
+      recipes = RECIPE_SIG_NODEDET,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_node_detector,
     },
 
     -- Settings
