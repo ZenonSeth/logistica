@@ -65,7 +65,9 @@ Placing a cable that bridges two different active networks will burn that cable.
 Note that Cables are the only way to extend a network's reach - meaning, machines will not carry the network connection through them. If you connect a network cable to one side of a machine, and then place a 2nd cable on the other side of the machine, the 2nd cable will not carry the network connection.
 
 # Toggleable Cables
-The Toggleable Cable works exactly like a regular cable, but can be right-clicked (aka used) to disconnect it from all other surrounding cables or machines. This allows you to make parts of your network easy to disconnect when you don't want to use them (For example, a disconnecting an auto-furnace setup when you don't need it anymore)
+The Toggleable Cable works exactly like a regular cable, but can be right-clicked (aka used) to disconnect it from all other surrounding cables or machines. This allows you to make parts of your network easy to disconnect when you don't want to use them (For example, a disconnecting an auto-furnace setup when you don't need it anymore).
+
+Toggleable Cables can also be controlled with mesecons or redstone (depending on what game base you are running). When right-clicked while being controlled by mesecons/redstone, the change will persist until the circuit undergoes a power cycle. (For example, if the mesecon was off, and a player right-clicked the Toggleable Cable to turn it on, then the mesecon would have to turn on and then off again to disable the Toggleable Cable once more).
 
 #Embedded Cables
 The Embedded Cable is a full block that acts like a regular Optic Cable, allowing cables to be run through walls without leaving visible gaps.
