@@ -202,11 +202,31 @@ local function get_guide_common_formspec(guideData, history, playerName)
     prevBtn..nextBtn
 end
 
+local function find_item_for_group(groupStr)
+  local firstGroup = groupStr:match("^([^,]+)") or groupStr
+  for name, def in pairs(minetest.registered_items) do
+    if name ~= "" and name ~= "unknown" and def.groups
+        and def.groups[firstGroup] and def.groups[firstGroup] > 0 then
+      return name
+    end
+  end
+  return ""
+end
+
 local function itm_img_grid(x, y, a, b, recipeData, recipeLinks)
   if not recipeData.input or not recipeData.input[a] or not recipeData.input[a][b] then return "" end
   if b > recipeData.width or a > recipeData.height then return "" end
 
   local item = recipeData.input[a][b]
+
+  local groupStr = item:match("^group:(.+)$")
+  if groupStr then
+    local repItem = find_item_for_group(groupStr)
+    local tooltip = "tooltip["..x..","..y..";1,1;"..minetest.formspec_escape("group:"..groupStr).."]"
+    local label = "label["..(x + 0.38)..","..(y + 0.58)..";G]"
+    return "item_image["..x..","..y..";1,1;"..repItem.."]"..label..tooltip
+  end
+
   local itemDescription = ItemStack(item):get_description()
   local tooltip = "tooltip["..x..","..y..";1,1;"..itemDescription.."]"
   if not recipeLinks or not recipeLinks[item] then -- no link, just show an image
