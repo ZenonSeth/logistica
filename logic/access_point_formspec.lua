@@ -469,7 +469,7 @@ local function ac_handle_recursive_check(pos, data)
   data.ac_rec_plan = plan
 
   if not plan then
-    data.ac_rec_lines = {"Cannot craft: "..(err or "unknown")}
+    data.ac_rec_lines = {err or "Cannot craft"}
     return
   end
 
@@ -505,7 +505,7 @@ local function ac_handle_recursive_craft(pos, data)
   data.ac_rec_plan = plan
 
   if not plan then
-    data.ac_rec_lines = {"Cannot craft: "..(err or "unknown")}
+    data.ac_rec_lines = {err or "Cannot craft"}
     return
   end
 

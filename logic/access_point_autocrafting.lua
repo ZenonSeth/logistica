@@ -351,8 +351,7 @@ end
 -- `virtual`: lazily-populated map of item_name -> remaining available count;
 --   mutated in place on success, restored on failure.
 -- `expanding`: set of item names currently in the call stack (cycle detection).
--- Returns a list of item names to craft in bottom-to-top order on success,
--- or nil on failure (virtual is unchanged when nil is returned).
+-- Returns queue, nil on success; nil, missing_item_name on failure.
 local function plan_item(item_name, count, virtual, expanding, network)
   if virtual[item_name] == nil then
     virtual[item_name] = logistica.count_items_in_network(item_name, network, true)
@@ -364,22 +363,43 @@ local function plan_item(item_name, count, virtual, expanding, network)
     return {}
   end
 
-  if expanding[item_name] then return nil end
+  if expanding[item_name] then return nil, item_name end
   local entry = ac_index[item_name]
-  if not entry then return nil end
+  if not entry then return nil, item_name end
 
   local still_need = count - have
   virtual[item_name] = 0
   expanding[item_name] = true
 
-  for _, recipe in ipairs(entry.recipes) do
+  local recipes_to_try = entry.recipes
+  if #entry.recipes > 1 then
+    local scored = {}
+    for _, recipe in ipairs(entry.recipes) do
+      local crafts = math.ceil(still_need / recipe.output_count)
+      local score = 0
+      for ingr_name, ingr_count in pairs(recipe.items) do
+        local have = virtual[ingr_name]
+        if have == nil then
+          have = logistica.count_items_in_network(ingr_name, network, true)
+        end
+        if have >= ingr_count * crafts then score = score + 1 end
+      end
+      scored[#scored + 1] = { recipe = recipe, score = score }
+    end
+    table.sort(scored, function(a, b) return a.score > b.score end)
+    recipes_to_try = {}
+    for _, s in ipairs(scored) do recipes_to_try[#recipes_to_try + 1] = s.recipe end
+  end
+
+  local last_missing = item_name
+  for _, recipe in ipairs(recipes_to_try) do
     local crafts = math.ceil(still_need / recipe.output_count)
     local v_snap = shallow_copy(virtual)
     local queue = {}
     local ok = true
     for ingr_name, ingr_count in pairs(recipe.items) do
-      local sub_q = plan_item(ingr_name, ingr_count * crafts, virtual, expanding, network)
-      if not sub_q then ok = false; break end
+      local sub_q, missing = plan_item(ingr_name, ingr_count * crafts, virtual, expanding, network)
+      if not sub_q then ok = false; last_missing = missing or ingr_name; break end
       for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
     end
     if ok then
@@ -395,7 +415,7 @@ local function plan_item(item_name, count, virtual, expanding, network)
 
   expanding[item_name] = nil
   virtual[item_name] = have
-  return nil
+  return nil, last_missing
 end
 
 -- Takes `count` of `item_name` from mass storage and normal suppliers only
@@ -452,10 +472,17 @@ function logistica.ac_execute_plan(plan, networkId, nodePos)
   return plan.output, nil
 end
 
+local function item_short_desc(name)
+  local def = minetest.registered_items[name]
+  if not def or not def.description then return name end
+  return (def.description:match("^([^\n]+)") or def.description)
+end
+
 -- Plans a recursive craft of `item_name` repeated `count` times against `network`.
 -- Tries all recipes for item_name at the top level and returns the plan with the
--- shortest craft queue. Sub-item recipes use first-match. Returns a plan table on
--- success, or nil + error string on failure.
+-- shortest craft queue. Sub-item recipes prefer the recipe with most ingredients
+-- available in storage. Returns a plan table on success, or nil + error string on
+-- failure.
 --   plan.to_take: {item_name -> count} to remove from network storage upfront.
 --   plan.queue:   ordered list of item names to craft, bottom-to-top,
 --                 including `count` entries of the top item at the end.
@@ -465,6 +492,8 @@ function logistica.ac_plan_recursive(item_name, count, network)
   if not entry or #entry.recipes == 0 then return nil, "Not enough materials" end
 
   local best_plan = nil
+  local last_missing_name = nil
+  local last_missing_count = nil
 
   for _, recipe in ipairs(entry.recipes) do
     local virtual = {}
@@ -472,8 +501,11 @@ function logistica.ac_plan_recursive(item_name, count, network)
     local ok = true
 
     for ingr_name, ingr_count in pairs(recipe.items) do
-      local sub_q = plan_item(ingr_name, ingr_count * count, virtual, {}, network)
-      if not sub_q then ok = false; break end
+      local needed = ingr_count * count
+      local sub_q = plan_item(ingr_name, needed, virtual, {}, network)
+      if not sub_q then
+        ok = false; last_missing_name = ingr_name; last_missing_count = needed; break
+      end
       for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
     end
 
@@ -496,5 +528,8 @@ function logistica.ac_plan_recursive(item_name, count, network)
   end
 
   if best_plan then return best_plan, nil end
+  if last_missing_name then
+    return nil, "NOT ENOUGH FOR: " .. last_missing_count .. "x " .. item_short_desc(last_missing_name)
+  end
   return nil, "Not enough materials"
 end
