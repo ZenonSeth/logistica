@@ -6,8 +6,8 @@ local function ends_with(str, ending)
   return str:sub(-#ending) == ending
 end
 
-local function toggle_cable(pos, node, clicker, itemstack, pointed_thing)
-  if clicker:is_player() and minetest.is_protected(pos, clicker:get_player_name()) then return end
+-- General purpose cable toggle, used for mesecons and player action..
+local function toggle_cable(pos, node)
   local nodeName = node.name
   if ends_with(nodeName, "_on") then
     nodeName = nodeName:sub(1, #nodeName - 3).."_off"
@@ -20,13 +20,24 @@ local function toggle_cable(pos, node, clicker, itemstack, pointed_thing)
   end
 end
 
--- Main function to register a new toggleable cable
-function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
+-- Specific case when a player toggles a cable. Usable in on_rightclick, and checks for protection.
+local function toggle_cable_player(pos, node, clicker, itemstack, pointed_thing)
+  if clicker:is_player() and minetest.is_protected(pos, clicker:get_player_name()) then return end
+  toggle_cable(pos, node)
+end
+
+
+-- Main function to register a new toggleable cable.
+--
+-- Final parameters dictate whether:
+-- - the player can toggle the cable
+-- - the cable can be controlled by mesecons (if mesecons is not available then it will not register - if creating 
+--   a separate triplet of nodes for mesecons control, consider not registering mesecons-only nodes). 
+function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff, enableRightClickToggle, enableMeseconsControl)
   local lname = string.lower(name)
   local nameOff = "logistica:"..lname.."_off"
 
   for _, state in ipairs({"on", "off"}) do
-
     local node_box = {
       type           = "connected",
       fixed          = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -73,18 +84,41 @@ function logistica.register_cable_toggleable(desc, name, tilesOn, tilesOff)
       connects_to = connectsTo,
       on_construct = onConst,
       after_dig_node = afterDig,
-      on_rightclick = toggle_cable,
+      on_rightclick = toggle_cable_player,
       _mcl_hardness = 1.5,
       _mcl_blast_resistance = 10
     }
+
+    if enableRightClickToggle then
+      def.on_rightclick = toggle_cable_player
+    end
+
 
     if state == "on" then
       logistica.GROUPS.cables.register(cable_name)
       def.groups[logistica.TIER_ALL] = 1
       def.groups.not_in_creative_inventory = 1
+      -- If on, then we only want to act when the mesecons turns off from an on state.
+      -- until next by player action.
+      if logistica.mesecons_is_present() and enableMeseconsControl then
+        def.mesecons = {
+          effector = {
+            action_off = toggle_cable
+          }
+        }
+      end
     else
       def.node_box = { type = "fixed", fixed = { -0.25, -0.25, -0.25, 0.25, 0.25, 0.25} }
       def.groups[logistica.TIER_CABLE_OFF] = 1
+
+      -- If on, then we only want to act when the mesecons turns on from an off state.
+      if logistica.mesecons_is_present() and enableMeseconsControl then
+        def.mesecons = {
+          effector = {
+            action_on = toggle_cable
+          }
+        }
+      end
     end
 
     minetest.register_node(cable_name, def)

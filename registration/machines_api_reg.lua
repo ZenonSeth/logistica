@@ -71,7 +71,9 @@ logistica.register_cable(S("Embedded Optic Cable"), "optic_cable_block",
 -- toggleable
 logistica.register_cable_toggleable(S("Toggleable Cable"), "optic_cable_toggleable",
   {"logistica_cable_toggleable_on.png"},
-  {"logistica_cable_toggleable_off.png"}
+  {"logistica_cable_toggleable_off.png"},
+  true,
+  true
 )
 
 --------------------------------
