@@ -42,6 +42,19 @@ end
 
 local LAVA_MAX = 1000
 
+local FSTATUS_NO_LAVA = 1
+local FSTATUS_NO_WATER = 2
+
+local function get_status_line(pos, x, y)
+  local s = logistica.farming_supplier_get_status(pos)
+  if s == FSTATUS_NO_LAVA then
+    return "label["..x..","..y..";"..minetest.colorize("#FF6666", FS("Halted: no lava in network")).."]"
+  elseif s == FSTATUS_NO_WATER then
+    return "label["..x..","..y..";"..minetest.colorize("#44DDDD", FS("Sprinkler: no water in network")).."]"
+  end
+  return "label["..x..","..y..";"..FS("Requires Lava in the Network to function").."]"
+end
+
 local function get_lava_indicator(pos, x, y, h)
   local lava = logistica.farming_supplier_get_lava(pos)
   local pct = logistica.round(lava / LAVA_MAX * 100)
@@ -85,7 +98,7 @@ local function get_farming_formspec(pos)
       table.concat(HEIGHT_MODE_NAMES, ",")..";"..dropdown_idx.."]"..
     "label[0.5,5.85;"..mode_desc.."]"..
     get_lava_indicator(pos, 9.3, 1.0, 5.8)..
-    "label[2.5,7.0;"..FS("Requires Lava in the Network to function").."]"..
+    get_status_line(pos, 2.5, 7.0)..
     logistica.player_inv_formspec(0.4, 7.3)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"

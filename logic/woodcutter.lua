@@ -21,6 +21,8 @@ local RESULT_TOO_TALL  = 2
 local RESULT_TOO_MANY  = 3
 local RESULT_INV_FULL  = 4
 
+local META_SAVED_SAPLING = "saved_sapling"
+
 local TRUNK_DIRS = {
   vector.new( 1, 0, 0),
   vector.new(-1, 0, 0),
@@ -141,7 +143,7 @@ local function scan_leaves(endpoints, leaf_node_name, trunk_count)
     local cur = table.remove(queue, 1)
     table.insert(leaf_list, cur)
 
-    if trunk_count + #leaf_list > MAX_TOTAL_NODES then return nil, RESULT_TOO_MANY end
+    if trunk_count + #leaf_list > MAX_TOTAL_NODES then break end
 
     for _, d in ipairs(LEAF_DIRS) do
       local npos = vector.add(cur, d)
@@ -156,11 +158,33 @@ local function scan_leaves(endpoints, leaf_node_name, trunk_count)
   return leaf_list
 end
 
+local function try_replant_sapling(sapling_name, tree_pos)
+  logistica.load_position(tree_pos)
+  if minetest.get_node(tree_pos).name ~= "air" then return end
+  local below_pos = vector.new(tree_pos.x, tree_pos.y - 1, tree_pos.z)
+  logistica.load_position(below_pos)
+  local below_name = minetest.get_node(below_pos).name
+  if below_name == "air" or below_name == "ignore" then return end
+  local below_def = minetest.registered_nodes[below_name]
+  if not below_def then return end
+  local dt = below_def.drawtype
+  if dt ~= nil and dt ~= "normal" then return end
+  if minetest.get_item_group(below_name, "tree") > 0 then return end
+  if minetest.get_item_group(below_name, "wood") > 0 then return end
+  minetest.set_node(tree_pos, {name = sapling_name})
+end
+
 local schedule_next_cut
-schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_name, leaf_name, leaves_cut)
+schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_name, leaf_name, leaves_cut, tree_pos, cut_base)
   leaves_cut = leaves_cut or 0
+  cut_base   = cut_base or false
   if idx > #nodes then
     local meta = minetest.get_meta(machine_pos)
+    if cut_base and tree_pos then
+      local sapling = meta:get_string(META_SAVED_SAPLING)
+      if sapling ~= "" then try_replant_sapling(sapling, tree_pos) end
+    end
+    meta:set_string(META_SAVED_SAPLING, "")
     meta:set_int(META_HARVEST_RESULT, 0)
     meta:set_int(META_IS_CUTTING, 0)
     logistica.update_cache_at_pos(machine_pos, LOG_CACHE_SUPPLIER)
@@ -183,7 +207,7 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
     local cut_name = minetest.get_node(cut_pos).name
 
     if cut_name == "air" or cut_name == "ignore" then
-      schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, leaves_cut)
+      schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, leaves_cut, tree_pos, cut_base)
       return
     end
 
@@ -212,21 +236,47 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
 
     local inv   = meta:get_inventory()
     local drops = minetest.get_node_drops(cut_name, "")
+
+    local skip_sapling = nil
+    if tree_pos and meta:get_string(META_SAVED_SAPLING) == "" then
+      for _, drop in ipairs(drops) do
+        if drop and drop ~= "" and minetest.get_item_group(drop, "sapling") > 0 then
+          skip_sapling = drop
+          meta:set_string(META_SAVED_SAPLING, drop)
+          break
+        end
+      end
+    end
+
+    local skip_used = false
     for _, drop in ipairs(drops) do
-      if drop and drop ~= "" and not inv:room_for_item(INV_MAIN, ItemStack(drop)) then
-        meta:set_int(META_HARVEST_RESULT, RESULT_INV_FULL)
-        meta:set_int(META_IS_CUTTING, 0)
-        return
+      if drop and drop ~= "" then
+        if skip_sapling and not skip_used and drop == skip_sapling then
+          skip_used = true
+        elseif not inv:room_for_item(INV_MAIN, ItemStack(drop)) then
+          meta:set_int(META_HARVEST_RESULT, RESULT_INV_FULL)
+          meta:set_int(META_IS_CUTTING, 0)
+          return
+        end
       end
     end
 
     if lava_cost > 0 then consume_lava(meta, lava_cost) end
+    skip_used = false
     for _, drop in ipairs(drops) do
-      if drop and drop ~= "" then inv:add_item(INV_MAIN, ItemStack(drop)) end
+      if drop and drop ~= "" then
+        if skip_sapling and not skip_used and drop == skip_sapling then
+          skip_used = true
+        else
+          inv:add_item(INV_MAIN, ItemStack(drop))
+        end
+      end
     end
     minetest.set_node(cut_pos, {name = "air"})
 
-    schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, new_leaves_cut)
+    local is_base = tree_pos ~= nil and
+      cut_pos.x == tree_pos.x and cut_pos.y == tree_pos.y and cut_pos.z == tree_pos.z
+    schedule_next_cut(machine_pos, enabled_name, gen, nodes, idx + 1, trunk_name, leaf_name, new_leaves_cut, tree_pos, cut_base or is_base)
   end)
 end
 
@@ -274,13 +324,7 @@ local function start_harvest(machine_pos, enabled_name)
   if has_leaves_upgrade(machine_pos) then
     expected_leaf_name = find_most_common_leaf(endpoints)
     if expected_leaf_name then
-      local leaves, err = scan_leaves(endpoints, expected_leaf_name, #trunk_list)
-      if not leaves then
-        meta:set_int(META_HARVEST_RESULT, err)
-        logistica.start_node_timer(machine_pos, CYCLE_TIME)
-        return
-      end
-      leaf_list = leaves
+      leaf_list = scan_leaves(endpoints, expected_leaf_name, #trunk_list)
     end
   end
 
@@ -300,8 +344,10 @@ local function start_harvest(machine_pos, enabled_name)
   meta:set_int(META_CUT_GEN, gen)
   meta:set_int(META_IS_CUTTING, 1)
   meta:set_int(META_HARVEST_RESULT, 0)
+  meta:set_string(META_SAVED_SAPLING, "")
 
-  schedule_next_cut(machine_pos, enabled_name, gen, all_nodes, 1, tree_name, expected_leaf_name, 0)
+  local sapling_tree_pos = has_leaves_upgrade(machine_pos) and tree_pos or nil
+  schedule_next_cut(machine_pos, enabled_name, gen, all_nodes, 1, tree_name, expected_leaf_name, 0, sapling_tree_pos, false)
 end
 
 ----------------------------------------------------------------

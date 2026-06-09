@@ -2,11 +2,15 @@
 local INV_MAIN = "main"
 local INV_UPGRADE = "upgrade"
 local SPRINKLER_UPGRADE = "logistica:sprinkler_upgrade"
-local SPRINKLER_GROW_CHANCE = 0.15
+local SPRINKLER_GROW_CHANCE = 0.35
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local LAVA_LIQUID_NAME = logistica.liquids.lava
 local META_LAVA = "lava_reserve"
 local LAVA_MAX = 1000
+local META_STATUS = "farm_status"
+local STATUS_OK = 0
+local STATUS_NO_LAVA = 1
+local STATUS_NO_WATER = 2
 local MAX_HARVESTS_PER_CYCLE = 4
 local META_RADIUS = "farm_radius"
 local META_HEIGHT_MODE = "farm_height_mode"
@@ -193,35 +197,59 @@ local function do_farming(pos)
   local plant_positions = minetest.find_nodes_in_area(min_pos, max_pos, "group:plant")
   if not plant_positions or #plant_positions == 0 then return false end
 
+  -- pass 1: collect growable positions; harvest fully-grown plants
+  local new_status = STATUS_OK
   local harvested = 0
+  local growable = {}
   for _, crop_pos in ipairs(plant_positions) do
-    if harvested >= MAX_HARVESTS_PER_CYCLE then break end
-    if not has_lava(pos, meta, 1) then break end
-    if try_harvest(crop_pos, inv) then
-      consume_lava(meta, 1)
-      harvested = harvested + 1
+    local node = minetest.get_node(crop_pos)
+    if not is_fully_grown(node.name) then
+      growable[#growable + 1] = crop_pos
+    elseif harvested < MAX_HARVESTS_PER_CYCLE then
+      if not has_lava(pos, meta, 1) then
+        new_status = STATUS_NO_LAVA
+        break
+      elseif try_harvest(crop_pos, inv) then
+        consume_lava(meta, 1)
+        harvested = harvested + 1
+      end
     end
   end
 
-  -- sprinkler pass: disabled in Farm Above mode, runs after harvest
-  if has_sprinkler_upgrade(pos) and height_mode ~= MODE_ABOVE then
+  -- pass 2: sprinkler grows N random growable positions
+  if new_status == STATUS_OK and has_sprinkler_upgrade(pos) and height_mode ~= MODE_ABOVE then
     if has_lava(pos, meta, 1) then
       local empty = ItemStack(logistica.itemstrings.empty_bucket)
       local result = logistica.use_bucket_for_liquid_in_network(pos, empty, logistica.liquids.water, false)
       if result ~= nil then
         spawn_water_particles(pos, height_mode)
+        local candidates = growable
+        if #growable > MAX_HARVESTS_PER_CYCLE then
+          candidates = {}
+          local idx = {}
+          for i = 1, #growable do idx[i] = i end
+          for i = 1, MAX_HARVESTS_PER_CYCLE do
+            local j = math.random(i, #idx)
+            idx[i], idx[j] = idx[j], idx[i]
+            candidates[i] = growable[idx[i]]
+          end
+        end
         local any_grown = false
-        for _, crop_pos in ipairs(plant_positions) do
+        for _, crop_pos in ipairs(candidates) do
           if math.random() < SPRINKLER_GROW_CHANCE then
-            if try_advance_growth(crop_pos) then
-              any_grown = true
-            end
+            if try_advance_growth(crop_pos) then any_grown = true end
           end
         end
         if any_grown then consume_lava(meta, 1) end
+      else
+        new_status = STATUS_NO_WATER
       end
+    else
+      new_status = STATUS_NO_LAVA
     end
   end
+
+  meta:set_int(META_STATUS, new_status)
 
   if harvested > 0 then
     logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
@@ -269,6 +297,10 @@ end
 
 function logistica.farming_supplier_get_lava(pos)
   return minetest.get_meta(pos):get_int(META_LAVA)
+end
+
+function logistica.farming_supplier_get_status(pos)
+  return minetest.get_meta(pos):get_int(META_STATUS)
 end
 
 function logistica.farming_supplier_show_scan_area(pos)
