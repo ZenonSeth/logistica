@@ -5,6 +5,7 @@ local function sett(settingName, settingValue)
 end
 
 local lines = {
+S("Logistica v")..logistica.VERSION_STRING.."\n",
 S("Current Server Settings for Logistica:\n"),
 }
 

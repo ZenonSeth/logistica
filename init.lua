@@ -9,6 +9,8 @@ logistica = {}
 logistica.MODNAME = minetest.get_current_modname() or "logistica"
 logistica.MODPATH = minetest.get_modpath(logistica.MODNAME)
 
+dofile(logistica.MODPATH.."/version.lua")
+
 -- order of loading files DOES matter
 dofile(logistica.MODPATH.."/util/util.lua")
 dofile(logistica.MODPATH.."/entity/entity.lua")
