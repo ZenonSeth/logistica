@@ -46,6 +46,10 @@ logistica.settings.network_node_limit = get_int("network_node_limit", 4000, 100,
 
 logistica.settings.max_receivers_per_transmitter = get_int("max_receivers_per_transmitter", 100, 1, 1000)
 
+logistica.settings.enable_wireless_antennas = get_bool("enable_wireless_antennas", true)
+
+logistica.settings.enable_wireless_access_pad = get_bool("enable_wireless_access_pad", true)
+
 logistica.settings.enable_node_digger = get_bool("enable_node_digger", true)
 
 logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)

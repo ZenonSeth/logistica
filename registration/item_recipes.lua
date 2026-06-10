@@ -142,14 +142,16 @@ minetest.register_craft({
   }
 })
 
-minetest.register_craft({
-  output = L("wireless_access_pad"),
-  recipe = {
-    {L("standing_wave_box"), itemstrings.diamond,             L("standing_wave_box")},
-    {L("wireless_crystal"),  L("silverin_circuit"), L("wireless_crystal")},
-    {L("silverin_slice"),    L("silverin_circuit"), L("silverin_slice")},
-  }
-})
+if logistica.settings.enable_wireless_access_pad then
+  minetest.register_craft({
+    output = L("wireless_access_pad"),
+    recipe = {
+      {L("standing_wave_box"), itemstrings.diamond,             L("standing_wave_box")},
+      {L("wireless_crystal"),  L("silverin_circuit"), L("wireless_crystal")},
+      {L("silverin_slice"),    L("silverin_circuit"), L("silverin_slice")},
+    }
+  })
+end
 
 minetest.register_craft({
   output = L("compression_tank 2"),

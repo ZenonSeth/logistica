@@ -180,14 +180,16 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
-  output = L("wireless_synchronizer"),
-  recipe = {
-    {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
-    {L("wireless_crystal"), L("silverin_circuit"), L("wireless_crystal")},
-    {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
-  }
-})
+if logistica.settings.enable_wireless_access_pad then
+  logistica.register_craft({
+    output = L("wireless_synchronizer"),
+    recipe = {
+      {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
+      {L("wireless_crystal"), L("silverin_circuit"), L("wireless_crystal")},
+      {L("silverin_plate"),   L("wireless_crystal"), L("silverin_plate")},
+    }
+  })
+end
 
 logistica.register_craft({
   output = L("reservoir_silverin_empty"),
@@ -268,23 +270,25 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
-  output = L("wireless_receiver"),
-  recipe = {
-    {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
-    {L("photonizer_reversed"), L("silverin_plate"),   L("photonizer")},
-    {"",                       L("silverin_circuit"), ""},
-  }
-})
+if logistica.settings.enable_wireless_antennas then
+  logistica.register_craft({
+    output = L("wireless_receiver"),
+    recipe = {
+      {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
+      {L("photonizer_reversed"), L("silverin_plate"),   L("photonizer")},
+      {"",                       L("silverin_circuit"), ""},
+    }
+  })
 
-logistica.register_craft({
-  output = L("wireless_transmitter"),
-  recipe = {
-    {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
-    {L("photonizer_reversed"), itemstrings.diamond,   L("photonizer")},
-    {L("wireless_antenna"),    L("silverin_circuit"), L("wireless_antenna")},
-  }
-})
+  logistica.register_craft({
+    output = L("wireless_transmitter"),
+    recipe = {
+      {L("wireless_antenna"),    L("optic_cable"),      L("wireless_antenna")},
+      {L("photonizer_reversed"), itemstrings.diamond,   L("photonizer")},
+      {L("wireless_antenna"),    L("silverin_circuit"), L("wireless_antenna")},
+    }
+  })
+end
 
 local PLATE  = L("silverin_plate")
 local RELAY  = L("signal_relay")

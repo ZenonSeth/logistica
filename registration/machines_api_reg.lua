@@ -572,6 +572,8 @@ logistica.register_signal_switch(
 -- Wireless Receiver
 --------------------------------
 
+if logistica.settings.enable_wireless_antennas then
+
 logistica.register_wireless_receiver("wireless_receiver", {
   description = S("Wireless Receiver"),
   paramtype2 = "color",
@@ -648,6 +650,8 @@ logistica.register_wireless_transmitter("wireless_transmitter", {
   groups = { oddly_breakable_by_hand = 1, cracky = 2, handy = 1, pickaxey = 2 },
   sounds = logistica.node_sound_metallic(),
 })
+
+end -- enable_wireless_antennas
 
 --------------------------------
 -- Item Monitor
@@ -760,9 +764,11 @@ end
 -- Wireless Upgrader
 --------------------------------
 
-logistica.register_synchronizer(S("Wireless Upgrader"), "wireless_synchronizer", {
-  "logistica_synchronizer_side.png"
-})
+if logistica.settings.enable_wireless_access_pad then
+  logistica.register_synchronizer(S("Wireless Upgrader"), "wireless_synchronizer", {
+    "logistica_synchronizer_side.png"
+  })
+end
 
 --------------------------------
 -- Digiline Signal Sender
