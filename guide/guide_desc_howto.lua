@@ -2,6 +2,48 @@ local S = logistica.TRANSLATOR
 
 local g = logistica.Guide.Desc
 
+do
+  local H = "#CCFF66"
+  local function h(t) return "<style color=" .. H .. "><b>" .. t .. "</b></style>" end
+  local n = "\n\n"
+
+  g.whats_new_2_0 =
+    h("Signals") .. "\n" ..
+    "Signals are named on/off states that travel within a single Logistica network via relays and logic gates." .. n ..
+    "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
+    "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
+    "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/XOR/NAND).\n" ..
+    "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel (requires the digilines mod)." .. n ..
+
+    h("Access Point Autocrafting") .. "\n" ..
+    "The Access Point has a new Crafting tab. With the Autocrafting Upgrade installed you can search recipes, view ingredients, and craft to an output slot. The Recursive Crafting Upgrade adds a queue that chains crafting steps automatically." .. n ..
+
+    h("Access Point Storage Management") .. "\n" ..
+    "A new tab in the Access Point lets you configure Mass Storage slots directly: set reserve amounts, demand targets, and whether to include crafting suppliers in demand - without visiting each chest." .. n ..
+
+    h("New Machines") .. "\n" ..
+    "- <b>Farming Supplier:</b> harvests and replants crops in a configurable area. Add the Sprinkler Upgrade to accelerate growth.\n" ..
+    "- <b>Wood Supplier:</b> chops trees in a configurable area and replants saplings. Add the Leafcutter Upgrade to also collect leaves.\n" ..
+    "- <b>Rock Melter:</b> a passive lava source on the network. Provides a read-only lava reservoir that other machines can draw from.\n" ..
+    "- <b>Machine Disassembler:</b> converts Logistica machines back into their component materials.\n" ..
+    "- <b>Item Monitor:</b> tracks up to 8 items over time and displays a rolling graph with per-point tooltips. Polling interval is configurable." .. n ..
+
+    h("Network Access Control") .. "\n" ..
+    "The Network Controller now tracks an owner (set on placement). The owner can grant access to other players by name and optionally hide network contents from players who lack area protection. Players without owner status, area rights, or access list entry cannot move or take items." .. n ..
+
+    h("Mass Storage") .. "\n" ..
+    "Reserve and Demand are now per-slot input fields. Each slot can optionally include crafting suppliers in its demand calculation. A new Multiplexer Upgrade multiplies a unit's storage capacity by 16." .. n ..
+
+    h("Other Changes") .. "\n" ..
+    "- Passive Supply Chest inventory expanded from 16 to 32 slots. Storing from machines and from the access point are now separately toggleable.\n" ..
+    "- Request Inserter filter slots now use numeric quantity fields (up to 9999) instead of item stacks.\n" ..
+    "- Vacuum Chest pickup range is configurable from 1 to 3 nodes.\n" ..
+    "- Hardened Silverin Block: crafted in the Lava Furnace from a Silverin Block and an Obsidian additive. Used in the Rock Melter recipe.\n" ..
+    "- Upgrade recipes added for the Network Importer and Request Inserter.\n" ..
+    "- Access Point displays large item counts in K and M notation." ..
+    "\n\n\n\n\n"
+end
+
 g.intro = S([[
 Logistica is an item storage and transportation mod.
 

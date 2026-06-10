@@ -8,6 +8,12 @@ local guidesData = {}
 local formsData = {}
 
 local DEFAULT_TOC_WIDTH = 3
+local function hypertext_escape(text)
+  if not text then return "" end
+  text = text:gsub("\\", "\\\\")
+  text = text:gsub(";", "\\;")
+  return text
+end
 local DEFAULT_CONTENT_WIDTH = 12
 local DEFAULT_TOTAL_HEIGHT = 10
 local PAGE_TITLE_COLOR = "#CCDDFF"
@@ -310,7 +316,12 @@ end
 local function get_page_text(pageData, verticaOffset, tocWidth, formWidth, formHeight)
   local y = 1.5 + verticaOffset
   local width = formWidth - tocWidth - 0.8
-  return "textarea["..(tocWidth + 0.6)..","..y..";"..width..","..(formHeight - y - 0.2)..";;;"..pageData.description.."]"
+  local x = tocWidth + 0.6
+  local h = formHeight - y - 0.2
+  if pageData.is_markup then
+    return "hypertext["..x..","..y..";"..width..","..h..";pagedesc;"..pageData.description.."]"
+  end
+  return "textarea["..x..","..y..";"..width..","..h..";;;"..pageData.description.."]"
 end
 
 local function get_curr_page_formspec(guideName, playerName)
@@ -526,7 +537,11 @@ function Guide.register(guideName, guideDef)
   end
   for _, pgTextInfo in pairs(guideDef.pageText) do
     pgTextInfo.title = minetest.formspec_escape(pgTextInfo.title) or ""
-    pgTextInfo.description = minetest.formspec_escape(pgTextInfo.description) or ""
+    if pgTextInfo.is_markup then
+      pgTextInfo.description = hypertext_escape(pgTextInfo.description) or ""
+    else
+      pgTextInfo.description = minetest.formspec_escape(pgTextInfo.description) or ""
+    end
     if pgTextInfo.recipes then
       for _, recipe in ipairs(pgTextInfo.recipes) do
         recipe.iconText = minetest.formspec_escape(recipe.iconText) or ""

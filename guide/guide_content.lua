@@ -2,6 +2,7 @@ local S = logistica.TRANSLATOR
 local function L(s) return "logistica:"..s end
 local GUIDE_NAME = "logistica_guide"
 
+local PAGE_WHATS_NEW_2_0 = "whatsnew20"
 local PAGE_INTRO = "intro"
 local PAGE_START = "start"
 
@@ -233,6 +234,9 @@ local RECIPE_LINKS = {
   [L("wireless_receiver")] = PAGE_WIRELESS_RECEIVER,
   [L("woodcutter")] = PAGE_WOODCUTTER,
   [L("leaves_upgrade")] = PAGE_LEAVES_UPGRADE,
+  [L("farming_supplier")] = PAGE_FARMING_SUPPLIER,
+  [L("disassembler")] = PAGE_DISASSEMBLER,
+  [L("item_monitor")] = PAGE_ITEM_MONITOR,
 
 }
 
@@ -243,6 +247,11 @@ local RECIPE_LINKS = {
 local function header(str)
   return "#CCFF66"..str
 end
+
+local RECIPE_LINKS_WHATS_NEW = setmetatable(
+  { [L("signal_relay")] = PAGE_SIGNALS_OVERVIEW },
+  { __index = RECIPE_LINKS }
+)
 
 local desc = logistica.Guide.Desc
 
@@ -256,6 +265,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
   totalHeight = 14,
 
   tableOfContent = {
+    { name = header(S("Logistica 2.0")), id = PAGE_WHATS_NEW_2_0 },
     { name = header(S("Intro")), id = PAGE_INTRO },
     { name = header(S("How To:"))},
     { name = S("  Get Started: The Lava Furnace"), id = PAGE_START },
@@ -341,6 +351,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
   },
 
   pageText = {
+
+    [PAGE_WHATS_NEW_2_0] = {
+      title = S("What's New in Logistica 2.0"),
+      is_markup = true,
+      relatedItems = {L("signal_relay"), L("farming_supplier"), L("woodcutter"), L("rock_melter"), L("disassembler"), L("item_monitor")},
+      recipeLinks = RECIPE_LINKS_WHATS_NEW,
+      description = desc.whats_new_2_0,
+    },
 
     -- intro
 
