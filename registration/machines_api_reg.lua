@@ -682,6 +682,17 @@ logistica.register_signal_item_counter(
 )
 
 --------------------------------
+-- Signal Liquid Count Sender
+--------------------------------
+
+logistica.register_signal_liquid_counter(
+  S("Signal Liquid Count Sender"),
+  "signal_liquid_counter",
+  {"logistica_fueler_front.png", "logistica_signal_liquid_counter_side.png"},
+  {"logistica_fueler_front.png", "logistica_signal_liquid_counter_side_on.png"}
+)
+
+--------------------------------
 -- Signal Timer Sender
 --------------------------------
 

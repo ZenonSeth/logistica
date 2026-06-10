@@ -48,9 +48,9 @@
 - Mass Storage - filled up indicators
 - Passive Supply Chest - allow storing rules (e.g. whitelist items allowed to be stored in it)
 - Vacuum Chest - add pushing option
-- Signal sender: Network content (#liquid)
+- Signal sender: Network content (#liquid) -- DONE (signal_liquid_counter: prev/next liquid selector with texture + curr/max display, >=/<= condition, bucket threshold, named signal)
 - Signal sender: Digiline output -- EXPERIMENTAL (digiline_sender: polls network every 1s, 8 item filter slots, signal monitoring, freeform message template with %sN/%iM placeholders, optional parse-as-table, Help tab with examples; requires digilines mod)
-- Signal receiver: Digiline input -- TODO (digiline_receiver: translate incoming digiline message on a channel to a logistica on/off signal; simpler than sender)
+- Signal receiver: Digiline input -- DONE (digiline_receiver: translate incoming digiline message on a channel to a logistica on/off signal; simpler than sender)
 - Signal receiver: Display Unit
 - Automatic Packer + Unpacker - detect crafting loops (e.g. 9 ingots = 1 block = 9 ingots) at load time, make a machine that enables that conversion by default on a network
 - Filters on Vacuum chest

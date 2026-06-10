@@ -394,6 +394,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("signal_liquid_counter"),
+  recipe = {
+    {PLATE, "",                          PLATE},
+    {CIRC,  itemstrings.empty_bucket,    CIRC},
+    {PLATE, RELAY,                       PLATE},
+  }
+})
+
+logistica.register_craft({
   output = L("signal_timer"),
   recipe = {
     {PLATE, itemstrings.steel, PLATE},

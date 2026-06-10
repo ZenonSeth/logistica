@@ -72,6 +72,7 @@ local PAGE_SIGNAL_LOGIC_GATE      = "siglg"
 local PAGE_MESECON_SIG_RECEIVER   = "mesrcv"
 local PAGE_MESECON_SIG_SENDER     = "messnd"
 local PAGE_SIGNAL_ITEM_COUNTER    = "sigitmcnt"
+local PAGE_SIGNAL_LIQUID_COUNTER  = "sigliqcnt"
 local PAGE_SIGNAL_EXT_READER      = "sigextrd"
 local PAGE_SIGNAL_TIMER           = "sigtimer"
 local PAGE_SIGNAL_NODE_DETECTOR   = "signodedet"
@@ -164,6 +165,7 @@ local RECIPE_SIG_LOGIC   = getrec({L("signal_logic_gate")})
 local RECIPE_SIG_MESR    = getrec({L("mesecon_signaler")})
 local RECIPE_SIG_MESS    = getrec({L("mesecon_sender")})
 local RECIPE_SIG_COUNTER  = getrec({L("signal_item_counter")})
+local RECIPE_SIG_LIQCNT   = getrec({L("signal_liquid_counter")})
 local RECIPE_SIG_EXTRD    = getrec({L("signal_ext_reader")})
 local RECIPE_SIG_TIMER    = getrec({L("signal_timer")})
 local RECIPE_SIG_NODEDET  = getrec({L("signal_node_detector")})
@@ -219,6 +221,7 @@ local RECIPE_LINKS = {
   [L("mesecon_signaler")]    = PAGE_MESECON_SIG_RECEIVER,
   [L("mesecon_sender")]      = PAGE_MESECON_SIG_SENDER,
   [L("signal_item_counter")]   = PAGE_SIGNAL_ITEM_COUNTER,
+  [L("signal_liquid_counter")] = PAGE_SIGNAL_LIQUID_COUNTER,
   [L("signal_ext_reader")]     = PAGE_SIGNAL_EXT_READER,
   [L("signal_timer")]          = PAGE_SIGNAL_TIMER,
   [L("signal_node_detector")]  = PAGE_SIGNAL_NODE_DETECTOR,
@@ -318,6 +321,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Mesecon Signal Receiver"), id = PAGE_MESECON_SIG_RECEIVER },
     { name = S("  Mesecon Signal Sender"), id = PAGE_MESECON_SIG_SENDER },
     { name = S("  Signal Item Count Sender"), id = PAGE_SIGNAL_ITEM_COUNTER },
+    { name = S("  Signal Liquid Count Sender"), id = PAGE_SIGNAL_LIQUID_COUNTER },
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
     { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
@@ -768,7 +772,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_SIGNALS_OVERVIEW] = {
       title = S("Signals"),
-      relatedItems = {L("signal_button"), L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_ext_reader"), L("signal_timer")},
+      relatedItems = {L("signal_button"), L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_liquid_counter"), L("signal_ext_reader"), L("signal_timer")},
       recipeLinks = RECIPE_LINKS,
       description = desc.signals_overview,
     },
@@ -848,6 +852,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_COUNTER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_item_counter,
+    },
+
+    [PAGE_SIGNAL_LIQUID_COUNTER] = {
+      title = S("Signal Liquid Count Sender"),
+      recipes = RECIPE_SIG_LIQCNT,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_liquid_counter,
     },
 
     [PAGE_SIGNAL_EXT_READER] = {

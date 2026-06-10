@@ -395,6 +395,43 @@ Example uses
 - Gate a machine with a Signal Toggler so it only runs while supplies are available.
 ]])
 
+g.signal_liquid_counter = S([[
+The Signal Liquid Count Sender is a signal sender that monitors how many buckets of a specific liquid are stored across all reservoirs on the network and broadcasts a named signal based on whether that amount meets a configured condition.
+
+Usage
+------------------------------
+Right-click to open the settings.
+Use the Enable button to start or pause monitoring.
+
+The infotext above the node shows the liquid being monitored, the condition, the signal name, and whether the node is Running or Paused.
+
+Configuration
+------------------------------
+Liquid: use the arrow buttons to cycle through liquids currently present on the network. The display shows the liquid name and its current total (in buckets) out of total reservoir capacity. If no reservoirs are on the network the signal is always OFF.
+
+Condition: choose >= (greater than or equal) or <= (less than or equal) from the dropdown.
+
+Buckets: the threshold number of buckets to compare the stored amount against.
+
+Signal: the name of the signal this node broadcasts when the condition is met. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Enable button: toggles the node between Running and Paused. When Paused, the signal is immediately sent as OFF regardless of the current liquid level.
+
+Behavior
+------------------------------
+The node checks the liquid level once per second. When the condition is met, the signal is sent as ON. When the condition is not met, the signal is sent as OFF.
+
+If no liquid is selected or no reservoirs with the selected liquid are on the network, the signal is always OFF.
+
+When the node is disconnected from the network, its signal contribution is automatically removed.
+
+Example uses
+------------------------------
+- Send a signal when lava drops below 10 buckets (condition: <= 9).
+- Trigger a pump when water reserves fall below half capacity (condition: <= 16).
+- Gate a Lava Furnace fueler with a Signal Toggler so it only runs while lava is available.
+]])
+
 g.signal_node_detector = S([[
 The Signal Node Detector is a signal sender that checks whether a specific node (or any non-air node) is present at a configured distance directly behind it, and broadcasts a named signal accordingly.
 

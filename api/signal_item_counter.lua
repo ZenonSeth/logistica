@@ -20,13 +20,13 @@ local function get_formspec(pos)
     logistica.ui.background..
     logistica.ui.button_only_style..
     "label[0.5,0.4;"..FS("Item Count Sender").."]"..
-    "label[0.5,1.05;"..FS("Item to Monitor:").."]"..
+    "label[0.5,1.15;"..FS("Item to Monitor:").."]"..
     "list["..posForm..";filter;2.8,0.75;1,1;0]"..
-    "label[0.5,2.05;"..FS("Condition:").."]"..
+    "label[0.5,2.15;"..FS("Condition:").."]"..
     "dropdown[2.8,1.8;1.5,0.75;comparison;>=,<=;"..cmpIdx.."]"..
-    "label[4.45,2.05;"..FS("amount:").."]"..
-    "field[5.4,1.8;2.1,0.75;threshold;;"..threshold.."]"..
-    "label[0.5,2.95;"..FS("Signal Name:").."]"..
+    "label[4.45,2.15;"..FS("amount:").."]"..
+    "field[5.7,1.8;2.1,0.75;threshold;;"..threshold.."]"..
+    "label[0.5,3.05;"..FS("Signal Name:").."]"..
     "field[2.8,2.7;7.3,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
     "label[2.8,3.55;"..FS("a-z 0-9 _ only").."]"..
     "checkbox[0.5,4.1;respect_reserve;"..FS("Respect Mass Storage Reserve")..";"..respectStr.."]"..

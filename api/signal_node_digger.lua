@@ -49,10 +49,10 @@ local function get_formspec(pos, playerName)
     "list["..posForm..";filter;0.5,1.55;8,1;0]"..
     "label[0.5,2.75;"..FS("Tool:").."]"..
     "list["..posForm..";tool;0.5,3.0;1,1;0]"..
-    "label[0.5,4.15;"..FS("Dig distance:").."]"..
-    "button[3.1,3.9;0.65,0.65;dist_dec;-]"..
-    "label[3.95,4.15;"..tostring(dist).."]"..
-    "button[4.3,3.9;0.65,0.65;dist_inc;+]"..
+    "label[0.5,4.25;"..FS("Dig distance:").."]"..
+    "button[3.0,3.9;0.65,0.65;dist_dec;-]"..
+    "label[3.85,4.15;"..tostring(dist).."]"..
+    "button[4.2,3.9;0.65,0.65;dist_inc;+]"..
     "label[0.5,5.1;"..FS("Signal Name:").."]"..
     "field[2.8,4.85;7.3,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
     "label[2.8,5.7;"..FS("a-z 0-9 _ only").."]"..
