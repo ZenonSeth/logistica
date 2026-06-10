@@ -155,9 +155,9 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
   local remaining = requestedAmount
   local stackName = stackToTake:get_name()
   local validSupplers = network.supplier_cache[stackName] or {}
-  local normalSupplierResult = ret(0)
-  local craftingSupplierResult = ret(0)
-  local bucketFillerResult = ret(0)
+  local normalSupplierResult   = { remaining = requestedAmount, error = nil }
+  local craftingSupplierResult = { remaining = requestedAmount, error = nil }
+  local bucketFillerResult     = { remaining = requestedAmount, error = nil }
 
   for hash, _ in pairs(validSupplers) do
     local pos = h2p(hash)
@@ -184,12 +184,13 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     end
     takeStack:set_count(remaining)
   end
-  local source = "crafting" -- assume crafting, then correct ourselves
+  local source = ""
   if type then source = type
   else
-    if craftingSupplierResult.remaining > 0 then source = "bucket" end
-    if bucketFillerResult.remaining  > 0 then source = "normal" end
-    if normalSupplierResult.remaining  > 0 then source = "" end
+    if craftingSupplierResult.error then source = "crafting"
+    elseif bucketFillerResult.error then source = "bucket"
+    elseif normalSupplierResult.error then source = "normal"
+    end
   end
 
   if source == "crafting" then return {success = false, error = craftingSupplierResult.error, source = source} end

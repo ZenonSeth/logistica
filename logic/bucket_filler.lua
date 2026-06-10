@@ -60,7 +60,7 @@ function logistica.take_item_from_bucket_filler(pos, stackToTake, network, colle
   local originalRequestedBuckets = stackToTake:get_count()
   local stackToTakeName = stackToTake:get_name()
   local liquidName = logistica.reservoir_get_liquid_name_for_filled_bucket(stackToTakeName)
-  if not liquidName then return { remaining = stackToTake:get_count(), error =  S("Unknown liquid: ")..liquidName } end
+  if not liquidName then return { remaining = stackToTake:get_count(), error = S("Unknown liquid") } end
 
   local liquidInfo = logistica.get_liquid_info_in_network(pos, liquidName)
   local remainingRequest = math.min(liquidInfo.curr, originalRequestedBuckets)
