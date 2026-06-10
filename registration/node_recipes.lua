@@ -446,6 +446,18 @@ if minetest.get_modpath("mesecons") then
   })
 end
 
+if minetest.get_modpath("digilines") then
+  local DWIRE = "digilines:wire_std_00000000"
+  logistica.register_craft({
+    output = L("digiline_sender"),
+    recipe = {
+      {PLATE, DWIRE, PLATE},
+      {CIRC,  RELAY, CIRC},
+      {PLATE, DWIRE, PLATE},
+    }
+  })
+end
+
 logistica.register_craft({
   output = L("autocrafting_upgrade"),
   recipe = {

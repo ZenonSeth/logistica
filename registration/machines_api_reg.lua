@@ -717,3 +717,22 @@ logistica.register_signal_node_placer(
 logistica.register_synchronizer(S("Wireless Upgrader"), "wireless_synchronizer", {
   "logistica_synchronizer_side.png"
 })
+
+--------------------------------
+-- Digiline Signal Sender
+--------------------------------
+
+if minetest.get_modpath("digilines") then
+  logistica.register_digiline_sender(
+    S("Logistica Digiline Signal Sender"),
+    "digiline_sender",
+    {
+      "logistica_digiline_sender_side.png",
+      "logistica_access_point_bottom.png",
+      "logistica_digiline_sender_side.png",
+      "logistica_digiline_sender_side.png",
+      "logistica_digiline_sender_side.png",
+      "logistica_digiline_sender_side.png",
+    }
+  )
+end

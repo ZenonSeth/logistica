@@ -170,6 +170,16 @@ The sender connects to Logistica cables from any face. Mesecon wires connect fro
 When disconnected from a Logistica network, the sender turns its Mesecon output off.
 ]])
 
+g.digiline_sender = S([[
+Only available if the Digilines mod is present.
+
+The Digiline Signal Sender monitors your Logistica network every second and sends a message on a configurable Digilines channel whenever the message content changes.
+
+It supports up to 8 item filter slots for item count queries and a list of Logistica signal names to monitor. Values are inserted into a freeform message template using placeholders. Optionally the message can be parsed and sent as a Lua table.
+
+For full details on placeholders, table mode, and examples, open the node and check the Help tab inside its interface.
+]])
+
 g.signal_not_gate = S([[
 The Signal NOT Gate is both a signal receiver and a signal sender. It reads one input signal and broadcasts the opposite state on a separate output signal.
 

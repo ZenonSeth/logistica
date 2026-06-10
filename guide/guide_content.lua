@@ -76,6 +76,7 @@ local PAGE_SIGNAL_TIMER           = "sigtimer"
 local PAGE_SIGNAL_NODE_DETECTOR   = "signodedet"
 local PAGE_SIGNAL_NODE_PLACER     = "signodeplacer"
 local PAGE_SIGNAL_NODE_DIGGER     = "signodedigger"
+local PAGE_DIGILINE_SENDER        = "diglsnd"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -166,6 +167,7 @@ local RECIPE_SIG_TIMER    = getrec({L("signal_timer")})
 local RECIPE_SIG_NODEDET  = getrec({L("signal_node_detector")})
 local RECIPE_SIG_NODEPLACER = getrec({L("signal_node_placer")})
 local RECIPE_SIG_NODEDIGGER = getrec({L("signal_node_digger")})
+local RECIPE_DIGILINE_SENDER = getrec({L("digiline_sender")})
 
 local RECIPE_LINKS = {
   -- items
@@ -213,6 +215,7 @@ local RECIPE_LINKS = {
   [L("signal_node_detector")]  = PAGE_SIGNAL_NODE_DETECTOR,
   [L("signal_node_placer")]    = PAGE_SIGNAL_NODE_PLACER,
   [L("signal_node_digger")]    = PAGE_SIGNAL_NODE_DIGGER,
+  [L("digiline_sender")]       = PAGE_DIGILINE_SENDER,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -301,6 +304,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
     { name = S("  Signal Node Placer"),   id = PAGE_SIGNAL_NODE_PLACER },
     { name = S("  Signal Node Digger"),   id = PAGE_SIGNAL_NODE_DIGGER },
+    { name = S("  Digiline Signal Sender"), id = PAGE_DIGILINE_SENDER },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -851,6 +855,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_NODEDIGGER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_node_digger,
+    },
+
+    [PAGE_DIGILINE_SENDER] = {
+      title = S("Digiline Signal Sender"),
+      recipes = RECIPE_DIGILINE_SENDER,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.digiline_sender,
     },
 
     -- Settings

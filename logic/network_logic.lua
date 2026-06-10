@@ -916,6 +916,10 @@ function logistica.on_item_monitor_change(pos, oldNode, oldMeta)
   on_node_change(pos, oldNode, oldMeta, MISC_OPS)
 end
 
+function logistica.on_digiline_sender_change(pos, oldNode, oldMeta)
+  on_node_change(pos, oldNode, oldMeta, MISC_OPS)
+end
+
 function logistica.on_wifi_receiver_change(pos, oldNode, oldMeta, objRef)
   on_wifi_receiver_changed(pos, oldNode, oldMeta, objRef)
 end
