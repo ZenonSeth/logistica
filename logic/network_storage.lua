@@ -266,7 +266,6 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
           return ret(true)
         end
       end
-      i = i - 1
     end
     if not dryRun then
       storageInv:set_list(MASS_STORAGE_LIST_NAME, storageList)

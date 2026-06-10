@@ -75,7 +75,7 @@ local function disconnect_transmitter(trPos, metaTable)
   for _, rcPos in pairs(connectedReceivers) do
     logistica.load_position(rcPos)
     local rcMeta = minetest.get_meta(rcPos)
-    rcMeta:set_string(META_LINKED_TRANSMITTER, nil)
+    rcMeta:set_string(META_LINKED_TRANSMITTER, "")
   end
   set_linked_receivers(trPos, {})
 end
