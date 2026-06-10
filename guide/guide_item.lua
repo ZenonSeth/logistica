@@ -1,10 +1,10 @@
 local S = logistica.TRANSLATOR
 local GUIDE_NAME = "logistica_guide"
 
-local function show_guide(_, user, _)
-  if user:is_player() then
-    logistica.GuideApi.show_guide(user:get_player_name(), GUIDE_NAME)
-  end
+local function convert_to_open(itemstack, user, _)
+  if not user or not user:is_player() then return itemstack end
+  logistica.GuideApi.show_guide(user:get_player_name(), GUIDE_NAME)
+  return ItemStack("logistica:guide_open")
 end
 
 local function place_or_show(itemstack, placer, pointed_thing)
@@ -15,8 +15,7 @@ local function place_or_show(itemstack, placer, pointed_thing)
     if placed then itemstack:take_item() end
     return itemstack
   end
-  show_guide(nil, placer, nil)
-  return itemstack
+  return convert_to_open(itemstack, placer, nil)
 end
 
 minetest.register_tool("logistica:guide", {
@@ -24,7 +23,7 @@ minetest.register_tool("logistica:guide", {
   inventory_image = "logistica_guide_book_item.png",
   stack_max = 1,
   groups = { not_in_creative_inventory = 1 },
-  on_secondary_use = show_guide,
+  on_secondary_use = convert_to_open,
   on_place = place_or_show,
   node_placement_prediction = "",
 })

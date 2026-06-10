@@ -66,6 +66,10 @@
 - Node placer
 - Named interactors?
   - Allow you to remotely place and get things from other blocks, e.g. furnaces
+- Network Bridge Provider + Network Bridge Receiver
+  - Provider has push mode or passive supply mode; faces the Receiver (backsides touching)
+  - Receiver connects to the Provider and either fulfils requests or accepts pushed items
+  - The two nodes are on different networks
 
 - Network Access Control -- DONE
   - Network Controller stores owner (set on place; migrates from wireless transmitter on first scan for existing networks)
