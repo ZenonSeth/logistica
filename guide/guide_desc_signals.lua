@@ -182,6 +182,39 @@ It supports up to 8 item filter slots for item count queries and a list of Logis
 For full details on placeholders, table mode, and examples, open the node and check the Help tab inside its interface.
 ]])
 
+g.digiline_receiver = S([[
+Only available if the Digilines mod is present.
+
+The Digiline to Signal Converter listens on a configurable Digilines channel and broadcasts a named Logistica signal based on the received message.
+
+Usage
+------------------------------
+Right-click to open the settings. Configure a Digiline channel to listen on and a Logistica signal name to broadcast.
+
+The node turns ON when the current signal state is ON, and returns to its default appearance when OFF.
+
+The infotext above the node shows the configured channel, signal name, and current state.
+
+Configuration
+------------------------------
+Digiline channel: the Digilines channel this node listens on. Only messages arriving on exactly this channel are processed.
+
+Signal: the name of the Logistica signal to broadcast. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Message interpretation
+------------------------------
+ON: true, "true", "on", or integer > 0
+OFF: any other value
+
+Behavior
+------------------------------
+When a message arrives on the configured channel, the node evaluates it and sends the resulting ON or OFF state as a Logistica signal. If the state is unchanged from the last received message, the signal is not resent.
+
+When the node connects to a Logistica network, it immediately rebroadcasts its current state so downstream receivers are in sync.
+
+When disconnected or dug up, its signal contribution is automatically removed from the network.
+]])
+
 g.signal_not_gate = S([[
 The Signal NOT Gate is both a signal receiver and a signal sender. It reads one input signal and broadcasts the opposite state on a separate output signal.
 

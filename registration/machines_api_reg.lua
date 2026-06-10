@@ -787,4 +787,11 @@ if minetest.get_modpath("digilines") then
       "logistica_digiline_sender_side.png",
     }
   )
+  logistica.register_digiline_receiver(
+    S("Logistica Digiline to Signal Converter"),
+    "digiline_receiver",
+    "logistica_digiline_receiver_side.png",
+    "logistica_digiline_receiver_top.png",
+    "logistica_access_point_bottom.png"
+  )
 end

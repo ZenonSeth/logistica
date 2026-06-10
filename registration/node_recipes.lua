@@ -468,6 +468,14 @@ if minetest.get_modpath("digilines") then
       {PLATE, DWIRE, PLATE},
     }
   })
+  logistica.register_craft({
+    output = L("digiline_receiver"),
+    recipe = {
+      {PLATE, "",    PLATE},
+      {RELAY, CIRC,  RELAY},
+      {PLATE, DWIRE, PLATE},
+    }
+  })
 end
 
 logistica.register_craft({

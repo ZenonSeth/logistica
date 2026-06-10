@@ -13,7 +13,8 @@ do
     "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
     "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
     "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/ADDER).\n" ..
-    "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel." .. n ..
+    "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel.\n" ..
+    "- <b>Experimental:</b> Digiline to Signal Converter - listens on a digiline channel and broadcasts a named Logistica signal based on the received message." .. n ..
 
     h("Access Point Autocrafting") .. "\n" ..
     "The Access Point has a new Crafting tab. With the Autocrafting Upgrade installed you can search recipes, view ingredients, and craft to an output slot. The Recursive Crafting Upgrade adds a queue that chains crafting steps automatically." .. n ..
