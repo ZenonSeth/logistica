@@ -97,7 +97,9 @@ Signal Name: the name of the signal to listen for. Must use only lowercase lette
 
 Colors
 ------------------------------
-Signal Lamps can be crafted in different colors. All colors behave identically, they are purely cosmetic.
+Signal Lamps come in 7 colors: White, Red, Yellow, Green, Cyan, Blue, and Purple. All colors behave identically, they are purely cosmetic.
+
+The White lamp has a standard craft recipe. All colors can also be cycled into the next color in the chain (White -> Red -> Yellow -> Green -> Cyan -> Blue -> Purple -> White) by placing any lamp alone in the crafting grid.
 ]])
 
 g.signal_lamp_2c = S([[

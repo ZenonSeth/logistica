@@ -318,6 +318,14 @@ logistica.register_craft({
   }
 })
 
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_red"),    recipe = {L("signal_lamp_white")}  })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_yellow"), recipe = {L("signal_lamp_red")}    })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_green"),  recipe = {L("signal_lamp_yellow")} })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_cyan"),   recipe = {L("signal_lamp_green")}  })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_blue"),   recipe = {L("signal_lamp_cyan")}   })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_purple"), recipe = {L("signal_lamp_blue")}   })
+logistica.register_craft({ type = "shapeless", output = L("signal_lamp_white"),  recipe = {L("signal_lamp_purple")} })
+
 logistica.register_craft({
   output = L("signal_lamp_2c_br"),
   recipe = {

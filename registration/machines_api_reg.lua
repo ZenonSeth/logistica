@@ -379,6 +379,48 @@ logistica.register_signal_lamp(
   "logistica_signal_lamp_white_on.png"
 )
 
+logistica.register_signal_lamp(
+  S("Red Signal Lamp"),
+  "signal_lamp_red",
+  "logistica_signal_lamp_red_off.png",
+  "logistica_signal_lamp_red_on.png"
+)
+
+logistica.register_signal_lamp(
+  S("Green Signal Lamp"),
+  "signal_lamp_green",
+  "logistica_signal_lamp_green_off.png",
+  "logistica_signal_lamp_green_on.png"
+)
+
+logistica.register_signal_lamp(
+  S("Blue Signal Lamp"),
+  "signal_lamp_blue",
+  "logistica_signal_lamp_blue_off.png",
+  "logistica_signal_lamp_blue_on.png"
+)
+
+logistica.register_signal_lamp(
+  S("Cyan Signal Lamp"),
+  "signal_lamp_cyan",
+  "logistica_signal_lamp_cyan_off.png",
+  "logistica_signal_lamp_cyan_on.png"
+)
+
+logistica.register_signal_lamp(
+  S("Yellow Signal Lamp"),
+  "signal_lamp_yellow",
+  "logistica_signal_lamp_yellow_off.png",
+  "logistica_signal_lamp_yellow_on.png"
+)
+
+logistica.register_signal_lamp(
+  S("Purple Signal Lamp"),
+  "signal_lamp_purple",
+  "logistica_signal_lamp_purple_off.png",
+  "logistica_signal_lamp_purple_on.png"
+)
+
 --------------------------------
 -- Mesecon Signal Receiver (mesecon effector -> logistica signal sender)
 --------------------------------
