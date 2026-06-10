@@ -154,6 +154,7 @@ function logistica.register_vaccuum_chest(desc, name, inventorySize, tiles)
     logistica = {
       inventory_size = inventorySize,
       on_power = on_vaccuum_power,
+      automatable = true,
     },
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10

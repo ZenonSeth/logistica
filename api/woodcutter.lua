@@ -223,6 +223,7 @@ function logistica.register_woodcutter(desc, name, inventorySize, tiles)
     logistica = {
       inventory_size = inventorySize,
       on_power       = on_woodcutter_power,
+      automatable    = true,
     },
     _mcl_hardness        = 1.5,
     _mcl_blast_resistance = 10,

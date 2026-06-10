@@ -254,6 +254,7 @@ function logistica.register_farming_supplier(desc, name, inventorySize, tiles)
     logistica = {
       inventory_size = inventorySize,
       on_power = on_farming_power,
+      automatable = true,
     },
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10,

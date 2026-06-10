@@ -113,6 +113,11 @@ function logistica.on_injector_timer(pos, elapsed)
   copyStack:set_count(numRemaining)
   targetInv:set_stack(targetList, targetSlot, copyStack)
 
+  if numRemaining == 0
+      and logistica.get_network_group_for_node_name(targetNodeName) == logistica.NETWORK_GROUPS.suppliers then
+    logistica.update_cache_at_pos(targetPos, LOG_CACHE_SUPPLIER)
+  end
+
   logistica.start_node_timer(pos, TIMER_DURATION_SHORT)
   return false
 end
