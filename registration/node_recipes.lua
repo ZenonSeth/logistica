@@ -64,7 +64,7 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
+logistica.register_craft({ no_recycle = true,
   output = L("requester_stack"),
   recipe = {
     {L("requester_item"), L("silverin_circuit"), ""},
@@ -88,7 +88,7 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
+logistica.register_craft({ no_recycle = true,
   output = L("injector_fast"),
   recipe = {
     {L("injector_slow"), L("silverin_circuit"),""},
@@ -328,7 +328,7 @@ logistica.register_craft({ type = "shapeless", output = L("signal_lamp_green"), 
 logistica.register_craft({ type = "shapeless", output = L("signal_lamp_cyan"),   recipe = {L("signal_lamp_green")}  })
 logistica.register_craft({ type = "shapeless", output = L("signal_lamp_blue"),   recipe = {L("signal_lamp_cyan")}   })
 logistica.register_craft({ type = "shapeless", output = L("signal_lamp_purple"), recipe = {L("signal_lamp_blue")}   })
-logistica.register_craft({ type = "shapeless", output = L("signal_lamp_white"),  recipe = {L("signal_lamp_purple")} })
+logistica.register_craft({ no_recycle = true, type = "shapeless", output = L("signal_lamp_white"),  recipe = {L("signal_lamp_purple")} })
 
 logistica.register_craft({
   output = L("signal_lamp_2c_br"),
