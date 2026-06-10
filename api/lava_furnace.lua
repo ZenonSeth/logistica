@@ -309,11 +309,7 @@ local function lava_furnace_allow_metadata_inv_move(pos, from_list, from_index, 
   if to_list == INV_ADDI or to_list == INV_INPT then
     return count
   elseif to_list == INV_FUEL then
-    if get_meta(pos):get_inventory():get_stack(from_list, from_index):get_name() == BUCKET_LAVA then
-      return count
-    else
-      return 0
-    end
+    return 0
   else
     return 0
   end

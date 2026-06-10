@@ -84,6 +84,7 @@ local function allow_filler_inv_put(pos, listname, index, stack, player)
     if logistica.reservoir_is_empty_bucket(stack:get_name()) then return stack:get_count()
     else return 0 end
   end
+  return 0
 end
 
 local function allow_filler_inv_take(pos, listname, index, stack, player)
