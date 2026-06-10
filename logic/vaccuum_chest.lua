@@ -1,7 +1,7 @@
 
 local TIMER_INTERVAL = 0.8
 local TIMER_INTERVAL_LONG = 2.0
-local DEF_RADIUS = 3
+local DEF_RADIUS = logistica.settings.vaccuum_chest_max_radius
 local META_RADIUS = "pickup_radius"
 local INV_MAIN = "main"
 local ITEM_TAKE_PER_CYCLE_LIMIT = 10

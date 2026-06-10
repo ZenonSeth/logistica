@@ -17,8 +17,8 @@ local META_HEIGHT_MODE = "farm_height_mode"
 local META_TIMER_INTERVAL = "farm_timer_interval"
 
 local MIN_RADIUS = 1
-local MAX_RADIUS = 3
-local DEF_RADIUS = 3
+local MAX_RADIUS = logistica.settings.farming_supplier_max_radius
+local DEF_RADIUS = logistica.settings.farming_supplier_max_radius
 
 -- height mode constants
 local MODE_ABOVE = 1

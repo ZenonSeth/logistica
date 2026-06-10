@@ -45,3 +45,21 @@ logistica.settings.pump_max_depth = get_int("pump_max_depth", 5, 1, 32)
 logistica.settings.network_node_limit = get_int("network_node_limit", 4000, 100, 1000000)
 
 logistica.settings.max_receivers_per_transmitter = get_int("max_receivers_per_transmitter", 100, 1, 1000)
+
+logistica.settings.enable_node_digger = get_bool("enable_node_digger", true)
+
+logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)
+
+logistica.settings.node_detector_max_distance = get_int("node_detector_max_distance", 16, 1, 32)
+
+logistica.settings.node_digger_max_distance = get_int("node_digger_max_distance", 16, 1, 32)
+
+logistica.settings.node_placer_max_distance = get_int("node_placer_max_distance", 16, 1, 32)
+
+logistica.settings.farming_supplier_max_radius = get_int("farming_supplier_max_radius", 3, 1, 10)
+
+logistica.settings.vaccuum_chest_max_radius = get_int("vaccuum_chest_max_radius", 3, 1, 10)
+
+logistica.settings.woodcutter_max_trunk_height = get_int("woodcutter_max_trunk_height", 30, 5, 200)
+
+logistica.settings.woodcutter_max_nodes = get_int("woodcutter_max_nodes", 500, 50, 5000)

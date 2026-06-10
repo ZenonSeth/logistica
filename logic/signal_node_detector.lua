@@ -2,7 +2,7 @@
 local META_SIGNAL_NAME = "signal_name"
 local META_DISTANCE    = "distance"
 local MIN_DISTANCE     = 1
-local MAX_DISTANCE     = 16
+local MAX_DISTANCE     = logistica.settings.node_detector_max_distance
 local POLL_INTERVAL    = 1.0
 local ON_SUFFIX        = "_on"
 

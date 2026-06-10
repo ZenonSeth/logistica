@@ -5,7 +5,7 @@ local META_LAST_ERROR  = "last_error"
 local META_PREV_SIG    = "prev_signal_state"
 local META_OWNER       = "owner"
 local MIN_DISTANCE     = 1
-local MAX_DISTANCE     = 16
+local MAX_DISTANCE     = logistica.settings.node_digger_max_distance
 local FILTER_SIZE      = 8
 
 function logistica.node_digger_get_signal_name(pos)

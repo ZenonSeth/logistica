@@ -5,7 +5,7 @@ local ON_OFF_BUTTON = "on_off_btn"
 local META_RADIUS = "farm_radius"
 local META_HEIGHT_MODE = "farm_height_mode"
 local MIN_RADIUS = 1
-local MAX_RADIUS = 3
+local MAX_RADIUS = logistica.settings.farming_supplier_max_radius
 local INV_UPGRADE = "upgrade"
 local SPRINKLER_UPGRADE = "logistica:sprinkler_upgrade"
 

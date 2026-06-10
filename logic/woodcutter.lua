@@ -11,8 +11,8 @@ local LAVA_LIQUID_NAME = logistica.liquids.lava
 local META_LAVA = "lava_reserve"
 local LAVA_MAX = 1000
 
-local MAX_TRUNK_HEIGHT = 30
-local MAX_TOTAL_NODES = 500
+local MAX_TRUNK_HEIGHT = logistica.settings.woodcutter_max_trunk_height
+local MAX_TOTAL_NODES = logistica.settings.woodcutter_max_nodes
 local CUT_DELAY = 0.6
 local CYCLE_TIME = 8.0
 

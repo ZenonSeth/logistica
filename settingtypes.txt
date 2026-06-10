@@ -8,3 +8,12 @@ logistica_pump_max_range (Sets from how far sideways from the Liquid Pump it can
 logistica_pump_max_depth (Sets how far below the Liquid Pump it can take liquids from) int 5 1 32
 logistica_network_node_limit (Sets how many nodes, including cables, a Network can consist of) int 4000 100 1000000
 logistica_max_receivers_per_transmitter (Sets how many wirless receivers can be linked to a single wirless transmitter) int 100 1 1000
+logistica_enable_node_digger (Enable the Signal Node Digger) bool true
+logistica_enable_node_placer (Enable the Signal Node Placer) bool true
+logistica_node_detector_max_distance (Max distance the Signal Node Detector can reach) int 16 1 32
+logistica_node_digger_max_distance (Max distance the Signal Node Digger can reach) int 16 1 32
+logistica_node_placer_max_distance (Max distance the Signal Node Placer can reach) int 16 1 32
+logistica_farming_supplier_max_radius (Max radius the Farming Supplier can cover) int 3 1 10
+logistica_vaccuum_chest_max_radius (Max radius the Vacuum Chest can pick up items from) int 3 1 10
+logistica_woodcutter_max_trunk_height (Max trunk height the Woodcutter will process) int 30 5 200
+logistica_woodcutter_max_nodes (Max total nodes the Woodcutter will process per tree) int 500 50 5000
