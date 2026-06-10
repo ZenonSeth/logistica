@@ -15,20 +15,20 @@ It can both take and insert items into the network's storage. It provides a Craf
 
 You can also access an Access Point and all its features remotely using a Wireless Access Pad synced to the Access Point.
 
-# Searching by text
-
+Searching by text
+------------------------------
 You can enter a search term to show items that term.
 
 A special search can be done by adding the groups: prefix at the start. For example groups:flower will match only items that have flower group set, thus it will display all flowers added by any mod.
 
-# Filtering
-
+Filtering
+------------------------------
 You can filter items by:
 
 All items, Blocks only, Craft-items only, Tools only, Lights only
 
-# Sorting
-
+Sorting
+------------------------------
 Items can also sorted by
 
 - Name: alphabetically sorted by the item's localized description to sort
@@ -36,22 +36,22 @@ Items can also sorted by
 - Count: sorts by total item count, with largest first.
 - Wear: Sorts by item wear, with most uses remaining first (best used when filtering for Tools only)
 
-# Use Metadata button
-
+Use Metadata button
+------------------------------
 Some items, usually tools, have other information stored in them, like wear, descriptions or more complex metadata.
 
 If "Use Metadata" is ON, the Access Point will display these items individually. If it's OFF, the Access Point will group items with the same name, but different metadata into 1 stack. When taking such an item when Use Metadata is OFF, you will still receive an actual item with the correct wear and metadata, but it will be picked at random from the network.
 
-# Liquid Storage
-
+Liquid Storage
+------------------------------
 Below the Metadata button is a small section where the Access Point will show any Reservoirs connected to the network.
 
 You can use the two arrows to cycle through all liquids (if there are any).
 To deposit a liquid, just put a full bucket into the slot below the liquid image. It does not matter which liquid is selected for this, the Access Point will attempt to deposit it into the fullest applicable Reservoir, or assign the next smallest empty reservoir, if one is available.
 To withdraw a liquid, first select which liquid you want, then put an Empty Bucket into the slot below. The liquid will be taken from the least-full Reservoir holding that liquid type on the Network.
 
-# Taking items from the Network
-
+Taking items from the Network
+------------------------------
 The Access Point shows a snapshot of available items, or items supplied by crafting suppliers. When you try to take an item, the Access Point makes a real request to the network. If the items are no longer available, you won't receive anything. In most cases the Access Point will try to show an error message informing what went wrong.
 ]])
 
@@ -72,14 +72,14 @@ The Easy Crafting tab on the Access Point lets you search for any craftable item
 
 To unlock this tab, insert an Access Point Crafting Upgrade (for basic crafting) or a Recursive Crafting Upgrade (for basic crafting and recursive crafting) into the upgrade slot in the top-right corner of the tab.
 
-# Searching
-
+Searching
+------------------------------
 Type at least 2 characters into the search field and press Search. Results match on item name parts and description words. For example, "logis" finds all Logistica items, and "no br" finds Node Breaker.
 
 Click a result on the left to view its recipe on the right.
 
-# Recipe view
-
+Recipe view
+------------------------------
 The 3x3 recipe grid shows each ingredient. Each slot is highlighted:
 
 - Blue: enough of this ingredient is available in the network (or player inventory if enabled)
@@ -87,14 +87,14 @@ The 3x3 recipe grid shows each ingredient. Each slot is highlighted:
 
 The "Can craft: N" label shows how many times the recipe can currently be completed.
 
-# Crafting
-
+Crafting
+------------------------------
 Use the [Craft] button to craft one batch, or [x10] to craft ten at once.
 
 If "Also use player inventory" is checked, items are first drawn from the network and the remainder taken from your inventory.
 
-# Recursive Crafting
-
+Recursive Crafting
+------------------------------
 The Recursive Crafting Upgrade works the same as the regular Access Point Crafting Upgrade, but also enables recursive (deep) crafting.
 
 With recursive crafting enabled, you can craft an item even when its direct ingredients are not all in storage - as long as the ingredients needed to make those ingredients are available. The system plans the full crafting chain automatically, crafting any missing sub-components from the network first, then assembling the final item.
@@ -103,35 +103,38 @@ Handles normal crafting grid recipes only. It is most useful when crafting compl
 
 The Recursive Crafting Upgrade can replace the regular Access Point Crafting Upgrade; you do not need both.
 
-# History navigation
-
+History navigation
+------------------------------
 The [ < ] and [ > ] buttons navigate back and forward through recipes you have viewed, similar to browser history. Clicking an ingredient in the recipe grid also navigates to that ingredient's own recipe.
 
-# Wireless Access Pad
-
+Wireless Access Pad
+------------------------------
 When accessing the Easy Crafting tab through a Wireless Access Pad, the upgrade slot is hidden. The upgrade must be inserted by opening the Access Point directly.
 
-# Recipe limitations
-
+Recipe limitations
+------------------------------
 Recipes that use group ingredients (e.g. "group:stick") are supported. Each unique group in a recipe is expanded to all items belonging to that group, and one recipe variant is created per combination. For example, a recipe with group:wood and group:stick will appear as a separate variant for each (wood item, stick item) pair. Crafting each variant requires those exact items from your network.
 ]])
 
 g.optic_cable = S([[
-# Regular Cables
-
+Regular Cables
+------------------------------
 Cables are used to connect a controller to other machines, allowing the establishing of a network.
 
 Placing a cable that bridges two different active networks will burn that cable. Burned cables can simply be picked up, and return normal cables.
 
 Note that Cables are the only way to extend a network's reach - meaning, machines will not carry the network connection through them. If you connect a network cable to one side of a machine, and then place a 2nd cable on the other side of the machine, the 2nd cable will not carry the network connection.
 
-# Toggleable Cables
+Toggleable Cables
+------------------------------
 The Toggleable Cable works exactly like a regular cable, but can be right-clicked (aka used) to disconnect it from all other surrounding cables or machines. This allows you to make parts of your network easy to disconnect when you don't want to use them (For example, a disconnecting an auto-furnace setup when you don't need it anymore)
 
-# Embedded Cables
+Embedded Cables
+------------------------------
 The Embedded Cable is a full block that acts like a regular Optic Cable, allowing cables to be run through walls without leaving visible gaps.
 
-# Insulated Cables
+Insulated Cables
+------------------------------
 Insulated Cables are directional cables that only carry the network connection along specific faces. All other faces are blocked, even if another cable or machine is touching them. This lets you run cables past machines or junctions without accidentally connecting them.
 
 The Insulated Optic Cable (straight) connects front-to-back only. Place it so its front and back faces align with the cable run you want.
