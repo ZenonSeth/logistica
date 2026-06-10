@@ -80,6 +80,7 @@ local PAGE_SIGNAL_NODE_PLACER     = "signodeplacer"
 local PAGE_SIGNAL_NODE_DIGGER     = "signodedigger"
 local PAGE_DIGILINE_SENDER        = "diglsnd"
 local PAGE_DIGILINE_RECEIVER      = "diglrecv"
+local PAGE_SIGNAL_MONITOR         = "sigmonitor"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -173,6 +174,7 @@ local RECIPE_SIG_NODEPLACER = getrec({L("signal_node_placer")})
 local RECIPE_SIG_NODEDIGGER = getrec({L("signal_node_digger")})
 local RECIPE_DIGILINE_SENDER   = getrec({L("digiline_sender")})
 local RECIPE_DIGILINE_RECEIVER = getrec({L("digiline_receiver")})
+local RECIPE_SIG_MONITOR       = getrec({L("signal_monitor")})
 
 local RECIPE_LINKS = {
   -- items
@@ -229,6 +231,7 @@ local RECIPE_LINKS = {
   [L("signal_node_digger")]    = PAGE_SIGNAL_NODE_DIGGER,
   [L("digiline_sender")]       = PAGE_DIGILINE_SENDER,
   [L("digiline_receiver")]     = PAGE_DIGILINE_RECEIVER,
+  [L("signal_monitor")]        = PAGE_SIGNAL_MONITOR,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -329,6 +332,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Node Digger"),   id = PAGE_SIGNAL_NODE_DIGGER },
     { name = S("  Digiline Signal Sender"),             id = PAGE_DIGILINE_SENDER },
     { name = S("  Digiline to Signal Converter"),      id = PAGE_DIGILINE_RECEIVER },
+    { name = S("  Signal Monitor"),                    id = PAGE_SIGNAL_MONITOR },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -908,6 +912,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_DIGILINE_RECEIVER,
       recipeLinks = RECIPE_LINKS,
       description = desc.digiline_receiver,
+    },
+
+    [PAGE_SIGNAL_MONITOR] = {
+      title = S("Signal Monitor"),
+      recipes = RECIPE_SIG_MONITOR,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_monitor,
     },
 
     -- Settings

@@ -385,6 +385,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("signal_monitor"),
+  recipe = {
+    {itemstrings.glass, CIRC,  itemstrings.glass},
+    {CIRC,              RELAY, CIRC},
+    {PLATE,             CABLE, PLATE},
+  }
+})
+
+logistica.register_craft({
   output = L("signal_item_counter"),
   recipe = {
     {PLATE, "",    PLATE},

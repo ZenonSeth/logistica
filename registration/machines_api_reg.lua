@@ -782,6 +782,23 @@ if logistica.settings.enable_wireless_access_pad then
 end
 
 --------------------------------
+-- Signal Monitor
+--------------------------------
+
+logistica.register_signal_monitor(
+  S("Signal Monitor"),
+  "signal_monitor",
+  {
+    "logistica_signal_toggler_front.png",
+    "logistica_signal_toggler_front.png",
+    "logistica_signal_monitor_side.png^[transformFX",
+    "logistica_signal_monitor_side.png",
+    "logistica_signal_monitor_side.png",
+    "logistica_signal_monitor_front.png",
+  }
+)
+
+--------------------------------
 -- Digiline Signal Sender
 --------------------------------
 

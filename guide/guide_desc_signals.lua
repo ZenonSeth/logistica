@@ -517,6 +517,39 @@ The placer stores an owner - the player who placed it (or last took ownership). 
 When disconnected from the network (dug up or isolated), the placer stops reacting to signals.
 ]])
 
+g.signal_monitor = S([[
+The Signal Monitor is a signal receiver that passively records every signal it sees on the network and lets you inspect them at a glance.
+
+Right-click to open the interface.
+
+Interface
+------------------------------
+The signal list on the left shows every signal name the monitor has observed since it was last reset, one entry per signal. Each entry shows its current state:
+
+(O) signal_name - the signal is currently ON (shown in green)
+( ) signal_name - the signal is currently OFF (shown in grey)
+
+Signals are kept in the list even after they go OFF, so you can see what has been active at any point since the last reset.
+
+Clicking a signal name in the left list opens the sender panel on the right, which shows how many senders are currently broadcasting that signal as ON, with the node name and position of each one. Clicking a node name or position sends a chat message to you with the exact location.
+
+Controls
+------------------------------
+Search: filters the signal list to names containing the typed text. Press Enter or Refresh to apply.
+
+Refresh: redraws the display with the latest recorded state. No data is lost when refreshing.
+
+Reset: clears the entire signal list and starts fresh from the current network state. Use this after removing signal senders to clean up stale entries.
+
+Live Update: when checked, the display automatically updates whenever any signal on the network changes. When unchecked, use Refresh to update manually.
+
+Behavior
+------------------------------
+The monitor records signals from the moment it connects to a network. If it is moved to a different network, the recorded list is automatically cleared and restarted for the new network.
+
+The recorded list is stored in memory only and is not saved to disk. It will be cleared on server restart.
+]])
+
 g.signal_toggler = S([[
 The Signal Toggler is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
 
