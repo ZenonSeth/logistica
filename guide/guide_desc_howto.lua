@@ -9,17 +9,17 @@ do
 
   g.whats_new_2_0 =
     h("Signals") .. "\n" ..
-    "Signals are named on/off states that travel within a single Logistica network via relays and logic gates." .. n ..
+    "Signals are named on/off states that travel within a single Logistica network via the regular cables." .. n ..
     "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
     "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
     "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/ADDER).\n" ..
-    "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel (requires the digilines mod)." .. n ..
+    "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel." .. n ..
 
     h("Access Point Autocrafting") .. "\n" ..
     "The Access Point has a new Crafting tab. With the Autocrafting Upgrade installed you can search recipes, view ingredients, and craft to an output slot. The Recursive Crafting Upgrade adds a queue that chains crafting steps automatically." .. n ..
 
     h("Access Point Storage Management") .. "\n" ..
-    "A new tab in the Access Point lets you configure Mass Storage slots directly: set reserve amounts, demand targets, and whether to include crafting suppliers in demand - without visiting each chest." .. n ..
+    "A new tab in the Access Point lets you configure Mass Storage slots directly: set reserve amounts, demand targets, and whether to include crafting suppliers in demand." .. n ..
 
     h("New Machines") .. "\n" ..
     "- <b>Farming Supplier:</b> harvests and replants crops in a configurable area. Add the Sprinkler Upgrade to accelerate growth.\n" ..
