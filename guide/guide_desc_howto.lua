@@ -12,7 +12,7 @@ do
     "Signals are named on/off states that travel within a single Logistica network via relays and logic gates." .. n ..
     "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
     "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
-    "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/XOR/NAND).\n" ..
+    "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/ADDER).\n" ..
     "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel (requires the digilines mod)." .. n ..
 
     h("Access Point Autocrafting") .. "\n" ..
