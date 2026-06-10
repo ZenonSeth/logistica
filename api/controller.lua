@@ -42,7 +42,7 @@ end
 local function on_controller_receive_fields(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
-  local pos = controllerForms[playerName].position
+  local pos = (controllerForms[playerName] or {}).position
   if not pos then return false end
   if minetest.is_protected(pos, playerName) then return true end
 
