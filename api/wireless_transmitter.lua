@@ -127,8 +127,9 @@ function logistica.register_wireless_transmitter(name, def)
   if not def.logistica then def.logistica = {} end
   def.logistica.on_connect_to_network = function(pos, networkId)
     logistica.wifi_network_register_transmitter_for_player(pos)
-    local netName = logistica.get_network_by_id_or_nil(networkId).name
-    logistica.wifi_transmitter_set_infotext(pos, netName)
+    local net = logistica.get_network_by_id_or_nil(networkId)
+    if not net then return end
+    logistica.wifi_transmitter_set_infotext(pos, net.name)
   end
 
   def._mcl_hardness = 1.5
