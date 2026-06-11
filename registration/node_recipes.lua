@@ -376,6 +376,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("signal_delayer"),
+  recipe = {
+    {PLATE, RELAY, PLATE},
+    {CIRC,  RELAY, CIRC},
+    {PLATE, RELAY, PLATE},
+  }
+})
+
+logistica.register_craft({
   output = L("signal_ext_reader"),
   recipe = {
     {PLATE,            CIRC,  PLATE},

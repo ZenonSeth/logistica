@@ -523,6 +523,31 @@ logistica.register_signal_toggle(
 )
 
 --------------------------------
+-- Signal Delayer
+--------------------------------
+
+logistica.register_signal_delayer(
+  S("Signal Delayer"),
+  "signal_delayer",
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_delayer_side.png",
+    "logistica_signal_delayer_side.png",
+    "logistica_signal_delayer_side.png",
+    "logistica_signal_delayer_side.png",
+  },
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_delayer_side_on.png",
+    "logistica_signal_delayer_side_on.png",
+    "logistica_signal_delayer_side_on.png",
+    "logistica_signal_delayer_side_on.png",
+  }
+)
+
+--------------------------------
 -- Signal Toggler
 --------------------------------
 

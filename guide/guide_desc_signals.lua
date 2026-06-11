@@ -552,6 +552,42 @@ The monitor records signals from the moment it connects to a network. If it is m
 The recorded list is stored in memory only and is not saved to disk. It will be cleared on server restart.
 ]])
 
+g.signal_delayer = S([[
+The Signal Delayer is both a signal receiver and a signal sender. It forwards a named input signal to a named output signal, but delays the ON transition and the OFF transition independently.
+
+Usage
+------------------------------
+Right-click to open the settings and configure the input signal name, output signal name, ON delay, and OFF delay.
+
+The infotext above the node shows the current configuration, the current output state, and any pending transitions.
+
+Configuration
+------------------------------
+Input Signal: the name of the signal this node listens for. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Output Signal: the name of the signal this node broadcasts. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+ON delay: how long to wait after the input goes ON before the output follows. Set with +/- buttons in 0.5s steps, from 0 to 600s.
+
+OFF delay: how long to wait before the output follows the OFF transition. Set with +/- buttons in 0.5s steps, from 0 to 600s.
+
+Behavior
+------------------------------
+Each transition of the input signal (ON or OFF) is queued. At most two pending transitions are held at once: the one being timed (head) and the next one (tail). If the same transition type arrives again while it is queued as the head, the head timer restarts. If the same transition type arrives while it is queued as the tail, it is a no-op. If the opposite type arrives while two are queued, the tail is discarded and the head timer restarts with the new value.
+
+A delay of 0 means the output follows immediately (within one server step).
+
+On connecting to a network, the node broadcasts its current output state immediately.
+
+When the node is dug or disconnected, all pending transitions are cancelled.
+
+Example uses
+------------------------------
+- Debounce a noisy input: set a short ON delay so brief flickers do not propagate.
+- Create a delayed shutdown: set a long OFF delay so a machine keeps running for a while after the input drops.
+- Sequence two machines: set different delays on two delayers fed by the same signal so one starts before the other.
+]])
+
 g.signal_toggle = S([[
 The Signal Toggle is both a signal receiver and a signal sender. It toggles its output signal ON or OFF each time its input signal turns ON.
 

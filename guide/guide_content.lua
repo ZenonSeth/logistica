@@ -82,6 +82,7 @@ local PAGE_SIGNAL_NODE_DIGGER     = "signodedigger"
 local PAGE_DIGILINE_SENDER        = "diglsnd"
 local PAGE_DIGILINE_RECEIVER      = "diglrecv"
 local PAGE_SIGNAL_MONITOR         = "sigmonitor"
+local PAGE_SIGNAL_DELAYER         = "sigdelayer"
 
 local getrec = logistica.GuideApi.convert_minetest_items_recipes_to_guide_recipes
 
@@ -177,6 +178,7 @@ local RECIPE_SIG_NODEDIGGER = getrec({L("signal_node_digger")})
 local RECIPE_DIGILINE_SENDER   = getrec({L("digiline_sender")})
 local RECIPE_DIGILINE_RECEIVER = getrec({L("digiline_receiver")})
 local RECIPE_SIG_MONITOR       = getrec({L("signal_monitor")})
+local RECIPE_SIG_DELAYER       = getrec({L("signal_delayer")})
 
 local RECIPE_LINKS = {
   -- items
@@ -235,6 +237,7 @@ local RECIPE_LINKS = {
   [L("digiline_sender")]       = PAGE_DIGILINE_SENDER,
   [L("digiline_receiver")]     = PAGE_DIGILINE_RECEIVER,
   [L("signal_monitor")]        = PAGE_SIGNAL_MONITOR,
+  [L("signal_delayer")]        = PAGE_SIGNAL_DELAYER,
 
   -- machines
   [L("lava_furnace_fueler")] = PAGE_LAVA_FUELER,
@@ -329,6 +332,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
     { name = S("  Signal Toggle"), id = PAGE_SIGNAL_TOGGLE },
+    { name = S("  Signal Delayer"), id = PAGE_SIGNAL_DELAYER },
     { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
     { name = S("  Signal Node Placer"),   id = PAGE_SIGNAL_NODE_PLACER },
     { name = S("  Signal Node Digger"),   id = PAGE_SIGNAL_NODE_DIGGER },
@@ -780,7 +784,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_SIGNALS_OVERVIEW] = {
       title = S("Signals"),
-      relatedItems = {L("signal_button"), L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_liquid_counter"), L("signal_ext_reader"), L("signal_timer")},
+      relatedItems = {L("signal_button"), L("signal_switch"), L("signal_lamp_white"), L("signal_lamp_2c_br"), L("signal_toggler"), L("signal_not_gate"), L("signal_logic_gate"), L("mesecon_signaler"), L("mesecon_sender"), L("signal_item_counter"), L("signal_liquid_counter"), L("signal_ext_reader"), L("signal_timer"), L("signal_delayer")},
       recipeLinks = RECIPE_LINKS,
       description = desc.signals_overview,
     },
@@ -916,6 +920,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_MONITOR,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_monitor,
+    },
+
+    [PAGE_SIGNAL_DELAYER] = {
+      title = S("Signal Delayer"),
+      recipes = RECIPE_SIG_DELAYER,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.signal_delayer,
     },
 
     [PAGE_MESECON_SIG_RECEIVER] = {
