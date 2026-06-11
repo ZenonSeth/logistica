@@ -43,11 +43,6 @@ local function on_receive_fields(player, formname, fields)
   if not pos then return false end
   if not logistica.player_has_network_access(pos, playerName) then return true end
 
-  if fields.quit then
-    forms[playerName] = nil
-    return true
-  end
-
   if fields.save
     or fields.key_enter_field == "channel"
     or fields.key_enter_field == "signal_name"
@@ -58,6 +53,12 @@ local function on_receive_fields(player, formname, fields)
       fields.signal_name or ""
     )
     forms[playerName] = nil
+    return true
+  end
+
+  if fields.quit then
+    forms[playerName] = nil
+    return true
   end
 
   return true
