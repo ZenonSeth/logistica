@@ -467,14 +467,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_TOOL_CHEST] = {
-      title = S("Optic cables"),
+      title = S("Tool Chest"),
       recipes = RECIPE_TOOLCHST,
       recipeLinks = RECIPE_LINKS,
       description = desc.tool_chest,
     },
 
     [PAGE_PASSIVE_SUPPLIER] = {
-      title = S("Wireless Upgrader"),
+      title = S("Passive Supplier Chest"),
       recipes = RECIPE_PASSSUPP,
       recipeLinks = RECIPE_LINKS,
       description = desc.passive_supplier,
@@ -559,7 +559,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     -- autocrafting
 
     [PAGE_CRAFTING_SUPPLIER] = {
-      title = S("Crafting Supplierr"),
+      title = S("Crafting Supplier"),
       recipes = RECIPE_CRAFTSUP,
       recipeLinks = RECIPE_LINKS,
       description = desc.crafting_supplier,
@@ -695,7 +695,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_SILVERIN_SLICE] = {
-      title = S("Silvrin Silce"),
+      title = S("Silverin Slice"),
       relatedItems = {L("silverin")},
       recipes = RECIPE_SILVSLIC,
       recipeLinks = RECIPE_LINKS,
@@ -703,7 +703,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_SILVERIN_CIRCUIT] = {
-      title = S("Silvrin Circuit"),
+      title = S("Silverin Circuit"),
       relatedItems = {L("lava_furnace")},
       recipes = RECIPE_SILVCIRC,
       recipeLinks = RECIPE_LINKS,
@@ -719,7 +719,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_SILVERIN_PLATE] = {
-      title = S("Silvrin Plate"),
+      title = S("Silverin Plate"),
       relatedItems = {L("lava_furnace")},
       recipes = RECIPE_SILVPLAT,
       recipeLinks = RECIPE_LINKS,

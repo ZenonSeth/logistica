@@ -84,13 +84,13 @@ Logistica allows you to access the inventories of machines or storage from other
 
 Taking Items
 ------------------------------
-To take items from machines of other mods, or storage of other mods, you can use a Network Importer - see button above for details. 
+To take items from machines of other mods, or storage of other mods, you can use a Network Importer - see button above for details.
 
 In the rare case where the network importer cannot access the inventory of a machine or storage, try to use machines from the other mod to put all the items in a regular Chest, then use the Network Importer to take items from the Chest.
 
 Placing Items
 ------------------------------
-To place items into other mahcines, ues a Request Inserter - see button above for details. 
+To place items into other machines, use a Request Inserter - see button above for details. 
 
 What NOT to do
 ------------------------------
