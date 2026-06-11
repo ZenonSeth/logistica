@@ -5,11 +5,12 @@ local FORMSPEC_NAME = "logistica:signal_node_placer"
 local forms = {}
 
 local function get_formspec(pos, playerName)
-  local posForm    = "nodemeta:"..pos.x..","..pos.y..","..pos.z
-  local sigName    = logistica.node_placer_get_signal_name(pos)
-  local dist       = logistica.node_placer_get_distance(pos)
-  local ownerName  = logistica.node_placer_get_owner(pos)
-  local isOwner    = (playerName == ownerName)
+  local posForm         = "nodemeta:"..pos.x..","..pos.y..","..pos.z
+  local sigName         = logistica.node_placer_get_signal_name(pos)
+  local dist            = logistica.node_placer_get_distance(pos)
+  local ownerName       = logistica.node_placer_get_owner(pos)
+  local isOwner         = (playerName == ownerName)
+  local allowReplaceable = logistica.node_placer_get_allow_replaceable(pos)
   local filterInv  = minetest.get_meta(pos):get_inventory():get_stack("filter", 1)
   local filterDesc = (not filterInv:is_empty())
     and minetest.formspec_escape(filterInv:get_short_description())
@@ -51,7 +52,9 @@ local function get_formspec(pos, playerName)
     "label[0.5,3.6;"..FS("Signal Name:").."]"..
     "field[2.8,3.35;7.3,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
     "label[2.8,4.2;"..FS("a-z 0-9 _ only").."]"..
-    "label[0.5,5.0;"..statusText.."]"..
+    "checkbox[0.5,4.6;allow_replaceable;"..FS("Allow placing on replaceable nodes (e.g. water, grass)")..";"
+      ..(allowReplaceable and "true" or "false").."]"..
+    "label[0.5,5.3;"..statusText.."]"..
     "button_exit[7.6,4.75;2.5,0.75;save;"..FS("Save").."]"..
     logistica.player_inv_formspec(0.5, 6.0)..
     "listring[current_player;main]"..
@@ -78,7 +81,10 @@ local function on_receive_fields(player, formname, fields)
   if not pos then return false end
   if not logistica.player_has_network_access(pos, playerName) then return true end
 
-  if fields.take_ownership then
+  if fields.allow_replaceable ~= nil then
+    logistica.node_placer_set_allow_replaceable(pos, fields.allow_replaceable == "true")
+    return true
+  elseif fields.take_ownership then
     logistica.node_placer_set_owner(pos, playerName)
     minetest.get_meta(pos):set_string("last_error", "")
     logistica.node_placer_update_infotext(pos)
@@ -148,6 +154,7 @@ function logistica.register_signal_node_placer(desc, name, tiles)
     local meta = minetest.get_meta(pos)
     meta:get_inventory():set_size("filter", 1)
     logistica.node_placer_set_distance(pos, 1)
+    logistica.node_placer_set_allow_replaceable(pos, true)
     if placer and placer:is_player() then
       logistica.node_placer_set_owner(pos, placer:get_player_name())
     end

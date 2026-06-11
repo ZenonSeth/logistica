@@ -1,9 +1,10 @@
 
-local META_SIGNAL_NAME = "signal_name"
-local META_DISTANCE    = "distance"
-local META_LAST_ERROR  = "last_error"
-local META_PREV_SIG    = "prev_signal_state"
-local META_OWNER       = "owner"
+local META_SIGNAL_NAME      = "signal_name"
+local META_DISTANCE         = "distance"
+local META_LAST_ERROR       = "last_error"
+local META_PREV_SIG         = "prev_signal_state"
+local META_OWNER            = "owner"
+local META_ALLOW_REPLACEABLE = "allow_replaceable"
 local MIN_DISTANCE     = 1
 local MAX_DISTANCE     = logistica.settings.node_placer_max_distance
 
@@ -32,6 +33,14 @@ end
 
 function logistica.node_placer_set_owner(pos, playerName)
   minetest.get_meta(pos):set_string(META_OWNER, playerName)
+end
+
+function logistica.node_placer_get_allow_replaceable(pos)
+  return minetest.get_meta(pos):get_int(META_ALLOW_REPLACEABLE) == 1
+end
+
+function logistica.node_placer_set_allow_replaceable(pos, value)
+  minetest.get_meta(pos):set_int(META_ALLOW_REPLACEABLE, value and 1 or 0)
 end
 
 local function get_target_pos(pos)
@@ -66,7 +75,9 @@ function logistica.node_placer_try_place(pos)
 
   local existing    = minetest.get_node(targetPos)
   local existingDef = minetest.registered_nodes[existing.name]
-  if not existingDef or not existingDef.buildable_to then return false, "target_blocked" end
+  local allowReplaceable = logistica.node_placer_get_allow_replaceable(pos)
+  local canPlace = existingDef and (allowReplaceable and existingDef.buildable_to or existing.name == "air")
+  if not canPlace then return false, "target_blocked" end
 
   local ownerName   = logistica.node_placer_get_owner(pos)
   local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
