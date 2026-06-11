@@ -348,7 +348,7 @@ function logistica.register_digiline_sender(desc, name, tiles)
     },
     digiline = {
       receptor = { rules = digilines.rules.default },
-      effector = {},
+      -- effector = { action =  },
     },
     _mcl_hardness         = 1.5,
     _mcl_blast_resistance = 10,

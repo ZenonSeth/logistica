@@ -125,17 +125,30 @@ function logistica.digiline_sender_on_rightclick(pos, _, player, _, _)
   logistica.digiline_sender_show_formspec(playerName, pos)
 end
 
-function logistica.digiline_sender_allow_inv_put(pos, listname, _index, stack, player)
+function logistica.digiline_sender_allow_inv_put(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
-  if stack:get_stack_max() == 1 then return 0 end
-  return 1
+  local inv = minetest.get_meta(pos):get_inventory()
+  local inv_stack = inv:get_stack(listname, index)
+  -- We always want exactly one "item" in the filter, only bother changing it if we actually need to.
+  if inv_stack:get_name() ~= stack:get_name() then
+    -- "imagine" taking at most one item from the stack.
+    local single_item_stack = stack:peek_item(1)
+    inv:set_stack(listname, index, single_item_stack)
+  end
+
+  -- I don't know why tools should be barred? TODO: ask
+  -- if stack:get_stack_max() == 1 then return 0 end
+  return 0
 end
 
-function logistica.digiline_sender_allow_inv_take(pos, listname, _index, _stack, player)
+function logistica.digiline_sender_allow_inv_take(pos, listname, index, _stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
-  return 1
+  -- We want to clear the relevant item slot on attempts to take.
+  local inv = minetest.get_meta(pos):get_inventory()
+  inv:set_stack(listname, index, "")
+  return 0
 end
 
 function logistica.digiline_sender_allow_inv_move(_, _, _, _, _, _, _)
