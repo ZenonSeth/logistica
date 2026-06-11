@@ -125,17 +125,26 @@ function logistica.digiline_sender_on_rightclick(pos, _, player, _, _)
   logistica.digiline_sender_show_formspec(playerName, pos)
 end
 
-function logistica.digiline_sender_allow_inv_put(pos, listname, _index, stack, player)
+function logistica.digiline_sender_allow_inv_put(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
-  if stack:get_stack_max() == 1 then return 0 end
-  return 1
+  local copyStack = ItemStack(stack:get_name())
+  copyStack:set_count(1)
+  minetest.get_meta(pos):get_inventory():set_stack("filter", index, copyStack)
+  local warn = validate_template(pos)
+  minetest.get_meta(pos):set_string("warning", warn)
+  logistica.digiline_sender_show_formspec(player:get_player_name(), pos)
+  return 0
 end
 
-function logistica.digiline_sender_allow_inv_take(pos, listname, _index, _stack, player)
+function logistica.digiline_sender_allow_inv_take(pos, listname, index, _stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname ~= "filter" then return 0 end
-  return 1
+  minetest.get_meta(pos):get_inventory():set_stack(listname, index, ItemStack())
+  local warn = validate_template(pos)
+  minetest.get_meta(pos):set_string("warning", warn)
+  logistica.digiline_sender_show_formspec(player:get_player_name(), pos)
+  return 0
 end
 
 function logistica.digiline_sender_allow_inv_move(_, _, _, _, _, _, _)

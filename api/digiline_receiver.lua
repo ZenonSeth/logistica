@@ -92,7 +92,7 @@ function logistica.register_digiline_receiver(desc, name, tile_side, tile_top, t
     type = "connected",
     fixed = {
       {-0.5, -0.5, -0.5,  0.5, -6/16, 0.5},
-      {-SIZE, -6/16, -SIZE, SIZE, 0.5, SIZE},
+      {-SIZE, -6/16, -SIZE, SIZE, 1/16, SIZE},
     },
     connect_top   = {-SIZE, -SIZE, -SIZE, SIZE, 0.5,  SIZE},
     connect_front = {-SIZE, -SIZE, -0.5,  SIZE, SIZE, SIZE},

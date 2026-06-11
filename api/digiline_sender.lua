@@ -313,7 +313,7 @@ function logistica.register_digiline_sender(desc, name, tiles)
       type = "connected",
       fixed = {
         {-0.5, -0.5, -0.5,  0.5, -6/16, 0.5},
-        {-SIZE, -6/16, -SIZE, SIZE, 0.5, SIZE},
+        {-SIZE, -6/16, -SIZE, SIZE, 1/16, SIZE},
       },
       connect_top   = {-SIZE, -SIZE, -SIZE, SIZE, 0.5,  SIZE},
       connect_front = {-SIZE, -SIZE, -0.5,  SIZE, SIZE, SIZE},
@@ -348,7 +348,6 @@ function logistica.register_digiline_sender(desc, name, tiles)
     },
     digiline = {
       receptor = { rules = digilines.rules.default },
-      effector = {},
     },
     _mcl_hardness         = 1.5,
     _mcl_blast_resistance = 10,

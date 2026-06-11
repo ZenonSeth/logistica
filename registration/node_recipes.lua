@@ -494,7 +494,7 @@ if minetest.get_modpath("mesecons") then
   })
 end
 
-if minetest.get_modpath("digilines") then
+if minetest.get_modpath("digilines") and logistica.settings.enable_digiline_machines then
   local DWIRE = "digilines:wire_std_00000000"
   logistica.register_craft({
     output = L("digiline_sender"),

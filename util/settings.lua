@@ -50,6 +50,8 @@ logistica.settings.enable_wireless_antennas = get_bool("enable_wireless_antennas
 
 logistica.settings.enable_wireless_access_pad = get_bool("enable_wireless_access_pad", true)
 
+logistica.settings.enable_digiline_machines = get_bool("enable_digiline_machines", true)
+
 logistica.settings.enable_node_digger = get_bool("enable_node_digger", true)
 
 logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)

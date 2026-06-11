@@ -852,7 +852,7 @@ logistica.register_signal_monitor(
 -- Digiline Signal Sender
 --------------------------------
 
-if minetest.get_modpath("digilines") then
+if minetest.get_modpath("digilines") and logistica.settings.enable_digiline_machines then
   logistica.register_digiline_sender(
     S("Logistica Digiline Signal Sender"),
     "digiline_sender",
