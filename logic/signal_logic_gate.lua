@@ -12,7 +12,7 @@ local MAX_THRESHOLD     = 100000
 
 function logistica.signal_logic_gate_get_mode(pos)
   local v = minetest.get_meta(pos):get_string(META_MODE)
-  if v ~= "and" and v ~= "or" and v ~= "adder" then return DEFAULT_MODE end
+  if v ~= "and" and v ~= "or" and v ~= "adder" and v ~= "xor" then return DEFAULT_MODE end
   return v
 end
 
@@ -55,6 +55,12 @@ local function evaluate_gate(networkId, inputList, mode, threshold)
       if logistica.signal_get_state(networkId, name) then return true end
     end
     return false
+  elseif mode == "xor" then
+    local count = 0
+    for _, name in ipairs(inputList) do
+      if logistica.signal_get_state(networkId, name) then count = count + 1 end
+    end
+    return count == 1
   else -- adder
     local count = 0
     for _, name in ipairs(inputList) do
@@ -74,6 +80,8 @@ local function update_infotext(pos, outputIsOn)
     label = "ADD " .. threshold
   elseif mode == "or" then
     label = "OR"
+  elseif mode == "xor" then
+    label = "XOR"
   else
     label = "AND"
   end

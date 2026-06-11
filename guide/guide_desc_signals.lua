@@ -244,7 +244,7 @@ If no other sender is keeping the output signal ON and the gate is disconnected 
 g.signal_logic_gate = S([[
 The Signal Logic Gate is both a signal receiver and a signal sender. It combines multiple input signals using a configurable logic rule and broadcasts the result on an output signal.
 
-Three modes are available: AND, OR, and ADDER.
+Four modes are available: AND, OR, XOR, and ADDER.
 
 Usage
 ------------------------------
@@ -257,6 +257,8 @@ Modes
 AND: the output is ON only if ALL listed input signals are currently ON. If any input is OFF or absent, the output is OFF.
 
 OR: the output is ON if ANY of the listed input signals is currently ON. The output is only OFF when all inputs are absent or OFF.
+
+XOR: the output is ON if exactly 1 of the listed input signals is currently ON. If zero or more than one input is ON, the output is OFF.
 
 ADDER: the output is ON if the number of input signals that are currently ON is greater than or equal to the configured threshold. Use this to require a minimum count of active signals.
 

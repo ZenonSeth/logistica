@@ -4,19 +4,22 @@ local FORMSPEC_NAME = "logistica:signal_logic_gate"
 
 local forms = {}
 
-local MODE_NAMES = { and_ = "AND", or_ = "OR", adder = "ADDER" }
+local MODE_NAMES = { and_ = "AND", or_ = "OR", xor_ = "XOR", adder = "ADDER" }
 
 local function mode_display(mode)
   if mode == "and" then return "AND"
   elseif mode == "or" then return "OR"
+  elseif mode == "xor" then return "XOR"
   else return "ADDER" end
 end
 
 local function mode_desc(mode, threshold)
   if mode == "and" then
-    return FS("All input signals must be On for the output signal to be On.")
+    return FS("Output is On when all input signals are On.")
   elseif mode == "or" then
-    return FS("Any input signal being On sets the output signal to On.")
+    return FS("Output is On when any input signal is On.")
+  elseif mode == "xor" then
+    return FS("Output is On when exactly 1 input signal is On.")
   else
     return FS("Output is On when ") .. threshold .. FS(" or more input signals are On.")
   end
@@ -36,16 +39,17 @@ local function get_formspec(pos)
   local save_y   = field_y + 0.9
 
   local fs = "formspec_version[4]"..
-    "size[7,6.8]"..
+    "size[7.5,6.8]"..
     logistica.ui.background..
     logistica.ui.button_style..
     "label[0.5,0.3;"..FS("Signal Logic Gate").."]"..
     "label[0.5,0.8;"..FS("Current Mode: ")..mode_display(mode).."]"..
     "label[0.5,1.2;"..mode_desc(mode, threshold).."]"..
-    "label[0.5,1.7;"..FS("Select Mode:").."]"..
-    "button[2.25,1.5;1.2,0.65;mode_and;AND]"..
-    "button[3.5,1.5;1.2,0.65;mode_or;OR]"..
-    "button[4.75,1.5;1.75,0.65;mode_adder;ADDER]"
+    -- "label[0.5,1.7;"..FS("Select Mode:").."]"..
+    "button[0.6,1.5;1.3,0.65;mode_and;AND]"..
+    "button[2.1,1.5;1.3,0.65;mode_or;OR]"..
+    "button[3.6,1.5;1.3,0.65;mode_xor;XOR]"..
+    "button[5.1,1.5;1.3,0.65;mode_adder;ADDER]"
 
   if is_adder then
     fs = fs..
@@ -104,6 +108,10 @@ local function on_receive_fields(player, formname, fields)
   elseif fields.mode_or then
     save_signal_fields(pos, fields)
     meta:set_string("gate_mode", "or")
+    show_gate_formspec(pos, playerName)
+  elseif fields.mode_xor then
+    save_signal_fields(pos, fields)
+    meta:set_string("gate_mode", "xor")
     show_gate_formspec(pos, playerName)
   elseif fields.mode_adder then
     save_signal_fields(pos, fields)
