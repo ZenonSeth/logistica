@@ -552,31 +552,59 @@ The monitor records signals from the moment it connects to a network. If it is m
 The recorded list is stored in memory only and is not saved to disk. It will be cleared on server restart.
 ]])
 
+g.signal_toggle = S([[
+The Signal Toggle is both a signal receiver and a signal sender. It toggles its output signal ON or OFF each time its input signal turns ON.
+
+Each rising edge (OFF to ON transition) of the input flips the output to the opposite state. The falling edge (ON to OFF) of the input is ignored. The output state is stored persistently and survives network reconnections.
+
+Usage
+------------------------------
+Right-click to open the settings and configure the input and output signal names.
+
+The Toggle Output button in the formspec manually flips the output state immediately, regardless of the input signal. This is useful for forcing a known state on placement or for manual overrides.
+
+The infotext above the node shows the current input and output signal names and the current output state.
+
+Configuration
+------------------------------
+Input Signal: the name of the signal this toggle listens for. Each time this signal goes ON, the output flips.
+
+Output Signal: the name of the signal this toggle broadcasts. Other receivers can listen to this name to react to the toggled state.
+
+Both names must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Notes
+------------------------------
+On connecting to a network, the toggle immediately re-broadcasts its stored output state, so downstream receivers are always in sync.
+
+If no other sender is keeping the output signal ON and the toggle is disconnected or dug up, its output contribution is automatically removed.
+]])
+
 g.signal_toggler = S([[
-The Signal Toggler is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
+The Signal Network Switch is a signal receiver that controls network connectivity. It conditionally connects the machines behind its back face to the rest of the network, depending on whether a named signal is ON or OFF.
 
 Usage
 ------------------------------
 Right-click to configure the signal name and NOT mode.
-Sneak + punch to show which node the toggler is currently targeting (the back face direction).
+Sneak + punch to show which node the switch is currently targeting (the back face direction).
 
 The infotext above the node shows the current state: On or Off.
 
-When the toggler is ON, machines and cables connected through its back face become part of the network. When OFF, they are disconnected.
+When the switch is ON, machines and cables connected through its back face become part of the network. When OFF, they are disconnected.
 
 Placement
 ------------------------------
-The toggler is directional. Place it so its back face points toward the machines you want to gate. The entity indicator (shown on placement and on sneak+punch) marks the node the back face is targeting.
+The switch is directional. Place it so its back face points toward the machines you want to gate. The entity indicator (shown on placement and on sneak+punch) marks the node the back face is targeting.
 
-The main network connects to the toggler from any face except the back face.
+The main network connects to the switch from any face except the back face.
 
 Configuration
 ------------------------------
-NOT checkbox: when checked, the logic is inverted. The toggler will open the connection when the signal is absent, and close it when the signal is present.
+NOT checkbox: when checked, the logic is inverted. The switch will open the connection when the signal is absent, and close it when the signal is present.
 
 Signal Name: the name of the signal to listen for. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
 
 Notes
 ------------------------------
-When the toggler turns ON, the network automatically rescans to discover any machines connected through the back face. When it turns OFF, those machines are disconnected from the network.
+When the switch turns ON, the network automatically rescans to discover any machines connected through the back face. When it turns OFF, those machines are disconnected from the network.
 ]])

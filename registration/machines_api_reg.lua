@@ -498,11 +498,36 @@ logistica.register_signal_not_gate(
 )
 
 --------------------------------
+-- Signal Toggle
+--------------------------------
+
+logistica.register_signal_toggle(
+  S("Signal Toggle"),
+  "signal_toggle",
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_toggle_side.png",
+    "logistica_signal_toggle_side.png",
+    "logistica_signal_toggle_side.png",
+    "logistica_signal_toggle_side.png",
+  },
+  {
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_not_gate_top.png",
+    "logistica_signal_toggle_side_on.png",
+    "logistica_signal_toggle_side_on.png",
+    "logistica_signal_toggle_side_on.png",
+    "logistica_signal_toggle_side_on.png",
+  }
+)
+
+--------------------------------
 -- Signal Toggler
 --------------------------------
 
 logistica.register_signal_toggler(
-  S("Signal Toggler"),
+  S("Signal Network Switch"),
   "signal_toggler",
   {
     "logistica_signal_toggler_side_off.png^[transformR270",

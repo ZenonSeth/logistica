@@ -367,6 +367,15 @@ logistica.register_craft({
 })
 
 logistica.register_craft({
+  output = L("signal_toggle"),
+  recipe = {
+    {PLATE, RELAY, PLATE},
+    {RELAY, CIRC,  RELAY},
+    {PLATE, "",    PLATE},
+  }
+})
+
+logistica.register_craft({
   output = L("signal_ext_reader"),
   recipe = {
     {PLATE,            CIRC,  PLATE},

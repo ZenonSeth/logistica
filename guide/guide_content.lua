@@ -68,6 +68,7 @@ local PAGE_SIGNAL_LAMP            = "siglmp"
 local PAGE_SIGNAL_LAMP_2C         = "siglmp2c"
 local PAGE_SIGNAL_TOGGLER         = "sigtgl"
 local PAGE_SIGNAL_NOT_GATE        = "signot"
+local PAGE_SIGNAL_TOGGLE          = "sigtoggle"
 local PAGE_SIGNAL_LOGIC_GATE      = "siglg"
 local PAGE_MESECON_SIG_RECEIVER   = "mesrcv"
 local PAGE_MESECON_SIG_SENDER     = "messnd"
@@ -162,6 +163,7 @@ local RECIPE_SIG_LAMP    = getrec({L("signal_lamp_white"), L("signal_lamp_red"),
 local RECIPE_SIG_LAMP2C  = getrec({L("signal_lamp_2c_br")})
 local RECIPE_SIG_TOGGLER = getrec({L("signal_toggler")})
 local RECIPE_SIG_NOT     = getrec({L("signal_not_gate")})
+local RECIPE_SIG_TOGGLE  = getrec({L("signal_toggle")})
 local RECIPE_SIG_LOGIC   = getrec({L("signal_logic_gate")})
 local RECIPE_SIG_MESR    = getrec({L("mesecon_signaler")})
 local RECIPE_SIG_MESS    = getrec({L("mesecon_sender")})
@@ -220,6 +222,7 @@ local RECIPE_LINKS = {
   [L("signal_toggler")]      = PAGE_SIGNAL_TOGGLER,
   [L("signal_not_gate")]     = PAGE_SIGNAL_NOT_GATE,
   [L("signal_logic_gate")]   = PAGE_SIGNAL_LOGIC_GATE,
+  [L("signal_toggle")]       = PAGE_SIGNAL_TOGGLE,
   [L("mesecon_signaler")]    = PAGE_MESECON_SIG_RECEIVER,
   [L("mesecon_sender")]      = PAGE_MESECON_SIG_SENDER,
   [L("signal_item_counter")]   = PAGE_SIGNAL_ITEM_COUNTER,
@@ -318,21 +321,22 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Signal Switch"), id = PAGE_SIGNAL_SWITCH },
     { name = S("  Signal Lamp"), id = PAGE_SIGNAL_LAMP },
     { name = S("  Signal Lamp (2-Color)"), id = PAGE_SIGNAL_LAMP_2C },
-    { name = S("  Signal Toggler"), id = PAGE_SIGNAL_TOGGLER },
+    { name = S("  Signal Network Switch"), id = PAGE_SIGNAL_TOGGLER },
     { name = S("  Signal NOT Gate"), id = PAGE_SIGNAL_NOT_GATE },
     { name = S("  Signal Logic Gate"), id = PAGE_SIGNAL_LOGIC_GATE },
-    { name = S("  Mesecon Signal Receiver"), id = PAGE_MESECON_SIG_RECEIVER },
-    { name = S("  Mesecon Signal Sender"), id = PAGE_MESECON_SIG_SENDER },
     { name = S("  Signal Item Count Sender"), id = PAGE_SIGNAL_ITEM_COUNTER },
     { name = S("  Signal Liquid Count Sender"), id = PAGE_SIGNAL_LIQUID_COUNTER },
     { name = S("  External Content Reader"), id = PAGE_SIGNAL_EXT_READER },
     { name = S("  Signal Timer Sender"), id = PAGE_SIGNAL_TIMER },
+    { name = S("  Signal Toggle"), id = PAGE_SIGNAL_TOGGLE },
     { name = S("  Signal Node Detector"), id = PAGE_SIGNAL_NODE_DETECTOR },
     { name = S("  Signal Node Placer"),   id = PAGE_SIGNAL_NODE_PLACER },
     { name = S("  Signal Node Digger"),   id = PAGE_SIGNAL_NODE_DIGGER },
     { name = S("  Digiline Signal Sender"),             id = PAGE_DIGILINE_SENDER },
     { name = S("  Digiline to Signal Converter"),      id = PAGE_DIGILINE_RECEIVER },
     { name = S("  Signal Monitor"),                    id = PAGE_SIGNAL_MONITOR },
+    { name = S("  Mesecon Signal Receiver"), id = PAGE_MESECON_SIG_RECEIVER },
+    { name = S("  Mesecon Signal Sender"), id = PAGE_MESECON_SIG_SENDER },
     { name = header(S("Resource Gathering:"))},
     { name = S("  Farming Supplier"), id = PAGE_FARMING_SUPPLIER },
     { name = S("  Sprinkler Upgrade"), id = PAGE_SPRINKLER_UPGRADE },
@@ -817,7 +821,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_SIGNAL_TOGGLER] = {
-      title = S("Signal Toggler"),
+      title = S("Signal Network Switch"),
       recipes = RECIPE_SIG_TOGGLER,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_toggler,
@@ -837,18 +841,11 @@ logistica.GuideApi.register(GUIDE_NAME, {
       description = desc.signal_logic_gate,
     },
 
-    [PAGE_MESECON_SIG_RECEIVER] = {
-      title = S("Mesecon Signal Receiver"),
-      recipes = RECIPE_SIG_MESR,
+    [PAGE_SIGNAL_TOGGLE] = {
+      title = S("Signal Toggle"),
+      recipes = RECIPE_SIG_TOGGLE,
       recipeLinks = RECIPE_LINKS,
-      description = desc.mesecon_signal_receiver,
-    },
-
-    [PAGE_MESECON_SIG_SENDER] = {
-      title = S("Mesecon Signal Sender"),
-      recipes = RECIPE_SIG_MESS,
-      recipeLinks = RECIPE_LINKS,
-      description = desc.mesecon_signal_sender,
+      description = desc.signal_toggle,
     },
 
     [PAGE_SIGNAL_ITEM_COUNTER] = {
@@ -919,6 +916,20 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_SIG_MONITOR,
       recipeLinks = RECIPE_LINKS,
       description = desc.signal_monitor,
+    },
+
+    [PAGE_MESECON_SIG_RECEIVER] = {
+      title = S("Mesecon Signal Receiver"),
+      recipes = RECIPE_SIG_MESR,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.mesecon_signal_receiver,
+    },
+
+    [PAGE_MESECON_SIG_SENDER] = {
+      title = S("Mesecon Signal Sender"),
+      recipes = RECIPE_SIG_MESS,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.mesecon_signal_sender,
     },
 
     -- Settings
