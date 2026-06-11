@@ -200,6 +200,7 @@ end
 ]]
 function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, liquidTexture, sourceNodeName, optLight, optEmptyBucketName)
   local lname = string.lower(liquidName:gsub(" ", "_"))
+  local modPrefix = minetest.get_current_modname()..":"
   local sourceNodeNames = nil
   if type(sourceNodeName) == "string" then
     sourceNodeNames = {sourceNodeName}
@@ -208,7 +209,7 @@ function logistica.register_reservoir(liquidName, liquidDesc, bucketItemName, li
   end
 
   for _, variantName in ipairs(variants) do
-    local nodeName = L("reservoir_"..variantName.."_"..lname)
+    local nodeName = modPrefix.."reservoir_"..variantName.."_"..lname
     local def = get_variant_def(variantName)
     if def then
       def.drop = nodeName
