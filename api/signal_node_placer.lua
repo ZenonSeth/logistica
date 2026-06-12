@@ -30,7 +30,7 @@ local function get_formspec(pos, playerName)
   local ownerRow = "label[0.5,0.8;" .. ownerLabel .. "]"
   if not isOwner then
     ownerRow = ownerRow ..
-      "button[3.5,0.6;2.5,0.55;take_ownership;" .. FS("Take Ownership") .. "]"
+      "button[6.5,2.4;2.5,0.55;take_ownership;" .. FS("Take Ownership") .. "]"
   end
 
   return "formspec_version[4]"..

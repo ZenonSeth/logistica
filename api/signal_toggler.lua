@@ -11,9 +11,9 @@ local function get_formspec(pos)
     "size[7,3.0]"..
     logistica.ui.background..
     logistica.ui.button_style..
-    "label[0.5,0.4;"..FS("Signal Toggler").."]"..
-    "checkbox[0.5,0.9;signal_not;"..FS("NOT")..";".. (notFlag and "true" or "false") .."]"..
-    "label[1.75,0.95;"..FS("Signal Name:").."]"..
+    "label[0.5,0.4;"..FS("Signal Network Switch").."]"..
+    "checkbox[0.5,1.15;signal_not;"..FS("NOT")..";".. (notFlag and "true" or "false") .."]"..
+    "label[1.75,1.15;"..FS("Signal Name:").."]"..
     "field[3.25,0.7;3.25,0.75;signal_name;;"..minetest.formspec_escape(signalName).."]"..
     "label[3.25,1.6;"..FS("a-z 0-9 _ only").."]"..
     "button_exit[2.0,2.1;3,0.75;save;"..FS("Save").."]"
