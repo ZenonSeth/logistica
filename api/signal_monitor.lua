@@ -245,9 +245,6 @@ function logistica.register_signal_monitor(desc, name, tiles)
   local function after_place(pos, placer, _, _)
     logistica.on_signal_receiver_change(pos, nil, nil)
     minetest.get_meta(pos):set_string("infotext", "Signal Monitor")
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

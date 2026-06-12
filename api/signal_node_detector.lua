@@ -129,9 +129,6 @@ function logistica.register_signal_node_detector(desc, name, tiles_off, tiles_on
     logistica.on_signal_sender_change(pos, nil, nil)
     logistica.node_detector_update_infotext(pos)
     logistica.node_detector_show_target(pos)
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

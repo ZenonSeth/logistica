@@ -165,9 +165,6 @@ function logistica.register_signal_node_placer(desc, name, tiles)
     logistica.on_signal_receiver_change(pos, nil, nil)
     logistica.node_placer_update_infotext(pos)
     logistica.node_placer_show_target(pos)
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

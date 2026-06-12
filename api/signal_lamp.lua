@@ -84,9 +84,6 @@ function logistica.register_signal_lamp(desc, name, tile_off, tile_on)
   local function after_place(pos, placer, _, _)
     logistica.on_signal_receiver_change(pos, nil, nil)
     minetest.get_meta(pos):set_string("infotext", "Off")
-    if placer and placer:is_player() then
-      show_lamp_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

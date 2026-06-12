@@ -154,9 +154,6 @@ function logistica.register_signal_ext_reader(desc, name, tiles)
     logistica.on_signal_sender_change(pos, nil, nil)
     logistica.ext_reader_update_infotext(pos)
     if targetPos then logistica.show_input_at(targetPos) end
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

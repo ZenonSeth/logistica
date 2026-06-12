@@ -166,9 +166,6 @@ function logistica.register_signal_logic_gate(desc, name, tiles)
     logistica.on_signal_receiver_change(pos, nil, nil)
     minetest.get_meta(pos):set_string("infotext", "Off")
     minetest.get_node_timer(pos):start(0.1)
-    if placer and placer:is_player() then
-      show_gate_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

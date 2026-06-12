@@ -131,9 +131,6 @@ function logistica.register_signal_delayer(desc, name, tiles_off, tiles_on)
   local function after_place(pos, placer, _, _)
     logistica.on_signal_receiver_change(pos, nil, nil)
     minetest.get_meta(pos):set_string("infotext", "Signal Delayer")
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

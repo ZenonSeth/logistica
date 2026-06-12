@@ -142,9 +142,6 @@ function logistica.register_signal_lamp_2c(desc, name,
     meta:set_string("color_a_name", color_a_name)
     meta:set_string("color_b_name", color_b_name)
     logistica.on_signal_receiver_change(pos, nil, nil)
-    if placer and placer:is_player() then
-      show_formspec(pos, placer:get_player_name())
-    end
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)
