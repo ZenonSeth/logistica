@@ -4,6 +4,7 @@ local META_DISTANCE    = "distance"
 local META_LAST_ERROR  = "last_error"
 local META_PREV_SIG    = "prev_signal_state"
 local META_OWNER       = "owner"
+local META_INVERT      = "invert_signal"
 local MIN_DISTANCE     = 1
 local MAX_DISTANCE     = logistica.settings.node_digger_max_distance
 local FILTER_SIZE      = 8
@@ -28,6 +29,14 @@ end
 
 function logistica.node_digger_set_owner(pos, playerName)
   minetest.get_meta(pos):set_string(META_OWNER, playerName)
+end
+
+function logistica.node_digger_get_invert(pos)
+  return minetest.get_meta(pos):get_int(META_INVERT) == 1
+end
+
+function logistica.node_digger_set_invert(pos, value)
+  minetest.get_meta(pos):set_int(META_INVERT, value and 1 or 0)
 end
 
 local function get_target_pos(pos)
@@ -226,10 +235,12 @@ end
 
 function logistica.node_digger_on_signal_received(pos, sigName, sigIsOn)
   if sigName ~= logistica.node_digger_get_signal_name(pos) then return end
-  local meta  = minetest.get_meta(pos)
-  local wasOn = meta:get_string(META_PREV_SIG) == "1"
+  local meta   = minetest.get_meta(pos)
+  local wasOn  = meta:get_string(META_PREV_SIG) == "1"
   meta:set_string(META_PREV_SIG, sigIsOn and "1" or "0")
-  if not (sigIsOn and not wasOn) then return end
+  local invert = logistica.node_digger_get_invert(pos)
+  local isEdge = invert and (not sigIsOn and wasOn) or (not invert and sigIsOn and not wasOn)
+  if not isEdge then return end
   local dug, errorKey = logistica.node_digger_try_dig(pos)
   if dug then
     meta:set_string(META_LAST_ERROR, "")

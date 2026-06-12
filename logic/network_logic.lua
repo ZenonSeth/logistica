@@ -402,15 +402,15 @@ local function recursive_scan_for_nodes_for_controller(network, positionHashes, 
           break_logistica_node(otherPos)
           minetest.get_meta(otherPos):set_string("infotext", "ERROR: Receiver cannot be placed connecting to existing networks!")
         elseif nodeNetworkGroup ~= nil then
-          network[nodeNetworkGroup][otherHash] = true
+          -- add to all network groups this node belongs to (some nodes, e.g. node digger, are in multiple)
+          for grp, _ in pairs(logistica.group_get_all_network_groups_for_node(otherName)) do
+            if network[grp] then network[grp][otherHash] = true end
+          end
           valid = true
           -- if this is a toggler in ON state, treat it as a relay so the scan continues from it
           if logistica.GROUPS.signal_togglers.is(otherName) and ends_with(otherName, ON_SUFFIX) then
             connections[otherHash] = true
           end
-          -- all machines, except controllers, should be added to network
-          network[nodeNetworkGroup][otherHash] = true
-          valid = true
         end
 
         if valid then

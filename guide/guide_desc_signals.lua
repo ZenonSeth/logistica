@@ -479,7 +479,9 @@ Tool slot: place a tool to use when digging. Details to be documented.
 
 Dig distance: the number of blocks behind the digger to target. Use the - and + buttons to adjust.
 
-Signal Name: the name of the signal this node listens for. The digger fires once each time this signal transitions from OFF to ON. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+Signal Name: the name of the signal this node listens for. The digger fires once each time this signal transitions from OFF to ON (rising edge). Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Not: when this checkbox is checked, the digger fires on the falling edge instead (ON to OFF).
 
 Behavior
 ------------------------------
@@ -506,7 +508,9 @@ Node to place: put any placeable node item into the filter slot to set what the 
 
 Place distance: the number of blocks behind the placer to target. Distance 1 means the node directly behind it; distance 2 means one block further back, and so on. Use the - and + buttons to adjust.
 
-Signal Name: the name of the signal this node listens for. The placer fires once each time this signal transitions from OFF to ON. Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+Signal Name: the name of the signal this node listens for. The placer fires once each time this signal transitions from OFF to ON (rising edge). Must use only lowercase letters, digits, and underscores (a-z 0-9 _).
+
+Not: when this checkbox is checked, the placer fires on the falling edge instead (ON to OFF).
 
 Behavior
 ------------------------------

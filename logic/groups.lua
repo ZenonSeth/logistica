@@ -158,6 +158,17 @@ function logistica.group_get_node_group_name(nodeName)
   return nil
 end
 
+-- returns a set {networkGroupName = true} for all network groups the node belongs to
+function logistica.group_get_all_network_groups_for_node(nodeName)
+  local result = {}
+  for _, v in pairs(logistica_groups) do
+    if v[nodeName] and v._networkGroup then
+      result[v._networkGroup] = true
+    end
+  end
+  return result
+end
+
 -- returns a lua list of group all the nodes belonging to this group,
 -- or empty list if no such group exists, or is empty
 function logistica.group_get_all_nodes_for_group(groupName)

@@ -27,6 +27,7 @@ local function get_formspec(pos, playerName)
     statusText = FS("Items will be drawn from network storage")
   end
 
+  local invert      = logistica.node_placer_get_invert(pos)
   local ownerLabel = FS("Owner:") .. " " .. (ownerName ~= "" and ownerName or FS("(none)"))
   local ownerRow = "label[0.5,0.8;" .. ownerLabel .. "]"
   if not isOwner then
@@ -54,8 +55,10 @@ local function get_formspec(pos, playerName)
     "label[2.8,4.2;"..FS("a-z 0-9 _ only").."]"..
     "checkbox[0.5,4.6;allow_replaceable;"..FS("Allow placing on replaceable nodes (e.g. water, grass)")..";"
       ..(allowReplaceable and "true" or "false").."]"..
-    "label[0.5,5.3;"..statusText.."]"..
-    "button_exit[7.6,4.75;2.5,0.75;save;"..FS("Save").."]"..
+    "checkbox[0.5,5.1;invert_signal;"..FS("Not (act on signal OFF instead of ON)")..";"
+      ..(invert and "true" or "false").."]"..
+    "label[0.5,5.8;"..statusText.."]"..
+    "button_exit[7.6,4.8;2.5,0.75;save;"..FS("Save").."]"..
     logistica.player_inv_formspec(0.5, 6.0)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"
@@ -83,6 +86,9 @@ local function on_receive_fields(player, formname, fields)
 
   if fields.allow_replaceable ~= nil then
     logistica.node_placer_set_allow_replaceable(pos, fields.allow_replaceable == "true")
+    return true
+  elseif fields.invert_signal ~= nil then
+    logistica.node_placer_set_invert(pos, fields.invert_signal == "true")
     return true
   elseif fields.take_ownership then
     logistica.node_placer_set_owner(pos, playerName)

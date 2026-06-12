@@ -5,6 +5,7 @@ local META_LAST_ERROR       = "last_error"
 local META_PREV_SIG         = "prev_signal_state"
 local META_OWNER            = "owner"
 local META_ALLOW_REPLACEABLE = "allow_replaceable"
+local META_INVERT           = "invert_signal"
 local MIN_DISTANCE     = 1
 local MAX_DISTANCE     = logistica.settings.node_placer_max_distance
 
@@ -41,6 +42,14 @@ end
 
 function logistica.node_placer_set_allow_replaceable(pos, value)
   minetest.get_meta(pos):set_int(META_ALLOW_REPLACEABLE, value and 1 or 0)
+end
+
+function logistica.node_placer_get_invert(pos)
+  return minetest.get_meta(pos):get_int(META_INVERT) == 1
+end
+
+function logistica.node_placer_set_invert(pos, value)
+  minetest.get_meta(pos):set_int(META_INVERT, value and 1 or 0)
 end
 
 local function get_target_pos(pos)
@@ -128,10 +137,12 @@ end
 
 function logistica.node_placer_on_signal_received(pos, sigName, sigIsOn)
   if sigName ~= logistica.node_placer_get_signal_name(pos) then return end
-  local meta  = minetest.get_meta(pos)
-  local wasOn = meta:get_string(META_PREV_SIG) == "1"
+  local meta   = minetest.get_meta(pos)
+  local wasOn  = meta:get_string(META_PREV_SIG) == "1"
   meta:set_string(META_PREV_SIG, sigIsOn and "1" or "0")
-  if not (sigIsOn and not wasOn) then return end -- only act on rising edge
+  local invert = logistica.node_placer_get_invert(pos)
+  local isEdge = invert and (not sigIsOn and wasOn) or (not invert and sigIsOn and not wasOn)
+  if not isEdge then return end
   local placed, errorKey = logistica.node_placer_try_place(pos)
   if placed then
     meta:set_string(META_LAST_ERROR, "")

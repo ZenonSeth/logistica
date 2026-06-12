@@ -12,6 +12,7 @@ local function get_formspec(pos, playerName)
   local dist      = logistica.node_digger_get_distance(pos)
   local ownerName = logistica.node_digger_get_owner(pos)
   local isOwner   = (playerName == ownerName)
+  local invert    = logistica.node_digger_get_invert(pos)
   local lastError = minetest.get_meta(pos):get_string("last_error")
   local statusText
   if lastError == "owner_offline" then
@@ -38,7 +39,7 @@ local function get_formspec(pos, playerName)
   end
 
   return "formspec_version[4]"..
-    "size["..logistica.inv_size(10.6, 15.5).."]"..
+    "size["..logistica.inv_size(10.6, 16.0).."]"..
     logistica.ui.background..
     logistica.ui.button_only_style..
     "label[0.5,0.4;"..FS("Node Digger").."]"..
@@ -56,11 +57,13 @@ local function get_formspec(pos, playerName)
     "label[0.5,5.1;"..FS("Signal Name:").."]"..
     "field[2.8,4.85;7.3,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
     "label[2.8,5.7;"..FS("a-z 0-9 _ only").."]"..
-    "label[0.5,6.5;"..statusText.."]"..
-    "button_exit[7.6,6.25;2.5,0.75;save;"..FS("Save").."]"..
-    "label[0.5,7.3;"..FS("Stored items (network can take from here):").."]"..
-    "list["..posForm..";main;0.5,7.55;8,2;0]"..
-    logistica.player_inv_formspec(0.5, 10.3)..
+    "checkbox[0.5,6.2;invert_signal;"..FS("Not (act on signal OFF instead of ON)")..";"
+      ..(invert and "true" or "false").."]"..
+    "label[0.5,6.8;"..statusText.."]"..
+    "button_exit[7.6,6.95;2.5,0.75;save;"..FS("Save").."]"..
+    "label[0.5,7.8;"..FS("Stored items (network can take from here):").."]"..
+    "list["..posForm..";main;0.5,8.05;8,2;0]"..
+    logistica.player_inv_formspec(0.5, 10.8)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end
@@ -85,7 +88,10 @@ local function on_receive_fields(player, formname, fields)
   if not pos then return false end
   if not logistica.player_has_network_access(pos, playerName) then return true end
 
-  if fields.take_ownership then
+  if fields.invert_signal ~= nil then
+    logistica.node_digger_set_invert(pos, fields.invert_signal == "true")
+    return true
+  elseif fields.take_ownership then
     logistica.node_digger_set_owner(pos, playerName)
     minetest.get_meta(pos):set_string("last_error", "")
     logistica.node_digger_update_infotext(pos)
