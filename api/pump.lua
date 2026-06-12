@@ -147,7 +147,10 @@ function logistica.register_pump(desc, name, tiles, tilesOn)
   local def = {
     description = desc,
     tiles = tiles,
+    drawtype = "nodebox",
+    paramtype = "light",
     paramtype2 = "facedir",
+    node_box = { type = "fixed", fixed = { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 } },
     groups = { cracky= 2, pickaxey = 2, [logistica.TIER_ALL] = 1 },
     is_ground_content = false,
     sounds = logistica.node_sound_metallic(),
