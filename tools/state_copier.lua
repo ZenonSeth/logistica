@@ -3,7 +3,7 @@ local S = logistica.TRANSLATOR
 
 local clipboard = {}
 
-local SKIP_FIELDS = { infotext = true }
+local SKIP_FIELDS = { infotext = true, owner = true, last_error = true, prev_signal_state = true, toggle_state = true, logonoff = true }
 local ALLOW_GROUPS = {
   "signal_senders",
   "signal_receivers",
