@@ -40,6 +40,21 @@ function logistica.load_position(pos)
   return pos
 end
 
+-- Wrapper around core.place_node that corrects for item_place_node's buildable_to
+-- redirect. core.place_node hardcodes under = pos - {0,1,0}; if that block is
+-- buildable_to, item_place_node redirects placement there instead of pos. This
+-- function detects that case and passes pos + {0,1,0} so the redirect lands at pos.
+function logistica.place_node(pos, node, placer)
+  local belowPos = vector.new(pos.x, pos.y - 1, pos.z)
+  local belowNode = minetest.get_node_or_nil(belowPos)
+  local belowDef = belowNode and minetest.registered_nodes[belowNode.name]
+  local placePos = (belowDef and belowDef.buildable_to)
+    and vector.new(pos.x, pos.y + 1, pos.z)
+    or pos
+  logistica.load_position(placePos)
+  core.place_node(placePos, node, placer)
+end
+
 function logistica.swap_node(pos, newName)
   local node = minetest.get_node(pos)
   if node.name ~= newName then

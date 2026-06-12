@@ -102,7 +102,7 @@ function logistica.node_placer_try_place(pos)
     ItemStack(filterName .. " 1"),
     network,
     function(stack)
-      core.place_node(targetPos, {name = stack:get_name()}, ownerPlayer)
+      logistica.place_node(targetPos, {name = stack:get_name()}, ownerPlayer)
       placed = true
       return 0
     end,
