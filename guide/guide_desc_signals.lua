@@ -485,7 +485,7 @@ Not: when this checkbox is checked, the digger fires on the falling edge instead
 
 Behavior
 ------------------------------
-The digger stores an owner. The owner must be online for digging to work. If a different player opens the formspec, they can press Take Ownership to become the new owner.
+The digger stores an owner used for protection checks. Digging works whether or not the owner is online. However, some node types may require a player to be present for their dig logic to work correctly - in most cases this is not an issue. If a different player opens the formspec, they can press Take Ownership to become the new owner.
 
 Dug items fill the digger's internal buffer (16 slots). If the buffer is full, excess drops fall at the target position. The network can pull from the buffer at any time. The digger cannot be picked up while its buffer contains items.
 
@@ -518,7 +518,7 @@ When triggered, the placer checks the target position. If it is occupied (not ai
 
 The status line in the formspec turns red if the last placement attempt failed because the item was not available in the network. The status clears when placement succeeds or when the filter slot is changed.
 
-The placer stores an owner - the player who placed it (or last took ownership). The owner must be online for placement to work, since the placement is performed as that player. This ensures protection mods are respected. If a different player opens the formspec, they can press Take Ownership to become the new owner.
+The placer stores an owner used for protection checks. Placement works whether or not the owner is online. However, some node types may require a player to be present for their placement logic to work correctly - in most cases this is not an issue. If a different player opens the formspec, they can press Take Ownership to become the new owner.
 
 When disconnected from the network (dug up or isolated), the placer stops reacting to signals.
 ]])

@@ -83,12 +83,10 @@ local function get_filter_set(pos)
 end
 
 -- Returns (dug: bool, errorKey: string|nil)
--- errorKey nil               = silent fail (no nodedef, protected, or no network)
--- errorKey "owner_offline"   = owner not online
--- errorKey "nothing_to_dig"  = target is air or unloaded
--- errorKey "no_match"        = target doesn't match filter
--- errorKey "wrong_tool"        = tool cannot dig this node type
--- errorKey "tool_too_damaged"  = next dig would break the tool
+-- errorKey nil              = silent fail (no nodedef, protected, or no network)
+-- errorKey "nothing_to_dig" = target is air or unloaded
+-- errorKey "no_match"       = target doesn't match filter
+-- errorKey "wrong_tool"     = tool cannot dig this node type
 function logistica.node_digger_try_dig(pos)
   local filterSet, hasFilter = get_filter_set(pos)
 
@@ -109,7 +107,6 @@ function logistica.node_digger_try_dig(pos)
 
   local ownerName   = logistica.node_digger_get_owner(pos)
   local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
-  if not ownerPlayer then return false, "owner_offline" end
 
   if minetest.is_protected(targetPos, ownerName) then return false, nil end
 
@@ -124,7 +121,7 @@ function logistica.node_digger_try_dig(pos)
     and (minetest.registered_items[toolName] or {}).on_use
     or nil
 
-  if on_use then
+  if on_use and ownerPlayer then
     local digNode = minetest.get_node(pos)
     local dir = logistica.get_rot_directions(digNode.param2).backward
     local pointed_thing = {
@@ -132,8 +129,13 @@ function logistica.node_digger_try_dig(pos)
       under = targetPos,
       above = vector.subtract(targetPos, dir),
     }
-    local newStack = on_use(toolStack, ownerPlayer, pointed_thing)
-    minetest.get_meta(pos):get_inventory():set_stack("tool", 1, newStack or toolStack)
+    local ok, err = pcall(on_use, toolStack, ownerPlayer, pointed_thing)
+    if not ok then
+      minetest.log("error", "[logistica] node_digger on_use failed at "
+        .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
+      return false, nil
+    end
+    -- intentionally not saving result back: no tool wear
     return true, nil
   end
 
@@ -141,18 +143,11 @@ function logistica.node_digger_try_dig(pos)
     return false, "wrong_tool"
   end
 
-  if not toolStack:is_empty() then
-    local digWear = minetest.get_dig_params(nodedef.groups, toolCaps).wear
-    if digWear > 0 and toolStack:get_wear() + digWear >= 65535 then
-      return false, "tool_too_damaged"
-    end
-  end
-
   -- Intercept drops before they reach the player's inventory
   local intercepted = {}
   local origHandleDrops = minetest.handle_node_drops
   minetest.handle_node_drops = function(_, drops, digger)
-    if digger == ownerPlayer then
+    if ownerPlayer == nil or digger == ownerPlayer then
       for _, drop in ipairs(drops) do
         table.insert(intercepted, ItemStack(drop))
       end
@@ -161,21 +156,22 @@ function logistica.node_digger_try_dig(pos)
     end
   end
 
-  -- Wield the digger's tool so on_dig sees the right item for wear/capabilities
-  local prevWielded = ownerPlayer:get_wielded_item()
-  ownerPlayer:set_wielded_item(toolStack)
+  local ok, err
+  if ownerPlayer then
+    -- Wield the tool so on_dig sees the right item for capabilities
+    local prevWielded = ownerPlayer:get_wielded_item()
+    ownerPlayer:set_wielded_item(toolStack)
+    ok, err = pcall(nodedef.on_dig, targetPos, targetNode, ownerPlayer)
+    -- restore owner's hand; intentionally not saving worn tool back: no tool wear
+    ownerPlayer:set_wielded_item(prevWielded)
+  else
+    ok, err = pcall(minetest.dig_node, targetPos)
+  end
 
-  local ok, err = pcall(nodedef.on_dig, targetPos, targetNode, ownerPlayer)
-
-  -- Save worn tool back to slot and restore owner's hand
-  local wornTool = ownerPlayer:get_wielded_item()
-  ownerPlayer:set_wielded_item(prevWielded)
   minetest.handle_node_drops = origHandleDrops
 
-  minetest.get_meta(pos):get_inventory():set_stack("tool", 1, wornTool)
-
   if not ok then
-    minetest.log("error", "[logistica] node_digger on_dig failed at "
+    minetest.log("error", "[logistica] node_digger dig failed at "
       .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
     return false, nil
   end
@@ -211,16 +207,12 @@ function logistica.node_digger_update_infotext(pos)
   end
   local filterStr = hasFilter and "(filtered)" or "(any)"
   local stateStr
-  if lastError == "owner_offline" then
-    stateStr = "Paused: owner offline (" .. ownerName .. ")"
-  elseif lastError == "nothing_to_dig" then
+  if lastError == "nothing_to_dig" then
     stateStr = "Warning: nothing to dig at target"
   elseif lastError == "no_match" then
     stateStr = "Warning: target does not match filter"
   elseif lastError == "wrong_tool" then
     stateStr = "Warning: tool cannot dig target node"
-  elseif lastError == "tool_too_damaged" then
-    stateStr = "Warning: tool too damaged, replace it"
   elseif lastError ~= "" then
     stateStr = "Error: " .. lastError
   else

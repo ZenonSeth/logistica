@@ -15,16 +15,12 @@ local function get_formspec(pos, playerName)
   local invert    = logistica.node_digger_get_invert(pos)
   local lastError = minetest.get_meta(pos):get_string("last_error")
   local statusText
-  if lastError == "owner_offline" then
-    statusText = minetest.colorize("#FF8844", FS("Digging requires owner to be online"))
-  elseif lastError == "nothing_to_dig" then
+  if lastError == "nothing_to_dig" then
     statusText = minetest.colorize("#FFCC00", FS("Nothing to dig at target position"))
   elseif lastError == "no_match" then
     statusText = minetest.colorize("#FFCC00", FS("Target node does not match filter"))
   elseif lastError == "wrong_tool" then
     statusText = minetest.colorize("#FF8844", FS("Tool cannot dig that node type"))
-  elseif lastError == "tool_too_damaged" then
-    statusText = minetest.colorize("#FF8844", FS("Tool too damaged, replace it"))
   elseif lastError ~= "" then
     statusText = minetest.colorize("#FF4444", minetest.formspec_escape(lastError))
   else

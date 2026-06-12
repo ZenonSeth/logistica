@@ -19,8 +19,6 @@ local function get_formspec(pos, playerName)
   local statusText
   if lastError == "no_item" then
     statusText = minetest.colorize("#FF4444", FS("Can't find item to place in network"))
-  elseif lastError == "owner_offline" then
-    statusText = minetest.colorize("#FF8844", FS("Placement requires owner to be online"))
   elseif lastError == "target_blocked" then
     statusText = minetest.colorize("#FFCC00", FS("Target position is occupied, can't place"))
   else

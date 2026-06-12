@@ -74,7 +74,6 @@ end
 -- errorKey nil              = silent fail (no filter, or target protected)
 -- errorKey "target_blocked" = target position is occupied
 -- errorKey "no_item"        = item not found in network
--- errorKey "owner_offline"  = owner player not currently online
 function logistica.node_placer_try_place(pos)
   local filterName = logistica.node_placer_get_filter(pos)
   if filterName == "" then return false, nil end
@@ -88,9 +87,8 @@ function logistica.node_placer_try_place(pos)
   local canPlace = existingDef and (allowReplaceable and existingDef.buildable_to or existing.name == "air")
   if not canPlace then return false, "target_blocked" end
 
-  local ownerName   = logistica.node_placer_get_owner(pos)
-  local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
-  if not ownerPlayer then return false, "owner_offline" end
+  local ownerName = logistica.node_placer_get_owner(pos)
+  local player    = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
 
   if minetest.is_protected(targetPos, ownerName) then return false, nil end
 
@@ -102,7 +100,12 @@ function logistica.node_placer_try_place(pos)
     ItemStack(filterName .. " 1"),
     network,
     function(stack)
-      logistica.place_node(targetPos, {name = stack:get_name()}, ownerPlayer)
+      local ok, err = pcall(logistica.place_node, targetPos, {name = stack:get_name()}, player)
+      if not ok then
+        minetest.log("error", "[logistica] node_placer place_node failed at "
+          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
+        return 0
+      end
       placed = true
       return 0
     end,
@@ -121,8 +124,6 @@ function logistica.node_placer_update_infotext(pos)
   local stateStr
   if lastError == "no_item" then
     stateStr = "Error: item not found in network"
-  elseif lastError == "owner_offline" then
-    stateStr = "Paused: owner offline (" .. ownerName .. ")"
   elseif lastError == "target_blocked" then
     stateStr = "Warning: target position is occupied"
   else
