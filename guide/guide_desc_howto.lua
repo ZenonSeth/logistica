@@ -10,7 +10,7 @@ do
   g.whats_new_2_0 =
     h("Signals") .. "\n" ..
     "Signals are named on/off states that travel within a single Logistica network via the regular cables." .. n ..
-    "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
+    "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, Signal Liquid Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
     "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
     "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/XOR/ADDER).\n" ..
     "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel.\n" ..
@@ -39,7 +39,6 @@ do
     "- Passive Supply Chest inventory expanded from 16 to 32 slots. Storing from machines and from the access point are now separately toggleable.\n" ..
     "- Request Inserter filter slots now use numeric quantity fields (up to 9999) instead of item stacks.\n" ..
     "- Vacuum Chest pickup range is configurable from 1 to 3 nodes.\n" ..
-    "- Hardened Silverin Block: crafted in the Lava Furnace from a Silverin Block and an Obsidian additive. Used in the Rock Melter recipe.\n" ..
     "- Upgrade recipes added for the Network Importer and Request Inserter.\n" ..
     "- Access Point displays large item counts in K and M notation." ..
     "\n\n\n\n\n"

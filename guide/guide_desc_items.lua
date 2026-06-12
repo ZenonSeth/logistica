@@ -37,6 +37,16 @@ To use a Wireless Access Pad:
 If you need more range, just place it in a Wireless Upgrader and repeat the upgrade process!
 ]])
 
+g.state_copier = S([[
+Copy and paste the configuration of signal machines and logistics nodes.
+
+- Right-click a supported node to copy its settings.
+- Punch (left-click) another node of the same type to paste the settings onto it.
+- Right-click in mid-air to see what type is currently in the clipboard.
+
+Supported node types: signal machines (senders, receivers, gates), Network Importers, and Request Inserters.
+]])
+
 g.hyperspanner = S([[
 A multipurpose engineering tool.
 

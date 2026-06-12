@@ -4,6 +4,7 @@ logistica.tools = {}
 
 dofile(path.."/misc.lua")
 dofile(path.."/hyperspanner.lua")
+dofile(path.."/state_copier.lua")
 if logistica.settings.enable_wireless_access_pad then
   dofile(path.."/wireless_access_pad.lua")
 end

@@ -46,6 +46,7 @@ local PAGE_COBBLE_GENERATOR_UPGR = "cbgnup"
 
 local PAGE_WIRELESS_ACCESS_PAD = "iwrlap"
 local PAGE_HYPERSPANNER = "ihyper"
+local PAGE_STATE_COPIER = "istatcp"
 
 local PAGE_SILVERIN_CRYSTAL = "isilcry"
 local PAGE_SILVERIN_SLICE = "isilsli"
@@ -143,6 +144,7 @@ local RECIPE_WRLSRECV = getrec({L("wireless_receiver")})
 local RECIPE_MASSUPGR = getrec({L("storage_upgrade_1"), L("storage_upgrade_2"), L("storage_upgrade_multiplier")})
 local RECIPE_COBGENUP = getrec({L("cobblegen_upgrade")})
 local RECIPE_HYPERSPN = getrec({L("hyperspanner")})
+local RECIPE_STATECPY = getrec({L("state_copier")})
 local RECIPE_PHOTONIZ = getrec({L("photonizer"), L("photonizer_reversed")})
 local RECIPE_STANDWAV = getrec({L("standing_wave_box")})
 local RECIPE_WIRLSSAP = getrec({L("wireless_access_pad")})
@@ -195,6 +197,7 @@ local RECIPE_LINKS = {
   [L("wireless_crystal")] = PAGE_WIRELESS_CRYSTAL,
   [L("wireless_access_pad")] = PAGE_WIRELESS_ACCESS_PAD,
   [L("hyperspanner")] = PAGE_HYPERSPANNER,
+  [L("state_copier")] = PAGE_STATE_COPIER,
   [L("optic_cable")] = PAGE_OPTIC_CABLE,
   [L("optic_cable_toggleable_off")] = PAGE_OPTIC_CABLE,
   [L("optic_cable_block")] = PAGE_OPTIC_CABLE,
@@ -359,6 +362,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Cobble Generator Upgrades"), id = PAGE_COBBLE_GENERATOR_UPGR },
     { name = header(S("Tools:"))},
     { name = S("  Hyperspanner"), id = PAGE_HYPERSPANNER },
+    { name = S("  State Copy Tool"), id = PAGE_STATE_COPIER },
     { name = header(S("Items:"))},
     { name = S("  Silverin Crystal"), id = PAGE_SILVERIN_CRYSTAL },
     { name = S("  Silverin Slice"), id = PAGE_SILVERIN_SLICE },
@@ -690,6 +694,13 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_HYPERSPN,
       recipeLinks = RECIPE_LINKS,
       description = desc.hyperspanner,
+    },
+
+    [PAGE_STATE_COPIER] = {
+      title = S("State Copy Tool"),
+      recipes = RECIPE_STATECPY,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.state_copier,
     },
 
     -- items

@@ -44,6 +44,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("state_copier"),
+  recipe = {
+    {itemstrings.crystal},
+    {L("signal_relay")},
+    {itemstrings.steel},
+  }
+})
+
+minetest.register_craft({
   output = L("photonizer"),
   recipe = {
     {itemstrings.fragment},
