@@ -139,7 +139,7 @@ local function formspec_get_cfg_buttons()
     local btnName = "cfg_slot_"..i
     result = result..
       "image_button["..bx..","..CFG_BTN_Y..";"..CFG_BTN_W..","..CFG_BTN_H..
-      ";logistica_icon_last.png^[transformR90;"..btnName..";]"..
+      ";logistica_icon_swap.png^[transformR90;"..btnName..";]"..
       "tooltip["..btnName..";"..CFG_TOOLTIP.."]"
   end
   return result
