@@ -24,11 +24,15 @@ When a sender is removed from the network (disconnected or dug up), its contribu
 
 Senders and Receivers
 ------------------------------
-Senders start a signal. The Signal Switch is the simplest sender: a manual on/off switch.
+Senders start a signal. The Signal Switch is the simplest sender: a manual on/off switch. More advanced senders like the Signal Item Count Sender and the External Content Reader monitor conditions and send signals automatically.
 
-Receivers listen for a signal by name and do something when it changes state. The Signal Lamp and Signal Toggler are both receivers.
+Receivers listen for a signal by name and do something when it changes state. The Signal Lamp and Signal Network Switch are both receivers.
 
-Receivers also support a NOT mode: when NOT is checked, the receiver activates when the signal is ABSENT instead of when it is present.
+Some receivers support a NOT mode: when NOT is checked, the receiver activates when the signal is ABSENT instead of when it is present. Not all receivers have this option. For those that do not, you can use the Signal NOT Gate to broadcast an inverted signal network-wide and have receivers listen to that instead.
+
+Logic Gates
+------------------------------
+Logic gates are machines that act as both receivers and senders. They read one or more input signals, apply a logic rule, and broadcast a single output signal. Use them to combine or transform signals before they reach other receivers.
 
 Signal names and scope
 ------------------------------
