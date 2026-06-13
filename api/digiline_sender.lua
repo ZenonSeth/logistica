@@ -115,11 +115,11 @@ The API currently has two "methods" - "configure" and "configure_raw". These are
 ```
 Fields set to `nil` are interpreted as "not present" (of particular note is for boolean fields, where you might want to use the expression `<your value> and true or false` in Lua to ensure a "truthy" value is in the correct type.
 
-See the "API: Common Configuration Fields" section for information on the fields common to both "configure" and "configure_raw" methods.
+See the "API: Common Config Fields" section for information on the fields common to both "configure" and "configure_raw" methods.
 
-See the "API: Raw Configuration Fields" section for information on the fields specific to "configure_raw", an API that controls various properties of the Digilines Sender individually
+See the "API: Raw Config Fields" section for information on the fields specific to "configure_raw", an API that controls various properties of the Digilines Sender individually
 
-See the "API: Structured Configuration" section for information on the fields specific to "configure", an API that provides more structured and automatic configuration of the digilines sender, with a focus on sending tables of well-typed information for further processing or use.
+See the "API: Structured Config" section for information on the fields specific to "configure", an API that provides more structured and automatic configuration of the digilines sender, with a focus on sending tables of well-typed information for further processing or use.
 ]]
   },
   {
