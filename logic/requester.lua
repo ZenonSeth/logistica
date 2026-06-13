@@ -5,25 +5,6 @@ local META_REQUESTER_LISTNAME = "demtarlist"
 local META_REQUESTER_AMOUNT_ = "reqamt"
 local OLD_META_INF_PREFIX = "infreq"
 local MAX_REQUEST_AMOUNT = 9999
-local TARGET_NODES_REQUIRING_TIMER = {
-  ["default:furnace"] = true,
-  ["mcl_furnaces:furnace"] = true,
-  ["mcl_furnaces:blast_furnace"] = true,
-  ["mcl_furnaces:smoker"] = true,
-  ["logistica:lava_furnace"] = true,
-  ["logistica:bucket_emptier"] = true,
-  ["gravelsieve:auto_sieve0"] = true,
-  ["gravelsieve:auto_sieve1"] = true,
-  ["gravelsieve:auto_sieve2"] = true,
-  ["gravelsieve:auto_sieve3"] = true,
-  ["techachge:ta2_grinder_pas"] = true,
-  ["techachge:ta3_grinder_pas"] = true,
-  ["techachge:ta4_grinder_pas"] = true,
-  ["techachge:ta2_gravelsieve_pas"] = true,
-  ["techachge:ta3_gravelsieve_pas"] = true,
-  ["techachge:ta4_gravelsieve_pas"] = true,
-  ["tubelub_addons1:grinder"] = true,
-}
 
 local function get_meta(pos)
   logistica.load_position(pos)
