@@ -24,28 +24,33 @@ The message is only sent when its content changes from the last sent value, so d
     ]],
   },
   {
-    title = "Signal (%s)",
+    title = "Signal (%s, %S)",
     content = [[
-%s1, %s2, %s3, ... are placeholder which are replaced by the current state of the Nth signal listed in the Signals field.
+%s1, %s2, %s3, ... are placeholders which are replaced by the current state of the Nth signal listed in the Signals field.
 
-Signals should be entered in the Signald field as a comma- or space-separated list, e.g.:
+%S1, %S2, %S3, ... are placeholders like above, but they resolve to a different format, primarily for use in "parse to table" mode.
+
+Signals should be entered in the Signals field as a comma- or space-separated list, e.g.:
   alarm, pump_running, tooMuchCobble
 
 %s1 resolves to "On" or "Off" (without quotes) based on whether the first signal is currently ON in the network.
 
-If a signal is not present on the network it is treated as Off.
+%S1 resolves to "true" or "false" (without quotes) based on whether the first signal is currently ON in the network.
 
-If you use %s4 but only have 3 signals configured, a warning is shown and the placeholder is left as-is.
+If a signal is not present on the network it is treated as OFF.
+
+If you use %s4 (or %S4) but only have 3 signals configured, a warning is shown and the placeholder is left as-is.
     ]],
   },
   {
-    title = "Item (%i)",
+    title = "Item (%i, %I)",
     content = [[
-%i1 through %i8 are placeholder which are replaced by the count of items matching the corresponding filter slot in the network.
+%i1 through %i8 are placeholders which are replaced by the count of items matching the corresponding filter slot in the network.
+%I1 through %I8 are placeholders which are replaced similarly, but the count does not include items that are below the "reserved" threshold in mass storage devices.
 
-Place an item in filter slot N to set what %iN counts. Crafting suppliers are excluded from the count.
+Place an item in filter slot N to set what %iN/%IN counts. Crafting suppliers are excluded from the count.
 
-If filter slot N is empty, %iN resolves to "n/a" and a warning is shown.
+If filter slot N is empty, %iN/%IN resolves to "n/a" and a warning is shown.
 
 Example message:
   iron=%i1 coal=%i2
@@ -94,6 +99,184 @@ When disconnected from a Logistica network, the timer stops. Signals not on the 
 Validation warnings shown in the formspec are checked at save time and slot change time. Runtime parse errors (table mode) are written to the warning field when they occur.
     ]],
   },
+  {
+     title = "API: Overview",
+     content = [[
+The Digiline Signal Sender can itself be controlled by a digilines api, using the same channel that it's configured to broadcast messages on.
+
+The API currently has two "methods" - "configure" and "configure_raw". These are invoked by sending a table of the form:
+```
+{
+  method = "configure" -- (or "configure_raw")
+  params = {
+    -- Various fields that each induce certain behaviour if present
+  }
+}
+```
+Fields set to `nil` are interpreted as "not present" (of particular note is for boolean fields, where you might want to use the expression `<your value> and true or false` in Lua to ensure a "truthy" value is in the correct type.
+
+See the "API: Common Configuration Fields" section for information on the fields common to both "configure" and "configure_raw" methods.
+
+See the "API: Raw Configuration Fields" section for information on the fields specific to "configure_raw", an API that controls various properties of the Digilines Sender individually
+
+See the "API: Structured Configuration" section for information on the fields specific to "configure", an API that provides more structured and automatic configuration of the digilines sender, with a focus on sending tables of well-typed information for further processing or use.
+]]
+  },
+  {
+    title = "API: Common Config Fields",
+    content = [[
+The following fields are common to the parameters of both "configure" and "configure_raw" APIs, and have the same behaviour in each.
+
+# `enable` (boolean)
+This field enables automated enabling/disabling of the Digiline Signal Sender.
+
+# `channel` (string)
+This field enables changing the channel the Digiline Signal Sender broadcasts (and listens for API calls) on. It's a string. 
+
+An empty string will prevent it from listening or broadcasting at all. It's also important to remember that if you're controlling it with a fixed channel, then you'll lose automated control of the device unless you change the channel you send on (or that it receives on) manually.
+]]
+  },
+  {
+    title = "API: Raw Config Fields",
+    content = [[
+The following fields are specific to the parameters of the "configure" API, and provide maximum flexibility but require more complex code/messages for more advanced automated information management.
+
+# `message` (string)
+If specified, this sets the message template of the Digilines Signal Sender, following the format (of substitution patterns, etc.) described in the "Overview" and sections on the available placeholders.
+
+Setting the `params` field in the parent table to a string rather than a table (when method = "configure_raw") is interpreted as a shorthand form of using this field.
+
+Sending a string to the Digiline Signal Sender (rather than a table structure with API calls) is interpreted similarly.
+
+# `signals` (string or array of strings)
+If specified, this allows you to set the signals available for substitution on the Digiline Signal Sender.
+
+When it's a single string, it's interpreted as a comma-separated list of signal names (that undergo "sanitization" later), essentially the same as the signal field in the GUI.
+
+When it's an array, each element must be a string, and it's composed into the list of signal names for the Digilines Signal Sender to use in the placeholders (these signal names are also sanitized, but before insertion into the Digilines Signal Sender).
+
+# `items` (array of strings)
+If specified, this allows you to set the items in the "filter" slots to get information on. If the array is longer than the number of available slots, it will be truncated.
+
+The strings are in the form used internally by luanti (such as "default:dirt"). Empty strings induce the creation of an empty slot at the relevant position, and invalid names will just create "unknown item" filters that have essentially no purpose.
+
+# `parse_as_table` (boolean)
+If specified, this sets whether or not the message of the Digilines Signal Sender should be parsed as a table before being sent over digilines. 
+]]
+  },
+  {
+    title = "API: Structured Config",
+    content = [[
+The structured configuration API involves only one field - `message` - that describes an arbitrarily-nested structure, where you can specify that fields of a table should be substituted for various values.
+
+It will automatically fill in slots with the needed items (but not more than the available filter slots), set `parse_as_table`, apply the signals, and so on, as required to do this. 
+
+The API itself works by recursively traversing the sent table and detecting table fields with a "ty" entry ("template specifiers"), that specifies what value they should be replaced with and what other fields are expected there. Example:
+```
+{
+  ty = "item",
+  name = "default:dirt"
+}
+```
+This would fill in the slots appropriately such that this field would be filled in with the count of available un-reserved dirt on the network (setting `respect_reserve=false` would count all dirt, even reserved). The structure of these "template specifiers" is checked - i.e. no extra or invalid fields are allowed.
+
+Such "template specifiers" may also have "shorthand strings" for concise specification. Shorthand strings are of the form `<prefix>::<suffix>`, and are essentially converted to template specifiers (if you have a string that you need to ensure does not get transformed, prefix it with `lit::`).
+
+For the above example, the shorthand string would look like "item::default:dirt". Shorthand strings are documented along with the template specifiers.
+
+Other than the shorthand string mechanism, primitives are passed through the whole process unaltered - numbers and booleans and strings alike.
+
+# Item Template Specifier (`ty = "item"`)
+The item template specifier has a `ty` value of "item".
+
+It has a mandatory string field `name`, which lets you control the item this refers to, using the luanti-internal itemstrings (such as "default:dirt"). Empty strings aren't valid.
+
+It has an optional boolean field `respect_reserve` (default is true), which determines whether or not to count reserved items in the network when replacing the template specifier with the item counts. `true` means don't include reserved items in the count (useful for automation, and the default), `false` neans do include reserved items in the count (useful for displays, graphing, comparison with reserves, etc.).
+
+This has two associated shorthand string prefixes - "item" and "item-all":
+- "item::<item name>" is equivalent to the item template specifier with the given name and `respect_reserve = true` (counts unreserved items)
+- "item-all::<item name>" is equivalent to the item template specifier with the given name and `respect_reserve = false` (counts all items)
+
+It should be noted that, while item template specifiers automatically allocate slots and intelligently reuse them for all references to the same item, they can't use more than the available slots, so you must have less than or equal to that number of distinct items (but you can reference each one as many times as you like within the structured configuration template).
+
+# Signal Template Specifier (`ty = "signal"`)
+The signal template specifier has a `ty` value of "signal".
+
+It has a mandatory string field "name", which lets you control the signal this refers to (automatically sanitized - bad names will be rejected).
+
+It has an optional boolean field `bool_mode` (default is true), which controls whether to replace this field with a boolean (`true` or `false`), or to replace it with a string ("On" or "Off").
+
+This has two associated shorthand string prefixes - "signal" and "signal-str":
+- "signal::<signal name>" is equivalent to the signal template specifier with the given signal name and `bool_mode = true`.
+- `signal-str::<signal name>` is equivalent to the signal template specifier with the given signal name and `bool_mode = false`.
+
+# Literal Specifier (`ty = "literal"`)
+This specifier has a `ty` value of "literal", and it's used to pass it's contents through without any further processing (other than removal of unsafe datatypes like functions, and removing the top-level `ty = "literal"` field from the top-level table).
+
+It has no string shorthand equivalent because it's primarily for tables, though conceptually the "lit::" prefix is similar in nature.
+
+# Nested Template Specifier (`ty = "nest"` or no `ty` field)
+This is the "default" `ty` specifier, which is used to indicate that the table it's in needs further recursion. It's also what's assumed for tables lacking a type specifier field (other than those within a "literal" specifier).
+
+It results in all values within the table - for every string, boolean, or numerical key (e.g. in an array) - being replaced with their template substitution in the resultant message. The only exception is the `ty` field, which if actually present and not just taken as default, is removed.
+
+# Examples
+This may be easier to illustrate with some example structured templates (which should be sent as the value of the `message` field of the params of the "configure" method):
+
+Creating an array of 3 metal infos:
+```
+message = {
+  [1] = { available = "item::default:gold_ingot", all = "item-all::default:gold_ingot" },
+  [2] = { available = "item::default:iron_ingot", all = "item-all::default:iron_ingot" }
+  [3] = { available = "item::default:copper_ingot", all = "item-all::default:copper_ingot" }
+}
+```
+
+Getting some automation indicators for a process, using both signals and quantity of some item:
+```
+message = {
+  automation_allowed = "signal::automation_enabled",
+  possible_item_bundles = {
+    -- Imagine this being programmatically generated
+    [1] = {
+      cost_weight = 10,
+      ["default:iron_ingot"] = {
+        needed = 4,
+        available = {
+          ty = "item",
+          name = "default:iron_ingot"
+        }
+      }, 
+      ["default:stick"] = {
+        needed = 2,
+        available = {
+          ty = "item",
+          name = "default:stick"
+        }
+      }
+    },
+    [2] = {
+      cost_weight = 100,
+      ["default:diamond"] = {
+        needed = 1, 
+        available = {
+          ty = "item",
+          name = "default:diamond"
+        }
+      },
+      ["default:gold_ingot"] = {
+        needed = 1,
+        available = {
+          ty = "item",
+          name = "default:gold_ingot"
+        }
+      }
+    }
+  }
+}
+```
+]]
+  }
 }
 
 local forms = {}
