@@ -237,7 +237,7 @@ end
 -- Function to add a warning to the warnings of this construction (if there were some already on the digilines sender this will replace them)
 function metadata_api:add_warning(warning_string)
   self.delta.warning = self.delta.warning or {}
-  self.delta.warning[#self.delta.warning + 1] = warning_string
+  self.delta.warning[#self.delta.warning + 1] = core.formspec_escape(warning_string)
 end
 
 -- Reset the warnings stored in this construction. Be careful when using this. This will also prevent wiping the existing warnings on finalisation.
@@ -259,7 +259,7 @@ end
 local function try_parse_as_table(str)
   local s = str:match("^%s*(.-)%s*$")
   if s:sub(1, 6) ~= "return" then s = "return " .. s end
-  return minetest.deserialize(s)
+  return minetest.deserialize(s, true)
 end
 
 -- Create the actual message from relevant data. This may produce warnings, so you should finalize().
@@ -527,7 +527,67 @@ end
 -- Adjustments and processing for structured table specification.
 local structure_adjust = {}
 
+-- Function that scans strings from structured specifications, and if they match the shorthand patterns, they are replaced with an appropriate table.
+--
+-- Returns `nil` and produces error in case of unrecognised prefix.
+local function scan_structured_spec_string_translate(metastruct, spec_string)
+  local prefix_mappers = {}
+  prefix_mappers.item = function(remaining)
+    return {
+      ty = "item",
+      name = remaining,
+      respect_reserve = true
+    }
+  end
+  prefix_mappers["item-all"] = function(remaining)
+    return {
+      ty = "item",
+      name = remaining,
+      respect_reserve = false
+    }
+  end
+  prefix_mappers.signal = function(remaining)
+    return {
+      ty = "signal",
+      name = remaining,
+      bool_mode = true
+    }
+  end
+  prefix_mappers["signal-str"] = function(remaining)
+    return {
+      ty = "signal",
+      name = remaining,
+      bool_mode = false
+    }
+  end
+  prefix_mappers["lit"] = function(remaining) return remaining end
 
+  local sep = "::"
+  -- Find the raw separator if present, no magic characters (`plain` arg from the end ^.^), starting from the start.
+  local found_start, found_end = string.find(spec_string, sep, 1, true)
+  if found_start == nil then return spec_string end
+  -- 1-based indexing makes this annoying. 
+  --
+  -- What helps in grokking this is that the `string.sub` function returns a prefix of the length of it's second index argument when the starting 
+  -- arg is 1. So a match from index 2 onwards would need to subtract 1 to get the bit before it. 
+  local prefix = string.sub(spec_string, 1, found_start - 1)
+  local suffix = string.sub(spec_string, found_end + 1)
+  local table_constructor = prefix_mappers[prefix]
+  if not table_constructor then
+    local allowed_prefixes = {}
+    for k, _ in pairs(prefix_mappers) do
+      allowed_prefixes[#allowed_prefixes + 1] = k
+    end
+    metastruct:add_warning(string.format(
+      "unknown string shorthand prefix '%s' in string '%s' (allowed: %s)", 
+      prefix, 
+      spec_string, 
+      table.concat(allowed_prefixes, ", ")
+    ))
+    return
+  end
+  return table_constructor(suffix)
+end
 
 -- This is the first stage of the two-stage structured specification process - allocation of slot-free table information, creating 
 -- allocation data and then filling in the slots/signals. The item allocations and signals lists need to be provided as empty sets 
@@ -547,6 +607,13 @@ local function allocate_structured_specification(metastruct, raw_structured_spec
     number = true,
     string = true,
   }
+
+  -- Perform pre-processing of strings for shorthands.
+  if type(raw_structured_spec) == "string" then
+    raw_structured_spec = scan_structured_spec_string_translate(metastruct, raw_structured_spec)
+    if raw_structured_spec == nil then return end
+  end
+
   if type(raw_structured_spec) ~= "table" then
     if allowed_non_table_types[type(raw_structured_spec)] then
       return raw_structured_spec
@@ -758,8 +825,6 @@ function structure_adjust.allocation.signal(metastruct, tbl, _item_allocations, 
 end
 
 -- Perform emission of the correct string for the signal slot and it's spec, delimited appropriately.
---
--- The literal
 function structure_adjust.resolution.signal(_metastruct, tbl, _literal_mode, _recursion_depth)
   if or_default(tbl.bool_mode, true) then
     return string.format("%%S%u", tbl.slot)
@@ -911,7 +976,8 @@ function api_process_structured_message_modifier(metastruct, message)
   end)
   metastruct:set_signal_names(signal_names)
   -- We only got to this point because of lack of errors, no need to keep any warnings.
-  metastruct:set_message_template(final_message_string)
+  -- (we prepend return to avoid it being added every time the digiline_sender sends a message)
+  metastruct:set_message_template("return " .. final_message_string)
   -- Finally mark "parse_as_table" as true. 
   metastruct:set_parse_as_table(true)
 end
