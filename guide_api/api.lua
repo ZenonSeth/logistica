@@ -212,7 +212,7 @@ local function find_item_for_group(groupStr)
   local firstGroup = groupStr:match("^([^,]+)") or groupStr
   for name, def in pairs(minetest.registered_items) do
     if name ~= "" and name ~= "unknown" and def.groups
-        and def.groups[firstGroup] and def.groups[firstGroup] > 0 then
+        and def.groups[firstGroup] and tonumber(def.groups[firstGroup]) > 0 then
       return name
     end
   end
