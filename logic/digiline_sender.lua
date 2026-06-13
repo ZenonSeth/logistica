@@ -158,11 +158,11 @@ end
 
 
 local function validate_template_v(template, signal_list, inventory, add_warning_fn) 
-  for kind, nstr in template:gmatch("%%([si])(%d+)") do
+  for kind, nstr in template:gmatch("%%([sSiI])(%d+)") do
     local n = tonumber(nstr)
-    if kind == "s" then
+    if kind == "s" or kind == "S" then
       if not n or n < 1 or n > #signal_list then
-        warnings[#warnings + 1] = "%s" .. nstr .. " needs signal " .. nstr .. " but only " .. #signal_list .. " configured"
+        add_warning_fn("%s" .. nstr .. " needs signal " .. nstr .. " but only " .. #signal_list .. " configured")
       end
     else
       if not n or n < 1 or n > NUM_SLOTS then
