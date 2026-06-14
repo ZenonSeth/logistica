@@ -23,6 +23,11 @@ local function build_group_lookup()
   for _, list in pairs(group_to_items) do table.sort(list) end
 end
 
+local function get_number_of_items_in_group(gname)
+  local members = group_to_items[gname]
+  return members and #members or 0
+end
+
 local function process_item_recipes(name, def)
   local all_recipes = minetest.get_all_craft_recipes(name)
   if not all_recipes then return end
@@ -33,18 +38,29 @@ local function process_item_recipes(name, def)
       local out_name  = out:get_name()
       local out_count = math.max(1, out:get_count())
       local skip = false
+      local seen_groups = {}
+      local unique_group_count = 0
+      local resolved_items = {}
       for i = 1, 9 do
         local s = recipe.items[i]
+        resolved_items[i] = s
         if s and s ~= "" and s:sub(1, 6) == "group:" then
-          local gname = s:match("^group:(%S+)")
-          if gname and (not group_to_items[gname] or #group_to_items[gname] == 0) then
+          local gname, rest = s:match("^group:(%S+)(.*)")
+          local n = gname and get_number_of_items_in_group(gname) or 0
+          if n == 0 then
             skip = true; break
+          elseif n == 1 then
+            resolved_items[i] = group_to_items[gname][1] .. rest
+          elseif not seen_groups[gname] then
+            seen_groups[gname] = true
+            unique_group_count = unique_group_count + 1
+            if unique_group_count > 1 then skip = true; break end
           end
         end
       end
       if not skip then
         valid[#valid + 1] = {
-          raw_items    = recipe.items,
+          raw_items    = resolved_items,
           width        = recipe.width,
           output_name  = out_name,
           output_count = out_count,
