@@ -325,10 +325,7 @@ local function get_settings_tab(pos)
       "label[%.2f,%.2f;%%i%d]", sx + 0.1, SLOT_Y + 1.2, i)
   end
 
-  local warnLine = ""
-  if warning and warning ~= "" then
-    warnLine = "label[0.5,9.2;" .. minetest.formspec_escape("Warning: " .. warning) .. "]"
-  end
+  local warnLine = warning ~= "" and "label[2.5," .. (SLOT_Y - 0.6)..";" .. minetest.formspec_escape(minetest.colorize("#FF8000", "Warning: " .. warning)) .. "]" or ""
 
   return
     -- title + enable

@@ -1159,6 +1159,13 @@ function logistica.digiline_sender_on_save(pos, channel, signal_names, message)
   meta:set_channel(channel)
   meta:set_signal_names_raw(signal_names)
   meta:set_message_template(message)
+  if meta:get_parse_as_table() then
+    local s = message:match("^%s*(.-)%s*$")
+    if s:sub(1, 6) ~= "return" then s = "return " .. s end
+    if minetest.deserialize(s, true) == nil then
+      meta:add_warning("Table parse failed - check message syntax")
+    end
+  end
   meta:finalize()
 end
 
