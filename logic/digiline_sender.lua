@@ -218,7 +218,7 @@ local function resolve_message_raw_v(networkId, template, signals, inventory, ad
         return "n/a"
       end
       local count = network
-        and logistica.count_items_in_network(stack:get_name(), network, respect_reserve)
+        and logistica.count_items_in_network(stack:get_name(), network, respect_reserve[kind])
         or 0
       return tostring(count)
     end
@@ -658,7 +658,7 @@ local function represent_primitive_value_textual(metastruct, v)
       return v and "true" or "false"
     end
     function value_repr.number(v)
-      return tonumber(v)
+      return tostring(v)
     end
 
     local proc = value_repr[type(v)]
@@ -846,7 +846,7 @@ local function represent_key_textual(metastruct, k)
       return k and "[true]" or "[false]"
     end
     function key_repr.number(k)
-      return string.format("[%u]", k)
+      return string.format("[%s]", tostring(k))
     end
 
     local proc = key_repr[type(k)]
@@ -889,7 +889,7 @@ function structure_adjust.resolution.literal(metastruct, tbl, literal_mode, recu
   local kv_pairs_list = {}
   for k, v in pairs(tbl) do
     if literal_mode or k ~= "ty" then
-      kv_text = represent_kv_pair_textual(metastruct, k, v, true, recursion_depth)
+      local kv_text = represent_kv_pair_textual(metastruct, k, v, true, recursion_depth)
       if kv_text == nil then return end
       kv_pairs_list[#kv_pairs_list + 1] = kv_text
     end
@@ -948,17 +948,6 @@ function api_process_structured_message_modifier(metastruct, message)
   local item_allocations = {}
   local signal_names = {}
 
-  local function map_only(m)
-    local r = {}
-    for k, v in pairs(m) do 
-      if type(k) ~= "number" then
-        r[k] = v
-      end
-    end
-    return r
-  end
-
-
   local validated_structured_spec = allocate_structured_specification(metastruct, message, item_allocations, signal_names)
   if validated_structured_spec == nil then return end
   local final_message_string = build_structured_specification_message(metastruct, validated_structured_spec)
@@ -1001,7 +990,7 @@ end
 function metadata_api:on_api_message(api_message)
   local normalized_message = api_message
   if type(api_message) == "string" then
-    normalized_message = { method = "configure_raw", content = api_message }
+    normalized_message = { method = "configure_raw", params = api_message }
   end
   if type(normalized_message) ~= "table" then 
     self:add_warning("api message must be a table or string")
