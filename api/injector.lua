@@ -83,8 +83,13 @@ end
 local function on_injector_punch(pos, node, puncher, pointed_thing)
   local targetPos = logistica.get_injector_target(pos)
   if targetPos and puncher:is_player() and puncher:get_player_control().sneak then
-    logistica.show_input_at(targetPos)
+    logistica.show_input_at(targetPos, tostring(minetest.hash_node_position(pos)))
   end
+end
+
+local function on_injector_rotate(pos, node, player, mode, newParam2)
+  local target = vector.add(pos, logistica.get_rot_directions(newParam2).backward)
+  logistica.show_input_at(target, tostring(minetest.hash_node_position(pos)))
 end
 
 local function on_injector_rightclick(pos, node, clicker, itemstack, pointed_thing)
@@ -103,7 +108,7 @@ local function after_place_injector(pos, placer, itemstack)
   logistica.set_injector_target_list(pos, "main")
   logistica.on_injector_change(pos)
   logistica.start_injector_timer(pos)
-  logistica.show_input_at(logistica.get_injector_target(pos))
+  logistica.show_input_at(logistica.get_injector_target(pos), tostring(minetest.hash_node_position(pos)))
 end
 
 local function allow_injector_storage_inv_put(pos, listname, index, stack, player)
@@ -170,6 +175,7 @@ function logistica.register_injector(description, name, transferRate, tiles)
     end,
     after_dig_node = logistica.on_injector_change,
     on_punch = on_injector_punch,
+    on_rotate = on_injector_rotate,
     on_rightclick = on_injector_rightclick,
     allow_metadata_inventory_put = allow_injector_storage_inv_put,
     allow_metadata_inventory_take = allow_injector_inv_take,

@@ -52,11 +52,11 @@ function logistica.node_placer_set_invert(pos, value)
   minetest.get_meta(pos):set_int(META_INVERT, value and 1 or 0)
 end
 
-local function get_target_pos(pos)
+local function get_target_pos(pos, newParam2)
   local node = minetest.get_node_or_nil(pos)
   if not node then return nil end
   local dist = logistica.node_placer_get_distance(pos)
-  local dir  = logistica.get_rot_directions(node.param2).backward
+  local dir  = logistica.get_rot_directions(newParam2 or node.param2).backward
   return vector.add(pos, vector.multiply(dir, dist))
 end
 
@@ -64,8 +64,8 @@ function logistica.node_placer_get_target_pos(pos)
   return get_target_pos(pos)
 end
 
-function logistica.node_placer_show_target(pos)
-  local targetPos = get_target_pos(pos)
+function logistica.node_placer_show_target(pos, newParam2)
+  local targetPos = get_target_pos(pos, newParam2)
   if not targetPos then return end
   logistica.show_output_at(targetPos, tostring(minetest.hash_node_position(pos)))
 end

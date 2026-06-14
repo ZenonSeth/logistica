@@ -101,8 +101,14 @@ local function on_woodcutter_punch(pos, _node, puncher, _pointed_thing)
   if not puncher or not puncher:is_player() then return end
   if puncher:get_player_control().sneak then
     local target = get_target_pos(pos)
-    if target then logistica.show_input_at(target) end
+    if target then logistica.show_input_at(target, tostring(minetest.hash_node_position(pos))) end
   end
+end
+
+local function on_woodcutter_rotate(pos, node, player, mode, newParam2)
+  local dirs = logistica.get_rot_directions(newParam2)
+  if not dirs then return end
+  logistica.show_input_at(vector.add(pos, dirs.backward), tostring(minetest.hash_node_position(pos)))
 end
 
 local function after_place_woodcutter(pos, _placer, _itemstack)
@@ -113,7 +119,7 @@ local function after_place_woodcutter(pos, _placer, _itemstack)
   logistica.set_node_tooltip_from_state(pos)
   logistica.on_supplier_change(pos)
   local target = get_target_pos(pos)
-  if target then logistica.show_input_at(target) end
+  if target then logistica.show_input_at(target, tostring(minetest.hash_node_position(pos))) end
 end
 
 local function allow_woodcutter_inv_put(pos, listname, _, stack, player)
@@ -212,6 +218,7 @@ function logistica.register_woodcutter(desc, name, inventorySize, tiles)
     after_place_node = after_place_woodcutter,
     after_dig_node   = logistica.on_supplier_change,
     on_punch         = on_woodcutter_punch,
+    on_rotate        = on_woodcutter_rotate,
     on_rightclick    = on_woodcutter_rightclick,
     allow_metadata_inventory_put  = allow_woodcutter_inv_put,
     allow_metadata_inventory_take = allow_woodcutter_inv_take,

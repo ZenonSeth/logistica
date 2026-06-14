@@ -184,6 +184,10 @@ function logistica.register_signal_node_placer(desc, name, tiles)
     end
   end
 
+  local function on_rotate(pos, node, player, mode, newParam2)
+    logistica.node_placer_show_target(pos, newParam2)
+  end
+
   local logistica_callbacks = {
     on_connect_to_network      = logistica.node_placer_on_connect,
     on_disconnect_from_network = logistica.node_placer_on_disconnect,
@@ -204,6 +208,7 @@ function logistica.register_signal_node_placer(desc, name, tiles)
     after_dig_node   = after_dig,
     on_rightclick    = on_rightclick,
     on_punch         = on_punch,
+    on_rotate        = on_rotate,
     allow_metadata_inventory_put  = allow_inv_put,
     allow_metadata_inventory_take = allow_inv_take,
     allow_metadata_inventory_move = allow_inv_move,

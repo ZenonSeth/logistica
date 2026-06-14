@@ -82,8 +82,13 @@ end
 local function on_requester_punch(pos, node, puncher, pointed_thing)
   local targetPos = logistica.get_requester_target(pos)
   if targetPos and puncher:is_player() and puncher:get_player_control().sneak then
-    logistica.show_output_at(targetPos)
+    logistica.show_output_at(targetPos, tostring(minetest.hash_node_position(pos)))
   end
+end
+
+local function on_requester_rotate(pos, node, player, mode, newParam2)
+  local target = vector.add(pos, logistica.get_rot_directions(newParam2).backward)
+  logistica.show_output_at(target, tostring(minetest.hash_node_position(pos)))
 end
 
 local function on_requester_rightclick(pos, node, clicker, itemstack, pointed_thing)
@@ -102,7 +107,7 @@ local function after_place_requester(pos, placer, itemstack, numRequestSlots)
   inv:set_size("filter", numRequestSlots)
   inv:set_size("actual", numRequestSlots)
   logistica.on_requester_change(pos)
-  logistica.show_output_at(logistica.get_requester_target(pos))
+  logistica.show_output_at(logistica.get_requester_target(pos), tostring(minetest.hash_node_position(pos)))
   logistica.set_node_tooltip_from_state(pos, nil, false)
 end
 
@@ -177,6 +182,7 @@ function logistica.register_requester(description, name, transferRate, tiles)
     end,
     after_dig_node = logistica.on_requester_change,
     on_punch = on_requester_punch,
+    on_rotate = on_requester_rotate,
     on_rightclick = on_requester_rightclick,
     allow_metadata_inventory_put = allow_requester_storage_inv_put,
     allow_metadata_inventory_take = allow_requester_inv_take,
