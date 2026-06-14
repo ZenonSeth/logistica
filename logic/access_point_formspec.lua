@@ -696,25 +696,28 @@ local function get_autocrafting_tab_content(pos, playerName)
       add("label[6.6,0.95;"..minetest.formspec_escape(entry.desc).."]")
 
       -- 3x3 recipe grid: colored box behind each occupied slot
+      local slot_display = logistica.ac_get_recipe_slot_display(recipe, network, cur_player)
       for i = 1, 9 do
-        local col      = (i - 1) % 3
-        local row      = math.floor((i - 1) / 3)
-        local x        = AC_GRID_X + col * AC_SLOT_STEP
-        local y        = AC_GRID_Y + row * AC_SLOT_STEP
-        local item_str = recipe.raw_items[i]
-        if item_str and item_str ~= "" then
-          local item_name  = ItemStack(item_str):get_name()
-          local total_need = recipe.items[item_name] or 1
-          local have = network and
-            logistica.count_items_in_network(item_name, network, true) or 0
-          if use_pi and cur_player then
-            have = have + logistica.ac_count_in_player_inv(cur_player, item_name)
-          end
-          local color = (have >= total_need) and AC_COLOR_HAVE or AC_COLOR_MISS
+        local col  = (i - 1) % 3
+        local row  = math.floor((i - 1) / 3)
+        local x    = AC_GRID_X + col * AC_SLOT_STEP
+        local y    = AC_GRID_Y + row * AC_SLOT_STEP
+        local info = slot_display[i]
+        if info then
+          local color = (info.have >= info.need) and AC_COLOR_HAVE or AC_COLOR_MISS
           add(string.format("box[%.2f,%.2f;%.2f,%.2f;%s]",
             x - 0.06, y - 0.06, AC_SLOT_SIZE + 0.12, AC_SLOT_SIZE + 0.12, color))
-          add(string.format("item_image_button[%.2f,%.2f;%.2f,%.2f;%s;%s%d;]",
-            x, y, AC_SLOT_SIZE, AC_SLOT_SIZE, item_str, AC_RECIPE_BTN, i))
+          if info.is_group then
+            add(string.format("item_image[%.2f,%.2f;%.2f,%.2f;%s]",
+              x, y, AC_SLOT_SIZE, AC_SLOT_SIZE, info.display_item))
+            add(string.format("label[%.2f,%.2f;G]", x + 0.38, y + 0.58))
+            add(string.format("tooltip[%.2f,%.2f;%.2f,%.2f;%s]",
+              x, y, AC_SLOT_SIZE, AC_SLOT_SIZE,
+              minetest.formspec_escape("group:" .. info.group_name)))
+          else
+            add(string.format("item_image_button[%.2f,%.2f;%.2f,%.2f;%s;%s%d;]",
+              x, y, AC_SLOT_SIZE, AC_SLOT_SIZE, info.display_item, AC_RECIPE_BTN, i))
+          end
         end
       end
 

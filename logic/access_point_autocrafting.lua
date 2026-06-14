@@ -23,119 +23,34 @@ local function build_group_lookup()
   for _, list in pairs(group_to_items) do table.sort(list) end
 end
 
-local function aggregate_ingredients(items)
-  local counts = {}
-  for i = 1, 9 do
-    local s = items[i]
-    if s and s ~= "" then
-      local st = ItemStack(s)
-      local n = st:get_name()
-      if n ~= "" then counts[n] = (counts[n] or 0) + st:get_count() end
-    end
-  end
-  return counts
-end
-
--- Returns a fingerprint string for a counts table, for deduplication.
-local function ingredient_fingerprint(counts)
-  local parts = {}
-  for n, c in pairs(counts) do parts[#parts + 1] = n .. "=" .. c end
-  table.sort(parts)
-  return table.concat(parts, ",")
-end
-
--- Applies a group->item_name assignment to an items list.
--- Each "group:foo N" slot is replaced with "chosen_item N".
-local function apply_group_assignment(items, assignment)
-  local out = {}
-  for i = 1, 9 do
-    local s = items[i]
-    if s and s ~= "" and s:sub(1, 6) == "group:" then
-      local gname, rest = s:match("^group:(%S+)(.*)")
-      local chosen = assignment[gname]
-      if not chosen then return nil end
-      out[i] = chosen .. rest
-    else
-      out[i] = s
-    end
-  end
-  return out
-end
-
--- Expands a recipe's group slots into all concrete variants.
--- Returns a list of resolved items-lists, or nil if any group has no members.
--- Each unique group type contributes one dimension to the cartesian product;
--- all slots sharing the same group type get the same item in each variant.
-local function expand_group_variants(items)
-  -- collect unique group names and their members
-  local group_names = {}
-  local seen_groups = {}
-  for i = 1, 9 do
-    local s = items[i]
-    if s and s ~= "" and s:sub(1, 6) == "group:" then
-      local gname = s:match("^group:(%S+)")
-      if gname and not seen_groups[gname] then
-        seen_groups[gname] = true
-        local members = group_to_items[gname]
-        if not members or #members == 0 then return nil end
-        group_names[#group_names + 1] = gname
-      end
-    end
-  end
-  if #group_names == 0 then return { items } end
-
-  -- cartesian product over group types (not slots)
-  local assignments = {{}}
-  for _, gname in ipairs(group_names) do
-    local members = group_to_items[gname]
-    local next_assignments = {}
-    for _, assignment in ipairs(assignments) do
-      for _, member in ipairs(members) do
-        local a = {}
-        for k, v in pairs(assignment) do a[k] = v end
-        a[gname] = member
-        next_assignments[#next_assignments + 1] = a
-      end
-    end
-    assignments = next_assignments
-  end
-
-  local variants = {}
-  for _, assignment in ipairs(assignments) do
-    local resolved = apply_group_assignment(items, assignment)
-    if resolved then variants[#variants + 1] = resolved end
-  end
-  return variants
-end
-
 local function process_item_recipes(name, def)
   local all_recipes = minetest.get_all_craft_recipes(name)
   if not all_recipes then return end
   local valid = {}
-  local seen_fingerprints = {}
   for _, recipe in ipairs(all_recipes) do
     if recipe.method == "normal" then
-      local variants = expand_group_variants(recipe.items)
-      if not variants then goto continue end
       local out = ItemStack(recipe.output)
       local out_name  = out:get_name()
       local out_count = math.max(1, out:get_count())
-      for _, items in ipairs(variants) do
-        local counts = aggregate_ingredients(items)
-        local fp = ingredient_fingerprint(counts)
-        if not seen_fingerprints[fp] then
-          seen_fingerprints[fp] = true
-          valid[#valid + 1] = {
-            items        = counts,
-            raw_items    = items,
-            width        = recipe.width,
-            output_name  = out_name,
-            output_count = out_count,
-          }
+      local skip = false
+      for i = 1, 9 do
+        local s = recipe.items[i]
+        if s and s ~= "" and s:sub(1, 6) == "group:" then
+          local gname = s:match("^group:(%S+)")
+          if gname and (not group_to_items[gname] or #group_to_items[gname] == 0) then
+            skip = true; break
+          end
         end
       end
+      if not skip then
+        valid[#valid + 1] = {
+          raw_items    = recipe.items,
+          width        = recipe.width,
+          output_name  = out_name,
+          output_count = out_count,
+        }
+      end
     end
-    ::continue::
   end
   if #valid == 0 then return end
   local desc = def.description or name
@@ -154,6 +69,54 @@ local function build_index()
 end
 
 minetest.register_on_mods_loaded(build_index)
+
+-- Resolves group slots in recipe.raw_items to concrete items greedily,
+-- picking the group member with the most available stock.
+-- virtual: optional lazy-cache map (item_name -> count), used read-only for scoring.
+-- player: optional; player inventory is also checked when scoring group members.
+-- Returns counts (item_name -> total needed), resolved_raw (9-slot concrete list),
+-- or nil if any required group has no members.
+local function get_recipe_counts(recipe, virtual, network, player)
+  local group_choice = {}
+  local counts = {}
+  local resolved_raw = {}
+
+  for i = 1, 9 do
+    local s = recipe.raw_items[i]
+    if s and s ~= "" then
+      if s:sub(1, 6) == "group:" then
+        local gname, rest = s:match("^group:(%S+)(.*)")
+        if not group_choice[gname] then
+          local members = group_to_items[gname]
+          if not members or #members == 0 then return nil end
+          local best_item, best_count = nil, -1
+          for _, member in ipairs(members) do
+            local have = virtual and virtual[member]
+            if have == nil then
+              have = logistica.count_items_in_network(member, network, true)
+            end
+            if player then have = have + logistica.ac_count_in_player_inv(player, member) end
+            if have > best_count then best_count = have; best_item = member end
+          end
+          if not best_item then return nil end
+          group_choice[gname] = best_item
+        end
+        local resolved = group_choice[gname] .. rest
+        resolved_raw[i] = resolved
+        local st = ItemStack(resolved)
+        local n = st:get_name()
+        if n ~= "" then counts[n] = (counts[n] or 0) + st:get_count() end
+      else
+        resolved_raw[i] = s
+        local st = ItemStack(s)
+        local n = st:get_name()
+        if n ~= "" then counts[n] = (counts[n] or 0) + st:get_count() end
+      end
+    end
+  end
+
+  return counts, resolved_raw
+end
 
 -- Word-prefix search: each space-separated token must be a prefix of some word
 -- in the description. E.g. "no br" matches "Node Breaker".
@@ -202,8 +165,10 @@ logistica.ac_count_in_player_inv = count_in_player_inv
 -- Returns the max number of times recipe can be crafted.
 -- Pass player + use_player_inv=true to include the player's inventory in the count.
 function logistica.ac_get_max_craftable(recipe, network, player, use_player_inv)
+  local counts = get_recipe_counts(recipe, nil, network, use_player_inv and player or nil)
+  if not counts then return 0 end
   local min_times = math.huge
-  for item_name, needed in pairs(recipe.items) do
+  for item_name, needed in pairs(counts) do
     local have = logistica.count_items_in_network(item_name, network, true)
     if use_player_inv and player then
       have = have + count_in_player_inv(player, item_name)
@@ -249,10 +214,13 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
       return crafted, "Output full"
     end
 
+    local counts, resolved_raw = get_recipe_counts(recipe, nil, network, use_player_inv and player or nil)
+    if not counts then break end
+
     -- plan how much to take from network vs player for each ingredient
     local plan = {}
     local can_craft = true
-    for item_name, needed in pairs(recipe.items) do
+    for item_name, needed in pairs(counts) do
       local net_have = logistica.count_items_in_network(item_name, network, true)
       local from_net = math.min(needed, net_have)
       local from_plr = needed - from_net
@@ -295,7 +263,7 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
     -- build craft grid and execute
     local craft_items = {}
     for i = 1, 9 do
-      local s = recipe.raw_items[i]
+      local s = resolved_raw[i]
       craft_items[i] = (s and s ~= "") and ItemStack(s) or ItemStack("")
     end
     local output, decremented = minetest.get_craft_result({
@@ -324,6 +292,37 @@ end
 -- Returns the index entry for item_name, or nil if not craftable.
 function logistica.ac_get_entry(name)
   return ac_index and ac_index[name]
+end
+
+-- Returns display info for all 9 recipe slots for the crafting grid UI.
+-- Resolves groups greedily (same logic as crafting) to pick a representative item.
+-- Each non-empty slot returns: {display_item, have, need, is_group, group_name}.
+--   display_item: concrete item name to show (representative member for group slots).
+--   have:         total available in network (+player if provided).
+--   need:         total of that resolved item needed across all slots in the recipe.
+--   is_group:     true if the slot was a group: entry.
+--   group_name:   group name string (only set when is_group is true).
+function logistica.ac_get_recipe_slot_display(recipe, network, player)
+  local counts, resolved_raw = get_recipe_counts(recipe, nil, network, player)
+  local slots = {}
+  if not counts then return slots end
+  for i = 1, 9 do
+    local s = recipe.raw_items[i]
+    if s and s ~= "" then
+      local is_group = s:sub(1, 6) == "group:"
+      local gname = is_group and s:match("^group:(%S+)") or nil
+      local resolved = resolved_raw[i]
+      local rname = resolved and ItemStack(resolved):get_name() or ""
+      if rname ~= "" then
+        local need = counts[rname] or 1
+        local have = logistica.count_items_in_network(rname, network, true)
+        if player then have = have + logistica.ac_count_in_player_inv(player, rname) end
+        slots[i] = { display_item = rname, have = have, need = need,
+                     is_group = is_group, group_name = gname }
+      end
+    end
+  end
+  return slots
 end
 
 -- Returns true if any crafting upgrade (basic or recursive) is installed in the AP at pos.
@@ -377,12 +376,15 @@ local function plan_item(item_name, count, virtual, expanding, network)
     for _, recipe in ipairs(entry.recipes) do
       local crafts = math.ceil(still_need / recipe.output_count)
       local score = 0
-      for ingr_name, ingr_count in pairs(recipe.items) do
-        local have = virtual[ingr_name]
-        if have == nil then
-          have = logistica.count_items_in_network(ingr_name, network, true)
+      local rcounts = get_recipe_counts(recipe, virtual, network)
+      if rcounts then
+        for ingr_name, ingr_count in pairs(rcounts) do
+          local ingr_have = virtual[ingr_name]
+          if ingr_have == nil then
+            ingr_have = logistica.count_items_in_network(ingr_name, network, true)
+          end
+          if ingr_have >= ingr_count * crafts then score = score + 1 end
         end
-        if have >= ingr_count * crafts then score = score + 1 end
       end
       scored[#scored + 1] = { recipe = recipe, score = score }
     end
@@ -394,23 +396,26 @@ local function plan_item(item_name, count, virtual, expanding, network)
   local last_missing = item_name
   for _, recipe in ipairs(recipes_to_try) do
     local crafts = math.ceil(still_need / recipe.output_count)
-    local v_snap = shallow_copy(virtual)
-    local queue = {}
-    local ok = true
-    for ingr_name, ingr_count in pairs(recipe.items) do
-      local sub_q, missing = plan_item(ingr_name, ingr_count * crafts, virtual, expanding, network)
-      if not sub_q then ok = false; last_missing = missing or ingr_name; break end
-      for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
+    local rcounts = get_recipe_counts(recipe, virtual, network)
+    if rcounts then
+      local v_snap = shallow_copy(virtual)
+      local queue = {}
+      local ok = true
+      for ingr_name, ingr_count in pairs(rcounts) do
+        local sub_q, missing = plan_item(ingr_name, ingr_count * crafts, virtual, expanding, network)
+        if not sub_q then ok = false; last_missing = missing or ingr_name; break end
+        for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
+      end
+      if ok then
+        local surplus = (crafts * recipe.output_count) - still_need
+        virtual[item_name] = surplus
+        for _ = 1, crafts do queue[#queue + 1] = item_name end
+        expanding[item_name] = nil
+        return queue
+      end
+      for k in pairs(virtual) do virtual[k] = nil end
+      for k, v in pairs(v_snap) do virtual[k] = v end
     end
-    if ok then
-      local surplus = (crafts * recipe.output_count) - still_need
-      virtual[item_name] = surplus
-      for _ = 1, crafts do queue[#queue + 1] = item_name end
-      expanding[item_name] = nil
-      return queue
-    end
-    for k in pairs(virtual) do virtual[k] = nil end
-    for k, v in pairs(v_snap) do virtual[k] = v end
   end
 
   expanding[item_name] = nil
@@ -497,32 +502,35 @@ function logistica.ac_plan_recursive(item_name, count, network)
 
   for _, recipe in ipairs(entry.recipes) do
     local virtual = {}
-    local queue = {}
-    local ok = true
+    local rcounts = get_recipe_counts(recipe, virtual, network)
+    if rcounts then
+      local queue = {}
+      local ok = true
 
-    for ingr_name, ingr_count in pairs(recipe.items) do
-      local needed = ingr_count * count
-      local sub_q = plan_item(ingr_name, needed, virtual, {}, network)
-      if not sub_q then
-        ok = false; last_missing_name = ingr_name; last_missing_count = needed; break
-      end
-      for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
-    end
-
-    if ok then
-      local to_take = {}
-      for iname, remaining in pairs(virtual) do
-        local original = logistica.count_items_in_network(iname, network, true)
-        if original > remaining then
-          to_take[iname] = original - remaining
+      for ingr_name, ingr_count in pairs(rcounts) do
+        local needed = ingr_count * count
+        local sub_q, missing = plan_item(ingr_name, needed, virtual, {}, network)
+        if not sub_q then
+          ok = false; last_missing_name = ingr_name; last_missing_count = needed; break
         end
+        for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
       end
-      for _ = 1, count do queue[#queue + 1] = item_name end
-      local output = ItemStack(item_name)
-      output:set_count(recipe.output_count * count)
-      local plan = { to_take = to_take, queue = queue, output = output }
-      if best_plan == nil or #queue < #best_plan.queue then
-        best_plan = plan
+
+      if ok then
+        local to_take = {}
+        for iname, remaining in pairs(virtual) do
+          local original = logistica.count_items_in_network(iname, network, true)
+          if original > remaining then
+            to_take[iname] = original - remaining
+          end
+        end
+        for _ = 1, count do queue[#queue + 1] = item_name end
+        local output = ItemStack(item_name)
+        output:set_count(recipe.output_count * count)
+        local plan = { to_take = to_take, queue = queue, output = output }
+        if best_plan == nil or #queue < #best_plan.queue then
+          best_plan = plan
+        end
       end
     end
   end
