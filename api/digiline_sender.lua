@@ -100,9 +100,17 @@ Validation warnings shown in the formspec are checked at save time and slot chan
     ]],
   },
   {
+    title = "Experimental features",
+    color = "#FFFF88",
+    content = "Features below this line are experimental and may change in the future",
+  },
+  {
      title = "API: Overview",
+     color = "#FFFF88",
      content = [[
 The Digiline Signal Sender can itself be controlled by a digilines api, using the same channel that it's configured to broadcast messages on.
+
+This feature is only enabled if the 'Enable API programming' checkbox is checked.
 
 The API currently has two "methods" - "configure" and "configure_raw". These are invoked by sending a table of the form:
 ```
@@ -124,6 +132,7 @@ See the "API: Structured Config" section for information on the fields specific 
   },
   {
     title = "API: Common Config Fields",
+    color = "#FFFF88",
     content = [[
 The following fields are common to the parameters of both "configure" and "configure_raw" APIs, and have the same behaviour in each.
 
@@ -138,6 +147,7 @@ An empty string will prevent it from listening or broadcasting at all. It's also
   },
   {
     title = "API: Raw Config Fields",
+    color = "#FFFF88",
     content = [[
 The following fields are specific to the parameters of the "configure" API, and provide maximum flexibility but require more complex code/messages for more advanced automated information management.
 
@@ -166,6 +176,7 @@ If specified, this sets whether or not the message of the Digilines Signal Sende
   },
   {
     title = "API: Structured Config",
+    color = "#FFFF88",
     content = [[
 The structured configuration API involves only one field - `message` - that describes an arbitrarily-nested structure, where you can specify that fields of a table should be substituted for various values.
 
@@ -315,8 +326,9 @@ local function get_settings_tab(pos)
   local sigNames   = meta:get_string("signal_names")
   local message    = meta:get_string("message")
   local warning    = meta:get_string("warning")
-  local parseTable = meta:get_string("parse_as_table") == "1"
-  local isOn       = logistica.is_machine_on(pos)
+  local parseTable  = meta:get_string("parse_as_table") == "1"
+  local apiEnabled  = meta:get_string("api_enabled") == "1"
+  local isOn        = logistica.is_machine_on(pos)
 
   local slotLabels = {}
   for i = 1, NUM_SLOTS do
@@ -332,11 +344,13 @@ local function get_settings_tab(pos)
     "label[0.5,0.35;" .. FS("Digiline Signal Sender") .. "]" ..
     logistica.ui.on_off_btn(isOn, 10.5, 0.4, ON_OFF_BTN, FS("Enable"), 1.0, 1.0) ..
     -- channel
-    "label[0.5,1.1;" .. FS("Channel:") .. "]" ..
+    "label[0.5,1.15;" .. FS("Channel:") .. "]" ..
     "field[2.0,0.8;4.0,0.75;channel;;" .. minetest.formspec_escape(channel) .. "]" ..
+    "checkbox[6.5,1.15;api_enabled;" .. FS("Enable API programming") .. ";" .. (apiEnabled and "true" or "false") .. "]" ..
+    "tooltip[api_enabled;" .. FS("See API Overview in Help tab for details") .. "]" ..
     -- signal names
-    "label[0.5,1.85;" .. FS("Signals:") .. "]" ..
-    "label[6.3,1.85;" .. FS("(%s1 = 1st, %s2 = 2nd, ...)") .. "]" ..
+    "label[0.5,1.9;" .. FS("Signals:") .. "]" ..
+    "label[6.3,1.9;" .. FS("(%s1 = 1st, %s2 = 2nd, ...)") .. "]" ..
     "field[2.0,1.55;4.0,0.75;signal_names;;" .. minetest.formspec_escape(sigNames) .. "]" ..
     -- message
     "label[0.5,2.55;" .. FS("Message:") .. "]" ..
@@ -362,7 +376,7 @@ end
 local function build_help_topic_list()
   local items = {}
   for _, t in ipairs(HELP_TOPICS) do
-    items[#items + 1] = minetest.formspec_escape(t.title)
+    items[#items + 1] = (t.color or "") .. minetest.formspec_escape(t.title)
   end
   return table.concat(items, ",")
 end
@@ -447,6 +461,10 @@ local function on_receive_fields(player, formname, fields)
 
   if fields.parse_as_table ~= nil then
     logistica.digiline_sender_set_parse_as_table(pos, fields.parse_as_table == "true")
+  end
+
+  if fields.api_enabled ~= nil then
+    minetest.get_meta(pos):set_string("api_enabled", fields.api_enabled == "true" and "1" or "0")
   end
 
   if fields.save

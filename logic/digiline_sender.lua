@@ -1103,6 +1103,7 @@ end
 
 --- API entrypoint
 local function on_receive_digilines(pos, channel, message)
+  if minetest.get_meta(pos):get_string("api_enabled") ~= "1" then return end
   local our_channel = get_channel(pos)
   if our_channel == "" or our_channel ~= channel then return end
   local metastruct = metadata_api.new(pos)
