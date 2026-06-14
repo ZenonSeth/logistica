@@ -113,7 +113,7 @@ When accessing the Easy Crafting tab through a Wireless Access Pad, the upgrade 
 
 Recipe limitations
 ------------------------------
-Recipes that use group ingredients (e.g. "group:stick") are supported. Each unique group in a recipe is expanded to all items belonging to that group, and one recipe variant is created per combination. For example, a recipe with group:wood and group:stick will appear as a separate variant for each (wood item, stick item) pair. Crafting each variant requires those exact items from your network.
+Recipes that use group ingredients (e.g. "group:wood") are supported, but only if the recipe uses at most one type of group. Recipes that require two or more different group ingredients are not available in Easy Crafting due to CPU and memory limitations.
 ]])
 
 g.optic_cable = S([[
