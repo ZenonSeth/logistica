@@ -341,7 +341,7 @@ The Enable button turns harvesting on or off. When enabled, the node runs on a f
 
 The upgrade slot accepts a Sprinkler Upgrade. See the Sprinkler Upgrade page for details.
 
-Requires Lava in the Network to function. Uses roughly 1/1000th of a bucket of lava per crop harvested, and 1/1000th per watering cycle when the Sprinkler Upgrade is active.
+Requires Lava in the Network to function. Uses roughly 1/1000th of a bucket of lava per crop harvested, and 1/1000th of the lava reserve as fuel for a watering cycle when the Sprinkler Upgrade is active (the sprinkler also consumes 1 bucket of water from the network as the water it sprays).
 ]])
 
 g.sprinkler_upgrade = S([[
@@ -381,14 +381,14 @@ If no leaves are detected above the trunk, the cutting proceeds normally with on
 g.vaccuum_chest = S([[
 The Vacuum Supply Chest acts like a regular Supply chest, providing items to the network when there's requests or storage pulls items. There are two differences:
 
-- As the name indicates, the Vacuum chest will collect nearby dropped items, up to a distance of 3 blocks, into its inventory, automatically making them available for the Network.
+- As the name indicates, the Vacuum chest will collect nearby dropped items, at a configurable distance of up to 3 blocks, into its inventory, automatically making them available for the Network.
 - It cannot be used by the Network to store items in it (unlike regular Supply Chests which can be configured to allow storing from the Network)
 
 The on/off switch in the Vacuum Chests's inventory enables whether the chest will be collecting nearby items or not.
 ]])
 
 g.rock_melter = S([[
-The Rock Melter is a network-connected machine that melts stone-type blocks into Lava, storing up to 16 buckets in its internal tank. The stored Lava is available to the network as a read-only Reservoir - a Lava Furnace Fueler on the same network can draw Lava from it. Unlike regular Reservoirs, the network cannot store Lava into the Rock Melter; it only provides Lava outward.
+The Rock Melter is a network-connected machine that melts stone-type blocks into Lava, storing up to 16 buckets in its internal tank. The stored Lava is available to the network as a read-only Reservoir - any machine on the same network can draw Lava from it (for example, a Lava Furnace Fueler). Unlike regular Reservoirs, the network cannot store Lava into the Rock Melter; it only provides Lava outward.
 
 Place any full-block stone-type item (such as Cobblestone or Stone) in the Input slot and a valid fuel in the Fuel slot. The machine burns through fuel while slowly melting the stone. Lava Buckets can also be used as fuel.
 

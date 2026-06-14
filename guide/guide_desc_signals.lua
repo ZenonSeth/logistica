@@ -42,7 +42,7 @@ All machines on the same network that share a signal name will communicate with 
 ]])
 
 g.signal_button = S([[
-The Signal Button is a momentary signal sender. When pressed it sends a named signal ON for one second, then automatically releases and sends it OFF again.
+The Signal Button is a momentary signal sender. When pressed it sends a named signal ON, stays pushed for 1 second, then turns the signal OFF again.
 
 Right-click (or use) to press the button. Use the Hyperspanner on it to open the configuration and set the signal name.
 
@@ -52,7 +52,7 @@ Signal Name: the name of the signal this button broadcasts when pressed. Must us
 
 Behavior
 ------------------------------
-Pressing the button while it is already mid-press has no effect - it must complete its 1-second release before it can be pressed again.
+Pressing the button while it is already pushed has no effect - it must finish its 1-second push before it can be pressed again.
 
 If the button is mid-press when it connects to a network, it re-sends the ON signal to that network. When disconnected, its signal contribution is automatically removed.
 

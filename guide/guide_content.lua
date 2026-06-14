@@ -545,7 +545,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     },
 
     [PAGE_PUMP] = {
-      title = S("Resevoir Pump"),
+      title = S("Reservoir Pump"),
       relatedItems = {L("reservoir_silverin_empty")},
       recipes = RECIPE_RESERPMP,
       recipeLinks = RECIPE_LINKS,
