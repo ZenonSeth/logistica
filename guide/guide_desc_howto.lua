@@ -11,7 +11,7 @@ do
     h("Signals") .. "\n" ..
     "Signals are named on/off states that travel within a single Logistica network via the regular cables." .. n ..
     "- <b>Senders:</b> Signal Switch, Signal Button, Signal Timer, Signal Item Counter, Signal Liquid Counter, External Content Reader, Node Detector, Mesecon Signal Receiver.\n" ..
-    "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Toggler, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
+    "- <b>Receivers:</b> Signal Lamp, Signal Lamp (2-Color), Signal Network Switch, Mesecon Signal Sender, Node Placer, Node Digger.\n" ..
     "- <b>Logic:</b> Signal NOT Gate, Signal Logic Gate (AND/OR/XOR/ADDER).\n" ..
     "- <b>Experimental:</b> Digiline Signal Sender - polls the network and sends item counts as digiline messages on a configurable channel.\n" ..
     "- <b>Experimental:</b> Digiline to Signal Converter - listens on a digiline channel and broadcasts a named Logistica signal based on the received message." .. n ..
