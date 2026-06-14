@@ -11,6 +11,7 @@ logistica_max_receivers_per_transmitter (Sets how many wirless receivers can be 
 logistica_enable_wireless_antennas (Enable the Wireless Transmitter and Wireless Receiver) bool true
 logistica_enable_wireless_access_pad (Enable the Wireless Access Pad and its Wireless Upgrader) bool true
 logistica_enable_digiline_machines (Enable the Digiline Signal Sender and Digiline to Signal Converter) bool true
+logistica_enable_digiline_sender_api (Enable the Digiline Sender API programming feature) bool true
 logistica_enable_node_digger (Enable the Signal Node Digger) bool true
 logistica_enable_node_placer (Enable the Signal Node Placer) bool true
 logistica_node_detector_max_distance (Max distance the Signal Node Detector can reach) int 16 1 32

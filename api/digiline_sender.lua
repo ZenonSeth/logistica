@@ -99,6 +99,9 @@ When disconnected from a Logistica network, the timer stops. Signals not on the 
 Validation warnings shown in the formspec are checked at save time and slot change time. Runtime parse errors (table mode) are written to the warning field when they occur.
     ]],
   },
+}
+
+local API_HELP_TOPICS = {
   {
     title = "Experimental features",
     color = "#FFFF88",
@@ -107,6 +110,7 @@ Validation warnings shown in the formspec are checked at save time and slot chan
   {
      title = "API: Overview",
      color = "#FFFF88",
+ 
      content = [[
 The Digiline Signal Sender can itself be controlled by a digilines api, using the same channel that it's configured to broadcast messages on.
 
@@ -133,6 +137,7 @@ See the "API: Structured Config" section for information on the fields specific 
   {
     title = "API: Common Config Fields",
     color = "#FFFF88",
+
     content = [[
 The following fields are common to the parameters of both "configure" and "configure_raw" APIs, and have the same behaviour in each.
 
@@ -148,6 +153,7 @@ An empty string will prevent it from listening or broadcasting at all. It's also
   {
     title = "API: Raw Config Fields",
     color = "#FFFF88",
+
     content = [[
 The following fields are specific to the parameters of the "configure" API, and provide maximum flexibility but require more complex code/messages for more advanced automated information management.
 
@@ -177,6 +183,7 @@ If specified, this sets whether or not the message of the Digilines Signal Sende
   {
     title = "API: Structured Config",
     color = "#FFFF88",
+
     content = [[
 The structured configuration API involves only one field - `message` - that describes an arbitrarily-nested structure, where you can specify that fields of a table should be substituted for various values.
 
@@ -290,6 +297,12 @@ message = {
   }
 }
 
+if logistica.settings.enable_digiline_sender_api then
+  for _, t in ipairs(API_HELP_TOPICS) do
+    HELP_TOPICS[#HELP_TOPICS + 1] = t
+  end
+end
+
 local forms = {}
 
 ----------------------------------------------------------------
@@ -339,6 +352,13 @@ local function get_settings_tab(pos)
 
   local warnLine = warning ~= "" and "label[2.5," .. (SLOT_Y - 0.6)..";" .. minetest.formspec_escape(minetest.colorize("#FF8000", "Warning: " .. warning)) .. "]" or ""
 
+  local apiCheckbox = ""
+  if logistica.settings.enable_digiline_sender_api then
+    apiCheckbox =
+      "checkbox[6.5,1.15;api_enabled;" .. FS("Enable API programming") .. ";" .. (apiEnabled and "true" or "false") .. "]" ..
+      "tooltip[api_enabled;" .. FS("See API Overview in Help tab for details") .. "]"
+  end
+
   return
     -- title + enable
     "label[0.5,0.35;" .. FS("Digiline Signal Sender") .. "]" ..
@@ -346,8 +366,7 @@ local function get_settings_tab(pos)
     -- channel
     "label[0.5,1.15;" .. FS("Channel:") .. "]" ..
     "field[2.0,0.8;4.0,0.75;channel;;" .. minetest.formspec_escape(channel) .. "]" ..
-    "checkbox[6.5,1.15;api_enabled;" .. FS("Enable API programming") .. ";" .. (apiEnabled and "true" or "false") .. "]" ..
-    "tooltip[api_enabled;" .. FS("See API Overview in Help tab for details") .. "]" ..
+    apiCheckbox ..
     -- signal names
     "label[0.5,1.9;" .. FS("Signals:") .. "]" ..
     "label[6.3,1.9;" .. FS("(%s1 = 1st, %s2 = 2nd, ...)") .. "]" ..
