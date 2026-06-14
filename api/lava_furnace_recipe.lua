@@ -52,8 +52,11 @@ function logistica.get_lava_furnace_recipes_for(itemName)
       time = lavaTime
     }
 
-    if presets then table.insert(presets, regularRecipe)
-    else presets = {regularRecipe}
+    if presets then
+      presets = table.copy(presets)
+      table.insert(presets, regularRecipe)
+    else
+      presets = {regularRecipe}
     end
   end
 
