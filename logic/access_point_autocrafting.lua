@@ -207,18 +207,20 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
 
   local function refund(taken)
     for _, st in ipairs(taken) do
-      local leftover = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
-      if leftover and not leftover:is_empty() then
-        minetest.item_drop(leftover, player, player:get_pos())
+      local remaining = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
+      if remaining > 0 then
+        st:set_count(remaining)
+        minetest.item_drop(st, player, player:get_pos())
       end
     end
   end
 
   local function give_or_drop(st)
     if st:is_empty() then return end
-    local leftover = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
-    if leftover and not leftover:is_empty() then
-      leftover = node_inv:add_item("ac_output", leftover)
+    local remaining = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
+    if remaining > 0 then
+      st:set_count(remaining)
+      local leftover = node_inv:add_item("ac_output", st)
       if not leftover:is_empty() then minetest.item_drop(leftover, player, player:get_pos()) end
     end
   end
@@ -476,9 +478,10 @@ function logistica.ac_execute_plan(plan, networkId, nodePos)
 
   local function refund()
     for _, st in ipairs(taken) do
-      local leftover = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
-      if leftover and not leftover:is_empty() then
-        minetest.item_drop(leftover, nil, nodePos)
+      local remaining = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
+      if remaining > 0 then
+        st:set_count(remaining)
+        minetest.item_drop(st, nil, nodePos)
       end
     end
   end
