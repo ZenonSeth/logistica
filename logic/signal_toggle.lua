@@ -1,7 +1,8 @@
 
-local META_INPUT  = "toggle_input"
-local META_OUTPUT = "toggle_output"
-local META_STATE  = "toggle_state"
+local META_INPUT      = "toggle_input"
+local META_OUTPUT     = "toggle_output"
+local META_STATE      = "toggle_state"
+local META_LAST_INPUT = "toggle_last_input"
 
 local DEFAULT_INPUT  = ""
 local DEFAULT_OUTPUT = "signal_out"
@@ -49,8 +50,12 @@ end
 
 -- Returns true if the signal matched and was processed, false otherwise.
 function logistica.signal_toggle_on_signal_received(pos, sigName, sigIsOn)
-  if not sigIsOn then return false end -- only rising edge triggers a toggle
   if sigName ~= logistica.signal_toggle_get_input(pos) then return false end
+  local meta = minetest.get_meta(pos)
+  local lastInput = meta:get_int(META_LAST_INPUT) == 1
+  meta:set_int(META_LAST_INPUT, sigIsOn and 1 or 0)
+  if not sigIsOn then return false end  -- falling edge: update stored state, no flip
+  if lastInput then return false end    -- was already ON: not a rising edge, no flip
   local newState = not logistica.signal_toggle_get_state(pos)
   set_state(pos, newState)
   set_visual(pos, newState)
@@ -77,6 +82,7 @@ function logistica.signal_toggle_on_disconnect(pos, networkId)
   logistica.signal_remove_sender(pos, networkId)
   set_visual(pos, false)
   update_infotext(pos, false)
+  minetest.get_meta(pos):set_int(META_LAST_INPUT, 0)
 end
 
 -- Manually flip the output state and broadcast it on the network.
