@@ -696,7 +696,7 @@ local function get_autocrafting_tab_content(pos, playerName)
       add("label[6.6,0.95;"..minetest.formspec_escape(entry.desc).."]")
 
       -- 3x3 recipe grid: colored box behind each occupied slot
-      local slot_display = logistica.ac_get_recipe_slot_display(recipe, network, cur_player)
+      local slot_display = network and logistica.ac_get_recipe_slot_display(recipe, network, cur_player) or {}
       for i = 1, 9 do
         local col  = (i - 1) % 3
         local row  = math.floor((i - 1) / 3)
