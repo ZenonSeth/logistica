@@ -307,13 +307,13 @@ end
 
 -- Can the cable propagate the scan OUT in this offset direction?
 -- Type 1 (straight): forward or backward axis only.
--- Type 2 (L-shape): forward or right only.
+-- Type 2 (L-shape): forward or left only (nodebox arms go -Z and +X at facedir=0).
 local function insul_allows_exit(offset, d, insulType)
   if not d then return true end
   if insulType == 1 then
     return vec_eq(offset, d.forward) or vec_eq(offset, d.backward)
   elseif insulType == 2 then
-    return vec_eq(offset, d.forward) or vec_eq(offset, d.right)
+    return vec_eq(offset, d.forward) or vec_eq(offset, d.left)
   end
   return true
 end
@@ -321,13 +321,13 @@ end
 -- Can the scan enter the cable FROM this offset direction?
 -- Entry direction is the negative of the arm direction (approaching from outside the arm end).
 -- Type 1 (straight): same as exit (symmetric).
--- Type 2 (L-shape): backward or left (the negative of forward/right).
+-- Type 2 (L-shape): backward or right (the negative of forward/left).
 local function insul_allows_entry(offset, d, insulType)
   if not d then return true end
   if insulType == 1 then
     return vec_eq(offset, d.forward) or vec_eq(offset, d.backward)
   elseif insulType == 2 then
-    return vec_eq(offset, d.backward) or vec_eq(offset, d.left)
+    return vec_eq(offset, d.backward) or vec_eq(offset, d.right)
   end
   return true
 end
