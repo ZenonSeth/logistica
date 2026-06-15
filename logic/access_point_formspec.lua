@@ -559,7 +559,10 @@ function logistica.access_point_queue_timer(pos)
       local pending = meta:get_string("ac_pending_output")
       if pending ~= "" then
         meta:set_string("ac_pending_output", "")
-        meta:get_inventory():add_item(AC_OUTPUT_LIST, ItemStack(pending))
+        local leftover = meta:get_inventory():add_item(AC_OUTPUT_LIST, ItemStack(pending))
+        if not leftover:is_empty() then
+          minetest.item_drop(leftover, nil, pos)
+        end
       end
       for _, pData in pairs(accessPointForms) do
         if vector.equals(pData.position, pos) then
