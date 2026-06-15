@@ -1,7 +1,7 @@
 logistica.VERSION = {
   major = 2,
   minor = 0,
-  patch = 3,
+  patch = 4,
 }
 
 logistica.VERSION_STRING = logistica.VERSION.major.."."..logistica.VERSION.minor.."."..logistica.VERSION.patch
