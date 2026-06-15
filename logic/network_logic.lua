@@ -127,9 +127,14 @@ function logistica.get_network_id_or_nil(pos)
   if not network then return nil else return network.controller end
 end
 
+-- Set by rescan_network to suppress on_connect_to_network for nodes that were
+-- already on the network before the rescan. Their state has not changed.
+local rescan_skip_notify = nil
+
 local function notify_connected(pos, nodeName, networkId)
   -- set the cached network ID first
   set_cache_network_id(minetest.get_meta(pos), networkId)
+  if rescan_skip_notify and rescan_skip_notify[p2h(pos)] then return end
   local def = minetest.registered_nodes[nodeName]
   if def and def.logistica and def.logistica.on_connect_to_network then
     def.logistica.on_connect_to_network(pos, networkId)
@@ -434,7 +439,10 @@ local function update_all_network_caches(network)
   logistica.update_cache_network(network, LOG_CACHE_SUPPLIER)
 end
 
-local function create_network(controllerPosition, oldNetworkName)
+-- initialSignals: optional {name -> {hash -> true}} copied from previous network so that
+-- on_connect_to_network callbacks that call signal_get_state see the right state.
+-- Stale sender entries are cleaned up via notify_disconnected -> signal_remove_sender.
+local function create_network(controllerPosition, oldNetworkName, initialSignals)
   local node = minetest.get_node(controllerPosition)
   if not node.name:find("_controller") or not node.name:find("logistica:") then return false end
   local meta = minetest.get_meta(controllerPosition)
@@ -456,6 +464,13 @@ local function create_network(controllerPosition, oldNetworkName)
   network.supplier_cache = {}
   network.requester_cache = {}
   network.signals = {}  -- {signal_name -> {sender_hash -> true}} for all active ON senders
+  if initialSignals then
+    for name, senders in pairs(initialSignals) do
+      local copy = {}
+      for senderHash, _ in pairs(senders) do copy[senderHash] = true end
+      if not logistica.table_is_empty(copy) then network.signals[name] = copy end
+    end
+  end
   network._num_nodes = 0
 
   local startPos = { [controllerHash] = true }
@@ -489,8 +504,11 @@ local function rescan_network(networkId)
   local controllerPosition = h2p(conHash)
   local oldNetworkName = network.name
   local oldHashes = collect_network_hashes(network)
+  local oldSignals = network.signals
   clear_network(networkId, true)
-  create_network(controllerPosition, oldNetworkName)
+  rescan_skip_notify = oldHashes
+  create_network(controllerPosition, oldNetworkName, oldSignals)
+  rescan_skip_notify = nil
   local newNetwork = networks[conHash]
   for hash, _ in pairs(oldHashes) do
     if not newNetwork or not network_contains_hash(newNetwork, hash) then
@@ -967,12 +985,15 @@ end
 -- Send a named signal ON or OFF from pos. Notifies all receivers on the network.
 -- Uses OR semantics: signal is ON as long as any sender has it ON.
 -- Gate receivers are processed breadth-first to prevent unbounded recursion.
+-- Receivers are only notified when the aggregate signal state actually changes,
+-- preventing flip-flop gates from toggling on every poll of a persistent sender.
 function logistica.signal_send(pos, name, isOn)
   if not name or name == "" then return end
   local network = logistica.get_network_or_nil(pos)
   if not network then return end
   local hash = p2h(pos)
   if not network.signals[name] then network.signals[name] = {} end
+  local prevIsOn = not logistica.table_is_empty(network.signals[name])
   if isOn then
     network.signals[name][hash] = true
   else
@@ -982,6 +1003,7 @@ function logistica.signal_send(pos, name, isOn)
     end
   end
   local signalIsOn = network.signals[name] ~= nil
+  if signalIsOn == prevIsOn then return end
   if network._propagation then
     notify_signal_receivers(network, name, signalIsOn)
     return
