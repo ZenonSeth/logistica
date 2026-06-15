@@ -1142,7 +1142,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
         return 0
       end
       -- remove the sometimes manually added count display - and set the stack in the inventory slot
-      taken:get_meta():set_string("count_meta", nil)
+      taken:get_meta():set_string("count_meta", "")
       inv:set_stack(listname, index, taken)
       return math.min(taken:get_count(), stackMax)
     else -- individual items are trickier
@@ -1160,7 +1160,7 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
         return 0
       end
       -- remove the sometimes manually added count display - and set the stack in the inventory slot
-      taken:get_meta():set_string("count_meta", nil)
+      taken:get_meta():set_string("count_meta", "")
       inv:set_stack(listname, index, taken)
       return taken:get_count()
     end
