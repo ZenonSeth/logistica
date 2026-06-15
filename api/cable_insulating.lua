@@ -2,7 +2,7 @@ local S = logistica.TRANSLATOR
 local SIZE = logistica.settings.cable_size
 
 -- shape = "straight" (default, group value 1): connects front-to-back only.
--- shape = "l_shape"  (group value 2): connects front arm (z-) and right arm (x+).
+-- shape = "l_shape"  (group value 2): connects front arm (z-) and left arm (x+) at default rotation.
 -- Network scan enforces the direction; all other faces are insulated.
 function logistica.register_insulating_cable(desc, name, customTiles, shape)
   local lname = string.lower(name)
@@ -51,6 +51,26 @@ function logistica.register_insulating_cable(desc, name, customTiles, shape)
     node_box = node_box,
     on_construct = function(pos) logistica.on_cable_insulating_change(pos) end,
     after_dig_node = function(pos, oldnode, oldmeta, _) logistica.on_cable_insulating_change(pos, oldnode, oldmeta) end,
+    on_punch = function(pos, node, player, _)
+      if not player or not player:is_player() then return end
+      if not player:get_player_control().sneak then return end
+      local d = logistica.get_rot_directions(node.param2)
+      if not d then return end
+      local key = tostring(minetest.hash_node_position(pos))
+      if isL then
+        logistica.show_input_at(vector.add(pos, d.forward), key .. "a")
+        logistica.show_input_at(vector.add(pos, d.left),    key .. "b")
+      else
+        logistica.show_input_at(vector.add(pos, d.forward),  key .. "a")
+        logistica.show_input_at(vector.add(pos, d.backward), key .. "b")
+      end
+    end,
+    on_rotate = function(pos, node, _player, _mode, newParam2)
+      node.param2 = newParam2
+      minetest.set_node(pos, node)
+      logistica.rescan_network_at_pos(pos)
+      return true
+    end,
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10,
   }
