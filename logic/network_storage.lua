@@ -168,6 +168,8 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
           logistica.GROUPS.suppliers.is(nodeName)
           or logistica.GROUPS.vaccuum_suppliers.is(nodeName)
           or logistica.GROUPS.bucket_emptiers.is(nodeName)
+          or logistica.GROUPS.wood_suppliers.is(nodeName)
+          or logistica.GROUPS.farming_suppliers.is(nodeName)
       )
     then
       normalSupplierResult = logistica.take_item_from_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun)
@@ -465,7 +467,9 @@ function logistica.count_items_in_network(itemName, network, respectReserve)
       logistica.load_position(pos)
       local nodeName = minetest.get_node(pos).name
       if logistica.GROUPS.suppliers.is(nodeName)
-          or logistica.GROUPS.vaccuum_suppliers.is(nodeName) then
+          or logistica.GROUPS.vaccuum_suppliers.is(nodeName)
+          or logistica.GROUPS.wood_suppliers.is(nodeName)
+          or logistica.GROUPS.farming_suppliers.is(nodeName) then
         local list = logistica.get_list(minetest.get_meta(pos):get_inventory(), SUPPLIER_LIST_NAME)
         for _, stack in ipairs(list) do
           if stack:get_name() == itemName then
