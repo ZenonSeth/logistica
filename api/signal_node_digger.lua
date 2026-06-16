@@ -61,7 +61,7 @@ local function get_formspec(pos, playerName)
     "list["..posForm..";main;0.5,8.05;8,2;0]"..
     logistica.player_inv_formspec(0.5, 10.8)..
     "listring[current_player;main]"..
-    "listring["..posForm..";main]"
+    "listring["..posForm..";tool]"
 end
 
 local function show_formspec(pos, playerName)
@@ -139,8 +139,6 @@ function logistica.register_signal_node_digger(desc, name, tiles)
       reshow_for_pos(pos)
       return 0
     elseif listname == "tool" then
-      return stack:get_count()
-    elseif listname == "main" then
       return stack:get_count()
     end
     return 0
