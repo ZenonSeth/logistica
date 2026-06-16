@@ -146,6 +146,16 @@ local function formspec_get_cfg_buttons()
 end
 
 -- `meta` is optional
+local function mass_storage_has_filter(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  local filterList = inv:get_list("filter")
+  if not filterList then return false end
+  for _, stack in ipairs(filterList) do
+    if not stack:is_empty() then return true end
+  end
+  return false
+end
+
 local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local upgradeInvString = upgrade_inv(posForm, numUpgradeSlots, 3.8)
@@ -154,6 +164,12 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
   local imgPickX = 1.65
   local imgPickY = 0.1
   local swapButtonsString = upgrade_swap_buttons(pos, numUpgradeSlots, 3.8)
+  local hasFilter = mass_storage_has_filter(pos)
+  local depositBtn = ""
+  if hasFilter then
+    depositBtn = "button[3.0,3.9;2.0,0.75;deposit;"..FS("Deposit").."]"..
+      "tooltip[deposit;"..FS("Deposit all filtered items from inventory into storage").."]"
+  end
   return "formspec_version[4]"..
     "size["..logistica.inv_size(12, 11.5).."]" ..
     logistica.ui.background..
@@ -175,6 +191,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "listring[current_player;main]"..
     upgradeInvString..
     swapButtonsString..
+    depositBtn..
     "label[1.55,5.15;"..FS("Slot Storage Capacity: ")..logistica.get_mass_storage_max_size(pos).."]"..
     "tooltip[0.25,1.9;1,1;"..STORAGE_TOOLTIP.."]"..
     "tooltip[0.2,3.8;1,1;"..INPUT_TOOLTIP.."]"..
@@ -325,6 +342,9 @@ local function on_receive_storage_formspec(player, formname, fields)
   if fields.quit and not fields.key_enter_field then
     logistica.update_mass_storage_front_image(pos)
     storageForms[playerName] = nil
+  elseif fields.deposit then
+    logistica.mass_storage_deposit_from_player(pos, playerName)
+    show_mass_storage_formspec(pos, playerName)
   else
     for i = 1, 8 do
       if fields["ico"..i] then

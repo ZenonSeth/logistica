@@ -194,6 +194,31 @@ function logistica.try_to_add_player_wield_item_to_mass_storage(pos, player)
   show_deposited_item_popup(player, numDesposited, wieldStack:get_short_description())
 end
 
+function logistica.mass_storage_deposit_from_player(pos, playerName)
+  local player = minetest.get_player_by_name(playerName)
+  if not player then return end
+  local meta = minetest.get_meta(pos)
+  local inv = meta:get_inventory()
+  local filterList = logistica.get_list(inv, "filter")
+  local allowedItems = {}
+  for _, fStack in ipairs(filterList) do
+    if not fStack:is_empty() then
+      allowedItems[fStack:get_name()] = true
+    end
+  end
+  if not next(allowedItems) then return end
+  local playerInv = player:get_inventory()
+  for i = 1, playerInv:get_size("main") do
+    local pStack = playerInv:get_stack("main", i)
+    if not pStack:is_empty() and allowedItems[pStack:get_name()] then
+      local leftover = logistica.insert_item_into_mass_storage(pos, inv, pStack)
+      if leftover:get_count() < pStack:get_count() then
+        playerInv:set_stack("main", i, leftover)
+      end
+    end
+  end
+end
+
 function logistica.set_mass_storage_reserve(meta, i, value)
   meta:set_int(META_RES_VAL..tostring(i), value)
 end
