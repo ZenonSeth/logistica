@@ -46,7 +46,7 @@
 ### Maybe
 - Lava generator - but slow -- DONE (Rock Melter: logistica:rock_melter; read-only lava reservoir on the network)
 - Mass Storage - filled up indicators
-- Passive Supply Chest - allow storing rules (e.g. whitelist items allowed to be stored in it)
+- Passive Supply Chest - allow storing rules (e.g. whitelist items allowed to be stored in it) -- DONE
 - Vacuum Chest - add pushing option
 - Signal sender: Network content (#liquid) -- DONE (signal_liquid_counter: prev/next liquid selector with texture + curr/max display, >=/<= condition, bucket threshold, named signal; empty signal name = no send)
 - Signal sender: Digiline output -- EXPERIMENTAL (digiline_sender: polls network every 1s, 8 item filter slots, signal monitoring, freeform message template with %sN/%iM placeholders, optional parse-as-table, Help tab with examples; requires digilines mod)
@@ -60,10 +60,10 @@
   - Add advanced autocrafting -- DONE (Easy Crafting tab: search, recipe view, basic craft to ac_output, recursive craft with queue display; two upgrade tiers: autocrafting_upgrade / autocrafting_recursive_upgrade)
   - Make allocating mass storage slots possible from access point -- DONE (Storage Management tab)
 - Item monitoring station -- DONE (logistica:item_monitor; logic/item_monitor.lua + api/item_monitor.lua; tracks up to 8 items, configurable interval, rolling graph with per-point tooltips, monitor-stand nodebox, custom textures)
-- Digilines compat
-- On-demand node-breaker
+- Digilines compat -- DONE
+- On-demand node-breaker -- DONE
 - On-demand node cracker
-- Node placer
+- Node placer -- DONE
 - Named interactors?
   - Allow you to remotely place and get things from other blocks, e.g. furnaces
 - Network Bridge Provider + Network Bridge Receiver
@@ -85,4 +85,4 @@
 - Direct pipeworks compatibility
 - Direct tubelib compatibility
 - API improvements
-- Rework old UI icons to be.. 48x48? 64x64? something else?
+- Rework old UI icons to be.. 48x48? 64x64? something else? -- DONE
