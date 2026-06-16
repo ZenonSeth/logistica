@@ -22,6 +22,7 @@ local RESULT_TOO_MANY  = 3
 local RESULT_INV_FULL  = 4
 
 local META_SAVED_SAPLING = "saved_sapling"
+local META_CUT_INTERRUPTED = "cut_interrupted"
 
 local TRUNK_DIRS = {
   vector.new( 1, 0, 0),
@@ -198,6 +199,7 @@ schedule_next_cut = function(machine_pos, enabled_name, gen, nodes, idx, trunk_n
     if meta:get_int(META_CUT_GEN) ~= gen then return end
     if not logistica.get_network_or_nil(machine_pos) then
       meta:set_int(META_IS_CUTTING, 0)
+      meta:set_int(META_CUT_INTERRUPTED, 1)
       meta:set_int(META_CUT_GEN, meta:get_int(META_CUT_GEN) + 1)
       logistica.start_node_timer(machine_pos, CYCLE_TIME)
       return
@@ -341,10 +343,14 @@ local function start_harvest(machine_pos, enabled_name)
   end
 
   local gen = meta:get_int(META_CUT_GEN) + 1
+  local was_interrupted = meta:get_int(META_CUT_INTERRUPTED) == 1
   meta:set_int(META_CUT_GEN, gen)
   meta:set_int(META_IS_CUTTING, 1)
   meta:set_int(META_HARVEST_RESULT, 0)
-  meta:set_string(META_SAVED_SAPLING, "")
+  meta:set_int(META_CUT_INTERRUPTED, 0)
+  if not was_interrupted then
+    meta:set_string(META_SAVED_SAPLING, "")
+  end
 
   local sapling_tree_pos = has_leaves_upgrade(machine_pos) and tree_pos or nil
   schedule_next_cut(machine_pos, enabled_name, gen, all_nodes, 1, tree_name, expected_leaf_name, 0, sapling_tree_pos, false)
@@ -362,6 +368,9 @@ end
 
 function logistica.woodcutter_on_power(pos, _power)
   local meta = minetest.get_meta(pos)
+  if meta:get_int(META_IS_CUTTING) == 1 then
+    meta:set_int(META_CUT_INTERRUPTED, 1)
+  end
   meta:set_int(META_IS_CUTTING, 0)
   meta:set_int(META_CUT_GEN, meta:get_int(META_CUT_GEN) + 1)
   logistica.set_node_tooltip_from_state(pos)
