@@ -1,6 +1,6 @@
 local FS = logistica.FTRANSLATOR
 
-local NUM_REQUEST_SLOTS = 4 -- maybe at some point make this a param, but why?
+local NUM_REQUEST_SLOTS = 8
 local PUSH_LIST_PICKER = "push_pick"
 local ON_OFF_BUTTON = "on_off_btn"
 local AMOUNT_FIELD_PREFIX = "reqamt"
@@ -12,7 +12,7 @@ local requesterForms = {}
 local function get_amount_fields(amounts, x, y)
   local fields = {}
   for i = 1, NUM_REQUEST_SLOTS do
-    local fx = x + (i - 1) * 1.25
+    local fx = x + (i - 1) * 1.24
     fields[i] = "field["..(fx)..","..y..";1.1,0.6;"..AMOUNT_FIELD_PREFIX..i..";;"..(amounts[i] or 0).."]"
   end
   return table.concat(fields)
@@ -25,23 +25,28 @@ local function get_requester_formspec(pos)
   local isOn = logistica.is_machine_on(pos)
   local amounts = logistica.get_requester_slot_amounts(pos)
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.6, 9.0).."]" ..
+    "size["..logistica.inv_size(10.6, 10.5).."]" ..
     logistica.ui.background..
     logistica.ui.button_only_style..
-    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 6.7, 1.5, pushPos, selectedList, FS("Put items in:"))..
-    logistica.ui.on_off_btn(isOn, 9.3, 1.3, ON_OFF_BUTTON, FS("Enable"))..
+    logistica.ui.push_list_picker(PUSH_LIST_PICKER, 0.5, 3.9, pushPos, selectedList, FS("Put items in:"))..
+    logistica.ui.on_off_btn(isOn, 3.0, 3.8, ON_OFF_BUTTON, FS("Enable"))..
     "label[0.5,0.4;"..FS("Request items from network and put them into the target inventory").."]"..
-    "list["..posForm..";filter;0.5,1.0;"..NUM_REQUEST_SLOTS..",1;0]"..
-    "label[0.5,2.3;"..FS("Request up to:").."]"..
+    "list["..posForm..";filter;0.5,1.0;8,1;0]"..
+    "label[0.5,2.2;"..FS("Request up to (per slot):").."]"..
     get_amount_fields(amounts, 0.5, 2.5)..
-    "button[5.55,2.5;1.0,0.6;"..SAVE_BUTTON..";Save]"..
-    logistica.player_inv_formspec(0.5, 3.5)..
+    "button[9.25,3.9;1.0,0.6;"..SAVE_BUTTON..";Save]"..
+    logistica.player_inv_formspec(0.5, 5.0)..
     "listring[current_player;main]"..
     "listring["..posForm..";filter]"
 end
 
 local function show_requester_formspec(playerName, pos)
   logistica.migrate_requester_slot_amounts(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  if inv:get_size("filter") < NUM_REQUEST_SLOTS then
+    inv:set_size("filter", NUM_REQUEST_SLOTS)
+    inv:set_size("actual", NUM_REQUEST_SLOTS)
+  end
   requesterForms[playerName] = {position = pos}
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_requester_formspec(pos))
 end

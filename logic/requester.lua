@@ -1,6 +1,6 @@
 local TIMER_DURATION_SHORT = 1.0
 local TIMER_DURATION_LONG = 3.0
-local NUM_REQUEST_SLOTS = 4
+local NUM_REQUEST_SLOTS = 8
 local META_REQUESTER_LISTNAME = "demtarlist"
 local META_REQUESTER_AMOUNT_ = "reqamt"
 local OLD_META_INF_PREFIX = "infreq"
