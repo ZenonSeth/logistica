@@ -34,8 +34,24 @@ function logistica.put_item_in_supplier(pos, stack, isAutomated)
   else
     if meta:get_string(META_ALLOW_AP) == "0" then return stack end
   end
+  local inv = meta:get_inventory()
+  local filterList = inv:get_list("filter")
+  if filterList then
+    local hasAnyFilter = false
+    local itemAllowed = false
+    local itemName = stack:get_name()
+    for _, filterStack in ipairs(filterList) do
+      if not filterStack:is_empty() then
+        hasAnyFilter = true
+        if filterStack:get_name() == itemName then
+          itemAllowed = true
+          break
+        end
+      end
+    end
+    if hasAnyFilter and not itemAllowed then return stack end
+  end
   local origCount = stack:get_count()
-  local inv = minetest.get_meta(pos):get_inventory()
   local leftover = inv:add_item(META_SUPPLIER_LIST, stack)
   if leftover:get_count() < origCount then
     logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
@@ -89,4 +105,35 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
   end
 
   return ret(remaining, "Not enough items to fulfil entire request")
+end
+
+function logistica.supplier_deposit_from_player(pos, playerName)
+  local player = minetest.get_player_by_name(playerName)
+  if not player then return end
+  local meta = minetest.get_meta(pos)
+  local inv = meta:get_inventory()
+  local filterList = inv:get_list("filter")
+  if not filterList then return end
+  local allowedItems = {}
+  for _, fStack in ipairs(filterList) do
+    if not fStack:is_empty() then
+      allowedItems[fStack:get_name()] = true
+    end
+  end
+  if not next(allowedItems) then return end
+  local playerInv = player:get_inventory()
+  local changed = false
+  for i = 1, playerInv:get_size("main") do
+    local pStack = playerInv:get_stack("main", i)
+    if not pStack:is_empty() and allowedItems[pStack:get_name()] then
+      local leftover = inv:add_item(META_SUPPLIER_LIST, pStack)
+      if leftover:get_count() < pStack:get_count() then
+        playerInv:set_stack("main", i, leftover)
+        changed = true
+      end
+    end
+  end
+  if changed then
+    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  end
 end
