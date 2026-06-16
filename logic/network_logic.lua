@@ -280,10 +280,21 @@ end
 -- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
 local function find_adjacent_networks(pos)
   local currNetwork = nil
+  local selfIsToggler = logistica.GROUPS.signal_togglers.is(minetest.get_node(pos).name)
   for _, adj in pairs(adjacent) do
     local otherPos = vector.add(pos, adj)
-    local otherNodeName = minetest.get_node(otherPos).name
-    if logistica.GROUPS.cables.is(otherNodeName) or logistica.GROUPS.controllers.is(otherNodeName) then
+    local otherNode = minetest.get_node(otherPos)
+    local otherNodeName = otherNode.name
+    -- an ON signal toggler relays the network to whatever it's facing, same as the full network scan does
+    local isActiveTogglerRelay = logistica.GROUPS.signal_togglers.is(otherNodeName) and ends_with(otherNodeName, ON_SUFFIX)
+    if isActiveTogglerRelay and selfIsToggler then
+      -- mirror the scan's one-way gate: block another toggler from entering via the backward (output) face
+      local d = logistica.get_rot_directions(otherNode.param2)
+      if d and adj.x == d.forward.x and adj.y == d.forward.y and adj.z == d.forward.z then
+        isActiveTogglerRelay = false
+      end
+    end
+    if logistica.GROUPS.cables.is(otherNodeName) or logistica.GROUPS.controllers.is(otherNodeName) or isActiveTogglerRelay then
       local otherNetwork = logistica.get_network_or_nil(otherPos)
       if otherNetwork ~= nil then
         if currNetwork == nil then currNetwork = otherNetwork
