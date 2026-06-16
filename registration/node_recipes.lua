@@ -167,18 +167,20 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
-  output = L("cobblegen_supplier"),
-  recipe = {
-    {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
-    {L("optic_cable"),    L("photonizer"),          itemstrings.nodebreaker},
-    {L("silverin_plate"), itemstrings.water_bucket, L("silverin_plate")},
-  },
-  replacements = {
-    {itemstrings.water_bucket, itemstrings.empty_bucket},
-    {itemstrings.lava_bucket,  itemstrings.empty_bucket},
-  }
-})
+if logistica.settings.enable_cobblestone_supplier then
+  logistica.register_craft({
+    output = L("cobblegen_supplier"),
+    recipe = {
+      {L("silverin_plate"), itemstrings.lava_bucket,  L("silverin_plate")},
+      {L("optic_cable"),    L("photonizer"),          itemstrings.nodebreaker},
+      {L("silverin_plate"), itemstrings.water_bucket, L("silverin_plate")},
+    },
+    replacements = {
+      {itemstrings.water_bucket, itemstrings.empty_bucket},
+      {itemstrings.lava_bucket,  itemstrings.empty_bucket},
+    }
+  })
+end -- enable_cobblestone_supplier
 
 if logistica.settings.enable_wireless_access_pad then
   logistica.register_craft({

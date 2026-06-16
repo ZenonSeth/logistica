@@ -95,14 +95,16 @@ logistica.register_insulating_cable(S("Insulated Optic Cable (L-Shape)"), "cable
 -- Cobble Generator
 --------------------------------
 
-logistica.register_cobble_generator_supplier(S("Cobble Generator"), "cobblegen_supplier", {
-  "logistica_cobblegen_top.png",
-  "logistica_cobblegen_bottom.png",
-  "logistica_cobblegen_side.png^[transformFX",
-  "logistica_cobblegen_side.png",
-  "logistica_cobblegen_back.png",
-  "logistica_cobblegen_front.png",
-})
+if logistica.settings.enable_cobblestone_supplier then
+  logistica.register_cobble_generator_supplier(S("Cobble Generator"), "cobblegen_supplier", {
+    "logistica_cobblegen_top.png",
+    "logistica_cobblegen_bottom.png",
+    "logistica_cobblegen_side.png^[transformFX",
+    "logistica_cobblegen_side.png",
+    "logistica_cobblegen_back.png",
+    "logistica_cobblegen_front.png",
+  })
+end -- enable_cobblestone_supplier
 
 --------------------------------
 -- Controller

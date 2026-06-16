@@ -58,6 +58,8 @@ logistica.settings.enable_node_digger = get_bool("enable_node_digger", true)
 
 logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)
 
+logistica.settings.enable_cobblestone_supplier = get_bool("enable_cobblestone_supplier", true)
+
 logistica.settings.node_detector_max_distance = get_int("node_detector_max_distance", 16, 1, 32)
 
 logistica.settings.node_digger_max_distance = get_int("node_digger_max_distance", 16, 1, 32)
