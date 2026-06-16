@@ -277,36 +277,6 @@ local function break_logistica_node(pos)
   end
 end
 
--- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
-local function find_adjacent_networks(pos)
-  local currNetwork = nil
-  local selfIsToggler = logistica.GROUPS.signal_togglers.is(minetest.get_node(pos).name)
-  for _, adj in pairs(adjacent) do
-    local otherPos = vector.add(pos, adj)
-    local otherNode = minetest.get_node(otherPos)
-    local otherNodeName = otherNode.name
-    -- an ON signal toggler relays the network to whatever it's facing, same as the full network scan does
-    local isActiveTogglerRelay = logistica.GROUPS.signal_togglers.is(otherNodeName) and ends_with(otherNodeName, ON_SUFFIX)
-    if isActiveTogglerRelay and selfIsToggler then
-      -- mirror the scan's one-way gate: block another toggler from entering via the backward (output) face
-      local d = logistica.get_rot_directions(otherNode.param2)
-      if d and adj.x == d.forward.x and adj.y == d.forward.y and adj.z == d.forward.z then
-        isActiveTogglerRelay = false
-      end
-    end
-    if logistica.GROUPS.cables.is(otherNodeName) or logistica.GROUPS.controllers.is(otherNodeName) or isActiveTogglerRelay then
-      local otherNetwork = logistica.get_network_or_nil(otherPos)
-      if otherNetwork ~= nil then
-        if currNetwork == nil then currNetwork = otherNetwork
-        elseif currNetwork ~= otherNetwork then return 2, nil end
-      end
-    end
-  end
-  local numNetworks = 1
-  if currNetwork == nil then numNetworks = 0 end
-  return numNetworks, currNetwork
-end
-
 -- Returns 1 for straight insulating cable, 2 for L-shape, 0 for not insulating.
 local function get_insul_type(nodeName)
   return minetest.get_item_group(nodeName, "logistica_insulating")
@@ -341,6 +311,44 @@ local function insul_allows_entry(offset, d, insulType)
     return vec_eq(offset, d.backward) or vec_eq(offset, d.right)
   end
   return true
+end
+
+-- returns a numberOfNetworks (which is 0, 1, 2), networkOrNil
+local function find_adjacent_networks(pos)
+  local currNetwork = nil
+  local selfIsToggler = logistica.GROUPS.signal_togglers.is(minetest.get_node(pos).name)
+  for _, adj in pairs(adjacent) do
+    local otherPos = vector.add(pos, adj)
+    local otherNode = minetest.get_node(otherPos)
+    local otherNodeName = otherNode.name
+    local isCable = logistica.GROUPS.cables.is(otherNodeName)
+    if isCable then
+      -- block connecting through an insulating cable on a non-permitted face, same as the full network scan does
+      local insulType = get_insul_type(otherNodeName)
+      if insulType > 0 and not insul_allows_entry(adj, logistica.get_rot_directions(otherNode.param2), insulType) then
+        isCable = false
+      end
+    end
+    -- an ON signal toggler relays the network to whatever it's facing, same as the full network scan does
+    local isActiveTogglerRelay = logistica.GROUPS.signal_togglers.is(otherNodeName) and ends_with(otherNodeName, ON_SUFFIX)
+    if isActiveTogglerRelay and selfIsToggler then
+      -- mirror the scan's one-way gate: block another toggler from entering via the backward (output) face
+      local d = logistica.get_rot_directions(otherNode.param2)
+      if d and vec_eq(adj, d.forward) then
+        isActiveTogglerRelay = false
+      end
+    end
+    if isCable or logistica.GROUPS.controllers.is(otherNodeName) or isActiveTogglerRelay then
+      local otherNetwork = logistica.get_network_or_nil(otherPos)
+      if otherNetwork ~= nil then
+        if currNetwork == nil then currNetwork = otherNetwork
+        elseif currNetwork ~= otherNetwork then return 2, nil end
+      end
+    end
+  end
+  local numNetworks = 1
+  if currNetwork == nil then numNetworks = 0 end
+  return numNetworks, currNetwork
 end
 
 local function recursive_scan_for_nodes_for_controller(network, positionHashes, numScanned)
