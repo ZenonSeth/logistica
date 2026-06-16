@@ -168,6 +168,7 @@ You can collectively access all Mass Storage on a particular network from an Acc
 - Can be upgraded to increase inventory size, up to a maximum of 65,535 per slot
 - Select Front Image: selects a stored item to display on the front of the storage node
 - Can quickly deposit items by punching it with a stack, or sneak-punching to deposit all matching stacks from your inventory
+- A Deposit button appears when at least one filter slot is configured, allowing you to deposit all matching items from your inventory into the storage
 
 Each storage slot has a Configure button (the small button below each slot). Pressing it opens the slot config:
 
@@ -197,6 +198,10 @@ Two toggles control what may store items into the chest:
 - Allow Storing from Access Point: when enabled, items inserted via an Access Point are stored here if there is no other suitable storage.
 
 Both are enabled by default. Disabling both effectively makes the chest read-only from the network's point of view, supplying items out but accepting nothing in automatically.
+
+A filter list of 8 slots controls which items are allowed to be stored into the chest. If the filter is empty, any item is accepted. If one or more items are placed in the filter, only those items can be stored - both by machines and by the Access Point.
+
+When the filter is not empty, a Deposit button appears. Clicking it will move all matching items from your inventory into the chest.
 ]])
 
 g.network_importer = S([[
