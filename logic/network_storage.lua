@@ -482,3 +482,74 @@ function logistica.count_items_in_network(itemName, network, respectReserve)
 
   return count
 end
+
+-- Same sources/exclusions as count_items_in_network, but stops scanning as soon as
+-- the threshold comparison is decided (count is monotonically increasing during the
+-- scan, so the early-stopped count still satisfies the same comparison as the full
+-- count would).
+local function count_items_until_decided(itemName, network, respectReserve, threshold, stopAbove)
+  if not itemName or itemName == "" then return 0 end
+  local count = 0
+
+  local function should_stop()
+    if stopAbove then return count >= threshold end
+    return count > threshold
+  end
+
+  local massLocations = network.storage_cache[itemName]
+  if massLocations then
+    for hash, _ in pairs(massLocations) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local meta = minetest.get_meta(pos)
+      local list = logistica.get_list(meta:get_inventory(), MASS_STORAGE_LIST_NAME)
+      for i, stack in ipairs(list) do
+        if stack:get_name() == itemName then
+          local available = stack:get_count()
+          if respectReserve then
+            available = math.max(0, available - logistica.get_mass_storage_reserve(meta, i))
+          end
+          count = count + available
+          if should_stop() then return count end
+        end
+      end
+    end
+  end
+
+  local supplierLocations = network.supplier_cache[itemName]
+  if supplierLocations then
+    for hash, _ in pairs(supplierLocations) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local nodeName = minetest.get_node(pos).name
+      if logistica.GROUPS.suppliers.is(nodeName)
+          or logistica.GROUPS.vaccuum_suppliers.is(nodeName)
+          or logistica.GROUPS.wood_suppliers.is(nodeName)
+          or logistica.GROUPS.farming_suppliers.is(nodeName) then
+        local list = logistica.get_list(minetest.get_meta(pos):get_inventory(), SUPPLIER_LIST_NAME)
+        for _, stack in ipairs(list) do
+          if stack:get_name() == itemName then
+            count = count + stack:get_count()
+            if should_stop() then return count end
+          end
+        end
+      end
+    end
+  end
+
+  return count
+end
+
+-- True if the network contains at least `threshold` of itemName. Stops scanning
+-- as soon as the threshold is reached.
+function logistica.network_has_at_least(itemName, network, threshold, respectReserve)
+  local count = count_items_until_decided(itemName, network, respectReserve, threshold, true)
+  return count >= threshold
+end
+
+-- True if the network contains at most `threshold` of itemName. Stops scanning
+-- as soon as the count exceeds the threshold.
+function logistica.network_has_at_most(itemName, network, threshold, respectReserve)
+  local count = count_items_until_decided(itemName, network, respectReserve, threshold, false)
+  return count <= threshold
+end
