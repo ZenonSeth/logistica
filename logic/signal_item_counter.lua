@@ -80,7 +80,6 @@ local function do_evaluate(pos, networkId)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not network then return end
   local respectReserve = logistica.signal_item_counter_get_respect_reserve(pos)
-  local count = logistica.count_items_in_network(itemName, network, respectReserve)
   local threshold = logistica.signal_item_counter_get_threshold(pos)
   local comparison = logistica.signal_item_counter_get_comparison(pos)
   local sigName = logistica.signal_item_counter_get_signal_name(pos)
@@ -90,8 +89,12 @@ local function do_evaluate(pos, networkId)
     logistica.signal_item_counter_update_infotext(pos)
     return
   end
-  local conditionMet = (comparison == ">=") and (count >= threshold)
-                    or (comparison == "<=") and (count <= threshold)
+  local conditionMet
+  if comparison == ">=" then
+    conditionMet = logistica.network_has_at_least(itemName, network, threshold, respectReserve)
+  else
+    conditionMet = logistica.network_has_at_most(itemName, network, threshold, respectReserve)
+  end
   logistica.signal_send(pos, sigName, conditionMet)
   set_visual(pos, conditionMet)
   logistica.signal_item_counter_update_infotext(pos)
