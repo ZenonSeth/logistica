@@ -54,7 +54,7 @@
 - Signal receiver: Display Unit
 - Signal Monitor -- DONE (logistica:signal_monitor; logic/signal_monitor.lua + api/signal_monitor.lua; live signal list with ON/OFF state, per-signal sender detail panel with chat-send on click, search filter, live update mode, per-network state persistence in memory)
 - Automatic Packer + Unpacker - detect crafting loops (e.g. 9 ingots = 1 block = 9 ingots) at load time, make a machine that enables that conversion by default on a network
-- Filters on Vacuum chest
+- Filters on Vacuum chest -- DONE
 - Access Point
   - Add tabs to access point -- DONE (Items tab + Storage Management tab)
   - Add advanced autocrafting -- DONE (Easy Crafting tab: search, recipe view, basic craft to ac_output, recursive craft with queue display; two upgrade tiers: autocrafting_upgrade / autocrafting_recursive_upgrade)
