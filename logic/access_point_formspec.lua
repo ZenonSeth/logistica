@@ -918,10 +918,23 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
     "list[current_player;craftpreview;3.9,"..(9.0+TAB_Y)..";1,1;]"
 end
 
+local function clear_stale_ac_queue(pos)
+  local posHash = minetest.hash_node_position(pos)
+  if activeAcQueues[posHash] then return end
+  local meta = minetest.get_meta(pos)
+  if meta:get_string("ac_queue") == "" and meta:get_string("ac_pending_to_take") == "" then return end
+  meta:set_string("ac_queue", "")
+  meta:set_string("ac_pending_to_take", "")
+  meta:set_string("ac_pending_output", "")
+  meta:set_int("ac_queue_pos", 0)
+  meta:set_int("ac_queue_cur_count", 0)
+end
+
 local function ensure_ap_inventories(pos)
   local inv = minetest.get_meta(pos):get_inventory()
   if inv:get_size(logistica.AP_UPGRADE_LIST) < 1 then inv:set_size(logistica.AP_UPGRADE_LIST, 1) end
   get_or_create_output_inv(pos)
+  clear_stale_ac_queue(pos)
 end
 
 local function show_access_point_formspec(pos, playerName, optError)
