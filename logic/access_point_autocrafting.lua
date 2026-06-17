@@ -195,14 +195,14 @@ function logistica.ac_get_max_craftable(recipe, network, player, use_player_inv)
   return min_times == math.huge and 0 or min_times
 end
 
--- Craft recipe up to `count` times, placing output in the ac_output node inventory at pos.
+-- Craft recipe up to `count` times, placing output in the detached ac_output inventory.
 -- With use_player_inv=true, takes from network first then player inventory for remainder.
 -- Returns crafted_count, error_msg.
 function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, pos)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not network then return 0, "No network" end
   local player_inv = player:get_inventory()
-  local node_inv = minetest.get_meta(pos):get_inventory()
+  local out_inv = logistica.get_ac_output_inv(pos)
   local crafted = 0
 
   local function refund(taken)
@@ -220,7 +220,7 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
     local remaining = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
     if remaining > 0 then
       st:set_count(remaining)
-      local leftover = node_inv:add_item("ac_output", st)
+      local leftover = out_inv:add_item("ac_output", st)
       if not leftover:is_empty() then minetest.item_drop(leftover, player, player:get_pos()) end
     end
   end
@@ -228,7 +228,7 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
   for _ = 1, count do
     local out_st = ItemStack(recipe.output_name)
     out_st:set_count(recipe.output_count)
-    if not node_inv:room_for_item("ac_output", out_st) then
+    if not out_inv:room_for_item("ac_output", out_st) then
       return crafted, "Output full"
     end
 
@@ -292,7 +292,7 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
       refund(taken); break
     end
 
-    local leftover = node_inv:add_item("ac_output", output.item)
+    local leftover = out_inv:add_item("ac_output", output.item)
     if not leftover:is_empty() then
       refund(taken)
       return crafted, "Output full"
@@ -304,6 +304,7 @@ function logistica.ac_craft(recipe, networkId, player, count, use_player_inv, po
     crafted = crafted + 1
   end
 
+  logistica.sync_ac_output_to_meta(pos)
   return crafted, nil
 end
 
