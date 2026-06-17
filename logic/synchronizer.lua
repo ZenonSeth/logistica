@@ -39,14 +39,15 @@ local GRAPH_XSIZE = 70.0
 local GRAPH_YMIN = -2.2
 local GRAPH_YSIZE = 4.4
 local GRAPH_STEP = 0.1
--- derived
-local SHIFT_NUM_STEPS = (SHIFT_MAX - SHIFT_MIN) / SHIFT_STEP
+-- derived (-1 to exclude SHIFT_MAX, since phase -pi and +pi are identical)
+local SHIFT_NUM_STEPS = (SHIFT_MAX - SHIFT_MIN) / SHIFT_STEP - 1
 local FREQ_NUM_STEPS = (FREQ_MAX - FREQ_MIN) / FREQ_STEP
 local BOX_SIZE = math.min(GRAPH_STEP / 2, 0.02)
 local BOX_W = BOX_SIZE * 2
 
 local ITEM_WIRELESS_CRYSTAL = "logistica:wireless_crystal"
 local ITEM_WAP = "logistica:wireless_access_pad"
+local ITEM_REC_UPGRADE = logistica.AP_RECURSIVE_UPGRADE_ITEM
 
 local COLOR_TARGET = "#6BA1FFFF"
 local COLOR_PTS_NO_MATCH = "#FFB300FF"
@@ -55,7 +56,15 @@ local COLOR_PTS_MATCH = "#CCFF00FF"
 local forms = {}
 local get_meta = minetest.get_meta
 
-local HARD_MODE = logistica.settings.wifi_upgrader_hard_mode
+local HARD_MODE_SETTING = logistica.settings.wifi_upgrader_hard_mode
+
+local function is_hard_mode(pos)
+  local inv = get_meta(pos):get_inventory()
+  if not inv:is_empty(INV_UPGRADE) then
+    if inv:get_stack(INV_UPGRADE, 1):get_name() == ITEM_REC_UPGRADE then return true end
+  end
+  return HARD_MODE_SETTING
+end
 local WAP_RANGE_UPGRADE = logistica.settings.wap_upgrade_step
 local WAP_MAX_RANGE = logistica.settings.wap_max_range
 
@@ -107,15 +116,16 @@ local function change_shift(meta, crysNum, change)
   end
 end
 
-local function waves_match(meta)
+local function waves_match(pos, meta)
+  local hardMode = is_hard_mode(pos)
   local freq1 = meta:get_int(META_F1)
   local freq2 = meta:get_int(META_F2)
-  local shft1 = (HARD_MODE and meta:get_int(META_S1)) or 0
-  local shft2 = (HARD_MODE and meta:get_int(META_S2)) or 0
+  local shft1 = (hardMode and meta:get_int(META_S1)) or 0
+  local shft2 = (hardMode and meta:get_int(META_S2)) or 0
   local freqT1 = meta:get_int(META_TF1)
-  local shftT1 = (HARD_MODE and meta:get_int(META_TS1)) or 0
+  local shftT1 = (hardMode and meta:get_int(META_TS1)) or 0
   local freqT2 = meta:get_int(META_TF2)
-  local shftT2 = (HARD_MODE and meta:get_int(META_TS2)) or 0
+  local shftT2 = (hardMode and meta:get_int(META_TS2)) or 0
   return (freq1 == freqT1 and shft1 == shftT1 and freq2 == freqT2 and shft2 == shftT2) or
          (freq2 == freqT1 and shft2 == shftT1 and freq1 == freqT2 and shft1 == shftT2)
 end
@@ -125,11 +135,12 @@ local function apply_to_wap(pos, playerName)
   local inv = meta:get_inventory()
   if inv:is_empty(INV_UPGRADE) then return end
   if not both_crystals_present(inv) then return end
-  if not waves_match(meta) then return end
+  if not waves_match(pos, meta) then return end
 
   local item = inv:get_stack(INV_UPGRADE, 1)
+  local itemName = item:get_name()
   local itemMeta = item:get_meta()
-  if item:get_name() == ITEM_WAP then
+  if itemName == ITEM_WAP then
     local currRange = itemMeta:get_int(logistica.tools.wap.meta_range_key)
     if currRange >= WAP_MAX_RANGE then
       minetest.chat_send_player(
@@ -141,6 +152,15 @@ local function apply_to_wap(pos, playerName)
     itemMeta:set_int(logistica.tools.wap.meta_range_key, newRange)
     local networkName = logistica.tools.wap.get_network_name_from_item(itemMeta)
     itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(newRange, networkName))
+    inv:set_stack(INV_UPGRADE, 1, item)
+    inv:set_stack(INV_C1, 1, ItemStack(""))
+    inv:set_stack(INV_C2, 1, ItemStack(""))
+  elseif itemName == ITEM_REC_UPGRADE then
+    if logistica.ac_is_upgrade_synced(item) then
+      minetest.chat_send_player(playerName, S("Upgrade is already synchronized"))
+      return
+    end
+    logistica.ac_sync_upgrade(item)
     inv:set_stack(INV_UPGRADE, 1, item)
     inv:set_stack(INV_C1, 1, ItemStack(""))
     inv:set_stack(INV_C2, 1, ItemStack(""))
@@ -206,17 +226,18 @@ local function get_point_boxes(x, y, w, h, f1, s1, f2, s2, color)
   )
 end
 
-local function get_adjust_buttons()
+local function get_adjust_buttons(pos)
+  local hardMode = is_hard_mode(pos)
   local btns = ""
-  if HARD_MODE then btns =
+  if hardMode then btns =
     "image_button[2.1,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP1_BTN..";]"..
-    "image_button[2.1,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
-    "image_button[3.9,0.8;0.8,0.8;logistica_icon_sr.png;"..SR1_BTN..";]"..
-    "image_button[3.9,1.6;0.8,0.8;logistica_icon_sl.png;"..SL1_BTN..";]"..
+    "image_button[2.1,1.6;0.8,0.8;logistica_icon_sl.png;"..SL1_BTN..";]"..
+    "image_button[3.9,0.8;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
+    "image_button[3.9,1.6;0.8,0.8;logistica_icon_sr.png;"..SR1_BTN..";]"..
     "image_button[5.8,0.8;0.8,0.8;logistica_icon_fup.png;"..FUP2_BTN..";]"..
-    "image_button[5.8,1.6;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"..
-    "image_button[7.6,0.8;0.8,0.8;logistica_icon_sr.png;"..SR2_BTN..";]"..
-    "image_button[7.6,1.6;0.8,0.8;logistica_icon_sl.png;"..SL2_BTN..";]"
+    "image_button[5.8,1.6;0.8,0.8;logistica_icon_sl.png;"..SL2_BTN..";]"..
+    "image_button[7.6,0.8;0.8,0.8;logistica_icon_fdn.png;"..FDN2_BTN..";]"..
+    "image_button[7.6,1.6;0.8,0.8;logistica_icon_sr.png;"..SR2_BTN..";]"
   else btns =
     "image_button[2.1,1.2;0.8,0.8;logistica_icon_fup.png;"..FUP1_BTN..";]"..
     "image_button[3.9,1.2;0.8,0.8;logistica_icon_fdn.png;"..FDN1_BTN..";]"..
@@ -228,7 +249,7 @@ local function get_adjust_buttons()
     "tooltip["..FDN1_BTN..";"..FS("Decrease Frequency").."]"..
     "tooltip["..FUP2_BTN..";"..FS("Increase Frequency").."]"..
     "tooltip["..FDN2_BTN..";"..FS("Decrease Frequency").."]"
-  if HARD_MODE then
+  if hardMode then
     tips = tips..
     "tooltip["..SR1_BTN..";"..FS("Shift Right").."]"..
     "tooltip["..SL1_BTN..";"..FS("Shift Left").."]"..
@@ -249,15 +270,16 @@ local function get_formspec_sync(pos, playerName, optMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or get_meta(pos)
   local tf1 = meta:get_int(META_TF1) / DISPLAY_FACTOR
-  local ts1 = (HARD_MODE and meta:get_int(META_TS1) / DISPLAY_FACTOR) or 0
+  local hardMode = is_hard_mode(pos)
+  local ts1 = (hardMode and meta:get_int(META_TS1) / DISPLAY_FACTOR) or 0
   local tf2 = meta:get_int(META_TF2) / DISPLAY_FACTOR
-  local ts2 = (HARD_MODE and meta:get_int(META_TS2) / DISPLAY_FACTOR) or 0
+  local ts2 = (hardMode and meta:get_int(META_TS2) / DISPLAY_FACTOR) or 0
   local f1 = meta:get_int(META_F1) / DISPLAY_FACTOR
   local f2 = meta:get_int(META_F2) / DISPLAY_FACTOR
-  local s1 = (HARD_MODE and meta:get_int(META_S1) / DISPLAY_FACTOR) or 0
-  local s2 = (HARD_MODE and meta:get_int(META_S2) / DISPLAY_FACTOR) or 0
+  local s1 = (hardMode and meta:get_int(META_S1) / DISPLAY_FACTOR) or 0
+  local s2 = (hardMode and meta:get_int(META_S2) / DISPLAY_FACTOR) or 0
   local valid = both_crystals_present(meta:get_inventory())
-  local matching = waves_match(meta)
+  local matching = waves_match(pos, meta)
   local ptsColor = nil
   local tarColor = nil
   local applyBtn = ""
@@ -280,7 +302,7 @@ local function get_formspec_sync(pos, playerName, optMeta)
     logistica.player_inv_formspec(0.4,8)..
     "list["..posForm..";"..INV_C1..";2.9,1.1;1,1;0]"..
     "list["..posForm..";"..INV_C2..";6.6,1.1;1,1;0]"..
-    get_adjust_buttons()..
+    get_adjust_buttons(pos)..
     "image[4.75,0.6;1,2;logistica_icon_combine.png]"..
     "image[0.3,2.6;10,4;logistica_icon_graph_back.png]"..
     targBoxes..
@@ -290,7 +312,7 @@ local function get_formspec_sync(pos, playerName, optMeta)
     "list["..posForm..";"..INV_UPGRADE..";5.3,6.7;1,1;0]"..
     "label[3.0,0.5;"..FS("Crystal").." 1]"..
     "label[6.6,0.5;"..FS("Crystal").." 2]"..
-    "label[6.4,7.2;"..FS("Wireless Access Pad").."]"
+    "label[6.4,7.2;"..FS("WAP / Recursive Upgrade").."]"
 end
 
 local function show_formspec_sync(playerName, pos, optMeta)
@@ -359,8 +381,10 @@ function logistica.sync_allow_storage_inv_put(pos, listname, index, stack, playe
     if stack:get_name() ~= ITEM_WIRELESS_CRYSTAL then return 0
     else return 1 end
   elseif listname == INV_UPGRADE then
-    if stack:get_name() ~= ITEM_WAP then return 0
-    else return 1 end
+    local name = stack:get_name()
+    if name ~= ITEM_WAP and name ~= ITEM_REC_UPGRADE then return 0 end
+    if name == ITEM_REC_UPGRADE and logistica.ac_is_upgrade_synced(stack) then return 0 end
+    return 1
   end
   return 0
 end
@@ -372,23 +396,36 @@ end
 
 function logistica.sync_on_inv_put(pos, listname, index, stack, player)
   if not player then return end
+  local meta = get_meta(pos)
   if listname == INV_C1 or listname == INV_C2 then
     if not forms[player:get_player_name()] then return end
-    local meta = get_meta(pos)
     if both_crystals_present(meta:get_inventory()) then
       set_new_targets(meta, true)
       randomize_curr_values(meta, true)
     end
     show_formspec_sync(player:get_player_name(), pos)
+  elseif listname == INV_UPGRADE then
+    set_new_targets(meta, both_crystals_present(meta:get_inventory()))
+    randomize_curr_values(meta, both_crystals_present(meta:get_inventory()))
+    if forms[player:get_player_name()] then
+      show_formspec_sync(player:get_player_name(), pos)
+    end
   end
 end
 
 function logistica.sync_on_inv_take(pos, listname, index, stack, player)
   if not player then return end
+  local meta = get_meta(pos)
   if listname == INV_C1 or listname == INV_C2 then
     if not forms[player:get_player_name()] then return end
-    set_new_targets(get_meta(pos), false)
+    set_new_targets(meta, false)
     show_formspec_sync(player:get_player_name(), pos)
+  elseif listname == INV_UPGRADE then
+    set_new_targets(meta, both_crystals_present(meta:get_inventory()))
+    randomize_curr_values(meta, both_crystals_present(meta:get_inventory()))
+    if forms[player:get_player_name()] then
+      show_formspec_sync(player:get_player_name(), pos)
+    end
   end
 end
 

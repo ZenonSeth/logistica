@@ -446,7 +446,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_ACCESS_POINT_CRAFTING] = {
       title = S("Access Point Crafting"),
-      relatedItems = {L("autocrafting_upgrade"), L("autocrafting_recursive_upgrade")},
+      relatedItems = {L("autocrafting_upgrade"), L("autocrafting_recursive_upgrade"), L("wireless_synchronizer")},
       recipes = RECIPE_ACUPGRD,
       recipeLinks = RECIPE_LINKS,
       description = desc.access_point_crafting,
@@ -462,7 +462,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
 
     [PAGE_WIRELESS_UPGRADER] = {
       title = S("Wireless Upgrader"),
-      relatedItems = {L("wireless_access_pad")},
+      relatedItems = {L("wireless_access_pad"), L("autocrafting_recursive_upgrade")},
       recipes = RECIPE_WRLUPGRD,
       recipeLinks = RECIPE_LINKS,
       description = desc.wireless_upgrader,
