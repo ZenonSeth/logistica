@@ -243,7 +243,7 @@ To use an Inserter, you must:
 
 - Place it facing a node that has an inventory it can target. Sneak + punching an inserter will show its output location.
 - Pick an inventory to place items into. Some nodes have multiple input inventories (e.g. a furnace).
-- Place items in the 4 filter slots to set which item types to request. Each slot holds 1 item to identify the type.
+- Place items in the 8 filter slots to set which item types to request. Each slot holds 1 item to identify the type.
 - Set the "Request up to" amount below each filter slot. This is the target count to keep in the destination inventory. Setting it to 0 disables that slot.
 - Make sure you press the Enable button to enable operation.
 
