@@ -390,6 +390,8 @@ The Vacuum Supply Chest acts like a regular Supply chest, providing items to the
 - It cannot be used by the Network to store items in it (unlike regular Supply Chests which can be configured to allow storing from the Network)
 
 The on/off switch in the Vacuum Chests's inventory enables whether the chest will be collecting nearby items or not.
+
+The Vacuum Chest also has a filter row. If any filter slots are filled, the chest will only pick up items matching those filters. If all filter slots are empty, the chest will pick up all nearby items.
 ]])
 
 g.rock_melter = S([[
