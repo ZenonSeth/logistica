@@ -103,6 +103,12 @@ Handles normal crafting grid recipes only. It is most useful when crafting compl
 
 The Recursive Crafting Upgrade can replace the regular Access Point Crafting Upgrade; you do not need both.
 
+Synchronizing the Recursive Upgrade
+------------------------------
+The Recursive Crafting Upgrade can be Synchronized using the Wireless Upgrader. A Synchronized upgrade allows the Easy Crafting tab to be used remotely through a Wireless Access Pad. Without synchronization, the Easy Crafting tab is only available when opening the Access Point directly.
+
+Synchronizing requires two separate upgrades in the Wireless Upgrader - match the waves once to partially synchronize, and a second time to fully synchronize the upgrade.
+
 History navigation
 ------------------------------
 The [ < ] and [ > ] buttons navigate back and forward through recipes you have viewed, similar to browser history. Clicking an ingredient in the recipe grid also navigates to that ingredient's own recipe.
@@ -110,6 +116,8 @@ The [ < ] and [ > ] buttons navigate back and forward through recipes you have v
 Wireless Access Pad
 ------------------------------
 When accessing the Easy Crafting tab through a Wireless Access Pad, the upgrade slot is hidden. The upgrade must be inserted by opening the Access Point directly.
+
+The Easy Crafting tab is only available via Wireless Access Pad if the Access Point has a Synchronized Recursive Crafting Upgrade installed.
 
 Recipe limitations
 ------------------------------
@@ -155,6 +163,8 @@ To upgrade a Wireless Access Pad:
 4. Use the buttons around each Crystal to make the orange wave match the blue wave.
 5. When they match, the wave turns Green and an Upgrade button appears.
 6. Press the Upgrade button to increase your Wireless Access Pad's range.
+
+The Wireless Upgrader can also synchronize a Recursive Crafting Upgrade. Place the upgrade in the bottom slot instead of a Wireless Access Pad, match the waves twice to fully synchronize it. A Synchronized upgrade allows Easy Crafting to be used remotely via a Wireless Access Pad.
 
 The Wireless Upgrader also has a "Hard Mode" toggleable via settings - see the "Server Settings" page on the left for info.
 ]])

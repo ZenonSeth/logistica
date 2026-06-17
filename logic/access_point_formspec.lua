@@ -685,6 +685,10 @@ end
 local function get_autocrafting_tab_content(pos, playerName)
   local data     = accessPointForms[playerName]
 
+  if data.from_wap and not logistica.ac_has_synced_recursive_upgrade(pos) then
+    return "label[4.5,4.0;"..S("Easy Crafting via\nWireless Access Pad\nonly available with\na ")..minetest.colorize("#44FF44", S("Synchronized"))..S(" Recursive Upgrade\nvia the Wireless Upgrader").."]"
+  end
+
   local posStr   = pos.x..","..pos.y..","..pos.z
   local history  = data.ac_history  or {}
   local hist_pos = data.ac_hist_pos or 0

@@ -357,6 +357,38 @@ function logistica.ac_has_recursive_upgrade(pos)
     AP_UPGRADE_LIST, ItemStack(AP_RECURSIVE_UPGRADE_ITEM))
 end
 
+local AP_SYNC_KEY_1 = "synced1"
+local AP_SYNC_KEY_2 = "synced2"
+local AP_SYNC_VAL_1 = 10
+local AP_SYNC_VAL_2 = 20
+
+function logistica.ac_has_synced_recursive_upgrade(pos)
+  local inv = minetest.get_meta(pos):get_inventory()
+  local stack = inv:get_stack(AP_UPGRADE_LIST, 1)
+  return logistica.ac_is_upgrade_synced(stack)
+end
+
+function logistica.ac_is_upgrade_synced(stack)
+  if stack:get_name() ~= AP_RECURSIVE_UPGRADE_ITEM then return false end
+  local meta = stack:get_meta()
+  return meta:get_int(AP_SYNC_KEY_1) == AP_SYNC_VAL_1
+    and meta:get_int(AP_SYNC_KEY_2) == AP_SYNC_VAL_2
+end
+
+function logistica.ac_sync_upgrade(stack)
+  local meta = stack:get_meta()
+  local baseDesc = minetest.registered_items[AP_RECURSIVE_UPGRADE_ITEM].description
+  if meta:get_int(AP_SYNC_KEY_1) ~= AP_SYNC_VAL_1 then
+    meta:set_int(AP_SYNC_KEY_1, AP_SYNC_VAL_1)
+    meta:set_string("description",
+      baseDesc .. "\n" .. minetest.colorize("#FFFF00", "Partially Synchronized"))
+  else
+    meta:set_int(AP_SYNC_KEY_2, AP_SYNC_VAL_2)
+    meta:set_string("description",
+      baseDesc .. "\n" .. minetest.colorize("#44FF44", "Synchronized"))
+  end
+end
+
 -- Recursive autocrafting planner -----------------------------------------------
 
 local function shallow_copy(t)
