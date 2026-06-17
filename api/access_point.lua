@@ -6,7 +6,6 @@ local function after_place_access_point(pos, placer, itemstack, numSlots, numUpg
   end
   local inv = meta:get_inventory()
   inv:set_size(logistica.AP_UPGRADE_LIST, 1)
-  inv:set_size("ac_output", 12)
   logistica.access_point_after_place(pos, meta)
   logistica.on_access_point_change(pos)
 end
@@ -24,8 +23,12 @@ end
 local function can_dig_access_point(pos, player)
   local meta = minetest.get_meta(pos)
   if meta:get_string("ac_queue") ~= "" then return false end
+  if meta:get_string("ac_pending_to_take") ~= "" then return false end
   local inv = meta:get_inventory()
-  return inv:is_empty(logistica.AP_UPGRADE_LIST) and inv:is_empty("ac_output")
+  if not inv:is_empty(logistica.AP_UPGRADE_LIST) then return false end
+  local outInv = logistica.get_ac_output_inv(pos)
+  if outInv and not outInv:is_empty("ac_output") then return false end
+  return true
 end
 
 local function allow_access_point_inv_put(pos, listname, index, stack, player)
@@ -40,7 +43,8 @@ end
 local function allow_access_point_inv_take(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
   if listname == logistica.AP_UPGRADE_LIST then
-    if not minetest.get_meta(pos):get_inventory():is_empty("ac_output") then return 0 end
+    local outInv = logistica.get_ac_output_inv(pos)
+    if outInv and not outInv:is_empty("ac_output") then return 0 end
   end
   return stack:get_count()
 end
@@ -104,7 +108,6 @@ function logistica.register_access_point(desc, name, tiles)
     drop = access_point_name,
     sounds = logistica.node_sound_metallic(),
     can_dig = can_dig_access_point,
-    on_timer = logistica.access_point_queue_timer,
     connect_sides = {"top", "bottom", "left", "back", "right" },
     after_place_node = after_place_access_point,
     after_dig_node = after_dig_access_point,
