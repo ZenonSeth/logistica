@@ -1387,6 +1387,12 @@ function logistica.access_point_on_dug(pos)
   for _, playerName in ipairs(removeForPlayers) do
     logistica.access_point_on_player_leave(playerName)
   end
+  local posHash = minetest.hash_node_position(pos)
+  local invName = outputInventories[posHash]
+  if invName then
+    minetest.remove_detached_inventory(invName)
+    outputInventories[posHash] = nil
+  end
 end
 
 function logistica.access_point_is_player_using_ap(playerName)
