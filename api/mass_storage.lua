@@ -145,6 +145,33 @@ local function formspec_get_cfg_buttons()
   return result
 end
 
+local SLOT_X      = 1.36
+local SLOT_W      = 1.25
+local SLOT_Y      = 1.9
+local SLOT_H      = 1.0
+local BAR_W       = 0.1
+local BAR_COLOR   = "#229922"
+local BAR_BG      = "#000000"
+
+local function formspec_get_fill_bars(pos, meta)
+  local maxSize = logistica.get_mass_storage_max_size(pos)
+  if not maxSize or maxSize <= 0 then return "" end
+  local inv = meta:get_inventory()
+  local result = ""
+  for i = 1, 8 do
+    local bx   = SLOT_X + (i - 1) * SLOT_W + SLOT_W - BAR_W - 0.01
+    local count = inv:get_stack("storage", i):get_count()
+    local fill  = math.min(count / maxSize, 1.0)
+    local fillH = fill * SLOT_H
+    result = result .. "box[" .. bx .. "," .. SLOT_Y .. ";" .. BAR_W .. "," .. SLOT_H .. ";" .. BAR_BG .. "]"
+    if fillH > 0 then
+      local fy = SLOT_Y + SLOT_H - fillH
+      result = result .. "box[" .. bx .. "," .. fy .. ";" .. BAR_W .. "," .. fillH .. ";" .. BAR_COLOR .. "]"
+    end
+  end
+  return result
+end
+
 -- `meta` is optional
 local function mass_storage_has_filter(pos)
   local inv = minetest.get_meta(pos):get_inventory()
@@ -183,6 +210,7 @@ local function get_mass_storage_formspec(pos, numUpgradeSlots, optionalMeta)
     "image[0.2,3.8;1,1;logistica_icon_input.png]" ..
     formspec_get_image_pickers(imgPickX, imgPickY, selectedImgIndex, meta)..
     formspec_get_cfg_buttons()..
+    formspec_get_fill_bars(pos, meta)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"..
     "listring["..posForm..";storage]"..
@@ -525,6 +553,7 @@ local function on_mass_storage_inv_put(pos, listname, index, stack, player)
         fullstack:set_count(fullstack:get_count() - taken)
       end
       inv:set_stack(listname, index, fullstack)
+      refresh_mass_storage_forms(pos)
     end
   elseif listname == "upgrade" then
     local inv = minetest.get_meta(pos):get_inventory()
@@ -554,6 +583,8 @@ end
 local function on_mass_storage_inv_take(pos, listname, index, stack, player)
   if listname == "upgrade" then
     logistica.on_mass_storage_upgrade_change(pos, stack:get_name(), false)
+    refresh_mass_storage_forms(pos)
+  elseif listname == "storage" then
     refresh_mass_storage_forms(pos)
   end
 end
