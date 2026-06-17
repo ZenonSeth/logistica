@@ -50,6 +50,16 @@ local function collect_items_into(pos, distance)
   local minPos = vector.subtract(pos, distance)
   local maxPos = vector.add(pos, distance)
   local inv = minetest.get_meta(pos):get_inventory()
+  local allowedItems = nil
+  local filterList = inv:get_list("filter")
+  if filterList then
+    for _, fStack in ipairs(filterList) do
+      if not fStack:is_empty() then
+        if not allowedItems then allowedItems = {} end
+        allowedItems[fStack:get_name()] = true
+      end
+    end
+  end
   for _, obj in pairs(minetest.get_objects_in_area(minPos, maxPos)) do
     local entity = obj:get_luaentity()
     if entity
@@ -57,7 +67,8 @@ local function collect_items_into(pos, distance)
       and entity.itemstring ~= ""
       and not entity._removed then
       local itemStack = ItemStack(entity.itemstring)
-      if inv:room_for_item(INV_MAIN, itemStack) then
+      if (not allowedItems or allowedItems[itemStack:get_name()])
+        and inv:room_for_item(INV_MAIN, itemStack) then
         add_particle_effect_for_item_taken(obj:get_pos(), pos)
         inv:add_item(INV_MAIN, itemStack)
         -- this look unsafe, but we only target our supplier nodes

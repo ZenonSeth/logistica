@@ -5,6 +5,8 @@ local ON_OFF_BUTTON = "on_off_btn"
 local META_RADIUS = "pickup_radius"
 local MIN_RADIUS = 1
 local MAX_RADIUS = logistica.settings.vaccuum_chest_max_radius
+local FILTER_LIST = "filter"
+local NUM_FILTER_SLOTS = 8
 
 local function get_radius(pos)
   local r = minetest.get_meta(pos):get_int(META_RADIUS)
@@ -20,23 +22,29 @@ local function get_vaccuum_formspec(pos)
   local radius = get_radius(pos)
 
   return "formspec_version[4]" ..
-    "size["..logistica.inv_size(10.5, 11).."]" ..
+    "size["..logistica.inv_size(10.5, 12.25).."]" ..
     logistica.ui.background..
     logistica.ui.button_only_style..
-    logistica.ui.on_off_btn(isOn, 6.0, 3.7, ON_OFF_BUTTON, FS("Enable"))..
+    logistica.ui.on_off_btn(isOn, 6.0, 5.05, ON_OFF_BUTTON, FS("Enable"))..
     "label[0.6,0.6;"..FS("Supplies collected items to the network.").."]"..
     "list["..posForm..";main;0.4,1.2;8,2;0]"..
-    "label[0.6,4.05;"..FS("Vacuum Range:").."]"..
-    "button[3.1,3.75;0.65,0.65;range_dec;-]"..
-    "label[3.95,4.05;"..tostring(radius).."]"..
-    "button[4.3,3.75;0.65,0.65;range_inc;+]"..
-    logistica.player_inv_formspec(0.4,4.8)..
+    "label[0.4,3.65;"..FS("Only pick up these types of items (if empty, then vacuum all):").."]"..
+    "list["..posForm..";filter;0.4,3.85;8,1;0]"..
+    "label[0.6,5.4;"..FS("Vacuum Range:").."]"..
+    "button[3.1,5.1;0.65,0.65;range_dec;-]"..
+    "label[3.95,5.4;"..tostring(radius).."]"..
+    "button[4.3,5.1;0.65,0.65;range_inc;+]"..
+    logistica.player_inv_formspec(0.4,6.05)..
     "listring[current_player;main]"..
     "listring["..posForm..";main]"
 end
 
 local function show_vaccuum_formspec(playerName, pos)
   forms[playerName] = {position = pos}
+  local inv = minetest.get_meta(pos):get_inventory()
+  if inv:get_size(FILTER_LIST) < NUM_FILTER_SLOTS then
+    inv:set_size(FILTER_LIST, NUM_FILTER_SLOTS)
+  end
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_vaccuum_formspec(pos))
 end
 
@@ -72,22 +80,36 @@ local function after_place_vaccuum(pos, placer, itemstack)
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
   inv:set_size("main", logistica.get_supplier_inv_size(pos))
+  inv:set_size(FILTER_LIST, NUM_FILTER_SLOTS)
   logistica.set_node_tooltip_from_state(pos)
   logistica.on_supplier_change(pos)
 end
 
-local function allow_vaccuum_storage_inv_put(pos, _, _, stack, player)
+local function allow_vaccuum_storage_inv_put(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
+  if listname == FILTER_LIST then
+    local inv = minetest.get_meta(pos):get_inventory()
+    local copyStack = ItemStack(stack:get_name())
+    copyStack:set_count(1)
+    inv:set_stack(FILTER_LIST, index, copyStack)
+    return 0
+  end
   return stack:get_count()
 end
 
-local function allow_vaccuum_inv_take(pos, _, _, stack, player)
+local function allow_vaccuum_inv_take(pos, listname, index, stack, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
+  if listname == FILTER_LIST then
+    local inv = minetest.get_meta(pos):get_inventory()
+    inv:set_stack(FILTER_LIST, index, ItemStack(""))
+    return 0
+  end
   return stack:get_count()
 end
 
-local function allow_vaccuum_inv_move(pos, _, _, _, _, count, player)
+local function allow_vaccuum_inv_move(pos, from_list, from_index, to_list, to_index, count, player)
   if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
+  if from_list == FILTER_LIST or to_list == FILTER_LIST then return 0 end
   return count
 end
 
