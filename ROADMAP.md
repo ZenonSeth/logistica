@@ -45,7 +45,7 @@
 - Upgrade recipes for Importer and Requester -- DONE
 ### Maybe
 - Lava generator - but slow -- DONE (Rock Melter: logistica:rock_melter; read-only lava reservoir on the network)
-- Mass Storage - filled up indicators
+- Mass Storage - filled up indicators -- DONE
 - Passive Supply Chest - allow storing rules (e.g. whitelist items allowed to be stored in it) -- DONE
 - Vacuum Chest - add pushing option
 - Signal sender: Network content (#liquid) -- DONE (signal_liquid_counter: prev/next liquid selector with texture + curr/max display, >=/<= condition, bucket threshold, named signal; empty signal name = no send)
