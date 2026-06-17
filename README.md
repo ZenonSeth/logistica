@@ -11,3 +11,11 @@ Available for download at ContentDB: https://content.luanti.org/packages/ZenonSe
 
 # Guide
 An in-game and online guide to all Logistica machines are available, see: https://github.com/ZenonSeth/logistica/wiki
+
+# Feature-complete
+As of v2.0.7 Logistica has every feature I could think of or has been requested.
+
+The repo now stands at 30K lines of code, excluding blank lines.
+
+Logistica is now in maintenance/bug-fix mode.
+
