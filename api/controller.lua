@@ -28,7 +28,7 @@ local function get_controller_formspec(pos)
     logistica.ui.button_only_style..
     "field[0.5,0.6;7,0.8;"..NAME_FIELD..";"..FS("Network Name")..";"..name.."]" ..
     "button[7.6,0.6;2.5,0.8;"..SET_BUTTON..";"..FS("Set").."]" ..
-    "field[0.5,2.0;9.5,0.8;"..ACCESS_PLAYERS_FIELD..";"..FS("Give Access To (comma-separated player names)")..";"..accessPlayers.."]" ..
+    "field[0.5,2.0;9.5,0.8;"..ACCESS_PLAYERS_FIELD..";"..FS("Give Access To (comma-separated names, use <ALL> for everyone)")..";"..accessPlayers.."]" ..
     "checkbox[0.5,3.4;"..HIDE_PROTECTION_CHECKBOX..";"..FS("Hide network content based on area protection")..";"..tostring(hideProtection).."]" ..
     ownerLabel
 end
