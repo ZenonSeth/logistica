@@ -18,7 +18,9 @@ local function is_in_access_list(controllerMeta, playerName)
   local accessList = controllerMeta:get_string(META_ACCESS_PLAYERS)
   if accessList == "" then return false end
   for _, name in ipairs(string.split(accessList, ",")) do
-    if string.trim(name) == playerName then return true end
+    local trimmed = string.trim(name)
+    if trimmed:upper() == "<ALL>" then return true end
+    if trimmed == playerName then return true end
   end
   return false
 end
