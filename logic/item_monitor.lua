@@ -204,7 +204,7 @@ local function get_formspec(pos)
     "list[" .. posForm .. ";filter;" ..
       SLOT_START_X .. "," .. SLOT_Y .. ";8,1;0]" ..
     build_slot_indicators(pos) ..
-    "button[1.00,6.65;3.50,0.65;refresh_btn;" .. FS("Refresh") .. "]" ..
+    -- "button[1.00,6.65;3.50,0.65;refresh_btn;" .. FS("Refresh") .. "]" ..
     "button[5.00,6.65;3.50,0.65;clear_btn;" .. FS("Clear History") .. "]" ..
     logistica.ui.on_off_btn(logistica.is_machine_on(pos), 9, 6.4, ON_OFF_BTN, FS("Enable")) ..
     "listring[" .. posForm .. ";filter]" ..
@@ -337,11 +337,21 @@ local function do_sample(pos, networkId)
   end
 end
 
+local function refresh_open_formspecs(pos)
+  local hash = minetest.hash_node_position(pos)
+  for playerName, pform in pairs(forms) do
+    if pform.position and minetest.hash_node_position(pform.position) == hash then
+      minetest.show_formspec(playerName, FORMSPEC_NAME, get_formspec(pos))
+    end
+  end
+end
+
 function logistica.item_monitor_timer(pos)
   if not logistica.is_machine_on(pos) then return false end
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then return false end
   do_sample(pos, networkId)
+  refresh_open_formspecs(pos)
   minetest.get_node_timer(pos):start(get_interval(minetest.get_meta(pos)))
   return false
 end
