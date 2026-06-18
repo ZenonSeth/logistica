@@ -158,9 +158,9 @@ The Wireless Upgrader is a machine used to upgrade the Wireless Access Pad's ran
 To upgrade a Wireless Access Pad:
 
 1. Craft the Wireless Upgrader
-2. In the Wireless Upgrader put the Wireless Access Pad at the bottom slot, and 1 Wireless crystal in each top slot (see screenshot above)
-3. You'll see two waves appear, one blue, one orange. The Orange wave is controlled by the buttons around the crystals.
-4. Use the buttons around each Crystal to make the orange wave match the blue wave.
+2. In the Wireless Upgrader put the Wireless Access Pad at the bottom slot, and 1 Wireless crystal in each top slot
+3. You'll see two waves appear, one blue, one orange. The Orange wave is controlled by the wave icon buttons around the crystals. Note: the wave icons are clickable buttons, not just pictures.
+4. Use the wave buttons around each Crystal to make the orange wave match the blue wave.
 5. When they match, the wave turns Green and an Upgrade button appears.
 6. Press the Upgrade button to increase your Wireless Access Pad's range.
 
@@ -291,7 +291,7 @@ The Pump is a machine that can automatically collect liquid nodes from the world
 
 To use a Pump:
 
-- Place it directly above the liquid level, as in screenshot above, (no air gaps or solid blocks between - it there are gaps/nodes it won't work!)
+- Place it directly above the liquid level (no air gaps or solid blocks between - if there are gaps/nodes it won't work!)
 - Connect reservoirs by one of 2 methods:
 - Place Reservoirs directly adjacent to it, up to 4, one on each side - no Network connection required
 - Connect the Pump to a network on which Reservoirs are also connected
