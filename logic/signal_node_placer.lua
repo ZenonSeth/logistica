@@ -88,7 +88,6 @@ function logistica.node_placer_try_place(pos)
   if not canPlace then return false, "target_blocked" end
 
   local ownerName = logistica.node_placer_get_owner(pos)
-  local player    = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
 
   if minetest.is_protected(targetPos, ownerName) then return false, nil end
 
@@ -100,13 +99,13 @@ function logistica.node_placer_try_place(pos)
     ItemStack(filterName .. " 1"),
     network,
     function(stack)
-      local ok, err = pcall(logistica.place_node, targetPos, {name = stack:get_name()}, player)
+      local ok, didPlace = pcall(logistica.place_node, targetPos, {name = stack:get_name()}, ownerName)
       if not ok then
         minetest.log("error", "[logistica] node_placer place_node failed at "
-          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
+          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(didPlace))
         return 0
       end
-      placed = true
+      if didPlace then placed = true end
       return 0
     end,
     true, false, false

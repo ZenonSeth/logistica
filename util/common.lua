@@ -40,19 +40,141 @@ function logistica.load_position(pos)
   return pos
 end
 
--- Wrapper around core.place_node that corrects for item_place_node's buildable_to
--- redirect. core.place_node hardcodes under = pos - {0,1,0}; if that block is
--- buildable_to, item_place_node redirects placement there instead of pos. This
--- function detects that case and passes pos + {0,1,0} so the redirect lands at pos.
-function logistica.place_node(pos, node, placer)
+-- Places a node at pos, replicating core.item_place_node behaviour but using
+-- playerName (string) for protection checks so it works when the owner is offline.
+-- The player object is resolved internally and only used where available.
+-- Returns true on success, false on failure.
+function logistica.place_node(pos, node, playerName)
+  local player = (playerName and playerName ~= "")
+    and minetest.get_player_by_name(playerName) or nil
+
+  logistica.load_position(pos)
+
+  if minetest.is_protected(pos, playerName or "") then
+    minetest.record_protection_violation(pos, playerName or "")
+    return false
+  end
+
+  local def = minetest.registered_nodes[node.name]
+  if not def then return false end
+
+  local oldnode = minetest.get_node(pos)
+
+  local param2 = 0
+  if def.place_param2 ~= nil then
+    param2 = def.place_param2
+  elseif (def.paramtype2 == "wallmounted"
+      or def.paramtype2 == "colorwallmounted") then
+    local belowPos = vector.new(pos.x, pos.y - 1, pos.z)
+    param2 = minetest.dir_to_wallmounted(vector.subtract(belowPos, pos))
+  elseif (def.paramtype2 == "facedir" or def.paramtype2 == "colorfacedir"
+      or def.paramtype2 == "4dir" or def.paramtype2 == "color4dir") and player then
+    local playerPos = player:get_pos()
+    if playerPos then
+      param2 = minetest.dir_to_facedir(vector.subtract(pos, playerPos))
+    end
+  end
+
+  local newnode = {name = node.name, param1 = 0, param2 = param2}
+  minetest.add_node(pos, newnode)
+
+  if def.sounds and def.sounds.place then
+    minetest.sound_play(def.sounds.place, {
+      pos = pos,
+      exclude_player = playerName or "",
+    }, true)
+  end
+
+  local itemstack = ItemStack(node.name)
   local belowPos = vector.new(pos.x, pos.y - 1, pos.z)
-  local belowNode = minetest.get_node_or_nil(belowPos)
-  local belowDef = belowNode and minetest.registered_nodes[belowNode.name]
-  local placePos = (belowDef and belowDef.buildable_to)
-    and vector.new(pos.x, pos.y + 1, pos.z)
-    or pos
-  logistica.load_position(placePos)
-  core.place_node(placePos, node, placer)
+  local pointed_thing = {type = "node", under = belowPos, above = pos}
+
+  if def.after_place_node then
+    local ok, err = pcall(def.after_place_node, vector.copy(pos), player,
+      itemstack, pointed_thing)
+    if not ok then
+      minetest.log("warning", "[logistica] after_place_node for " .. node.name
+        .. " at " .. minetest.pos_to_string(pos) .. ": " .. tostring(err))
+    end
+  end
+
+  for _, callback in ipairs(minetest.registered_on_placenodes) do
+    local ok, err = pcall(callback, vector.copy(pos), newnode, player,
+      oldnode, itemstack, pointed_thing)
+    if not ok then
+      minetest.log("warning", "[logistica] on_placenode callback: " .. tostring(err))
+    end
+  end
+
+  return true
+end
+
+-- Digs a node at pos, replicating core.node_dig behaviour but using playerName
+-- (string) for protection checks so it works when the owner is offline.
+-- toolStack is the ItemStack of the tool to dig with (or nil for bare hands).
+-- The player object is resolved internally and only used where available.
+-- Does NOT apply tool wear (matching the signal digger's existing design).
+-- Returns the list of dropped ItemStacks, or nil on failure.
+function logistica.dig_node(pos, node, playerName, toolStack)
+  local player = (playerName and playerName ~= "")
+    and minetest.get_player_by_name(playerName) or nil
+
+  local def = minetest.registered_nodes[node.name]
+  if def and (not def.diggable or (def.can_dig and not def.can_dig(vector.copy(pos), player))) then
+    return nil
+  end
+
+  if minetest.is_protected(pos, playerName or "") then
+    minetest.record_protection_violation(pos, playerName or "")
+    return nil
+  end
+
+  local wielded = toolStack or ItemStack()
+  local drops = minetest.get_node_drops(node, wielded:get_name())
+
+  if def and def.preserve_metadata then
+    local oldmeta = minetest.get_meta(pos):to_table().fields
+    local drop_stacks = {}
+    for k, v in pairs(drops) do
+      drop_stacks[k] = ItemStack(v)
+    end
+    drops = drop_stacks
+    pcall(def.preserve_metadata, vector.copy(pos),
+      {name = node.name, param1 = node.param1, param2 = node.param2},
+      oldmeta, drops)
+  end
+
+  local oldmetadata = nil
+  if def and def.after_dig_node then
+    oldmetadata = minetest.get_meta(pos):to_table()
+  end
+
+  minetest.remove_node(pos)
+
+  if def and def.sounds and def.sounds.dug then
+    minetest.sound_play(def.sounds.dug, {
+      pos = pos,
+      exclude_player = playerName or "",
+    }, true)
+  end
+
+  if def and def.after_dig_node then
+    pcall(def.after_dig_node, vector.copy(pos),
+      {name = node.name, param1 = node.param1, param2 = node.param2},
+      oldmetadata, player)
+  end
+
+  for _, callback in ipairs(minetest.registered_on_dignodes) do
+    pcall(callback, vector.copy(pos),
+      {name = node.name, param1 = node.param1, param2 = node.param2},
+      player)
+  end
+
+  local result = {}
+  for _, item in ipairs(drops) do
+    table.insert(result, ItemStack(item))
+  end
+  return result
 end
 
 function logistica.swap_node(pos, newName)

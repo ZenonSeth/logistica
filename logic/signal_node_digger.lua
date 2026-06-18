@@ -105,8 +105,7 @@ function logistica.node_digger_try_dig(pos)
   local nodedef = minetest.registered_nodes[targetNode.name]
   if not nodedef or not nodedef.on_dig then return false, nil end
 
-  local ownerName   = logistica.node_digger_get_owner(pos)
-  local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
+  local ownerName = logistica.node_digger_get_owner(pos)
 
   if minetest.is_protected(targetPos, ownerName) then return false, nil end
 
@@ -121,7 +120,8 @@ function logistica.node_digger_try_dig(pos)
     and (minetest.registered_items[toolName] or {}).on_use
     or nil
 
-  if on_use and ownerPlayer then
+  if on_use then
+    local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
     local digNode = minetest.get_node(pos)
     local dir = logistica.get_rot_directions(digNode.param2).backward
     local pointed_thing = {
@@ -135,7 +135,6 @@ function logistica.node_digger_try_dig(pos)
         .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
       return false, nil
     end
-    -- intentionally not saving result back: no tool wear
     return true, nil
   end
 
@@ -143,47 +142,22 @@ function logistica.node_digger_try_dig(pos)
     return false, "wrong_tool"
   end
 
-  -- Intercept drops before they reach the player's inventory
-  local intercepted = {}
-  local origHandleDrops = minetest.handle_node_drops
-  minetest.handle_node_drops = function(_, drops, digger)
-    if ownerPlayer == nil or digger == ownerPlayer then
-      for _, drop in ipairs(drops) do
-        table.insert(intercepted, ItemStack(drop))
-      end
-    else
-      origHandleDrops(_, drops, digger)
-    end
-  end
-
-  local ok, err
-  if ownerPlayer then
-    -- Wield the tool so on_dig sees the right item for capabilities
-    local prevWielded = ownerPlayer:get_wielded_item()
-    ownerPlayer:set_wielded_item(toolStack)
-    ok, err = pcall(nodedef.on_dig, targetPos, targetNode, ownerPlayer)
-    -- restore owner's hand; intentionally not saving worn tool back: no tool wear
-    ownerPlayer:set_wielded_item(prevWielded)
-  else
-    ok, err = pcall(minetest.dig_node, targetPos)
-  end
-
-  minetest.handle_node_drops = origHandleDrops
-
+  local ok, drops = pcall(logistica.dig_node, targetPos, targetNode, ownerName, toolStack)
   if not ok then
     minetest.log("error", "[logistica] node_digger dig failed at "
-      .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
+      .. minetest.pos_to_string(targetPos) .. ": " .. tostring(drops))
     return false, nil
   end
+  if not drops then return false, nil end
 
   -- Store drops in own "main" inventory; network can pull from there
   local selfInv = minetest.get_meta(pos):get_inventory()
   local cacheNeeded = false
-  for _, drop in ipairs(intercepted) do
+  for _, drop in ipairs(drops) do
     if not drop:is_empty() then
       local leftover = selfInv:add_item("main", drop)
       if not leftover:is_empty() then
-        minetest.item_drop(leftover, ownerPlayer, targetPos)
+        minetest.item_drop(leftover, nil, targetPos)
       end
       cacheNeeded = true
     end
