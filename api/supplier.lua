@@ -29,7 +29,7 @@ local function get_supplier_formspec(pos)
 
   local depositBtn = ""
   if hasFilter then
-    depositBtn = "button[7.75,8.2;2,0.75;deposit;"..FS("Desposit").."]"..
+    depositBtn = "button[7.75,8.2;2,0.75;deposit;"..FS("Deposit").."]"..
       "tooltip[deposit;Deposit all filtered items from inventory into supplier]"
   end
 

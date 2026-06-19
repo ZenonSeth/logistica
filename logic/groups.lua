@@ -218,7 +218,7 @@ end
 
 -- returns a readible, user-friendly name, or empty string if the groupName is not valid
 function logistica.get_network_group_description(groupName)
-  if not groupName or not type(groupName) == "string" then return "" end
+  if not groupName or type(groupName) ~= "string" then return "" end
   return NETWORK_GROUP_NAMES[groupName] or ""
 end
 

@@ -1360,8 +1360,8 @@ function logistica.access_point_on_player_leave(playerName)
   local info = accessPointForms[playerName]
   if info and info.invName then
     local onlyRef = true
-    for _, otherInfo in pairs(accessPointForms) do
-      if otherInfo.invName == info.invName then onlyRef = false end
+    for pName, otherInfo in pairs(accessPointForms) do
+      if pName ~= playerName and otherInfo.invName == info.invName then onlyRef = false end
     end
     if onlyRef then
       local toRemForPlayer = {}

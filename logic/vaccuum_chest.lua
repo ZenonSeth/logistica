@@ -94,7 +94,7 @@ end
 function logistica.vaccuum_chest_on_timer(pos, elapsed)
   if not logistica.is_machine_on(pos) then return false end
   local inserted = collect_items_into(pos, get_radius(pos))
-  if inserted then
+  if inserted > 0 then
     logistica.start_node_timer(pos, TIMER_INTERVAL)
   else
     logistica.start_node_timer(pos, TIMER_INTERVAL_LONG)

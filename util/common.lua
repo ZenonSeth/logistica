@@ -198,7 +198,7 @@ function logistica.set_infotext(pos, txt)
 end
 
 function logistica.ttos(val, name, skipnewlines, depth)
-    skipnewlines = skipnewlines or true
+    if skipnewlines == nil then skipnewlines = true end
     depth = depth or 0
     local tmp = string.rep(" ", depth)
     local newline = (not skipnewlines and "\n" or "")
@@ -263,7 +263,8 @@ function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
   local meta = minetest.get_meta(pos)
   local node = minetest.get_node(pos)
   local isOnText = (minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].logistica and minetest.registered_nodes[node.name].logistica.on_power and (isOn and "Running" or "Stopped")) or ""
-  local text = minetest.registered_nodes[node.name].description..extraText.."\n"..isOnText
+  local nodeDef = minetest.registered_nodes[node.name]
+  local text = (nodeDef and nodeDef.description or "")..extraText.."\n"..isOnText
   meta:set_string("infotext", text)
 end
 

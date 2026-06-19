@@ -16,18 +16,25 @@ local function get_dropdown_list_and_index_str(pos, playerName)
   forms[playerName] = formData
   local selPos = logistica.wifi_network_get_connected_transmitter_for_receiver(pos)
   local selIdx = 0
+  local allItems = {}
   local itemList = logistica.table_to_list_indexed(items, function(key, trTbl, index)
-    local trPos = trTbl.pos
-    if selIdx == 0 and selPos and vector.equals(selPos, trPos) then selIdx = index end
-    formData.items[index] = trTbl
-    logistica.load_position(trPos)
-    local networkName = logistica.get_network_name_or_nil(trPos)
+    allItems[index] = trTbl
+    logistica.load_position(trTbl.pos)
+    local networkName = logistica.get_network_name_or_nil(trTbl.pos)
     if not networkName then return 0
     else return minetest.formspec_escape(networkName) end
   end)
-  itemList = logistica.list_filter(itemList, function(v) return type(v) == "string" end)
-  forms[playerName] = formData
-  return table.concat(itemList,",")..";"..tostring(selIdx)
+  local filteredList = {}
+  local filteredIndex = 0
+  for i, v in ipairs(itemList) do
+    if type(v) == "string" then
+      filteredIndex = filteredIndex + 1
+      filteredList[filteredIndex] = v
+      formData.items[filteredIndex] = allItems[i]
+      if selIdx == 0 and selPos and vector.equals(allItems[i].pos, selPos) then selIdx = filteredIndex end
+    end
+  end
+  return table.concat(filteredList, ",")..";"..tostring(selIdx)
 end
 
 local function get_formspec(pos, playerName, msg)

@@ -187,13 +187,13 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
 
     nodeLiquidLevel = nodeLiquidLevel + 1
     if nodeLiquidLevel > maxBuckets then return nil end
-    node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
-    minetest.swap_node(pos, node)
     local newNodeName = get_liquid_reservoir_name_for(node.name, newLiquidName)
 
     local nodeDef = minetest.registered_nodes[newNodeName]
     if not nodeDef or not nodeDef.logistica then return nil end
     if not dryRun then
+      node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
+      minetest.swap_node(pos, node)
       if nodeLiquidLevel == 1 then -- first bucket we added, swap to that reservoir type
         logistica.swap_node(pos, newNodeName)
       end

@@ -37,7 +37,7 @@ local function get_guide_formspec(currPage, langCode)
       "tooltip[2.2,2.3;1,1;"..minetest.formspec_escape(T(langCode, srcItem:get_short_description())).."]"..
       "item_image[7.8,2.3;1,1;"..tostring(recipe.recipe.output).."]"..--dst
       "tooltip[7.8,2.3;1,1;"..minetest.formspec_escape(T(langCode, dstItem:get_short_description())).."]"..
-      "item_image[4.3,0.9;1,1;"..tostring(recipe.recipe.additive).."]"..--add
+      "item_image[4.3,0.9;1,1;"..(recipe.recipe.additive or "").."]"..--add
       "tooltip[4.3,0.9;1,1;"..minetest.formspec_escape(T(langCode, addItem:get_short_description())).."]"..
       "image[4,2.3;3,1;logistica_lava_furnace_arrow_bg.png^[transformR270]"..
       "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png]"..
@@ -95,6 +95,7 @@ function logistica.lava_furnace_show_guide(playername)
   local page = 1
   if forms[playername] then page = forms[playername].page or 1
   else forms[playername] = { page = 1 } end
-  local langCode = minetest.get_player_information(playername).lang_code or "en"
+  local playerInfo = minetest.get_player_information(playername)
+  local langCode = (playerInfo and playerInfo.lang_code) or "en"
   minetest.show_formspec(playername, FORMSPEC, get_guide_formspec(page, langCode))
 end

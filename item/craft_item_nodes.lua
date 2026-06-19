@@ -60,7 +60,7 @@ items["logistica:silverin_plate"] = {
       end
     end
     if rotNeeded then
-      if placer:is_player() then
+      if placer and placer:is_player() then
         local lookDir = placer:get_look_dir()
         if placer:get_player_control().sneak then
           lookDir = vector.multiply(lookDir, -1)
