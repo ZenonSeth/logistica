@@ -16,6 +16,7 @@ local ioCommonDef = {
   groups = {"immortal"},
   on_punch = function (self, puncher, time_from_last_punch, tool_capabilities, dir)
     self.object:remove()
+    entityTable[self.key] = nil
   end,
   on_activate = function(self, staticdata, dtime_s)
     self.key = staticdata

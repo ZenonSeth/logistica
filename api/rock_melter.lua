@@ -222,7 +222,7 @@ local function rock_melter_node_timer(pos, elapsed)
             if not leftover:is_empty() then
               local above = vector.new(pos.x, pos.y + 1, pos.z)
               local drop_pos = minetest.find_node_near(above, 1, {"air"}) or above
-              minetest.item_drop(repl, nil, drop_pos)
+              minetest.item_drop(leftover, nil, drop_pos)
             end
           end
         end

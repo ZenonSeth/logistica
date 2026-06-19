@@ -449,23 +449,27 @@ logistica.register_craft({
   }
 })
 
-logistica.register_craft({
-  output = L("signal_node_digger"),
-  recipe = {
-    {PLATE,             itemstrings.steel, PLATE},
-    {itemstrings.glass, RELAY,             L("silverin_block")},
-    {PLATE,             CIRC,              PLATE},
-  }
-})
+if logistica.settings.enable_node_digger then
+  logistica.register_craft({
+    output = L("signal_node_digger"),
+    recipe = {
+      {PLATE,             itemstrings.steel, PLATE},
+      {itemstrings.glass, RELAY,             L("silverin_block")},
+      {PLATE,             CIRC,              PLATE},
+    }
+  })
+end
 
-logistica.register_craft({
-  output = L("signal_node_placer"),
-  recipe = {
-    {PLATE,              CIRC,  PLATE},
-    {L("silverin_block"), RELAY, itemstrings.glass},
-    {PLATE,              CIRC,  PLATE},
-  }
-})
+if logistica.settings.enable_node_placer then
+  logistica.register_craft({
+    output = L("signal_node_placer"),
+    recipe = {
+      {PLATE,              CIRC,  PLATE},
+      {L("silverin_block"), RELAY, itemstrings.glass},
+      {PLATE,              CIRC,  PLATE},
+    }
+  })
+end
 
 logistica.register_craft({
   output = L("disassembler"),

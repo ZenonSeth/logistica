@@ -103,10 +103,10 @@ function logistica.node_placer_try_place(pos)
       if not ok then
         minetest.log("error", "[logistica] node_placer place_node failed at "
           .. minetest.pos_to_string(targetPos) .. ": " .. tostring(didPlace))
-        return 0
+        return stack:get_count()
       end
       if didPlace then placed = true end
-      return 0
+      return didPlace and 0 or stack:get_count()
     end,
     true, false, false
   )

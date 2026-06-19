@@ -127,7 +127,7 @@ end
 
 -- Update whether or not to parse the template as a table, passed in as a bool.
 function metadata_api:set_parse_as_table(parse_as_table_bool)
-  local parse_as_table_bool = parse_as_table_bool and true or false
+  parse_as_table_bool = parse_as_table_bool and true or false
   if self:get_parse_as_table() ~= parse_as_table_bool then
     self.delta.parse_as_table = parse_as_table_bool and true or false
   end
@@ -425,7 +425,7 @@ end
 --
 -- The locator is a string to use in the warnings.
 local function normalize_itemstack_for_filter_inv(metastruct, unvalidated_itemstring, locator)
-  local unvalidated_itemstring = unvalidated_itemstring or ""
+  unvalidated_itemstring = unvalidated_itemstring or ""
   if type(unvalidated_itemstring) ~= "string" then 
     metastruct:add_warning(locator .. " = " .. tostring(unvalidated_itemstring) .. " was not a string or nil")
     return
@@ -508,7 +508,6 @@ end
 --`
 --  This will finalise the metastruct.
 function api.configure_raw(metastruct, dmsg)
-  local dmsg = dmsg
   if type(dmsg) == "string" then
     dmsg = { message = dmsg }
   end

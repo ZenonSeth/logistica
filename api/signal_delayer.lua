@@ -130,7 +130,10 @@ function logistica.register_signal_delayer(desc, name, tiles_off, tiles_on)
 
   local function after_place(pos, placer, _, _)
     logistica.on_signal_receiver_change(pos, nil, nil)
-    minetest.get_meta(pos):set_string("infotext", "Signal Delayer")
+    local meta = minetest.get_meta(pos)
+    meta:set_string("infotext", "Signal Delayer")
+    meta:set_float("delayer_on_delay", 1.0)
+    meta:set_float("delayer_off_delay", 1.0)
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)

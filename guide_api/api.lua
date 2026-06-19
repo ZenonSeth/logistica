@@ -291,7 +291,7 @@ local function get_crafting_grid(pageData, playerName, tocWidth, formWidth)
 end
 
 local function get_related_items(pageData, tocWidth, vertOffset)
-  if not pageData.relatedItems or not type(pageData.relatedItems) == "table" then return "" end
+  if not pageData.relatedItems or type(pageData.relatedItems) ~= "table" then return "" end
   local x = tocWidth + 1.7
   local sz = 0.8
   local items = {}
@@ -372,7 +372,7 @@ end
 local function handle_table_of_content_clicked(playerName, textListString)
   local eventTable = minetest.explode_textlist_event(textListString)
   if eventTable.type == "CHG" then
-    local formData = formsData[playerName] ; if not formsData then return end
+    local formData = formsData[playerName] ; if not formData then return end
     formData.currRecipeIndex = 1
     local guideName = formData.guideName
     local guideData = guidesData[guideName] ; if not guideData then return end

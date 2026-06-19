@@ -182,7 +182,7 @@ function logistica.update_fake_inv(pos, invName, listName, listSize, playerName)
   local fullList = fakeInvMap[playerName].stackList
   if not fullList then return end
   local fakeInvList = {}
-  for i = startingPos, startingPos + listSize do
+  for i = startingPos, startingPos + listSize - 1 do
     fakeInvList[i - startingPos + 1] = fullList[i] or ItemStack("")
   end
   inv:set_list(listName, fakeInvList)

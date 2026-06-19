@@ -78,10 +78,7 @@ function logistica.get_front_face_object_info(param2)
   local rot = objRot[param2]
   local pos = rots[param2]
   if not rot or not pos then return nil end
-  rot.x = pos.forward.x
-  rot.y = pos.forward.y
-  rot.z = pos.forward.z
-  return rot
+  return {pitch = rot.pitch, yaw = rot.yaw, roll = rot.roll, x = pos.forward.x, y = pos.forward.y, z = pos.forward.z}
 end
 
 -- given a direction tries to return a facedir int such that the bottom of block would be facing that direction

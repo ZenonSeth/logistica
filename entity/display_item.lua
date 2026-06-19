@@ -66,18 +66,17 @@ function logistica.display_item_on_block_front(pos, item, newParam2)
   local adjust = logistica.get_front_face_object_info(newParam2 or node.param2)
   if not adjust then return end
 
-  pos.x = pos.x + adjust.x * ENTITY_DIST_ADJ
-  pos.y = pos.y + adjust.y * ENTITY_DIST_ADJ
-  pos.z = pos.z + adjust.z * ENTITY_DIST_ADJ
+  local epos = vector.new(pos)
+  epos.x = epos.x + adjust.x * ENTITY_DIST_ADJ
+  epos.y = epos.y + adjust.y * ENTITY_DIST_ADJ
+  epos.z = epos.z + adjust.z * ENTITY_DIST_ADJ
   local  pitch = adjust.pitch
-  --local yaw = math.pi * 2 - adjust.yaw * math.pi / 2
-  local yaw = 6.28 - adjust.yaw * 1.57
-  --local roll = math.pi * 2 - adjust.roll * math.pi / 2
-  local roll = 6.28 - adjust.roll * 1.57
+  local yaw = math.pi * 2 - adjust.yaw * math.pi / 2
+  local roll = math.pi * 2 - adjust.roll * math.pi / 2
 
   local texture = ItemStack(item):get_name()
 
-  local entity = minetest.add_entity(pos, ENTITY_NAME, id..";"..texture)
+  local entity = minetest.add_entity(epos, ENTITY_NAME, id..";"..texture)
 
   entity:set_rotation({x = pitch, y = yaw, z = roll})
 end

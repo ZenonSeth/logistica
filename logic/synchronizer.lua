@@ -266,7 +266,7 @@ local function get_guide_labels() return
   "box[0.4,7.3;0.3,0.2;"..COLOR_PTS_NO_MATCH.."]"
 end
 
-local function get_formspec_sync(pos, playerName, optMeta)
+local function get_formspec_sync(pos, optMeta)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = optMeta or get_meta(pos)
   local tf1 = meta:get_int(META_TF1) / DISPLAY_FACTOR
@@ -351,8 +351,10 @@ end
 
 function logistica.sync_on_rightclick(pos, node, clicker, itemstack, pointed_thing)
   for k, _ in pairs(forms) do
-    logistica.show_popup(clicker:get_player_name(), S("Someone is currently using this Upgrader!"))
-    return
+    if k ~= clicker:get_player_name() then
+      logistica.show_popup(clicker:get_player_name(), S("Someone is currently using this Upgrader!"))
+      return
+    end
   end
   forms[clicker:get_player_name()] = {
     position = pos

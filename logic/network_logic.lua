@@ -267,7 +267,7 @@ local function break_logistica_node(pos)
     -- a little ugly but some nodes (e.g. toggleable cable) have _on/_off and _on_disabled/_off_disabled
     local newNodeName = nodeName:sub(1, #node.name - #ON_SUFFIX)
     if minetest.registered_nodes[newNodeName..DISABLED_SUFFIX] then
-      nodeName = newNodeName
+      logistica.swap_node(pos, newNodeName..DISABLED_SUFFIX)
     end
   else
     local newNodeName = nodeName .. DISABLED_SUFFIX
@@ -800,7 +800,9 @@ function logistica.try_to_wake_up_network(pos)
   if logistica.get_network_or_nil(pos, nil, true) then return end -- it's already awake
   local cachedId = get_unchecked_cached_network_id(minetest.get_meta(pos))
   if not cachedId or cachedId == "" or cachedId == CACHED_NETWORK_ID_ALREADY_TRIED then return end
-  local conPos = h2p(cachedId)
+  local cachedIdNum = tonumber(cachedId)
+  if not cachedIdNum then return end
+  local conPos = h2p(cachedIdNum)
 
   logistica.load_position(conPos)
   local node = minetest.get_node(conPos)

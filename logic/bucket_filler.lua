@@ -99,16 +99,16 @@ function logistica.take_item_from_bucket_filler(pos, stackToTake, network, colle
 
   local numEmptyBucketsAvailable = collectedInternal + collectedFromNetwork
 
+  local toGive = ItemStack(filledBucketName) ; toGive:set_count(numEmptyBucketsAvailable)
+  local leftover = collectorFunc(toGive)
+  local numAccepted = numEmptyBucketsAvailable - leftover
+
   local emptyBucketStack = ItemStack(emptyBucketName)
-  for _ = 1, numEmptyBucketsAvailable, 1 do
+  for _ = 1, numAccepted, 1 do
     logistica.fill_bucket_from_network(network, emptyBucketStack, liquidName, dryRun)
   end
 
-  local toGive = ItemStack(filledBucketName) ; toGive:set_count(numEmptyBucketsAvailable)
-  local leftover = collectorFunc(toGive)
-
   if not dryRun then -- actually remove empty buckets from storages
-    local numAccepted = numEmptyBucketsAvailable - leftover
     local actuallyTakeFromInternal = math.min(collectedInternal, numAccepted)
     if actuallyTakeFromInternal > 0 then
       local stackRemInternal = ItemStack(emptyBucketName) ; stackRemInternal:set_count(actuallyTakeFromInternal)
