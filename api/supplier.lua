@@ -3,12 +3,19 @@ local FS = logistica.FTRANSLATOR
 local FORMSPEC_NAME = "logistica_supplier"
 local BTN_ALLOW_MACHINES = "allow_machines_btn"
 local BTN_ALLOW_AP       = "allow_ap_btn"
+local BTN_PAGE           = "page_btn"
 local META_ALLOW_MACHINES = "supplier_allow_machines"
 local META_ALLOW_AP       = "supplier_allow_ap"
 local FILTER_LIST = "filter"
 local NUM_FILTER_SLOTS = 8
+local MAIN_LIST_PAGE_SIZE = 32 -- 8x4 slots shown at a time
 
 local supplierForms = {}
+
+local function get_supplier_total_pages(pos)
+  local size = logistica.get_supplier_inv_size(pos)
+  return math.max(1, math.ceil(size / MAIN_LIST_PAGE_SIZE))
+end
 
 local function supplier_has_filter(pos)
   local inv = minetest.get_meta(pos):get_inventory()
@@ -20,12 +27,23 @@ local function supplier_has_filter(pos)
   return false
 end
 
-local function get_supplier_formspec(pos)
+local function get_supplier_formspec(pos, page)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local meta = minetest.get_meta(pos)
   local allowMachines = meta:get_string(META_ALLOW_MACHINES) ~= "0"
   local allowAp       = meta:get_string(META_ALLOW_AP) ~= "0"
   local hasFilter = supplier_has_filter(pos)
+
+  local totalPages = get_supplier_total_pages(pos)
+  page = math.min(math.max(page or 1, 1), totalPages)
+  local startIndex = (page - 1) * MAIN_LIST_PAGE_SIZE
+
+  local pageBtn = ""
+  if totalPages > 1 then
+    pageBtn = "button[8.4,0.3;1.8,0.75;"..BTN_PAGE..";"..
+      FS("Page ")..page..FS(" of ")..totalPages.."]"..
+      "tooltip["..BTN_PAGE..";"..FS("Click to view the next page of this chest's inventory").."]"
+  end
 
   local depositBtn = ""
   if hasFilter then
@@ -38,7 +56,8 @@ local function get_supplier_formspec(pos)
     logistica.ui.background..
     logistica.ui.button_only_style..
     "label[0.6,0.4;"..FS("Passive Supplier\nItems become available to network requests.").."]"..
-    "list["..posForm..";main;0.4,1.3;8,4;0]"..
+    pageBtn..
+    "list["..posForm..";main;0.4,1.3;8,4;"..startIndex.."]"..
     "label[0.4,6.3;"..FS("Items allowed to be stored (if empty, then all accepted):").."]"..
     "list["..posForm..";filter;0.4,6.5;8,1;0]"..
     logistica.ui.on_off_btn(allowMachines, 0.4,  7.85, BTN_ALLOW_MACHINES, FS("Allow Storing from Machines"))..
@@ -49,8 +68,11 @@ local function get_supplier_formspec(pos)
     "listring["..posForm..";main]"
 end
 
-local function show_supplier_formspec(playerName, pos)
-  supplierForms[playerName] = {position = pos}
+local function show_supplier_formspec(playerName, pos, page)
+  if not page then
+    page = supplierForms[playerName] and supplierForms[playerName].page or 1
+  end
+  supplierForms[playerName] = {position = pos, page = page}
   local meta = minetest.get_meta(pos)
   -- resize inventory for existing chests placed before the size increase
   local inv = meta:get_inventory()
@@ -64,7 +86,7 @@ local function show_supplier_formspec(playerName, pos)
   if logistica.is_machine_on(pos) then
     logistica.toggle_machine_on_off(pos)
   end
-  minetest.show_formspec(playerName, FORMSPEC_NAME, get_supplier_formspec(pos))
+  minetest.show_formspec(playerName, FORMSPEC_NAME, get_supplier_formspec(pos, page))
 end
 
 local function on_player_receive_fields(player, formname, fields)
@@ -90,6 +112,10 @@ local function on_player_receive_fields(player, formname, fields)
   elseif fields.deposit then
     logistica.supplier_deposit_from_player(pos, playerName)
     show_supplier_formspec(playerName, pos)
+  elseif fields[BTN_PAGE] then
+    local totalPages = get_supplier_total_pages(pos)
+    local currPage = supplierForms[playerName].page or 1
+    show_supplier_formspec(playerName, pos, (currPage % totalPages) + 1)
   end
   return true
 end
@@ -97,7 +123,7 @@ end
 local function on_supplier_rightclick(pos, node, clicker, itemstack, pointed_thing)
   if not clicker or not clicker:is_player() then return end
   if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
-  show_supplier_formspec(clicker:get_player_name(), pos)
+  show_supplier_formspec(clicker:get_player_name(), pos, 1)
 end
 
 local function after_place_supplier(pos, placer, itemstack)
