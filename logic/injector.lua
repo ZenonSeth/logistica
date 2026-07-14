@@ -98,9 +98,14 @@ function logistica.on_injector_timer(pos, elapsed)
   local copyStack = targetInv:get_stack(targetList, targetSlot)
   local targetStackSize = copyStack:get_count()
   local numToTake = math.min(targetStackSize, maxStack)
-  copyStack:set_count(numToTake)
+  local takenStack = ItemStack(copyStack)
+  takenStack:set_count(numToTake)
+  -- remove before inserting into the network: if the target is itself a network
+  -- supplier/storage, insert_item_in_network may write back into this same live
+  -- inventory, and overwriting the slot afterwards from a stale count would clobber that
+  targetInv:remove_item(targetList, takenStack)
   local numRemaining = logistica.insert_item_in_network(
-      copyStack,
+      takenStack,
       networkId,
       false,
       not get_put_into_state(meta, 1),
@@ -109,9 +114,11 @@ function logistica.on_injector_timer(pos, elapsed)
       not get_put_into_state(meta, 4),
       true
     )
-  numRemaining = targetStackSize - numToTake + numRemaining
-  copyStack:set_count(numRemaining)
-  targetInv:set_stack(targetList, targetSlot, copyStack)
+  if numRemaining > 0 then
+    local leftoverStack = ItemStack(takenStack)
+    leftoverStack:set_count(numRemaining)
+    targetInv:add_item(targetList, leftoverStack)
+  end
 
   if numRemaining == 0
       and logistica.get_network_group_for_node_name(targetNodeName) == logistica.NETWORK_GROUPS.suppliers then
