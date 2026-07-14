@@ -12,6 +12,8 @@ local SOURCE_TO_NAME = {} -- { source_node_name = liquid_name }
 
 local EMPTY_BUCKET = logistica.itemstrings.empty_bucket
 local EMPTY_SUFFIX = "_empty"
+local LAVA_UNIT_ITEM = "logistica:lava_unit"
+local LAVA_LIQUID_NAME = logistica.liquids.lava
 
 local META_LIQUID_LEVEL = "liquidLevel"
 local LIQUID_NONE = ""
@@ -204,6 +206,40 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
     return ItemStack(newEmptyBucket)
   end
   return nil
+end
+
+-- deposits 1 unit of lava into the reservoir at pos, same as emptying a lava bucket into it,
+-- except no item is returned since a lava unit isn't a bucket.
+-- returns true if a unit was deposited (caller is responsible for consuming 1 from the wielded stack),
+-- false if the reservoir isn't a lava reservoir (or lava-compatible empty one) or has no room
+function logistica.reservoir_deposit_lava_unit(pos, optNode, dryRun)
+  local node = optNode or minetest.get_node(pos)
+  local nodeDef = minetest.registered_nodes[node.name]
+  if not nodeDef or not nodeDef.logistica or not nodeDef.logistica.liquidName or not nodeDef.logistica.maxBuckets then return false end
+
+  local meta = minetest.get_meta(pos)
+  local liquidName = nodeDef.logistica.liquidName
+  if liquidName ~= LAVA_LIQUID_NAME and liquidName ~= LIQUID_NONE then return false end
+
+  local maxBuckets = nodeDef.logistica.maxBuckets
+  local nodeLiquidLevel = meta:get_int(META_LIQUID_LEVEL) + 1
+  if nodeLiquidLevel > maxBuckets then return false end
+
+  local newNodeName = get_liquid_reservoir_name_for(node.name, LAVA_LIQUID_NAME)
+  local newNodeDef = minetest.registered_nodes[newNodeName]
+  if not newNodeDef or not newNodeDef.logistica then return false end
+
+  if not dryRun then
+    node.param2 = logistica.reservoir_make_param2(nodeLiquidLevel, maxBuckets)
+    minetest.swap_node(pos, node)
+    if nodeLiquidLevel == 1 then -- first unit added, swap to the lava reservoir type
+      logistica.swap_node(pos, newNodeName)
+    end
+    local newLiquidDesc = logistica.reservoir_get_description_of_liquid(newNodeDef.logistica.liquidName)
+    meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
+    meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
+  end
+  return true
 end
 
 -- returns the liquid name for the reservoir; or "" if there's no liquid stored, or nil if its not a reservoir

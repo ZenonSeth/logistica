@@ -7,6 +7,8 @@ local EMPTY_SUFFIX = "_empty"
 
 local LIQUID_NONE = ""
 
+local LAVA_UNIT_ITEM = "logistica:lava_unit"
+
 local VAR_SMALL = "silverin"
 local VAR_LARGE = "obsidian"
 
@@ -114,6 +116,12 @@ end
 local function on_rightclick(pos, node, player, itemstack, pointed_thing, max)
   if not player or not player:is_player() or not logistica.player_has_network_access(pos, player:get_player_name()) then return end
 
+    if itemstack:get_name() == LAVA_UNIT_ITEM then
+      if not logistica.reservoir_deposit_lava_unit(pos, node) then return end
+      itemstack:take_item(1)
+      return itemstack
+    end
+
     local usedItem = logistica.reservoir_use_item_on(pos, itemstack, node)
 
     if not usedItem then return end
@@ -125,6 +133,18 @@ local function on_rightclick(pos, node, player, itemstack, pointed_thing, max)
       itemstack:take_item(1)
       return itemstack
     end
+end
+
+local function on_punch(pos, node, puncher, pointed_thing)
+  if not puncher or not puncher:is_player() then return end
+  if not logistica.player_has_network_access(pos, puncher:get_player_name()) then return end
+
+  local wielded = puncher:get_wielded_item()
+  if wielded:get_name() ~= LAVA_UNIT_ITEM then return end
+  if not logistica.reservoir_deposit_lava_unit(pos, node) then return end
+
+  wielded:take_item(1)
+  puncher:set_wielded_item(wielded)
 end
 
 --------------------------------
@@ -142,6 +162,7 @@ local commonDef = {
   after_place_node = after_place_node,
   after_dig_node = logistica.on_reservoir_change,
   on_rightclick = on_rightclick,
+  on_punch = on_punch,
   stack_max = 1,
   backface_culling = false,
   _mcl_hardness = 1.5,
