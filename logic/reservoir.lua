@@ -212,6 +212,11 @@ function logistica.reservoir_get_liquid_name(pos)
   if not logistica.GROUPS.reservoirs.is(node.name) then return nil end
   local def = minetest.registered_nodes[node.name]
   if not def or not def.logistica or not def.logistica.liquidName then return nil end
+  if def.logistica.liquidName == LIQUID_NONE then return LIQUID_NONE end
+  -- some reservoirs (e.g. rock melter) keep one node name across all levels instead of
+  -- swapping to an "_empty" variant, so the static def alone can't tell an empty one apart
+  local meta = minetest.get_meta(pos)
+  if meta:get_int(META_LIQUID_LEVEL) == 0 then return LIQUID_NONE end
   return def.logistica.liquidName
 end
 
