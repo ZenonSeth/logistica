@@ -23,6 +23,10 @@ local LIQUID_NEXT_BTN = "liq_nxt"
 local LIQUID_PREV_BTN = "liq_prv"
 local STOR_PREV_BTN = "stor_prev"
 local STOR_NEXT_BTN = "stor_next"
+local DEPOSIT_ALL_BTN = "dep_all"
+local DEPOSIT_MASS_BTN = "dep_mass"
+local DEPOSIT_SUPPLY_BTN = "dep_supply"
+local DEPOSIT_TOOL_BTN = "dep_tool"
 
 local INV_FAKE = "fake"
 local INV_INSERT = "isert"
@@ -55,7 +59,6 @@ local STR_CLEAR_DESC = S("Clear search")
 
 -- height added at the top for the tab header row
 local TAB_Y = 0.8
-local AP_FORM_H = 14.05   -- 13.25 + TAB_Y
 local AP_PLAYER_INV_X = 5.2
 local AP_PLAYER_INV_Y = 8.8  -- 8.0 + TAB_Y
 
@@ -319,6 +322,14 @@ local function get_search_and_page_section(searchTerm, pageInfo, yOff) return
   "image_button[13.9,"..(6.5+yOff)..";0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
 end
 
+local function get_deposit_section(y) return
+  "label[5.2,"..(y + 0.3)..";"..S("Deposit:").."]"..
+  "button[6.4,"..y..";1.0,0.6;"..DEPOSIT_ALL_BTN..";"..S("All").."]"..
+  "button[7.5,"..y..";2.5,0.6;"..DEPOSIT_MASS_BTN..";"..S("In Mass Storage").."]"..
+  "button[10.1,"..y..";2.5,0.6;"..DEPOSIT_SUPPLY_BTN..";"..S("In Supply Chests").."]"..
+  "button[12.7,"..y..";2.2,0.6;"..DEPOSIT_TOOL_BTN..";"..S("In Tool Chests").."]"
+end
+
 local function get_liquid_section(invName, meta, playerName, yOff)
   local currInfo = logistica.access_point_get_current_liquid_display_info(meta, playerName)
   return
@@ -326,7 +337,8 @@ local function get_liquid_section(invName, meta, playerName, yOff)
     "image[1.05,"..(5.8+yOff)..";0.8,0.8;"..currInfo.texture.."]"..
     "label[0.75,"..(6.9+yOff)..";"..currInfo.description.." "..currInfo.capacity.."]"..
     "image_button[0.45,"..(5.8+yOff)..";0.6,0.8;logistica_icon_prev.png;"..LIQUID_PREV_BTN..";;false;false]"..
-    "image_button[1.85,"..(5.8+yOff)..";0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"
+    "image_button[1.85,"..(5.8+yOff)..";0.6,0.8;logistica_icon_next.png;"..LIQUID_NEXT_BTN..";;false;false]"..
+    "label[0.6,"..(8.3+yOff)..";"..S("Place bucket here").."]"
 end
 
 local function get_error_display(x, y, errorMsg)
@@ -889,22 +901,27 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
     local usesMetadata = logistica.access_point_is_set_to_use_metadata(pos)
     local searchTerm = minetest.formspec_escape(logistica.access_point_get_current_search_term(meta))
     local usesMetaStr = usesMetadata and S("Metadata: ON") or S("Metadata: OFF")
+    local filterSortYOff = TAB_Y + 0.5
+    local liquidInsertYOff = TAB_Y + 1.0
+    local networkSearchYOff = TAB_Y + 1.0
     topContent =
       "list[detached:"..invName..";"..INV_FAKE..";0.2,"..(0.2+TAB_Y)..";"..FAKE_INV_W..","..FAKE_INV_H..";0]"..
-      "image[3.2,"..(6.5+TAB_Y)..";0.8,0.8;logistica_icon_input.png]"..
-      "list[detached:"..invName..";"..INV_INSERT..";4.0,"..(6.4+TAB_Y)..";1,1;0]"..
-      get_error_display(5.2, 7.6+TAB_Y, optError)..
-      get_liquid_section(invName, meta, playerName, TAB_Y)..
+      "image[3.2,"..(6.5+liquidInsertYOff)..";0.8,0.8;logistica_icon_input.png]"..
+      "list[detached:"..invName..";"..INV_INSERT..";4.0,"..(6.4+liquidInsertYOff)..";1,1;0]"..
+      get_error_display(5.2, 7.6+liquidInsertYOff, optError)..
+      get_liquid_section(invName, meta, playerName, liquidInsertYOff + 0.6)..
       get_listrings(invName)..
-      get_filter_section(usesMetaStr, filterHighImg, TAB_Y)..
+      get_filter_section(usesMetaStr, filterHighImg, filterSortYOff)..
       get_tooltips()..
-      get_sort_section(sortHighImg, TAB_Y)..
-      "label[5.3,"..(6.3+TAB_Y)..";"..S("Network: ")..currentNetwork.."]"..
-      get_search_and_page_section(searchTerm, pageInfo, TAB_Y)
+      get_sort_section(sortHighImg, filterSortYOff)..
+      "label[5.3,"..(6.3+networkSearchYOff)..";"..S("Network: ")..currentNetwork.."]"..
+      get_search_and_page_section(searchTerm, pageInfo, networkSearchYOff)..
+      get_deposit_section(9.9)
   end
 
-  local formH   = (tab == 3) and AC_FORM_H_AC       or AP_FORM_H
-  local plrInvY = (tab == 3) and AC_PLAYER_INV_Y_AC or AP_PLAYER_INV_Y
+  local formH   = AC_FORM_H_AC
+  local plrInvY = AC_PLAYER_INV_Y_AC
+  local craftYOff = AC_PLAYER_INV_Y_AC - AP_PLAYER_INV_Y
 
   return "formspec_version[4]"..
     "size["..logistica.inv_size(15.2, formH).."]"..
@@ -913,9 +930,9 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
     tabHeader..
     topContent..
     logistica.player_inv_formspec(AP_PLAYER_INV_X, plrInvY)..
-    "label[1.4,"..(12.7+TAB_Y)..";"..S("Crafting").."]"..
-    "list[current_player;craft;0.2,"..(9.0+TAB_Y)..";3,3;]"..
-    "list[current_player;craftpreview;3.9,"..(9.0+TAB_Y)..";1,1;]"
+    "label[1.4,"..(12.7+TAB_Y+craftYOff)..";"..S("Crafting").."]"..
+    "list[current_player;craft;0.2,"..(9.0+TAB_Y+craftYOff)..";3,3;]"..
+    "list[current_player;craftpreview;3.9,"..(9.0+TAB_Y+craftYOff)..";1,1;]"
 end
 
 local function clear_stale_ac_queue(pos)
@@ -1017,6 +1034,35 @@ local function get_total_storage_pages(pos)
   return math.max(1, math.ceil(count / STOR_PER_PAGE))
 end
 
+-- tries to deposit every stack in the player's main inventory into the network, per the given
+-- restrictions; returns an error string if nothing at all could be deposited, else nil
+local function deposit_player_inventory(pos, player, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
+  local networkId = logistica.get_network_id_or_nil(pos)
+  if not networkId then return S("Access Point not connected to any network") end
+
+  local inv = player:get_inventory()
+  local size = inv:get_size("main")
+  local depositedAny = false
+  for i = 1, size do
+    local stack = inv:get_stack("main", i)
+    if not stack:is_empty() then
+      local origCount = stack:get_count()
+      local leftover = logistica.insert_item_in_network(
+        stack, networkId, false, ignoreRequesters, ignoreStorages, ignoreSuppliers, true, false, storageKind)
+      if leftover < origCount then depositedAny = true end
+      if leftover <= 0 then
+        inv:set_stack("main", i, ItemStack(""))
+      else
+        stack:set_count(leftover)
+        inv:set_stack("main", i, stack)
+      end
+    end
+  end
+
+  if not depositedAny then return S("Nothing to deposit") end
+  return nil
+end
+
 function logistica.on_receive_access_point_formspec(player, formname, fields)
   if formname ~= FORMSPEC_NAME then return end
   local playerName = player:get_player_name()
@@ -1073,6 +1119,22 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     if not logistica.access_point_change_liquid(minetest.get_meta(pos),-1, playerName) then return true end
   elseif fields[LIQUID_NEXT_BTN] then
     if not logistica.access_point_change_liquid(minetest.get_meta(pos), 1, playerName) then return true end
+  elseif fields[DEPOSIT_ALL_BTN] then
+    local err = deposit_player_inventory(pos, player, false, false, false, nil)
+    show_access_point_formspec(pos, playerName, err)
+    return true
+  elseif fields[DEPOSIT_MASS_BTN] then
+    local err = deposit_player_inventory(pos, player, true, false, true, "mass")
+    show_access_point_formspec(pos, playerName, err)
+    return true
+  elseif fields[DEPOSIT_SUPPLY_BTN] then
+    local err = deposit_player_inventory(pos, player, true, true, false, nil)
+    show_access_point_formspec(pos, playerName, err)
+    return true
+  elseif fields[DEPOSIT_TOOL_BTN] then
+    local err = deposit_player_inventory(pos, player, true, false, true, "item")
+    show_access_point_formspec(pos, playerName, err)
+    return true
   else
     -- autocrafting tab handlers
     local data = accessPointForms[playerName]

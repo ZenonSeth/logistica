@@ -291,7 +291,8 @@ end
 
 -- attempts to insert the given itemstack in the network, returns how many items remain
 -- isAutomated: true if called by a machine (injector etc.), false if called by a user (access point)
-function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRequesters, ignoreStorages, ignoreSuppliers, ignoreTrashcans, isAutomated)
+-- storageKind: nil to allow both, "mass" to only allow mass storage, "item" to only allow item (tool) storage
+function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRequesters, ignoreStorages, ignoreSuppliers, ignoreTrashcans, isAutomated, storageKind)
   local network = logistica.get_network_by_id_or_nil(networkId)
   if not itemstack or itemstack:is_empty() then return 0 end
   if not network then return itemstack:get_count() end
@@ -312,14 +313,17 @@ function logistica.insert_item_in_network(itemstack, networkId, dryRun, ignoreRe
 
   -- check storages
   if not ignoreStorages then
-    local storages = {}
-    local addFunc = nil
+    local storages, addFunc = {}, nil
     if itemstack:get_stack_max() <= 1 then
-      storages = network.item_storage
-      addFunc = logistica.insert_item_into_item_storage
+      if storageKind ~= "mass" then
+        storages = network.item_storage
+        addFunc = logistica.insert_item_into_item_storage
+      end
     else
-      storages = network.storage_cache[itemstack:get_name()] or {}
-      addFunc = logistica.insert_item_into_mass_storage
+      if storageKind ~= "item" then
+        storages = network.storage_cache[itemstack:get_name()] or {}
+        addFunc = logistica.insert_item_into_mass_storage
+      end
     end
     for hash, _ in pairs(storages) do
       local pos = h2p(hash)
