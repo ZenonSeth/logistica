@@ -3,6 +3,7 @@ local META_SIGNAL_NAME = "signal_name"
 local META_THRESHOLD = "threshold"
 local META_COMPARISON = "comparison"
 local META_RESPECT_RESERVE = "respect_reserve"
+local META_SHOW_ITEM = "show_item"
 local DEFAULT_SIGNAL_NAME = ""
 local POLL_INTERVAL = 1.0
 local ON_SUFFIX = "_on"
@@ -31,6 +32,21 @@ end
 function logistica.signal_item_counter_get_item(pos)
   local stack = minetest.get_meta(pos):get_inventory():get_stack("filter", 1)
   return stack:get_name()
+end
+
+function logistica.signal_item_counter_get_show_item(pos)
+  return minetest.get_meta(pos):get_int(META_SHOW_ITEM) == 1
+end
+
+function logistica.signal_item_counter_set_show_item(pos, shouldShow)
+  minetest.get_meta(pos):set_int(META_SHOW_ITEM, shouldShow and 1 or 0)
+end
+
+-- `newParam2` is optional, will override the lookup of node.param2 for rotation
+function logistica.signal_item_counter_update_front_image(pos, newParam2)
+  logistica.remove_item_on_block_front(pos)
+  if not logistica.signal_item_counter_get_show_item(pos) then return end
+  logistica.display_item_on_block_front(pos, logistica.signal_item_counter_get_item(pos), newParam2)
 end
 
 local function node_is_on(pos)
@@ -138,6 +154,7 @@ end
 
 -- Called from formspec save and filter slot changes to re-evaluate immediately.
 function logistica.signal_item_counter_reconfigure(pos)
+  logistica.signal_item_counter_update_front_image(pos)
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then
     logistica.signal_item_counter_update_infotext(pos)

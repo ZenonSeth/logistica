@@ -14,6 +14,7 @@ local function get_formspec(pos)
   local isOn       = logistica.is_machine_on(pos)
   local cmpIdx     = comparison == ">=" and 1 or 2
   local respectStr = logistica.signal_item_counter_get_respect_reserve(pos) and "true" or "false"
+  local showStr    = logistica.signal_item_counter_get_show_item(pos) and "true" or "false"
   local posForm    = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   return "formspec_version[4]"..
     "size["..logistica.inv_size(10.6, 11.5).."]"..
@@ -22,6 +23,7 @@ local function get_formspec(pos)
     "label[0.5,0.4;"..FS("Item Count Sender").."]"..
     "label[0.5,1.15;"..FS("Item to Monitor:").."]"..
     "list["..posForm..";filter;2.8,0.75;1,1;0]"..
+    "checkbox[4.3,1.0;show_item;"..FS("Show Item")..";"..showStr.."]"..
     "label[0.5,2.15;"..FS("Condition:").."]"..
     "dropdown[2.8,1.8;1.5,0.75;comparison;>=,<=;"..cmpIdx.."]"..
     "label[4.45,2.15;"..FS("amount:").."]"..
@@ -76,6 +78,10 @@ local function on_receive_fields(player, formname, fields)
     minetest.get_meta(pos):set_string("respect_reserve",
       fields.respect_reserve == "true" and "1" or "0")
   end
+  if fields.show_item then
+    logistica.signal_item_counter_set_show_item(pos, fields.show_item == "true")
+    logistica.signal_item_counter_update_front_image(pos)
+  end
   return true
 end
 
@@ -128,12 +134,17 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)
+    logistica.remove_item_on_block_front(pos)
     logistica.on_signal_sender_change(pos, oldNode, oldMeta)
   end
 
   local function on_rightclick(pos, _, player, _, _)
     if logistica.should_hide_from_player(pos, player:get_player_name()) then return end
     show_formspec(pos, player:get_player_name())
+  end
+
+  local function on_rotate(pos, _, _, _, newParam2)
+    logistica.signal_item_counter_update_front_image(pos, newParam2)
   end
 
   local logistica_callbacks = {
@@ -155,6 +166,7 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
     after_place_node = after_place,
     after_dig_node   = after_dig,
     on_rightclick    = on_rightclick,
+    on_rotate        = on_rotate,
     on_timer         = logistica.signal_item_counter_timer,
     allow_metadata_inventory_put  = allow_inv_put,
     allow_metadata_inventory_take = allow_inv_take,
@@ -174,7 +186,7 @@ function logistica.register_signal_item_counter(desc, name, tiles_off, tiles_on)
   def_disabled.tiles       = tiles_disabled
   def_disabled.groups      = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1, pickaxey = 1, handy = 1, axey = 1 }
   def_disabled.on_construct  = nil
-  def_disabled.after_dig_node = nil
+  def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
   def_disabled.on_timer      = nil
   def_disabled.on_rightclick  = nil
 
