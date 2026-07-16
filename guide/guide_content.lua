@@ -25,6 +25,7 @@ local PAGE_BUCKET_EMPTIER = "mbckemp"
 local PAGE_BUCKET_FILLER = "mbckfil"
 local PAGE_WIRELESS_UPGRADER = "mwrlup"
 local PAGE_CRAFTING_SUPPLIER = "mcrftsup"
+local PAGE_COOKING_SUPPLIER = "mcooksup"
 local PAGE_AUTOCRAFTER = "mautocrf"
 local PAGE_VACCUUM_CHEST = "mvacchs"
 local PAGE_FARMING_SUPPLIER = "mfarmsup"
@@ -123,6 +124,7 @@ local RECIPE_RESERVOR = getrec({L("reservoir_obsidian_empty"), L("reservoir_silv
 local RECIPE_RESERPMP = getrec({L("pump")})
 local RECIPE_WRLUPGRD = getrec({L("wireless_synchronizer")})
 local RECIPE_CRAFTSUP = getrec({L("crafting_supplier")})
+local RECIPE_COOKSUP = getrec({L("cooking_supplier")})
 local RECIPE_AUTOCRFT = getrec({L("autocrafter")})
 local RECIPE_BUCKFILL = getrec({L("bucket_filler")})
 local RECIPE_BUCKEMPT = getrec({L("bucket_emptier")})
@@ -320,6 +322,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Bucket Emptier"), id = PAGE_BUCKET_EMPTIER },
     { name = header(S("Autocrafting:"))},
     { name = S("  Crafting Supplier"), id = PAGE_CRAFTING_SUPPLIER },
+    { name = S("  Cooking Supplier"), id = PAGE_COOKING_SUPPLIER },
     { name = S("  Autocrafter"), id = PAGE_AUTOCRAFTER },
     { name = header(S("Signals:"))},
     { name = S("  Signals Overview"), id = PAGE_SIGNALS_OVERVIEW },
@@ -575,6 +578,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_CRAFTSUP,
       recipeLinks = RECIPE_LINKS,
       description = desc.crafting_supplier,
+    },
+
+    [PAGE_COOKING_SUPPLIER] = {
+      title = S("Cooking Supplier"),
+      relatedItems = {L("lava_furnace")},
+      recipes = RECIPE_COOKSUP,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.cooking_supplier,
     },
 
     [PAGE_AUTOCRAFTER] = {
