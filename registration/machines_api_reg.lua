@@ -252,16 +252,6 @@ logistica.register_lava_furnace(S("Lava Furnace"), "lava_furnace", 4, {
 })
 
 --------------------------------
--- Quantum Cycle Generator
---------------------------------
-
-logistica.register_quantum_cycle_generator(S("Quantum Cycle Generator"), "quantum_cycle_generator", {
-  "logistica_quantum_cycle_generator_top.png",
-  "logistica_quantum_cycle_generator_bottom.png",
-  "logistica_quantum_cycle_generator_side.png",
-})
-
---------------------------------
 -- Lava Furnace Fueler
 --------------------------------
 

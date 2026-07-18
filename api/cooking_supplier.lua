@@ -10,20 +10,30 @@ local forms = {}
 
 
 
+local function get_lava_img(currLava, lavaCap)
+  local lavaPercent = logistica.round(currLava / lavaCap * 100)
+  local img = ""
+  if lavaPercent > 0 then
+    img = "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png^[lowpart:"..
+      lavaPercent..":logistica_lava_furnace_tank.png]"
+  else
+    img = "image[0.4,1.4;1,3;logistica_lava_furnace_tank_bg.png]"
+  end
+  return img.."tooltip[0.4,1.4;1,3;"..FS("Remaining: ")..(currLava/1000)..FS(" Buckets").."]"
+end
+
 local function get_cooksup_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local isOn = logistica.is_machine_on(pos)
-  local network = logistica.get_network_or_nil(pos)
-  local currQc = logistica.network_get_quantum_cycles(network)
-  local maxQc = logistica.network_get_quantum_cycles_max()
+  local currLava = logistica.cooking_supplier_get_lava(pos)
+  local lavaCap = logistica.cooking_supplier_get_lava_capacity()
   local errorText = logistica.cooking_supplier_get_error(pos)
 
   return "formspec_version[4]" ..
     "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background..
-    "label[0.4,1.3;"..FS("Network").."]"..
-    "label[0.4,1.7;"..FS("Quantum Cycles:").."]"..
-    "label[0.4,2.1;"..currQc.."/"..maxQc.."]"..
+    get_lava_img(currLava, lavaCap)..
+    "label[0.5,1.1;"..FS("Lava").."]"..
     logistica.ui.on_off_btn(isOn, 1.5, 2.6, ON_OFF_BUTTON, FS("Enable"), 0.8, 0.8)..
     "label[0.4,0.5;"..FS("Cooks configured item when requested by Network. Excess stored below.").."]"..
     "label[3.5,2.0;"..FS("Configure").."]"..

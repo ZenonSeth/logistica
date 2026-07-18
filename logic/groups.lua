@@ -79,7 +79,6 @@ logistica.GROUPS = {
   bucket_emptiers = make_group_table("bucket_emptiers", logistica.NETWORK_GROUPS.suppliers),
   bucket_fillers = make_group_table("bucket_fillers", logistica.NETWORK_GROUPS.suppliers),
   pumps = make_group_table("pumps", logistica.NETWORK_GROUPS.misc),
-  quantum_generators = make_group_table("quantum_generators", logistica.NETWORK_GROUPS.misc),
   mass_storage = make_group_table("mass_storage", logistica.NETWORK_GROUPS.mass_storage),
   item_storage = make_group_table("item_storage", logistica.NETWORK_GROUPS.item_storage),
   misc_machines = make_group_table("misc_machines", logistica.NETWORK_GROUPS.misc),

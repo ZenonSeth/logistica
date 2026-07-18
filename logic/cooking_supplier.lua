@@ -4,36 +4,61 @@ local INV_MAIN   = "main"
 local INV_CONFIG = "config"
 local INV_HOUT   = "hout"
 
+local META_LAVA  = "lava_reserve"
 local META_ERROR = "cook_err"
 
-local MIN_COOK_TIME       = 0.1 -- seconds
-local QC_COST_PER_SEC     = 10  -- 1 Quantum Cycle per 0.1s of cook time
+local LAVA_MAX        = 2000 -- 2 buckets
+local LAVA_COST_MULT   = 100
+
+local EMPTY_BUCKET     = logistica.itemstrings.empty_bucket
+local LAVA_LIQUID_NAME = logistica.liquids.lava
 
 local function ret(remaining, optError)
   return { remaining = remaining, error = optError and S(optError) or nil }
 end
 
--- returns {input_count = 1, output = "item_name N", time = #}/nil for the given input item name<br>
--- only plain cooking recipes are supported here (no additives/byproducts) - those still need a Lava Furnace
+local function get_lava(meta) return meta:get_int(META_LAVA) end
+
+-- pulls buckets of lava from the network, 1 at a time, only until `neededAmount` is covered<br>
+-- `currentLava` is the lava amount tracked so far this call (may not be persisted yet if dryRun) <br>
+-- returns the new tracked lava amount, persisting it to meta unless dryRun
+local function try_refill_lava(pos, meta, currentLava, neededAmount, dryRun)
+  local lava = currentLava
+  while lava < neededAmount do
+    local result = logistica.use_bucket_for_liquid_in_network(pos, ItemStack(EMPTY_BUCKET), LAVA_LIQUID_NAME, dryRun)
+    if not result then break end
+    lava = math.min(LAVA_MAX, lava + 1000)
+    if not dryRun then meta:set_int(META_LAVA, lava) end
+  end
+  return lava
+end
+
+-- returns the new tracked lava amount, and whether the amount could be consumed<br>
+-- persists the new amount to meta unless dryRun
+local function try_consume_lava(meta, currentLava, amount, dryRun)
+  if currentLava < amount then return currentLava, false end
+  local newLava = currentLava - amount
+  if not dryRun then meta:set_int(META_LAVA, newLava) end
+  return newLava, true
+end
+
+-- returns the first non-additive lava furnace recipe for the given input item name, or nil
 local function get_valid_recipe(configItemName)
-  local output, decrOut = minetest.get_craft_result({
-    method = "cooking", width = 1, items = { ItemStack(configItemName) }
-  })
-  if output.time <= 0 or not decrOut.items[1]:is_empty() then return nil end
-  return {
-    input_count = 1,
-    output = output.item:to_string(),
-    time = math.max(MIN_COOK_TIME, output.time),
-  }
+  local outputDefs = logistica.get_lava_furnace_recipes_for(configItemName)
+  if not outputDefs then return nil end
+  for _, outputDef in ipairs(outputDefs) do
+    if not outputDef.additive then return outputDef end
+  end
+  return nil
 end
 
-local function get_cook_qc_cost(recipe)
-  return math.ceil(recipe.time * QC_COST_PER_SEC)
+local function get_cook_lava_cost(recipe)
+  return recipe.lava * LAVA_COST_MULT
 end
 
--- a recipe is only cookable here if its full cost can ever fit in the network's Quantum Cycle bank
+-- a recipe is only cookable here if its full cost can ever fit in the tank
 local function is_recipe_cookable(recipe)
-  return recipe ~= nil and get_cook_qc_cost(recipe) <= logistica.network_get_quantum_cycles_max()
+  return recipe ~= nil and get_cook_lava_cost(recipe) <= LAVA_MAX
 end
 
 -- returns table { newList = listWithoutStack, takenStack = stackOfHowManyRemoved }
@@ -121,7 +146,7 @@ local function update_cook_output(pos, meta, inv)
   if recipe and is_recipe_cookable(recipe) then
     item = ItemStack(recipe.output)
   elseif recipe then
-    errorText = configStack:get_short_description().." "..S("requires too many Quantum Cycles to instantly cook!")
+    errorText = configStack:get_short_description().." "..S("requires too much lava to instantly cook!")
   end
   inv:set_stack(INV_MAIN, 1, item)
   meta:set_string(META_ERROR, errorText)
@@ -145,6 +170,14 @@ function logistica.cooking_supplier_get_main_list(pos)
     end
     return sublist
   end
+end
+
+function logistica.cooking_supplier_get_lava(pos)
+  return get_lava(minetest.get_meta(pos))
+end
+
+function logistica.cooking_supplier_get_lava_capacity()
+  return LAVA_MAX
 end
 
 function logistica.cooking_supplier_get_error(pos)
@@ -184,7 +217,7 @@ function logistica.take_item_from_cooking_supplier(pos, _takeStack, network, col
   local recipe = get_valid_recipe(configStack:get_name())
   if not is_recipe_cookable(recipe) then return ret(remaining) end
 
-  local qcCost = get_cook_qc_cost(recipe)
+  local lavaCost = get_cook_lava_cost(recipe)
 
   inv:set_list(INV_HOUT, {})
   local numCooked = 0
@@ -192,16 +225,17 @@ function logistica.take_item_from_cooking_supplier(pos, _takeStack, network, col
 
   local cookOutputCount = outputStack:get_count()
   local craftItemMult = 0
-  local trackedQc = logistica.network_get_quantum_cycles(network)
+  local trackedLava = get_lava(meta)
   repeat
     craftItemMult = craftItemMult + 1
+    trackedLava = try_refill_lava(pos, meta, trackedLava, lavaCost, dryRun)
 
     -- use the output of any previous loop iterations to make it available to take from - except for the item we have to send to requester
     local extrasListsMinusTarget = list_without_stack(logistica.get_list(inv, INV_HOUT), takeStack)
     local extrasMadeByCooking = extrasListsMinusTarget.newList -- extra items output by the previous cook loops (aka substitutes)
 
     local numCanCook = 0
-    if trackedQc >= qcCost then
+    if trackedLava >= lavaCost then
       local inputStack = ItemStack(configStack:get_name()) ; inputStack:set_count(recipe.input_count)
       -- consume items required to cook the item from the extras and network if needed
       local consumeResult = consume_for_cook({ inputStack }, craftItemMult, extrasMadeByCooking, network, depth, dryRun)
@@ -217,8 +251,7 @@ function logistica.take_item_from_cooking_supplier(pos, _takeStack, network, col
 
     numCooked = numCooked + numCanCook
     if numCanCook > 0 then -- now "cook" the item
-      trackedQc = trackedQc - qcCost
-      logistica.network_take_quantum_cycles(network, qcCost, dryRun)
+      trackedLava = select(1, try_consume_lava(meta, trackedLava, lavaCost, dryRun))
       inv:add_item(INV_HOUT, ItemStack(recipe.output))
     end
 
@@ -229,7 +262,7 @@ function logistica.take_item_from_cooking_supplier(pos, _takeStack, network, col
     end
   until (isEnough)
 
-  if numCooked == 0 then return ret(remaining, "Not enough Quantum Cycles/mats to cook item in Cooking Supplier") end -- nothing could be cooked
+  if numCooked == 0 then return ret(remaining, "Not enough lava/mats to cook item in Cooking Supplier") end -- nothing could be cooked
 
   -- give the item to the collector (dry run conjures items into HOUT without consuming network, for the AP allow_take flow)
   local taken = inv:remove_item(INV_HOUT, takeStack)

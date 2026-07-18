@@ -75,5 +75,3 @@ logistica.settings.vaccuum_chest_max_radius = get_int("vaccuum_chest_max_radius"
 logistica.settings.woodcutter_max_trunk_height = get_int("woodcutter_max_trunk_height", 30, 5, 200)
 
 logistica.settings.woodcutter_max_nodes = get_int("woodcutter_max_nodes", 500, 50, 5000)
-
-logistica.settings.quantum_cycle_bank_max = get_int("quantum_cycle_bank_max", 100, 1, 100000)

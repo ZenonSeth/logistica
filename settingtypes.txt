@@ -23,4 +23,3 @@ logistica_farming_supplier_max_radius (Max radius the Farming Supplier can cover
 logistica_vaccuum_chest_max_radius (Max radius the Vacuum Chest can pick up items from) int 3 1 10
 logistica_woodcutter_max_trunk_height (Max trunk height the Woodcutter will process) int 30 5 200
 logistica_woodcutter_max_nodes (Max total nodes the Woodcutter will process per tree) int 500 50 5000
-logistica_quantum_cycle_bank_max (Max Quantum Cycles a network can bank at once) int 100 1 100000

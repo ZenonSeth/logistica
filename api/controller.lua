@@ -35,7 +35,7 @@ end
 
 local function show_controller_formspec(pos, playerName)
   controllerForms[playerName] = {position = pos}
-  logistica.on_controller_timer(pos, 0) -- to ensure net is initialized, 0 elapsed so it doesn't also generate
+  logistica.on_controller_timer(pos, 1) -- to ensure net is initialized
   minetest.show_formspec(playerName, FORMSPEC_NAME, get_controller_formspec(pos))
 end
 
