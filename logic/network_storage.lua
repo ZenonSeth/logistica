@@ -132,17 +132,11 @@ function logistica.take_stack_from_network(stackToTake, network, collectorFunc, 
     logistica.take_stack_from_suppliers(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "crafting")
   if takeStack:is_empty() or  craftingSuppliersCheck.success then return ret(true) end
 
-  local cookingSuppliersCheck =
-    logistica.take_stack_from_suppliers(takeStack, network, internalCollectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, "cooking")
-  if takeStack:is_empty() or  cookingSuppliersCheck.success then return ret(true) end
-
   -- iffy, but specific suppliers error are more important than mass storage ones
   if not bucketSuppliersCheck.success and bucketSuppliersCheck.error and bucketSuppliersCheck.error ~= "" then
     return {success = false, error = bucketSuppliersCheck.error}
   elseif not craftingSuppliersCheck.success and craftingSuppliersCheck.error and craftingSuppliersCheck.error ~= "" then
     return {success = false, error = craftingSuppliersCheck.error}
-  elseif not cookingSuppliersCheck.success and cookingSuppliersCheck.error and cookingSuppliersCheck.error ~= "" then
-    return {success = false, error = cookingSuppliersCheck.error}
   elseif not storageCheck.success then
     return {success = false, error = storageCheck.error}
   else
@@ -153,8 +147,8 @@ end
 -- tries to take the given stack from the passive suppliers on the network
 -- calls the collectorFunc with the stack when necessary
 -- note that it may be called multiple times as the itemstack is gathered from mass storage<br>
--- `type` is which supplier type, leave as nil for all types. Other accepted types = "normal", "crafting", "cooking", "bucket"<br>
--- returns table { success = true/false, error = "Error msg"/nil, source = "normal"/"crafting"/"cooking"/"bucket"/"" the source of the error }
+-- `type` is which supplier type, leave as nil for all types. Other accepted types = "normal", "crafting", "bucket"<br>
+-- returns table { success = true/false, error = "Error msg"/nil, source = "normal"/"crafting"/"bucket"/"" the source of the error }
 function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc, isAutomatedRequest, useMetadata, dryRun, depth, type)
   local takeStack = ItemStack(stackToTake)
   local requestedAmount = stackToTake:get_count()
@@ -163,7 +157,6 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
   local validSupplers = network.supplier_cache[stackName] or {}
   local normalSupplierResult   = { remaining = requestedAmount, error = nil }
   local craftingSupplierResult = { remaining = requestedAmount, error = nil }
-  local cookingSupplierResult  = { remaining = requestedAmount, error = nil }
   local bucketFillerResult     = { remaining = requestedAmount, error = nil }
 
   for hash, _ in pairs(validSupplers) do
@@ -184,9 +177,6 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
     elseif (type == nil or type == "crafting") and logistica.GROUPS.crafting_suppliers.is(nodeName) then
       craftingSupplierResult = logistica.take_item_from_crafting_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
       remaining = craftingSupplierResult.remaining
-    elseif (type == nil or type == "cooking") and logistica.GROUPS.cooking_suppliers.is(nodeName) then
-      cookingSupplierResult = logistica.take_item_from_cooking_supplier(pos, takeStack, network, collectorFunc, useMetadata, dryRun, depth)
-      remaining = cookingSupplierResult.remaining
     elseif (type == nil or type == "bucket") and logistica.GROUPS.bucket_fillers.is(nodeName) then
       bucketFillerResult = logistica.take_item_from_bucket_filler(pos, takeStack, network, collectorFunc, isAutomatedRequest, dryRun, depth)
       remaining = bucketFillerResult.remaining
@@ -200,14 +190,12 @@ function logistica.take_stack_from_suppliers(stackToTake, network, collectorFunc
   if type then source = type
   else
     if craftingSupplierResult.error then source = "crafting"
-    elseif cookingSupplierResult.error then source = "cooking"
     elseif bucketFillerResult.error then source = "bucket"
     elseif normalSupplierResult.error then source = "normal"
     end
   end
 
   if source == "crafting" then return {success = false, error = craftingSupplierResult.error, source = source} end
-  if source == "cooking" then return {success = false, error = cookingSupplierResult.error, source = source} end
   if source == "bucket" then return {success = false, error = bucketFillerResult.error, source = source} end
   if source == "normal" then return {success = false, error = normalSupplierResult.error, source = source} end
   return {success = false, error = "Could not find all requested items in network suppliers", source = ""}

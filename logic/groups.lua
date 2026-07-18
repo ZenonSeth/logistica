@@ -75,7 +75,6 @@ logistica.GROUPS = {
   requesters = make_group_table("requesters", logistica.NETWORK_GROUPS.requesters),
   suppliers = make_group_table("suppliers", logistica.NETWORK_GROUPS.suppliers),
   crafting_suppliers = make_group_table("craftsups", logistica.NETWORK_GROUPS.suppliers),
-  cooking_suppliers = make_group_table("cooksups", logistica.NETWORK_GROUPS.suppliers),
   bucket_emptiers = make_group_table("bucket_emptiers", logistica.NETWORK_GROUPS.suppliers),
   bucket_fillers = make_group_table("bucket_fillers", logistica.NETWORK_GROUPS.suppliers),
   pumps = make_group_table("pumps", logistica.NETWORK_GROUPS.misc),

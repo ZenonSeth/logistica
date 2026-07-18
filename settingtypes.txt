@@ -15,7 +15,6 @@ logistica_enable_digiline_sender_api (Enable the Digiline Sender API programming
 logistica_enable_node_digger (Enable the Signal Node Digger) bool true
 logistica_enable_node_placer (Enable the Signal Node Placer) bool true
 logistica_enable_cobblestone_supplier (Enable the Cobble Generator Supplier) bool true
-logistica_enable_cooking_supplier (Enable the Cooking Supplier) bool true
 logistica_node_detector_max_distance (Max distance the Signal Node Detector can reach) int 16 1 32
 logistica_node_digger_max_distance (Max distance the Signal Node Digger can reach) int 16 1 32
 logistica_node_placer_max_distance (Max distance the Signal Node Placer can reach) int 16 1 32

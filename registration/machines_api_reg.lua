@@ -161,18 +161,6 @@ logistica.register_crafting_supplier(S("Crafting Supplier"), "crafting_supplier"
 })
 
 --------------------------------
--- Cooking Supplier
---------------------------------
-
-if logistica.settings.enable_cooking_supplier then
-  logistica.register_cooking_supplier(S("Cooking Supplier"), "cooking_supplier", {
-    "logistica_cooking_supplier_top.png",
-    "logistica_crafting_supplier_bottom.png",
-    "logistica_cooking_supplier_side.png",
-  })
-end -- enable_cooking_supplier
-
---------------------------------
 -- Network Importer
 --------------------------------
 

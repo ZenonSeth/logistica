@@ -337,16 +337,6 @@ These machines also work recursively: if you have multiple Crafting Suppliers se
 These machines also interface with the Access Point and Wireless Access Pad, so you can take items that aren't stored on your network and they will be crafted by the Crafting Supplier for you!
 ]])
 
-g.cooking_supplier = S([[
-The Cooking Supplier is an on-demand supplier that cooks (smelts) items instantly, instead of waiting on a furnace's cook time. This convenience is paid for with lava: it holds an internal tank of up to 2 buckets and pulls only as much lava as each cook needs directly from the network (via any connected Reservoir), a bucket at a time.
-
-Specify an item you want cooked, and the resulting output will be provided to the network, similar to a Crafting Supplier. Any excess produced beyond what was requested is kept in the 8 slots below as a passive supply.
-
-Each cook costs 100 times the lava a Lava Furnace would use for that same recipe. If there isn't enough lava in the tank (and none is available on the network to top it up), the Cooking Supplier simply can't fulfil the request - the same as if it were turned off. If a recipe's cook time is so long that it would never fit in the tank at all, the Cooking Supplier shows an error and won't accept it as a valid configuration.
-
-Only recognizes regular cooking recipes. Recipes that require an additive are not supported and still need a Lava Furnace.
-]])
-
 g.autocrafter = S([[
 The Autocrafter is simple a non-network machine that simply crafts from its input to the output. It does not interface directly with a network but can be accessed by both Network Importers and Request Inserters to feed it to/from the network.
 ]])
