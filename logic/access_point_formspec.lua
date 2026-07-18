@@ -28,10 +28,17 @@ local DEPOSIT_MASS_BTN = "dep_mass"
 local DEPOSIT_SUPPLY_BTN = "dep_supply"
 local DEPOSIT_TOOL_BTN = "dep_tool"
 
+local SUPPLY_PREV_BTN = "sup_prev"
+local SUPPLY_NEXT_BTN = "sup_next"
+local SUPPLY_SORT_NAME_BTN = "sup_sort_name"
+local SUPPLY_SORT_MOD_BTN = "sup_sort_mod"
+
 local INV_FAKE = "fake"
 local INV_INSERT = "isert"
 local INV_LIQUID = "liqd"
 local INV_STOR_FILTER = "stor_filter"
+local INV_SUPPLY_MAIN = "sup_main"
+local INV_SUPPLY_FILTER = "sup_filter"
 local FAKE_INV_W = 12
 local FAKE_INV_H = 4
 local FAKE_INV_SIZE = FAKE_INV_W * FAKE_INV_H
@@ -104,6 +111,8 @@ local accessPointForms = {}
 local storFilterInventories = {}  -- [playerName] = invName
 -- per-player no-interact queue display inventories for recursive crafting
 local queueInventories = {}  -- [playerName] = invName
+-- per-player detached inventory mirroring the currently-viewed supply chest's real inventory
+local supplyInventories = {}  -- [playerName] = invName
 -- per-position detached output inventories for autocrafting
 local outputInventories = {}  -- [posHash] = invName
 
@@ -222,6 +231,115 @@ local function get_or_create_storage_filter_inv(playerName)
   inv:set_size(INV_STOR_FILTER, STOR_PER_PAGE * 8)
   storFilterInventories[playerName] = invName
   return invName
+end
+
+-- writes the player's supply-tab `main` mirror list back onto the real chest's meta
+-- inventory (loading the position first, since the chest may be unloaded), and triggers
+-- the same cache update a direct player interaction with the chest would
+local function sync_supply_main_to_real(playerName)
+  local data = accessPointForms[playerName]
+  local chestPos = data and data.supplyChestPos
+  if not chestPos then return end
+  local sInv = minetest.get_inventory({type = "detached", name = data.supplyInvName})
+  if not sInv then return end
+  logistica.load_position(chestPos)
+  local realInv = minetest.get_meta(chestPos):get_inventory()
+  realInv:set_list("main", sInv:get_list(INV_SUPPLY_MAIN))
+  logistica.update_cache_at_pos(chestPos, LOG_CACHE_SUPPLIER)
+end
+
+-- only the `main` list supports free drag/move; the `filter` list is handled entirely in
+-- allow_put/allow_take below, same as the real chest's own formspec and the Mass Storage
+-- tab's filter mirror: it holds name-only markers, never real items, so moves are disallowed
+local function supply_inv_allow_move(sinv, from_list, from_index, to_list, to_index, count, player)
+  if from_list ~= INV_SUPPLY_MAIN or to_list ~= INV_SUPPLY_MAIN then return 0 end
+  local pName = player:get_player_name()
+  local data = accessPointForms[pName]
+  if not data or not data.supplyChestPos then return 0 end
+  if not logistica.player_has_network_access(data.supplyChestPos, pName) then return 0 end
+  return count
+end
+
+-- `filter` markers never actually change hands: like the real chest's own formspec, putting
+-- an item onto a filter slot only records its name (count 1) without consuming the source
+-- stack, and taking one back off only clears the marker without handing over a real item.
+-- Returning 0 here means the engine performs no transfer at all; we mutate both the real
+-- chest and the mirror slot ourselves.
+local function supply_inv_allow_put(sinv, listname, index, stack, player)
+  local pName = player:get_player_name()
+  local data = accessPointForms[pName]
+  if not data or not data.supplyChestPos then return 0 end
+  local chestPos = data.supplyChestPos
+  if not logistica.player_has_network_access(chestPos, pName) then return 0 end
+
+  if listname == INV_SUPPLY_FILTER then
+    logistica.load_position(chestPos)
+    local realInv = minetest.get_meta(chestPos):get_inventory()
+    local copy = ItemStack(stack:get_name())
+    copy:set_count(1)
+    realInv:set_stack("filter", index, copy)
+    sinv:set_stack(listname, index, copy)
+    logistica.update_cache_at_pos(chestPos, LOG_CACHE_SUPPLIER)
+    return 0
+  end
+
+  return stack:get_count()
+end
+
+local function supply_inv_allow_take(sinv, listname, index, stack, player)
+  local pName = player:get_player_name()
+  local data = accessPointForms[pName]
+  if not data or not data.supplyChestPos then return 0 end
+  local chestPos = data.supplyChestPos
+  if not logistica.player_has_network_access(chestPos, pName) then return 0 end
+
+  if listname == INV_SUPPLY_FILTER then
+    logistica.load_position(chestPos)
+    local realInv = minetest.get_meta(chestPos):get_inventory()
+    realInv:set_stack("filter", index, ItemStack(""))
+    sinv:set_stack(listname, index, ItemStack(""))
+    logistica.update_cache_at_pos(chestPos, LOG_CACHE_SUPPLIER)
+    return 0
+  end
+
+  return stack:get_count()
+end
+
+-- creates (or returns the existing) per-player detached inventory used to mirror the currently
+-- displayed supply chest's `main` and `filter` lists on the AP's Supply Chests tab
+local function get_or_create_supply_inv(playerName)
+  if supplyInventories[playerName] then return supplyInventories[playerName] end
+  local invName = "Logistica_AP_Sup_"..playerName
+  minetest.create_detached_inventory(invName, {
+    allow_move = supply_inv_allow_move,
+    allow_put  = supply_inv_allow_put,
+    allow_take = supply_inv_allow_take,
+    on_move    = function(sinv, from_list, from_index, to_list, to_index, count, player)
+      sync_supply_main_to_real(player:get_player_name())
+    end,
+    on_put     = function(sinv, listname, index, stack, player)
+      if listname == INV_SUPPLY_MAIN then sync_supply_main_to_real(player:get_player_name()) end
+    end,
+    on_take    = function(sinv, listname, index, stack, player)
+      if listname == INV_SUPPLY_MAIN then sync_supply_main_to_real(player:get_player_name()) end
+    end,
+  }, playerName)
+  supplyInventories[playerName] = invName
+  return invName
+end
+
+-- refreshes the player's supply-tab mirror inventory from the given chest's real meta
+-- inventory; must be called before rendering the tab and whenever the shown chest changes
+local function refresh_supply_inv(invName, chestPos)
+  logistica.load_position(chestPos)
+  local realInv = minetest.get_meta(chestPos):get_inventory()
+  local sInv = minetest.get_inventory({type = "detached", name = invName})
+  if not sInv then return end
+  local size = logistica.get_supplier_inv_size(chestPos)
+  sInv:set_size(INV_SUPPLY_MAIN, size)
+  sInv:set_list(INV_SUPPLY_MAIN, realInv:get_list("main"))
+  sInv:set_size(INV_SUPPLY_FILTER, logistica.SUPPLIER_FILTER_SLOTS)
+  sInv:set_list(INV_SUPPLY_FILTER, realInv:get_list("filter"))
 end
 
 -- creates the inv and returns the inv name
@@ -352,17 +470,35 @@ end
 -- storage tab
 ----------------------------------------------------------------
 
-local function get_sorted_mass_storage_list(network)
-  local list = {}
-  for hash, _ in pairs(network.mass_storage) do
-    table.insert(list, minetest.get_position_from_hash(hash))
-  end
+local function sort_positions(list)
   table.sort(list, function(a, b)
     if a.x ~= b.x then return a.x < b.x end
     if a.y ~= b.y then return a.y < b.y end
     return a.z < b.z
   end)
   return list
+end
+
+local function get_sorted_mass_storage_list(network)
+  local list = {}
+  for hash, _ in pairs(network.mass_storage) do
+    table.insert(list, minetest.get_position_from_hash(hash))
+  end
+  return sort_positions(list)
+end
+
+-- passive supplier chests only (nodes players can deposit into directly), not
+-- generator/crafting/cooking/farming suppliers which fill themselves
+local function get_sorted_supplier_list(network)
+  local list = {}
+  for hash, _ in pairs(network.suppliers) do
+    local pos = minetest.get_position_from_hash(hash)
+    logistica.load_position(pos)
+    if logistica.is_passive_supplier_node(minetest.get_node(pos).name) then
+      table.insert(list, pos)
+    end
+  end
+  return sort_positions(list)
 end
 
 local function get_storage_tab_content(pos, playerName)
@@ -450,6 +586,67 @@ local function get_storage_tab_content(pos, playerName)
 
     y = y + STOR_BLOCK_H
   end
+
+  return result
+end
+
+----------------------------------------------------------------
+-- supply chests tab
+----------------------------------------------------------------
+
+local function get_total_supplier_pages(pos)
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return 1 end
+  return math.max(1, #get_sorted_supplier_list(network))
+end
+
+local function get_supply_tab_content(pos, playerName)
+  local data = accessPointForms[playerName]
+
+  local result =
+    "label[0.2,0.5;"..S("Supply Chests").."]"..
+    "label[0.2,0.85;"..S("Drag items to rearrange the chest's slots, or use Sort to compact and alphabetize them").."]"..
+    "image_button[9.8,0.3;0.8,0.8;logistica_icon_prev.png;"..SUPPLY_PREV_BTN..";;false;false;]"..
+    "image_button[13.4,0.3;0.8,0.8;logistica_icon_next.png;"..SUPPLY_NEXT_BTN..";;false;false;]"
+
+  local network = logistica.get_network_or_nil(pos)
+  if not network then
+    return result.."label[0.2,2.0;"..S("No network connected.").."]"
+  end
+
+  local chests = get_sorted_supplier_list(network)
+  if #chests == 0 then
+    return result.."label[0.2,2.0;"..S("No Supply Chests on this network.").."]"
+  end
+
+  local page = logistica.clamp(data.supplyPage or 1, 1, #chests)
+  data.supplyPage = page
+  local chestPos = chests[page]
+  data.supplyChestPos = chestPos
+
+  refresh_supply_inv(data.supplyInvName, chestPos)
+
+  logistica.load_position(chestPos)
+  local node = minetest.get_node(chestPos)
+  local def = minetest.registered_nodes[node.name]
+  local desc = (def and def.description or node.name):match("^([^\n]+)") or node.name
+  local size = logistica.get_supplier_inv_size(chestPos)
+  local rows = math.max(1, math.ceil(size / 8))
+  local mainListY = 1.9
+  local filterLabelY = mainListY + rows * 1.25 + 0.3
+  local filterListY  = filterLabelY + 0.4
+
+  result = result..
+    "label[11.25,0.75;"..S("Chest").." "..page.." / "..#chests.."]"..
+    "label[0.2,1.3;"..minetest.formspec_escape(desc).."  @ "..chestPos.x..", "..chestPos.y..", "..chestPos.z.."]"..
+    "label[10.6,1.55;"..S("Sort by:").."]"..
+    "button[10.6,1.75;3.4,0.6;"..SUPPLY_SORT_NAME_BTN..";"..S("Alphabetical").."]"..
+    "button[10.6,2.45;3.4,0.6;"..SUPPLY_SORT_MOD_BTN..";"..S("Mod").."]"..
+    "list[detached:"..data.supplyInvName..";"..INV_SUPPLY_MAIN..";0.2,"..mainListY..";8,"..rows..";0]"..
+    "listring[detached:"..data.supplyInvName..";"..INV_SUPPLY_MAIN.."]"..
+    "listring[current_player;main]"..
+    "label[0.2,"..filterLabelY..";"..S("Items allowed to be stored (if empty, then all accepted):").."]"..
+    "list[detached:"..data.supplyInvName..";"..INV_SUPPLY_FILTER..";0.2,"..filterListY..";8,1;0]"
 
   return result
 end
@@ -887,12 +1084,14 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
   local currentNetwork = logistica.get_network_name_or_nil(pos) or S("<NONE>")
 
   local tabHeader =
-    "tabheader[0,0;"..TAB_BTN..";"..S(" Main ")..","..S("Mass Storage")..","..S("Easy Crafting")..";"..tab..";false;true]"
+    "tabheader[0,0;"..TAB_BTN..";"..S(" Main ")..","..S("Mass Storage")..","..S("Supply Chests")..","..S("Easy Crafting")..";"..tab..";false;true]"
 
   local topContent
   if tab == 2 then
     topContent = get_storage_tab_content(pos, playerName)
   elseif tab == 3 then
+    topContent = get_supply_tab_content(pos, playerName)
+  elseif tab == 4 then
     topContent = get_autocrafting_tab_content(pos, playerName)
   else
     local filterHighImg = logistica.access_point_get_filter_highlight_images(meta, IMG_HIGHLGIHT, IMG_BLANK)
@@ -975,9 +1174,12 @@ local function show_access_point_formspec(pos, playerName, optError)
     invName           = invName,
     storFilterInvName = get_or_create_storage_filter_inv(playerName),
     ac_queue_inv_name = get_or_create_queue_inv(playerName),
+    supplyInvName     = get_or_create_supply_inv(playerName),
     tab               = prev.tab or 1,
     storPage          = prev.storPage or 1,
     storMapping       = prev.storMapping or {},
+    supplyPage        = prev.supplyPage or 1,
+    supplyChestPos    = prev.supplyChestPos,
     ac_search         = prev.ac_search  or "",
     ac_results        = prev.ac_results or {},
     ac_res_page       = prev.ac_res_page or 1,
@@ -1083,6 +1285,24 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     local data = accessPointForms[playerName]
     local total = get_total_storage_pages(pos)
     data.storPage = ((data.storPage or 1) % total) + 1
+  elseif fields[SUPPLY_PREV_BTN] then
+    local data = accessPointForms[playerName]
+    local total = get_total_supplier_pages(pos)
+    data.supplyPage = (((data.supplyPage or 1) - 2) % total) + 1
+  elseif fields[SUPPLY_NEXT_BTN] then
+    local data = accessPointForms[playerName]
+    local total = get_total_supplier_pages(pos)
+    data.supplyPage = ((data.supplyPage or 1) % total) + 1
+  elseif fields[SUPPLY_SORT_NAME_BTN] then
+    local data = accessPointForms[playerName]
+    if data.supplyChestPos and logistica.player_has_network_access(data.supplyChestPos, playerName) then
+      logistica.sort_supplier_inventory(data.supplyChestPos, LOG_SORT_NAME_AZ)
+    end
+  elseif fields[SUPPLY_SORT_MOD_BTN] then
+    local data = accessPointForms[playerName]
+    if data.supplyChestPos and logistica.player_has_network_access(data.supplyChestPos, playerName) then
+      logistica.sort_supplier_inventory(data.supplyChestPos, LOG_SORT_MOD_AZ)
+    end
   elseif fields[FRST_BTN] then
     if not logistica.access_point_change_page(pos, -2, playerName, FAKE_INV_SIZE) then return true end
   elseif fields[PREV_BTN] then
@@ -1445,6 +1665,10 @@ function logistica.access_point_on_player_leave(playerName)
   if queueInventories[playerName] then
     minetest.remove_detached_inventory(queueInventories[playerName])
     queueInventories[playerName] = nil
+  end
+  if supplyInventories[playerName] then
+    minetest.remove_detached_inventory(supplyInventories[playerName])
+    supplyInventories[playerName] = nil
   end
   accessPointForms[playerName] = nil
   logistica.access_point_on_player_close(playerName)

@@ -10,6 +10,8 @@ local FILTER_LIST = "filter"
 local NUM_FILTER_SLOTS = 8
 local MAIN_LIST_PAGE_SIZE = 32 -- 8x4 slots shown at a time
 
+logistica.SUPPLIER_FILTER_SLOTS = NUM_FILTER_SLOTS
+
 local supplierForms = {}
 
 local function get_supplier_total_pages(pos)
