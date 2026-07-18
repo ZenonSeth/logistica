@@ -32,6 +32,8 @@ local SUPPLY_PREV_BTN = "sup_prev"
 local SUPPLY_NEXT_BTN = "sup_next"
 local SUPPLY_SORT_NAME_BTN = "sup_sort_name"
 local SUPPLY_SORT_MOD_BTN = "sup_sort_mod"
+local SUPPLY_CHEST_PAGE_BTN = "sup_chest_page"
+local SUPPLY_CHEST_PAGE_SIZE = 32 -- 8x4 slots shown at a time, same as the supplier chest's own formspec
 
 local INV_FAKE = "fake"
 local INV_INSERT = "isert"
@@ -600,6 +602,15 @@ local function get_total_supplier_pages(pos)
   return math.max(1, #get_sorted_supplier_list(network))
 end
 
+-- advances the currently-viewed chest's own page (its slot window), not which chest is shown
+local function advance_supply_chest_page(playerName)
+  local data = accessPointForms[playerName]
+  if not data or not data.supplyChestPos then return end
+  local size = logistica.get_supplier_inv_size(data.supplyChestPos)
+  local total = math.max(1, math.ceil(size / SUPPLY_CHEST_PAGE_SIZE))
+  data.supplyChestPage = ((data.supplyChestPage or 1) % total) + 1
+end
+
 local function get_supply_tab_content(pos, playerName)
   local data = accessPointForms[playerName]
 
@@ -631,18 +642,32 @@ local function get_supply_tab_content(pos, playerName)
   local def = minetest.registered_nodes[node.name]
   local desc = (def and def.description or node.name):match("^([^\n]+)") or node.name
   local size = logistica.get_supplier_inv_size(chestPos)
-  local rows = math.max(1, math.ceil(size / 8))
+
+  local totalChestPages = math.max(1, math.ceil(size / SUPPLY_CHEST_PAGE_SIZE))
+  local chestPage = logistica.clamp(data.supplyChestPage or 1, 1, totalChestPages)
+  data.supplyChestPage = chestPage
+  local startIndex = (chestPage - 1) * SUPPLY_CHEST_PAGE_SIZE
+  local rows = math.max(1, math.min(4, math.ceil((size - startIndex) / 8)))
+
   local mainListY = 1.9
   local filterLabelY = mainListY + rows * 1.25 + 0.3
   local filterListY  = filterLabelY + 0.4
 
+  local chestPageBtn = ""
+  if totalChestPages > 1 then
+    chestPageBtn = "button[10.6,1.85;3.4,0.6;"..SUPPLY_CHEST_PAGE_BTN..";"..
+      S("Page").." "..chestPage.." / "..totalChestPages.."]"..
+      "tooltip["..SUPPLY_CHEST_PAGE_BTN..";"..S("Click to view the next page of this chest's inventory").."]"
+  end
+
   result = result..
     "label[11.25,0.75;"..S("Chest").." "..page.." / "..#chests.."]"..
     "label[0.2,1.3;"..minetest.formspec_escape(desc).."  @ "..chestPos.x..", "..chestPos.y..", "..chestPos.z.."]"..
-    "label[10.6,1.55;"..S("Sort by:").."]"..
-    "button[10.6,1.75;3.4,0.6;"..SUPPLY_SORT_NAME_BTN..";"..S("Alphabetical").."]"..
-    "button[10.6,2.45;3.4,0.6;"..SUPPLY_SORT_MOD_BTN..";"..S("Mod").."]"..
-    "list[detached:"..data.supplyInvName..";"..INV_SUPPLY_MAIN..";0.2,"..mainListY..";8,"..rows..";0]"..
+    chestPageBtn..
+    "label[10.6,2.85;"..S("Sort by:").."]"..
+    "button[10.6,3.05;3.4,0.6;"..SUPPLY_SORT_NAME_BTN..";"..S("Alphabetical").."]"..
+    "button[10.6,3.75;3.4,0.6;"..SUPPLY_SORT_MOD_BTN..";"..S("Mod").."]"..
+    "list[detached:"..data.supplyInvName..";"..INV_SUPPLY_MAIN..";0.2,"..mainListY..";8,"..rows..";"..startIndex.."]"..
     "listring[detached:"..data.supplyInvName..";"..INV_SUPPLY_MAIN.."]"..
     "listring[current_player;main]"..
     "label[0.2,"..filterLabelY..";"..S("Items allowed to be stored (if empty, then all accepted):").."]"..
@@ -1180,6 +1205,7 @@ local function show_access_point_formspec(pos, playerName, optError)
     storMapping       = prev.storMapping or {},
     supplyPage        = prev.supplyPage or 1,
     supplyChestPos    = prev.supplyChestPos,
+    supplyChestPage   = prev.supplyChestPage or 1,
     ac_search         = prev.ac_search  or "",
     ac_results        = prev.ac_results or {},
     ac_res_page       = prev.ac_res_page or 1,
@@ -1289,10 +1315,14 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     local data = accessPointForms[playerName]
     local total = get_total_supplier_pages(pos)
     data.supplyPage = (((data.supplyPage or 1) - 2) % total) + 1
+    data.supplyChestPage = 1
   elseif fields[SUPPLY_NEXT_BTN] then
     local data = accessPointForms[playerName]
     local total = get_total_supplier_pages(pos)
     data.supplyPage = ((data.supplyPage or 1) % total) + 1
+    data.supplyChestPage = 1
+  elseif fields["sup_chest_page"] then -- SUPPLY_CHEST_PAGE_BTN, hardcoded here to avoid adding another
+    advance_supply_chest_page(playerName)                                 -- upvalue to this already near-the-limit function
   elseif fields[SUPPLY_SORT_NAME_BTN] then
     local data = accessPointForms[playerName]
     if data.supplyChestPos and logistica.player_has_network_access(data.supplyChestPos, playerName) then
