@@ -21,7 +21,7 @@ local function try_migrate_owner_from_transmitter(pos)
   end
 end
 
-function logistica.on_controller_timer(pos, _)
+function logistica.on_controller_timer(pos, elapsed)
   local node = minetest.get_node_or_nil(pos)
   if not node then return true end -- what?
   if not logistica.GROUPS.controllers.is(node.name) then return false end
@@ -29,6 +29,10 @@ function logistica.on_controller_timer(pos, _)
   local networkId = logistica.get_network_id_or_nil(pos)
   if not networkId then
     logistica.on_controller_change(pos) -- this should re-scan the network
+    networkId = logistica.get_network_id_or_nil(pos)
+  end
+  if networkId then
+    logistica.run_quantum_cycle_generation(pos, logistica.get_network_by_id_or_nil(networkId), elapsed)
   end
   try_migrate_owner_from_transmitter(pos)
   return true
