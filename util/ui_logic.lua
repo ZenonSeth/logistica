@@ -4,6 +4,7 @@ local allowedPull = {
   ["dst"] = true,
   ["output"] = true,
   ["fuel"] = true,
+  ["mailbox"] = true,
 }
 
 local allowedPush = {
