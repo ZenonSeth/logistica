@@ -804,6 +804,7 @@ local function ac_handle_recursive_craft(pos, data)
   local first_count = #cq > 0 and cq[1].count or 0
   meta:set_string("ac_queue", minetest.serialize(cq))
   meta:set_string("ac_pending_to_take", minetest.serialize(plan.to_take))
+  meta:set_string("ac_pending_to_give", minetest.serialize(plan.to_give or {}))
   meta:set_string("ac_pending_output", plan.output:to_string())
   meta:set_int("ac_queue_pos", 1)
   meta:set_int("ac_queue_cur_count", first_count)
@@ -832,13 +833,16 @@ local function ac_queue_tick(posHash)
       meta:set_string("ac_queue", "")
       local pending_output = meta:get_string("ac_pending_output")
       local pending_to_take = meta:get_string("ac_pending_to_take")
+      local pending_to_give = meta:get_string("ac_pending_to_give")
       meta:set_string("ac_pending_output", "")
       meta:set_string("ac_pending_to_take", "")
+      meta:set_string("ac_pending_to_give", "")
       if pending_output ~= "" and pending_to_take ~= "" then
         local to_take = minetest.deserialize(pending_to_take)
+        local to_give = pending_to_give ~= "" and minetest.deserialize(pending_to_give) or {}
         local networkId = logistica.get_network_id_or_nil(pos)
         if to_take and networkId then
-          local plan = { to_take = to_take, output = ItemStack(pending_output) }
+          local plan = { to_take = to_take, to_give = to_give, output = ItemStack(pending_output) }
           local output, execErr = logistica.ac_execute_plan(plan, networkId, pos)
           if output then
             local outInv = logistica.get_ac_output_inv(pos)
@@ -1166,6 +1170,7 @@ local function clear_stale_ac_queue(pos)
   if meta:get_string("ac_queue") == "" and meta:get_string("ac_pending_to_take") == "" then return end
   meta:set_string("ac_queue", "")
   meta:set_string("ac_pending_to_take", "")
+  meta:set_string("ac_pending_to_give", "")
   meta:set_string("ac_pending_output", "")
   meta:set_int("ac_queue_pos", 0)
   meta:set_int("ac_queue_cur_count", 0)

@@ -397,6 +397,67 @@ local function shallow_copy(t)
   return c
 end
 
+-- Computes per-item consumption deltas for one execution of `recipe` against the
+-- already-resolved grid `resolved_raw` (concrete items, no group: placeholders).
+-- Accounts for minetest craft replacements (e.g. a tool item given back after
+-- use, or a different substitute item like an emptied bucket).
+-- Returns item_name -> net amount consumed by one craft (can be 0 or negative
+-- for a pure byproduct); items with no replacement involvement are omitted.
+local function get_recipe_replacement_deltas(recipe, resolved_raw)
+  local items = {}
+  for i = 1, 9 do
+    local s = resolved_raw[i]
+    items[i] = (s and s ~= "") and ItemStack(s) or ItemStack("")
+  end
+  local output, decremented = minetest.get_craft_result({
+    method = "normal", width = recipe.width, items = items,
+  })
+  local deltas = {}
+  for i = 1, 9 do
+    local n = items[i]:get_name()
+    if n ~= "" then deltas[n] = (deltas[n] or 0) + items[i]:get_count() end
+  end
+  if decremented and decremented.items then
+    for i = 1, 9 do
+      local after = decremented.items[i]
+      if after and not after:is_empty() then
+        local n = after:get_name()
+        deltas[n] = (deltas[n] or 0) - after:get_count()
+      end
+    end
+  end
+  if output and output.replacements then
+    for _, st in ipairs(output.replacements) do
+      local n = st:get_name()
+      deltas[n] = (deltas[n] or 0) - st:get_count()
+    end
+  end
+  return deltas
+end
+
+-- Credits substitute items returned by a recipe's craft replacements back into
+-- `virtual`, so they remain available to later planning steps instead of being
+-- treated as permanently consumed. `rcounts`/`resolved_raw` are the recipe's
+-- gross per-craft ingredient counts and resolved grid (from get_recipe_counts);
+-- `crafts` is how many times the recipe is being run.
+local function refund_replacements(virtual, recipe, resolved_raw, rcounts, crafts)
+  local deltas = get_recipe_replacement_deltas(recipe, resolved_raw)
+  for ingr_name, ingr_count in pairs(rcounts) do
+    local gross = ingr_count * crafts
+    local net = deltas[ingr_name]
+    net = (net ~= nil) and (net * crafts) or gross
+    local refund = gross - net
+    if refund ~= 0 then virtual[ingr_name] = (virtual[ingr_name] or 0) + refund end
+  end
+  -- byproducts that are not themselves a grid ingredient (e.g. a different
+  -- substitute item entirely)
+  for byname, bydelta in pairs(deltas) do
+    if rcounts[byname] == nil and bydelta < 0 then
+      virtual[byname] = (virtual[byname] or 0) + (-bydelta * crafts)
+    end
+  end
+end
+
 -- Recursively plans to satisfy `count` of `item_name` from virtual storage.
 -- `virtual`: lazily-populated map of item_name -> remaining available count;
 --   mutated in place on success, restored on failure.
@@ -447,7 +508,7 @@ local function plan_item(item_name, count, virtual, expanding, network)
   local last_missing = item_name
   for _, recipe in ipairs(recipes_to_try) do
     local crafts = math.ceil(still_need / recipe.output_count)
-    local rcounts = get_recipe_counts(recipe, virtual, network)
+    local rcounts, resolved_raw = get_recipe_counts(recipe, virtual, network)
     if rcounts then
       local v_snap = shallow_copy(virtual)
       local queue = {}
@@ -458,6 +519,7 @@ local function plan_item(item_name, count, virtual, expanding, network)
         for _, q_item in ipairs(sub_q) do queue[#queue + 1] = q_item end
       end
       if ok then
+        refund_replacements(virtual, recipe, resolved_raw, rcounts, crafts)
         local surplus = (crafts * recipe.output_count) - still_need
         virtual[item_name] = surplus
         for _ = 1, crafts do queue[#queue + 1] = item_name end
@@ -526,6 +588,16 @@ function logistica.ac_execute_plan(plan, networkId, nodePos)
     end
   end
 
+  for item_name, count in pairs(plan.to_give or {}) do
+    local st = ItemStack(item_name)
+    st:set_count(count)
+    local remaining = logistica.insert_item_in_network(st, networkId, false, true, false, false, false, true)
+    if remaining > 0 then
+      st:set_count(remaining)
+      minetest.item_drop(st, nil, nodePos)
+    end
+  end
+
   return plan.output, nil
 end
 
@@ -554,7 +626,7 @@ function logistica.ac_plan_recursive(item_name, count, network)
 
   for _, recipe in ipairs(entry.recipes) do
     local virtual = {}
-    local rcounts = get_recipe_counts(recipe, virtual, network)
+    local rcounts, resolved_raw = get_recipe_counts(recipe, virtual, network)
     if rcounts then
       local queue = {}
       local ok = true
@@ -569,17 +641,21 @@ function logistica.ac_plan_recursive(item_name, count, network)
       end
 
       if ok then
+        refund_replacements(virtual, recipe, resolved_raw, rcounts, count)
         local to_take = {}
+        local to_give = {}
         for iname, remaining in pairs(virtual) do
           local original = logistica.count_items_in_network(iname, network, true)
           if original > remaining then
             to_take[iname] = original - remaining
+          elseif remaining > original then
+            to_give[iname] = remaining - original
           end
         end
         for _ = 1, count do queue[#queue + 1] = item_name end
         local output = ItemStack(item_name)
         output:set_count(recipe.output_count * count)
-        local plan = { to_take = to_take, queue = queue, output = output }
+        local plan = { to_take = to_take, to_give = to_give, queue = queue, output = output }
         if best_plan == nil or #queue < #best_plan.queue then
           best_plan = plan
         end
