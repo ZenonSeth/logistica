@@ -53,6 +53,17 @@ To withdraw a liquid, first select which liquid you want, then put an Empty Buck
 Taking items from the Network
 ------------------------------
 The Access Point shows a snapshot of available items, or items supplied by crafting suppliers. When you try to take an item, the Access Point makes a real request to the network. If the items are no longer available, you won't receive anything. In most cases the Access Point will try to show an error message informing what went wrong.
+
+Depositing items into the Network
+------------------------------
+Below the Filter and Sort sections are Deposit buttons that let you empty your inventory into the network in one click:
+
+- All: deposits your inventory into any device that will accept it - Requesters, Mass Storage, and Supply Chests, in that order.
+- In Mass Storage: deposits only into Mass Storage units on the network.
+- In Supply Chests: deposits only into Supply Chests on the network.
+- In Tool Chests: deposits only into Tool Chests on the network.
+
+Any items that can't be deposited by a given button are left in your inventory.
 ]])
 
 g.access_point_storage = S([[
