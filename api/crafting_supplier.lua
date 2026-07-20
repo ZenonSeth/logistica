@@ -179,7 +179,8 @@ function logistica.register_crafting_supplier(desc, name, tiles)
     can_dig = can_dig_craftsup,
     logistica = {
       on_power = on_craftsup_power,
-      get_cache_list = logistica.crafting_supplier_get_main_list
+      get_cache_list = logistica.crafting_supplier_get_main_list,
+      on_paste_state = logistica.crafting_supplier_update_output,
     },
     _mcl_hardness = 1.5,
     _mcl_blast_resistance = 10

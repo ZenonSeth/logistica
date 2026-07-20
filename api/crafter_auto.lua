@@ -157,7 +157,7 @@ function logistica.register_autocrafter(desc, name, tiles)
     description = desc,
     tiles = tiles,
     paramtype2 = "facedir",
-    groups = { cracky= 2, pickaxey = 2 },
+    groups = { cracky= 2, pickaxey = 2, logistica_autocrafter = 1 },
     is_ground_content = false,
     sounds = logistica.sound_mod.node_sound_stone_defaults(),
     can_dig = autocrafter_can_dig,
@@ -173,6 +173,7 @@ function logistica.register_autocrafter(desc, name, tiles)
     on_receive_fields = autocrafter_receive_fields,
     logistica = {
       on_power = autocrafter_on_power,
+      on_paste_state = autocrafter_on_inv_change,
     },
     _mcl_hardness = 3,
     _mcl_blast_resistance = 15

@@ -11,15 +11,29 @@ local ALLOW_GROUPS = {
   "signal_togglers",
   "injectors",
   "requesters",
+  "crafting_suppliers",
 }
 
+-- autocrafters don't join logistica.GROUPS (they don't connect to networks), so they're
+-- tagged with this plain minetest group instead, just so this tool can recognize them
+local AUTOCRAFTER_GROUP = "logistica_autocrafter"
+
+local function is_autocrafter(nodeName)
+  return minetest.get_item_group(nodeName, AUTOCRAFTER_GROUP) == 1
+end
+
+local function is_recognized_node(nodeName)
+  return logistica.is_machine(nodeName) or is_autocrafter(nodeName)
+end
+
 local function is_allowed(nodeName)
+  if is_autocrafter(nodeName) then return true end
   for _, g in ipairs(ALLOW_GROUPS) do
     if logistica.GROUPS[g] and logistica.GROUPS[g].is(nodeName) then return true end
   end
   return false
 end
-local COPY_INV_LISTS = { filter = true, tool = true }
+local COPY_INV_LISTS = { filter = true, tool = true, crf = true }
 
 local function base_name(nodeName)
   if nodeName:sub(-3) == "_on" then
@@ -36,7 +50,7 @@ local function copy_state(pos, player)
   local playerName = player:get_player_name()
   local node = minetest.get_node_or_nil(pos)
   if not node then return end
-  if not logistica.is_machine(node.name) then return end
+  if not is_recognized_node(node.name) then return end
   if not is_allowed(node.name) then
     logistica.show_popup(playerName, S("Cannot copy this node type!"))
     return
@@ -67,7 +81,7 @@ local function paste_state(pos, player)
   end
   local node = minetest.get_node_or_nil(pos)
   if not node then return end
-  if not logistica.is_machine(node.name) then return end
+  if not is_recognized_node(node.name) then return end
   if not is_allowed(node.name) then
     logistica.show_popup(playerName, S("Cannot paste to this node type!"))
     return
@@ -97,6 +111,9 @@ local function paste_state(pos, player)
   local networkId = logistica.get_network_id_or_nil(pos)
   if nodeDef and nodeDef.logistica and nodeDef.logistica.on_connect_to_network and networkId then
     nodeDef.logistica.on_connect_to_network(pos, networkId)
+  end
+  if nodeDef and nodeDef.logistica and nodeDef.logistica.on_paste_state then
+    nodeDef.logistica.on_paste_state(pos)
   end
   minetest.sound_play("off", { to_player = playerName, gain = 0.5, pitch = 0.7 })
   logistica.show_popup(playerName, S("Pasted to ")..get_node_desc(node.name))
