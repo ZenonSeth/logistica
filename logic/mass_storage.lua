@@ -37,6 +37,10 @@ local function take_item_from_supplier_for_mass_storage(pos, stack, allowCraftin
     if allowCrafting then
       logistica.take_item_from_crafting_supplier(pos, stack, network, collectFunc, false, false, 1)
     end
+  elseif logistica.GROUPS.cooking_suppliers.is(node.name) then
+    if allowCrafting then
+      logistica.take_item_from_cooking_supplier(pos, stack, network, collectFunc, false, false, 1)
+    end
   else
     logistica.take_item_from_supplier(pos, stack, network, collectFunc, false, false)
   end

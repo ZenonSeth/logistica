@@ -167,6 +167,17 @@ logistica.register_craft({
   }
 })
 
+if logistica.settings.enable_cooking_supplier then
+  logistica.register_craft({
+    output = L("cooking_supplier"),
+    recipe = {
+      {L("silverin_plate"),          L("compression_tank"), L("silverin_plate")},
+      {L("hardened_silverin_block"), L("crafting_supplier"), L("hardened_silverin_block")},
+      {L("silverin_plate"),          L("optic_cable"),      L("silverin_plate")},
+    }
+  })
+end -- enable_cooking_supplier
+
 if logistica.settings.enable_cobblestone_supplier then
   logistica.register_craft({
     output = L("cobblegen_supplier"),

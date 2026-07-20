@@ -276,6 +276,16 @@ function logistica.append_makes_infotext(pos, itemstack)
   meta:set_string("infotext", existing .. desc)
 end
 
+function logistica.append_recipe_infotext(pos, inputStack, outputStack)
+  local meta = minetest.get_meta(pos)
+  local existing = meta:get_string("infotext")
+  existing = existing:gsub("\nRecipe: [^\n]*$", "")
+  local desc = (not outputStack:is_empty())
+    and ("\nRecipe: "..inputStack:get_short_description().." -> "..outputStack:get_short_description())
+    or ""
+  meta:set_string("infotext", existing .. desc)
+end
+
 -- returns a value in the range [1,#listSize], incrementing the slot each 
 -- time this is called, and returining a slot that has an item
 -- if there's no item in the list, it will return 0

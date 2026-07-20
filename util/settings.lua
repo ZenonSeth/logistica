@@ -60,6 +60,10 @@ logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)
 
 logistica.settings.enable_cobblestone_supplier = get_bool("enable_cobblestone_supplier", true)
 
+logistica.settings.enable_cooking_supplier = get_bool("enable_cooking_supplier", true)
+
+logistica.settings.cooking_supplier_max_charge_seconds = get_int("cooking_supplier_max_charge_seconds", 10, 1, 60)
+
 logistica.settings.node_detector_max_distance = get_int("node_detector_max_distance", 16, 1, 32)
 
 logistica.settings.node_digger_max_distance = get_int("node_digger_max_distance", 16, 1, 32)
