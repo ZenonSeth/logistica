@@ -484,6 +484,17 @@ function logistica.count_items_in_network(itemName, network, respectReserve)
     end
   end
 
+  for hash, _ in pairs(network.item_storage) do
+    local pos = h2p(hash)
+    logistica.load_position(pos)
+    local list = logistica.get_list(minetest.get_meta(pos):get_inventory(), ITEM_STORAGE_LIST_NAME)
+    for _, stack in ipairs(list) do
+      if stack:get_name() == itemName then
+        count = count + stack:get_count()
+      end
+    end
+  end
+
   return count
 end
 
@@ -536,6 +547,21 @@ local function count_items_until_decided(itemName, network, respectReserve, thre
             count = count + stack:get_count()
             if should_stop() then return count end
           end
+        end
+      end
+    end
+  end
+
+  local itemLocations = network.item_storage
+  if itemLocations then
+    for hash, _ in pairs(itemLocations) do
+      local pos = h2p(hash)
+      logistica.load_position(pos)
+      local list = logistica.get_list(minetest.get_meta(pos):get_inventory(), ITEM_STORAGE_LIST_NAME)
+      for _, stack in ipairs(list) do
+        if stack:get_name() == itemName then
+          count = count + stack:get_count()
+          if should_stop() then return count end
         end
       end
     end
