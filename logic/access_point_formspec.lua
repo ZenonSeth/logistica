@@ -1576,6 +1576,10 @@ function logistica.access_point_allow_take(inv, listname, index, _stack, player)
       local taken = nil
       local acceptTaken = function(st) taken = st; return 0 end
 
+      -- count_meta is only for display in the fake inventory - strip it so metadata comparisons
+      -- against the actual stored stack (which never has count_meta) succeed
+      stack:get_meta():set_string("count_meta", "")
+
       -- for the rare case where two items got stacked despite using metadata
       local takeResult = logistica.take_stack_from_network(stack, network, acceptTaken, false, useMetadata, true)
       local error = nil ; if not takeResult.success then error = takeResult.error end
