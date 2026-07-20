@@ -112,31 +112,9 @@ function logistica.node_digger_try_dig(pos)
   if not logistica.get_network_id_or_nil(pos) then return false, nil end
 
   local toolStack = minetest.get_meta(pos):get_inventory():get_stack("tool", 1)
-  local toolName  = toolStack:is_empty() and "" or toolStack:get_name()
   local toolCaps  = toolStack:is_empty()
     and minetest.registered_items[""].tool_capabilities
     or toolStack:get_tool_capabilities()
-  local on_use    = (not toolStack:is_empty())
-    and (minetest.registered_items[toolName] or {}).on_use
-    or nil
-
-  if on_use then
-    local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
-    local digNode = minetest.get_node(pos)
-    local dir = logistica.get_rot_directions(digNode.param2).backward
-    local pointed_thing = {
-      type  = "node",
-      under = targetPos,
-      above = vector.subtract(targetPos, dir),
-    }
-    local ok, err = pcall(on_use, toolStack, ownerPlayer, pointed_thing)
-    if not ok then
-      minetest.log("error", "[logistica] node_digger on_use failed at "
-        .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err))
-      return false, nil
-    end
-    return true, nil
-  end
 
   if not can_tool_dig_node(targetNode.name, toolCaps) then
     return false, "wrong_tool"

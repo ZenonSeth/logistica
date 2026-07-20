@@ -70,29 +70,42 @@ function logistica.node_placer_show_target(pos, newParam2)
   logistica.show_output_at(targetPos, tostring(minetest.hash_node_position(pos)))
 end
 
--- Returns (placed: bool, errorKey: string|nil)
--- errorKey nil              = silent fail (no filter, or target protected)
--- errorKey "target_blocked" = target position is occupied
--- errorKey "no_item"        = item not found in network
-function logistica.node_placer_try_place(pos)
-  local filterName = logistica.node_placer_get_filter(pos)
-  if filterName == "" then return false, nil end
+-- items are "used" (e.g. a hoe on farmland, bonemeal on a plant) rather than placed as a
+-- node when the configured filter item defines an on_use handler
+local function try_use_item(pos, targetPos, filterName, ownerName, network)
+  local itemDef = minetest.registered_items[filterName]
+  local used = false
+  logistica.take_stack_from_network(
+    ItemStack(filterName .. " 1"),
+    network,
+    function(stack)
+      local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
+      local dir = logistica.get_rot_directions(minetest.get_node(pos).param2).backward
+      local pointed_thing = {
+        type  = "node",
+        under = targetPos,
+        above = vector.subtract(targetPos, dir),
+      }
+      local ok, result = pcall(itemDef.on_use, stack, ownerPlayer, pointed_thing)
+      if not ok then
+        minetest.log("error", "[logistica] node_placer on_use failed at "
+          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(result))
+        return stack:get_count()
+      end
+      used = true
+      return (result and result:get_count()) or 0
+    end,
+    true, false, false
+  )
+  return used, used and nil or "no_item"
+end
 
-  local targetPos = get_target_pos(pos)
-  if not targetPos then return false, nil end
-
+local function try_place_node(pos, targetPos, filterName, ownerName, network)
   local existing    = minetest.get_node(targetPos)
   local existingDef = minetest.registered_nodes[existing.name]
   local allowReplaceable = logistica.node_placer_get_allow_replaceable(pos)
   local canPlace = existingDef and (allowReplaceable and existingDef.buildable_to or existing.name == "air")
   if not canPlace then return false, "target_blocked" end
-
-  local ownerName = logistica.node_placer_get_owner(pos)
-
-  if minetest.is_protected(targetPos, ownerName) then return false, nil end
-
-  local network = logistica.get_network_or_nil(pos)
-  if not network then return false, "no_item" end
 
   local placed = false
   logistica.take_stack_from_network(
@@ -111,6 +124,32 @@ function logistica.node_placer_try_place(pos)
     true, false, false
   )
   return placed, placed and nil or "no_item"
+end
+
+-- Returns (success: bool, errorKey: string|nil)
+-- errorKey nil              = silent fail (no filter, or target protected)
+-- errorKey "target_blocked" = target position is occupied (node placement only)
+-- errorKey "no_item"        = item not found in network
+function logistica.node_placer_try_place(pos)
+  local filterName = logistica.node_placer_get_filter(pos)
+  if filterName == "" then return false, nil end
+
+  local targetPos = get_target_pos(pos)
+  if not targetPos then return false, nil end
+
+  local ownerName = logistica.node_placer_get_owner(pos)
+  if minetest.is_protected(targetPos, ownerName) then return false, nil end
+
+  local itemDef = minetest.registered_items[filterName]
+  if not itemDef then return false, nil end
+
+  local network = logistica.get_network_or_nil(pos)
+  if not network then return false, "no_item" end
+
+  if itemDef.on_use then
+    return try_use_item(pos, targetPos, filterName, ownerName, network)
+  end
+  return try_place_node(pos, targetPos, filterName, ownerName, network)
 end
 
 function logistica.node_placer_update_infotext(pos)

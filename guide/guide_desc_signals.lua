@@ -479,7 +479,7 @@ Configuration
 ------------------------------
 Filter slots: place up to 8 node items to restrict digging to only those node types. Leave all slots empty to dig any node at the target position regardless of type.
 
-Tool slot: place a tool to use when digging. Details to be documented.
+Tool slot: place a tool to dig with. The tool stays in this slot and is not consumed - its dig capabilities determine which nodes can be dug (matching the same rules as digging by hand or with a wielded tool). Leave empty to dig with bare hands. Items that only "use" on a node rather than dig it (e.g. a hoe, bonemeal) do not belong here - see the Signal Node Placer for that.
 
 Dig distance: the number of blocks behind the digger to target. Use the - and + buttons to adjust.
 
@@ -497,18 +497,18 @@ When disconnected from the network (dug up or isolated), the digger stops reacti
 ]])
 
 g.signal_node_placer = S([[
-The Signal Node Placer is a signal receiver that places a configured node at a set distance directly behind it when it receives a rising signal edge (OFF to ON). Items are drawn from network storage automatically.
+The Signal Node Placer is a signal receiver that places or uses a configured item at a set distance directly behind it when it receives a rising signal edge (OFF to ON). Items are drawn from network storage automatically.
 
 Usage
 ------------------------------
 Right-click to open the settings.
 Sneak+punch to highlight the target position.
 
-The infotext shows the configured node, distance, signal name, and current state.
+The infotext shows the configured item, distance, signal name, and current state.
 
 Configuration
 ------------------------------
-Node to place: put any placeable node item into the filter slot to set what the placer will place. Only registered nodes are accepted. Leave the slot empty and the placer will do nothing when triggered.
+Item to place/use: put a node item into the filter slot to have the placer place it, or an item that has its own "use" action (e.g. a hoe, bonemeal) to have the placer use it on the target position instead. Only registered items are accepted. Leave the slot empty and the placer will do nothing when triggered.
 
 Place distance: the number of blocks behind the placer to target. Distance 1 means the node directly behind it; distance 2 means one block further back, and so on. Use the - and + buttons to adjust.
 
@@ -518,9 +518,11 @@ Not: when this checkbox is checked, the placer fires on the falling edge instead
 
 Behavior
 ------------------------------
-When triggered, the placer checks the target position. If it is occupied (not air or otherwise not buildable), the trigger is silently ignored and no item is consumed. If the position is free, the placer takes one item of the configured node from the network and places it at the target.
+When the filter item is a node, triggering checks the target position first. If it is occupied (not air or otherwise not buildable), the trigger is silently ignored and no item is consumed. If the position is free, the placer takes one of the configured node from the network and places it at the target.
 
-The status line in the formspec turns red if the last placement attempt failed because the item was not available in the network. The status clears when placement succeeds or when the filter slot is changed.
+When the filter item instead has its own "use" action, the occupied check is skipped - the placer takes one from the network and uses it directly on the target position, just as a player would by pointing at that position and using the item. Whether the item is consumed depends on that item's own behavior (e.g. bonemeal is used up, most tools are not).
+
+The status line in the formspec turns red if the last attempt failed because the item was not available in the network. The status clears when the action succeeds or when the filter slot is changed.
 
 The placer stores an owner used for protection checks. Placement works whether or not the owner is online. However, some node types may require a player to be present for their placement logic to work correctly - in most cases this is not an issue. If a different player opens the formspec, they can press Take Ownership to become the new owner.
 

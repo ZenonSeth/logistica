@@ -46,6 +46,7 @@ local function get_formspec(pos, playerName)
     "list["..posForm..";filter;0.5,1.55;8,1;0]"..
     "label[0.5,2.75;"..FS("Tool:").."]"..
     "list["..posForm..";tool;0.5,3.0;1,1;0]"..
+    "label[2.0,3.0;"..FS("Only tools accepted here.\nTo 'use' items like bonemeal, use a Node Placer instead").."]"..
     "label[0.5,4.25;"..FS("Dig distance:").."]"..
     "button[3.0,3.9;0.65,0.65;dist_dec;-]"..
     "label[3.85,4.15;"..tostring(dist).."]"..
@@ -139,6 +140,8 @@ function logistica.register_signal_node_digger(desc, name, tiles)
       reshow_for_pos(pos)
       return 0
     elseif listname == "tool" then
+      local itemDef = minetest.registered_items[stack:get_name()]
+      if not itemDef or itemDef.type ~= "tool" then return 0 end
       return stack:get_count()
     end
     return 0

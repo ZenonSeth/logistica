@@ -18,7 +18,7 @@ local function get_formspec(pos, playerName)
   local lastError  = minetest.get_meta(pos):get_string("last_error")
   local statusText
   if lastError == "no_item" then
-    statusText = minetest.colorize("#FF4444", FS("Can't find item to place in network"))
+    statusText = minetest.colorize("#FF4444", FS("Can't find item to place/use in network"))
   elseif lastError == "target_blocked" then
     statusText = minetest.colorize("#FFCC00", FS("Target position is occupied, can't place"))
   else
@@ -41,7 +41,7 @@ local function get_formspec(pos, playerName)
     "label[5.5,0.4;"..FS("Sneak-punch to see target").."]"..
     "label[5.5,0.8;"..FS("Places node on signal ON (rising edge)").."]"..
     ownerRow..
-    "label[0.5,1.6;"..FS("Node to place:").."]"..
+    "label[0.5,1.6;"..FS("Item to place/use:").."]"..
     "list["..posForm..";filter;2.8,1.25;1,1;0]"..
     "label[4.0,1.6;"..filterDesc.."]"..
     "label[0.5,2.65;"..FS("Place distance:").."]"..
@@ -131,8 +131,8 @@ function logistica.register_signal_node_placer(desc, name, tiles)
   local function allow_inv_put(pos, listname, _, stack, player)
     if not logistica.player_has_network_access(pos, player:get_player_name()) then return 0 end
     if listname ~= "filter" then return 0 end
-    local itemDef = minetest.registered_nodes[stack:get_name()]
-    if not itemDef then return 0 end
+    local itemDef = minetest.registered_items[stack:get_name()]
+    if not itemDef or not (minetest.registered_nodes[stack:get_name()] or itemDef.on_use) then return 0 end
     local copy = ItemStack(stack:get_name())
     copy:set_count(1)
     minetest.get_meta(pos):get_inventory():set_stack("filter", 1, copy)
