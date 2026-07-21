@@ -97,8 +97,9 @@ local function try_use_item(pos, targetPos, filterName, ownerName, network)
     ItemStack(filterName .. " 1"),
     network,
     function(stack)
-      local ownerPlayer = (ownerName ~= "") and minetest.get_player_by_name(ownerName) or nil
       local dir = logistica.get_rot_directions(minetest.get_node(pos).param2).backward
+      local ownerPlayer = (ownerName ~= "") and (minetest.get_player_by_name(ownerName)
+        or logistica.create_fake_player(ownerName, pos, {dir = dir, wielded_item = stack})) or nil
       local pointed_thing = {
         type  = "node",
         under = targetPos,

@@ -45,8 +45,11 @@ end
 -- The player object is resolved internally and only used where available.
 -- Returns true on success, false on failure.
 function logistica.place_node(pos, node, playerName)
-  local player = (playerName and playerName ~= "")
-    and minetest.get_player_by_name(playerName) or nil
+  local player = nil
+  if playerName and playerName ~= "" then
+    player = minetest.get_player_by_name(playerName)
+      or logistica.create_fake_player(playerName, pos, {wielded_item = ItemStack(node.name)})
+  end
 
   logistica.load_position(pos)
 
@@ -116,8 +119,11 @@ end
 -- Does NOT apply tool wear (matching the signal digger's existing design).
 -- Returns the list of dropped ItemStacks, or nil on failure.
 function logistica.dig_node(pos, node, playerName, toolStack)
-  local player = (playerName and playerName ~= "")
-    and minetest.get_player_by_name(playerName) or nil
+  local player = nil
+  if playerName and playerName ~= "" then
+    player = minetest.get_player_by_name(playerName)
+      or logistica.create_fake_player(playerName, pos, {wielded_item = toolStack})
+  end
 
   local def = minetest.registered_nodes[node.name]
   if def and (not def.diggable or (def.can_dig and not def.can_dig(vector.copy(pos), player))) then
