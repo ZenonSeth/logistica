@@ -168,6 +168,7 @@ function logistica.register_signal_node_placer(desc, name, tiles)
   end
 
   local function after_dig(pos, oldNode, oldMeta, _)
+    logistica.node_placer_clear_pcall_error(pos)
     logistica.on_signal_receiver_change(pos, oldNode, oldMeta)
   end
 

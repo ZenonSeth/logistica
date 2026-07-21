@@ -9,6 +9,9 @@ local META_INVERT           = "invert_signal"
 local MIN_DISTANCE     = 1
 local MAX_DISTANCE     = logistica.settings.node_placer_max_distance
 
+-- in-memory only, does not need to survive a server restart
+local last_pcall_error_by_pos = {}
+
 function logistica.node_placer_get_signal_name(pos)
   local v = minetest.get_meta(pos):get_string(META_SIGNAL_NAME)
   return (v and v ~= "") and v or ""
@@ -70,6 +73,21 @@ function logistica.node_placer_show_target(pos, newParam2)
   logistica.show_output_at(targetPos, tostring(minetest.hash_node_position(pos)))
 end
 
+-- logs a pcall failure only when it differs from the last one logged at this pos,
+-- so a signal stuck toggling against a persistent error doesn't flood the log
+function logistica.node_placer_clear_pcall_error(pos)
+  last_pcall_error_by_pos[minetest.hash_node_position(pos)] = nil
+end
+
+local function log_pcall_error_once(pos, targetPos, context, err)
+  local hash = minetest.hash_node_position(pos)
+  local msg = "node_placer " .. context .. " failed at "
+    .. minetest.pos_to_string(targetPos) .. ": " .. tostring(err)
+  if last_pcall_error_by_pos[hash] == msg then return end
+  last_pcall_error_by_pos[hash] = msg
+  minetest.log("error", "[logistica] " .. msg)
+end
+
 -- items are "used" (e.g. a hoe on farmland, bonemeal on a plant) rather than placed as a
 -- node when the configured filter item defines an on_use handler
 local function try_use_item(pos, targetPos, filterName, ownerName, network)
@@ -88,10 +106,10 @@ local function try_use_item(pos, targetPos, filterName, ownerName, network)
       }
       local ok, result = pcall(itemDef.on_use, stack, ownerPlayer, pointed_thing)
       if not ok then
-        minetest.log("error", "[logistica] node_placer on_use failed at "
-          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(result))
+        log_pcall_error_once(pos, targetPos, "on_use", result)
         return stack:get_count()
       end
+      last_pcall_error_by_pos[minetest.hash_node_position(pos)] = nil
       used = true
       return (result and result:get_count()) or 0
     end,
@@ -114,11 +132,13 @@ local function try_place_node(pos, targetPos, filterName, ownerName, network)
     function(stack)
       local ok, didPlace = pcall(logistica.place_node, targetPos, {name = stack:get_name()}, ownerName)
       if not ok then
-        minetest.log("error", "[logistica] node_placer place_node failed at "
-          .. minetest.pos_to_string(targetPos) .. ": " .. tostring(didPlace))
+        log_pcall_error_once(pos, targetPos, "place_node", didPlace)
         return stack:get_count()
       end
-      if didPlace then placed = true end
+      if didPlace then
+        placed = true
+        last_pcall_error_by_pos[minetest.hash_node_position(pos)] = nil
+      end
       return didPlace and 0 or stack:get_count()
     end,
     true, false, false
