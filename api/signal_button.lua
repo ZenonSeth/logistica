@@ -7,13 +7,13 @@ local forms = {}
 local function get_formspec(pos)
   local sigName = logistica.signal_button_get_name(pos)
   return "formspec_version[4]"..
-    "size[7.8,3.1]"..
+    "size[8.3,3.1]"..
     logistica.ui.background..
     logistica.ui.button_style..
     "label[0.5,0.4;"..FS("Signal Button").."]"..
     "label[0.5,1.25;"..FS("Signal Name:").."]"..
-    "field[2.6,0.9;4.5,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
-    "label[2.6,1.85;"..FS("a-z 0-9 _ only").."]"..
+    "field[3.1,0.9;4.5,0.75;signal_name;;"..minetest.formspec_escape(sigName).."]"..
+    "label[3.1,1.85;"..FS("a-z 0-9 _ only").."]"..
     "button_exit[3.75,2.1;2.75,0.75;save;"..FS("Save").."]"
 end
 

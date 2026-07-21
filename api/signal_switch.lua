@@ -9,13 +9,13 @@ local function get_formspec(pos)
   local stateStr = logistica.signal_switch_is_on(pos) and FS("ON") or FS("OFF")
   local toggleLabel = logistica.signal_switch_is_on(pos) and FS("Turn Off") or FS("Turn On")
   return "formspec_version[4]"..
-    "size[7,3.5]"..
+    "size[7.5,3.5]"..
     logistica.ui.background..
     logistica.ui.button_style..
     "label[0.5,0.4;"..FS("Signal Switch").."]"..
     "label[0.5,0.9;"..FS("Signal Name:").."]"..
-    "field[2.0,0.7;4.5,0.75;signal_name;;"..minetest.formspec_escape(signalName).."]"..
-    "label[2.0,1.6;"..FS("a-z 0-9 _ only").."]"..
+    "field[2.5,0.7;4.5,0.75;signal_name;;"..minetest.formspec_escape(signalName).."]"..
+    "label[2.5,1.6;"..FS("a-z 0-9 _ only").."]"..
     "label[0.5,1.9;"..FS("State: ")..stateStr.."]"..
     "button[0.5,2.5;3,0.75;toggle;"..toggleLabel.."]"..
     "button_exit[3.75,2.5;2.75,0.75;save;"..FS("Save Name").."]"
