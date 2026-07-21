@@ -58,6 +58,8 @@ logistica.settings.enable_node_digger = get_bool("enable_node_digger", true)
 
 logistica.settings.enable_node_placer = get_bool("enable_node_placer", true)
 
+logistica.settings.enable_requester_programmer = get_bool("enable_requester_programmer", true)
+
 logistica.settings.enable_cobblestone_supplier = get_bool("enable_cobblestone_supplier", true)
 
 logistica.settings.enable_cooking_supplier = get_bool("enable_cooking_supplier", true)

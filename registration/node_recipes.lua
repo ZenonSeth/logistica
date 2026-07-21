@@ -482,6 +482,17 @@ if logistica.settings.enable_node_placer then
   })
 end
 
+if logistica.settings.enable_requester_programmer then
+  logistica.register_craft({
+    output = L("requester_programmer_on"),
+    recipe = {
+      {PLATE, CIRC,                 PLATE},
+      {RELAY, L("requester_item"), RELAY},
+      {PLATE, CIRC,                 PLATE},
+    }
+  })
+end
+
 logistica.register_craft({
   output = L("disassembler"),
   recipe = {

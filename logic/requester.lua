@@ -208,6 +208,12 @@ function logistica.set_requester_slot_amount(pos, i, amount)
   get_meta(pos):set_int(META_REQUESTER_AMOUNT_..i, amount)
 end
 
+-- sets filter slot i directly (used by the Requester Programmer); stack is expected to be count 1 or empty
+function logistica.set_requester_filter_slot(pos, i, stack)
+  get_meta(pos):get_inventory():set_stack("filter", i, stack)
+  logistica.update_cache_at_pos(pos, LOG_CACHE_REQUESTER)
+end
+
 -- migrates legacy data to the new per-slot amount fields.
 -- 1. Old inf meta set -> amount 9999, clear inf meta.
 -- 2. Filter slot count > 1 (old style) -> migrate count to amount field, reset to 1.

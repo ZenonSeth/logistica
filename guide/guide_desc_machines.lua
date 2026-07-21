@@ -427,6 +427,17 @@ The on/off switch in the Vacuum Chests's inventory enables whether the chest wil
 The Vacuum Chest also has a filter row. If any filter slots are filled, the chest will only pick up items matching those filters. If all filter slots are empty, the chest will pick up all nearby items.
 ]])
 
+g.requester_programmer = S([[
+The Requester Programmer remotely sets the filter and request amounts of the Requester it's facing (its back face must point at the Requester).
+
+- Has 4 signal-triggered rows plus 1 default row, each with its own 8 item slots and per-slot request amounts.
+- Right-click to configure: set a signal name on rows 1-4, fill in items and amounts, then Save.
+- Whichever active row has the lowest number wins (row 1 beats row 3 if both signals are on).
+- The default row (5) applies only when none of the 4 signals are ON.
+- Saving, or any change in one of its configured signals, immediately rewrites the target Requester's filter and amounts.
+- Always relays the network connection through to whatever is behind it, same as a Signal Network Switch left permanently on.
+]])
+
 g.rock_melter = S([[
 The Rock Melter is a network-connected machine that melts stone-type blocks into Lava, storing up to 16 buckets in its internal tank. The stored Lava is available to the network as a read-only Reservoir - any machine on the same network can draw Lava from it (for example, a Lava Furnace Fueler). Unlike regular Reservoirs, the network cannot store Lava into the Rock Melter; it only provides Lava outward.
 

@@ -14,6 +14,7 @@ logistica_enable_digiline_machines (Enable the Digiline Signal Sender and Digili
 logistica_enable_digiline_sender_api (Enable the Digiline Sender API programming feature) bool true
 logistica_enable_node_digger (Enable the Signal Node Digger) bool true
 logistica_enable_node_placer (Enable the Signal Node Placer) bool true
+logistica_enable_requester_programmer (Enable the Requester Programmer) bool true
 logistica_enable_cobblestone_supplier (Enable the Cobble Generator Supplier) bool true
 logistica_enable_cooking_supplier (Enable the Cooking Supplier) bool true
 logistica_cooking_supplier_max_charge_seconds (Max Time Charge, in seconds, a Cooking Supplier can accumulate) int 10 1 60

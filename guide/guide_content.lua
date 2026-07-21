@@ -28,6 +28,7 @@ local PAGE_CRAFTING_SUPPLIER = "mcrftsup"
 local PAGE_COOKING_SUPPLIER = "mcooksup"
 local PAGE_AUTOCRAFTER = "mautocrf"
 local PAGE_VACCUUM_CHEST = "mvacchs"
+local PAGE_REQUESTER_PROGRAMMER = "mreqprog"
 local PAGE_FARMING_SUPPLIER = "mfarmsup"
 local PAGE_SPRINKLER_UPGRADE = "isprinkup"
 local PAGE_WOODCUTTER = "mwoodcut"
@@ -129,6 +130,7 @@ local RECIPE_AUTOCRFT = getrec({L("autocrafter")})
 local RECIPE_BUCKFILL = getrec({L("bucket_filler")})
 local RECIPE_BUCKEMPT = getrec({L("bucket_emptier")})
 local RECIPE_VACCUUMC = getrec({L("vaccuum_chest")})
+local RECIPE_REQPROGRAMMER = getrec({L("requester_programmer_on")})
 local RECIPE_FARMSUP = getrec({L("farming_supplier")})
 local RECIPE_SPRINKUP = getrec({L("sprinkler_upgrade")})
 local RECIPE_WOODCUT  = getrec({L("woodcutter")})
@@ -263,6 +265,7 @@ local RECIPE_LINKS = {
   [L("farming_supplier")] = PAGE_FARMING_SUPPLIER,
   [L("disassembler")] = PAGE_DISASSEMBLER,
   [L("item_monitor")] = PAGE_ITEM_MONITOR,
+  [L("requester_programmer_on")] = PAGE_REQUESTER_PROGRAMMER,
 
 }
 
@@ -354,6 +357,7 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = S("  Leafcutter Upgrade"), id = PAGE_LEAVES_UPGRADE },
     { name = header(S("Utility Machines:"))},
     { name = S("  Vacuum Chest"), id = PAGE_VACCUUM_CHEST },
+    { name = S("  Requester Programmer"), id = PAGE_REQUESTER_PROGRAMMER },
     { name = S("  Lava Furnace Fueler"), id = PAGE_LAVA_FUELER },
     { name = S("  Rock Melter"), id = PAGE_ROCK_MELTER },
     { name = S("  Cobble Generator"), id = PAGE_COBBLE_GENERATOR },
@@ -602,6 +606,14 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_VACCUUMC,
       recipeLinks = RECIPE_LINKS,
       description = desc.vaccuum_chest,
+    },
+
+    [PAGE_REQUESTER_PROGRAMMER] = {
+      title = S("Requester Programmer"),
+      relatedItems = {L("requester_item"), L("requester_stack")},
+      recipes = RECIPE_REQPROGRAMMER,
+      recipeLinks = RECIPE_LINKS,
+      description = desc.requester_programmer,
     },
 
     [PAGE_FARMING_SUPPLIER] = {
