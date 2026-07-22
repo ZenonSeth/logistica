@@ -120,6 +120,14 @@ local function get_related_button_index_from_name(relatedButtonName)
 end
 
 
+-- true if the player holds at least one of the given privs
+local function has_any_priv(playerName, privNames)
+  for _, privName in ipairs(privNames) do
+    if minetest.check_player_privs(playerName, { [privName] = true }) then return true end
+  end
+  return false
+end
+
 local function build_filtered_toc(guideData, playerName, searchTerm)
   local currPageId = get_history(playerName).get_current()
   local itemsTbl = {}
@@ -129,8 +137,9 @@ local function build_filtered_toc(guideData, playerName, searchTerm)
   local searching = term ~= ""
 
   for i, entry in ipairs(guideData.tableOfContent) do
-    local match = true
-    if searching then
+    local visible = not entry.requiredPrivs or has_any_priv(playerName, entry.requiredPrivs)
+    local match = visible
+    if visible and searching then
       if not entry.id then
         match = false -- hide section headers when filtering
       else

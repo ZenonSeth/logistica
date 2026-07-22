@@ -49,6 +49,8 @@ local PAGE_COBBLE_GENERATOR_UPGR = "cbgnup"
 local PAGE_WIRELESS_ACCESS_PAD = "iwrlap"
 local PAGE_HYPERSPANNER = "ihyper"
 local PAGE_STATE_COPIER = "istatcp"
+local PAGE_INF_WAND = "iinfwnd"
+local PAGE_WAND = "iinvwnd"
 
 local PAGE_SILVERIN_CRYSTAL = "isilcry"
 local PAGE_SILVERIN_SLICE = "isilsli"
@@ -370,6 +372,9 @@ logistica.GuideApi.register(GUIDE_NAME, {
     { name = header(S("Tools:"))},
     { name = S("  Hyperspanner"), id = PAGE_HYPERSPANNER },
     { name = S("  State Copy Tool"), id = PAGE_STATE_COPIER },
+    { name = header(S("Admin Tools:")), requiredPrivs = {"give", "server"} },
+    { name = S("  Infinite Wand"), id = PAGE_INF_WAND, requiredPrivs = {"give", "server"} },
+    { name = S("  Inv List Scanner"), id = PAGE_WAND, requiredPrivs = {"give", "server"} },
     { name = header(S("Items:"))},
     { name = S("  Silverin Crystal"), id = PAGE_SILVERIN_CRYSTAL },
     { name = S("  Silverin Slice"), id = PAGE_SILVERIN_SLICE },
@@ -724,6 +729,18 @@ logistica.GuideApi.register(GUIDE_NAME, {
       recipes = RECIPE_STATECPY,
       recipeLinks = RECIPE_LINKS,
       description = desc.state_copier,
+    },
+
+    -- admin tools
+
+    [PAGE_INF_WAND] = {
+      title = S("Infinite Wand"),
+      description = desc.inf_wand,
+    },
+
+    [PAGE_WAND] = {
+      title = S("Inv List Scanner"),
+      description = desc.wand,
     },
 
     -- items

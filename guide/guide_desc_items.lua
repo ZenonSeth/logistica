@@ -47,6 +47,31 @@ Copy and paste the configuration of signal machines and logistics nodes.
 Supported node types: signal machines (senders, receivers, gates), Network Importers, and Request Inserters.
 ]])
 
+g.inf_wand = S([[
+An admin/debug tool, not obtainable through normal play.
+
+Use /giveme logistica:inf_wand
+
+Right-click a Mass Storage, Passive Supplier Chest, or Reservoir to toggle it between normal and infinite supply.
+
+While a node is marked infinite:
+- A Passive Supplier Chest will fulfil any network request for an item it holds without ever running out of that item.
+- A Mass Storage will fulfil withdrawals of its stored items the same way, without depleting its stock.
+- A Reservoir will never run dry when drained (by bucket or pump), and never blocks further deposits once full.
+
+This only affects automated network requests and pumps/bucket-fillers - manually taking items out of a chest's inventory screen still physically removes them. The infinite flag does not survive digging up the node; it is tied to that specific placed node.
+]])
+
+g.wand = S([[
+An admin/debug tool, not obtainable through normal play.
+
+Use /giveme logistica:wand
+
+Right-click (use) it on any node to list the names of its metadata inventory lists (e.g. "main", "filter", "storage") in a popup.
+
+Useful for figuring out which inventory list name to reference when inspecting or scripting against a node's inventory.
+]])
+
 g.hyperspanner = S([[
 A multipurpose engineering tool.
 
