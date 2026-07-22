@@ -117,6 +117,8 @@ local queueInventories = {}  -- [playerName] = invName
 local supplyInventories = {}  -- [playerName] = invName
 -- per-position detached output inventories for autocrafting
 local outputInventories = {}  -- [posHash] = invName
+-- per-position detached trash inventories (trash slot + last deleted item slot)
+local trashInventories = {}  -- [posHash] = invName
 
 local function get_or_create_queue_inv(playerName)
   if queueInventories[playerName] then return queueInventories[playerName] end
@@ -179,6 +181,59 @@ local function get_or_create_output_inv(pos)
     end
   end
   outputInventories[posHash] = invName
+  return invName
+end
+
+local AP_TRASH_LIST     = "ap_trash"
+local AP_TRASH_DST_LIST = "ap_trash_dst"
+local AP_TRASH_DST_META_KEY = "ap_trash_dst_backup"
+
+local function sync_trash_dst_to_meta(pos)
+  logistica.load_position(pos)
+  local invName = trashInventories[minetest.hash_node_position(pos)]
+  if not invName then return end
+  local inv = minetest.get_inventory({type = "detached", name = invName})
+  if not inv then return end
+  local stack = inv:get_stack(AP_TRASH_DST_LIST, 1)
+  minetest.get_meta(pos):set_string(AP_TRASH_DST_META_KEY, stack:to_string())
+end
+
+local function get_or_create_trash_inv(pos)
+  local posHash = minetest.hash_node_position(pos)
+  if trashInventories[posHash] then return trashInventories[posHash] end
+  local invName = "Logistica_AP_Trash_"..posHash
+  local inv = minetest.create_detached_inventory(invName, {
+    allow_move = function() return 0 end,
+    allow_put  = function(_, listname, _, stack, player)
+      if listname ~= AP_TRASH_LIST then return 0 end
+      local pName = player:get_player_name()
+      if not logistica.player_has_network_access(pos, pName) then return 0 end
+      return stack:get_count()
+    end,
+    allow_take = function(_, listname, _, stack, player)
+      if listname ~= AP_TRASH_DST_LIST then return 0 end
+      local pName = player:get_player_name()
+      if not logistica.player_has_network_access(pos, pName) then return 0 end
+      return stack:get_count()
+    end,
+    on_move = function() end,
+    on_put  = function(sinv, listname, index)
+      if listname ~= AP_TRASH_LIST then return end
+      local stack = sinv:get_stack(listname, index)
+      sinv:set_stack(listname, index, ItemStack(""))
+      sinv:set_stack(AP_TRASH_DST_LIST, 1, stack)
+      sync_trash_dst_to_meta(pos)
+    end,
+    on_take = function() sync_trash_dst_to_meta(pos) end,
+  })
+  inv:set_size(AP_TRASH_LIST, 1)
+  inv:set_size(AP_TRASH_DST_LIST, 1)
+  logistica.load_position(pos)
+  local saved = minetest.get_meta(pos):get_string(AP_TRASH_DST_META_KEY)
+  if saved ~= "" then
+    inv:set_stack(AP_TRASH_DST_LIST, 1, ItemStack(saved))
+  end
+  trashInventories[posHash] = invName
   return invName
 end
 
@@ -384,10 +439,6 @@ local function get_listrings(invName) return
   "listring[detached:"..invName..";"..INV_INSERT.."]"..
   "listring[current_player;main]"..
   "listring[detached:"..invName..";"..INV_FAKE.."]"..
-  "listring[current_player;main]"..
-  "listring[current_player;craft]"..
-  "listring[current_player;main]"..
-  "listring[current_player;craftpreview]"..
   "listring[current_player;main]"..
   "listring[detached:"..invName..";"..INV_LIQUID.."]"
 end
@@ -1150,6 +1201,7 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
   local formH   = AC_FORM_H_AC
   local plrInvY = AC_PLAYER_INV_Y_AC
   local craftYOff = AC_PLAYER_INV_Y_AC - AP_PLAYER_INV_Y
+  local trashInvName = get_or_create_trash_inv(pos)
 
   return "formspec_version[4]"..
     "size["..logistica.inv_size(15.2, formH).."]"..
@@ -1158,9 +1210,12 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
     tabHeader..
     topContent..
     logistica.player_inv_formspec(AP_PLAYER_INV_X, plrInvY)..
-    "label[1.4,"..(12.7+TAB_Y+craftYOff)..";"..S("Crafting").."]"..
-    "list[current_player;craft;0.2,"..(9.0+TAB_Y+craftYOff)..";3,3;]"..
-    "list[current_player;craftpreview;3.9,"..(9.0+TAB_Y+craftYOff)..";1,1;]"
+    "label[1.7,"..(9.1+TAB_Y+craftYOff)..";"..S("Trash slot").."]"..
+    "list[detached:"..trashInvName..";"..AP_TRASH_LIST..";1.7,"..(9.4+TAB_Y+craftYOff)..";1,1;]"..
+    "label[1.7,"..(11.1+TAB_Y+craftYOff)..";"..S("Last deleted item").."]"..
+    "list[detached:"..trashInvName..";"..AP_TRASH_DST_LIST..";1.7,"..(11.4+TAB_Y+craftYOff)..";1,1;]"..
+    "listring[detached:"..trashInvName..";"..AP_TRASH_DST_LIST.."]"..
+    "listring[current_player;main]"
 end
 
 local function clear_stale_ac_queue(pos)
@@ -1180,6 +1235,7 @@ local function ensure_ap_inventories(pos)
   local inv = minetest.get_meta(pos):get_inventory()
   if inv:get_size(logistica.AP_UPGRADE_LIST) < 1 then inv:set_size(logistica.AP_UPGRADE_LIST, 1) end
   get_or_create_output_inv(pos)
+  get_or_create_trash_inv(pos)
   clear_stale_ac_queue(pos)
 end
 
@@ -1726,6 +1782,11 @@ function logistica.access_point_on_dug(pos)
     logistica.access_point_on_player_leave(playerName)
   end
   local posHash = minetest.hash_node_position(pos)
+  local trashInvName = trashInventories[posHash]
+  if trashInvName then
+    minetest.remove_detached_inventory(trashInvName)
+    trashInventories[posHash] = nil
+  end
   local invName = outputInventories[posHash]
   if invName then
     minetest.remove_detached_inventory(invName)

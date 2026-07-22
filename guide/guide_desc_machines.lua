@@ -11,7 +11,7 @@ Controllers allow you to rename the network, but this is for visual identificati
 g.access_point = S([[
 The Access Point provides easy access to all Storage devices connected to the Network.
 
-It can both take and insert items into the network's storage. It provides a Crafting Grid built into it for convenience.
+It can both take and insert items into the network's storage.
 
 You can also access an Access Point and all its features remotely using a Wireless Access Pad synced to the Access Point.
 
@@ -64,6 +64,12 @@ Below the Filter and Sort sections are Deposit buttons that let you empty your i
 - In Tool Chests: deposits only into Tool Chests on the network.
 
 Any items that can't be deposited by a given button are left in your inventory.
+
+Trash slot
+------------------------------
+Below the player inventory is a Trash slot and a Last Deleted Item slot. Any item put into the Trash slot is immediately deleted, and a copy is moved into the Last Deleted Item slot.
+
+The Last Deleted Item slot only holds the most recently deleted item - putting another item into the Trash slot will permanently lose whatever was previously in the Last Deleted Item slot.
 ]])
 
 g.access_point_storage = S([[
