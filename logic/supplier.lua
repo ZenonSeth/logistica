@@ -125,21 +125,25 @@ function logistica.take_item_from_supplier(supplierPos, stackToTake, network, co
   if stackToTake:get_stack_max() == 1 and useMetadata then eq = function(s1, s2) return s1:equals(s2) end end
   logistica.load_position(supplierPos)
   local remaining = stackToTake:get_count()
+  local isInfinite = logistica.is_pos_infinite(supplierPos)
 
   local supplierInv = minetest.get_meta(supplierPos):get_inventory()
   local supplyList = logistica.get_list(supplierInv, META_SUPPLIER_LIST)
   for i, supplyStack in ipairs(supplyList) do
   if i ~= optIgnorePosition and eq(supplyStack, stackToTake) then
     local supplyCount = supplyStack:get_count()
+    if isInfinite then supplyCount = remaining end
     if supplyCount >= remaining then -- enough to fulfil requested
       local toSend = ItemStack(supplyStack) ; toSend:set_count(remaining)
       local leftover = collectorFunc(toSend)
-      local newSupplyCount = supplyCount - remaining + leftover
-      supplyStack:set_count(newSupplyCount)
-      if not dryRun then
-        supplierInv:set_stack(META_SUPPLIER_LIST, i, supplyStack)
-        if newSupplyCount <= 0 then
-          logistica.update_cache_at_pos(supplierPos, LOG_CACHE_SUPPLIER, network)
+      if not isInfinite then
+        local newSupplyCount = supplyCount - remaining + leftover
+        supplyStack:set_count(newSupplyCount)
+        if not dryRun then
+          supplierInv:set_stack(META_SUPPLIER_LIST, i, supplyStack)
+          if newSupplyCount <= 0 then
+            logistica.update_cache_at_pos(supplierPos, LOG_CACHE_SUPPLIER, network)
+          end
         end
       end
       return ret(0)

@@ -2,6 +2,7 @@
 logistica.TRANSLATOR = minetest.get_translator(logistica.MODNAME)
 
 local META_ON_OFF_KEY = "logonoff"
+local META_INFINITE_KEY = "loginfinite"
 
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 local function rand_str(length, seed)
@@ -272,6 +273,18 @@ function logistica.set_node_tooltip_from_state(pos, extraText, overrideState)
   local nodeDef = minetest.registered_nodes[node.name]
   local text = (nodeDef and nodeDef.description or "")..extraText.."\n"..isOnText
   meta:set_string("infotext", text)
+end
+
+function logistica.is_pos_infinite(pos)
+  return minetest.get_meta(pos):get_string(META_INFINITE_KEY) == "1"
+end
+
+-- toggles the infinite flag at pos and returns the new state (true/false)
+function logistica.toggle_pos_infinite(pos)
+  local meta = minetest.get_meta(pos)
+  local newState = not logistica.is_pos_infinite(pos)
+  meta:set_string(META_INFINITE_KEY, newState and "1" or "")
+  return newState
 end
 
 function logistica.append_makes_infotext(pos, itemstack)

@@ -259,19 +259,23 @@ function logistica.take_stack_from_mass_storage(stackToTake, network, collectorF
     local meta = get_meta(storagePos)
     local storageInv = meta:get_inventory()
     local storageList = logistica.get_list(storageInv, MASS_STORAGE_LIST_NAME)
+    local isInfinite = logistica.is_pos_infinite(storagePos)
     -- we can't use the usual take/put methods because mass storage exceeds max stack
     for i = #storageList, 1, -1 do -- traverse backwards for taking items
       local storageStack = storageList[i]
       local slotReserve = logistica.get_mass_storage_reserve(meta, i)
       local available = storageStack:get_count()
       if isAutomatedRequest then available = math.max(0, available - slotReserve) end
+      if isInfinite then available = remainingRequest end
       if stackToTakeName == storageStack:get_name() and available > 0 then
         local numTaken = math.min(available, remainingRequest)
         local takenStack = ItemStack(stackToTake)
         takenStack:set_count(numTaken)
         local leftover = collectorFunc(takenStack)
         numTaken = numTaken - leftover
-        storageStack:set_count(storageStack:get_count() - numTaken)
+        if not isInfinite then
+          storageStack:set_count(storageStack:get_count() - numTaken)
+        end
         remainingRequest = remainingRequest - numTaken
         if remainingRequest <= 0 then
           if not dryRun then

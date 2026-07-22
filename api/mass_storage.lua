@@ -400,12 +400,19 @@ local function on_receive_storage_formspec(player, formname, fields)
   return true
 end
 
+function logistica.update_mass_storage_infotext(pos)
+  local meta = minetest.get_meta(pos)
+  local text = S("Mass Storage")
+  if logistica.is_pos_infinite(pos) then text = text.."\n"..S("INFINITE") end
+  meta:set_string("infotext", text)
+end
+
 local function after_place_mass_storage(pos, placer, itemstack, numSlots, numUpgradeSlots)
   local meta = minetest.get_meta(pos)
   if placer and placer:is_player() then
     meta:set_string("owner", placer:get_player_name())
   end
-  meta:set_string("infotext", S("Mass Storage"))
+  logistica.update_mass_storage_infotext(pos)
   local nodeName = minetest.get_node(pos).name
   local inv = meta:get_inventory()
   inv:set_size("main", 1)

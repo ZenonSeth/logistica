@@ -92,8 +92,10 @@ function logistica.reservoir_make_param2(val, max)
   return ret
 end
 
-function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName)
-  return strDescription.."\n"..getStrContains(currBuckets, maxBuckets, liquidName)
+function logistica.reservoir_get_description(currBuckets, maxBuckets, liquidName, isInfinite)
+  local text = strDescription.."\n"..getStrContains(currBuckets, maxBuckets, liquidName)
+  if isInfinite then text = text.."\n"..S("INFINITE") end
+  return text
 end
 
 function logistica.reservoir_register_names(liquidName, bucketName, emptyBucketName, liquidDesc, liquidTexture, sourceNodeNames)
@@ -139,6 +141,7 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
   local liquidName = nodeDef.logistica.liquidName
   local maxBuckets = nodeDef.logistica.maxBuckets
   local liquidDesc = logistica.reservoir_get_description_of_liquid(liquidName)
+  local isInfinite = logistica.is_pos_infinite(pos)
 
   local isReservoirFull = liquidName ~= LIQUID_NONE
 
@@ -153,13 +156,17 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
   end
 
   if tryToFillBucket then
-    if nodeLiquidLevel == 0 then
+    if nodeLiquidLevel == 0 and not isInfinite then
       -- make sure we swap this for the empty reservoir
       logistica.swap_node(pos, get_empty_reservoir_name(node.name, liquidName))
       return nil
     end
     local fullBucket = get_filled_bucket_for_empty_and_liquid(itemStackName, liquidName)
     if not fullBucket then return nil end
+
+    if isInfinite then
+      return ItemStack(fullBucket)
+    end
 
     nodeLiquidLevel = nodeLiquidLevel - 1
     if nodeDef.paramtype2 ~= "facedir" then
@@ -177,7 +184,7 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
         if not minetest.registered_nodes[newNodeName] then return nil end
         logistica.swap_node(pos, newNodeName)
       end
-      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, liquidDesc))
+      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, liquidDesc, isInfinite))
     end
 
     return ItemStack(fullBucket)
@@ -188,7 +195,10 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
     if not newEmptyBucket then return nil end
 
     nodeLiquidLevel = nodeLiquidLevel + 1
-    if nodeLiquidLevel > maxBuckets then return nil end
+    if nodeLiquidLevel > maxBuckets then
+      if not isInfinite then return nil end
+      nodeLiquidLevel = maxBuckets
+    end
     local newNodeName = get_liquid_reservoir_name_for(node.name, newLiquidName)
 
     local nodeDef = minetest.registered_nodes[newNodeName]
@@ -200,7 +210,7 @@ function logistica.reservoir_use_item_on(pos, itemstack, optNode, dryRun)
         logistica.swap_node(pos, newNodeName)
       end
       local newLiquidDesc = logistica.reservoir_get_description_of_liquid(nodeDef.logistica.liquidName)
-      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
+      meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc, isInfinite))
       meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
     end
     return ItemStack(newEmptyBucket)
@@ -221,9 +231,13 @@ function logistica.reservoir_deposit_lava_unit(pos, optNode, dryRun)
   local liquidName = nodeDef.logistica.liquidName
   if liquidName ~= LAVA_LIQUID_NAME and liquidName ~= LIQUID_NONE then return false end
 
+  local isInfinite = logistica.is_pos_infinite(pos)
   local maxBuckets = nodeDef.logistica.maxBuckets
   local nodeLiquidLevel = meta:get_int(META_LIQUID_LEVEL) + 1
-  if nodeLiquidLevel > maxBuckets then return false end
+  if nodeLiquidLevel > maxBuckets then
+    if not isInfinite then return false end
+    nodeLiquidLevel = maxBuckets
+  end
 
   local newNodeName = get_liquid_reservoir_name_for(node.name, LAVA_LIQUID_NAME)
   local newNodeDef = minetest.registered_nodes[newNodeName]
@@ -236,7 +250,7 @@ function logistica.reservoir_deposit_lava_unit(pos, optNode, dryRun)
       logistica.swap_node(pos, newNodeName)
     end
     local newLiquidDesc = logistica.reservoir_get_description_of_liquid(newNodeDef.logistica.liquidName)
-    meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc))
+    meta:set_string("infotext", logistica.reservoir_get_description(nodeLiquidLevel, maxBuckets, newLiquidDesc, isInfinite))
     meta:set_int(META_LIQUID_LEVEL, nodeLiquidLevel)
   end
   return true
