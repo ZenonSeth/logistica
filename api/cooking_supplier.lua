@@ -24,6 +24,8 @@ local function get_lava_img(currLava, lavaCap)
   return img.."tooltip[0.4,1.4;1,3;"..FS("Remaining: ")..(currLava/1000)..FS(" Buckets").."]"
 end
 
+local SHOW_ITEM_TOOLTIP = FS("Show the cooked item on the front of this node")
+
 local function get_cooksup_formspec(pos)
   local posForm = "nodemeta:"..pos.x..","..pos.y..","..pos.z
   local isOn = logistica.is_machine_on(pos)
@@ -33,6 +35,7 @@ local function get_cooksup_formspec(pos)
   local chargeCapSeconds = logistica.cooking_supplier_get_charge_capacity_seconds()
   local errorText = logistica.cooking_supplier_get_error(pos)
   local cookTime = logistica.cooking_supplier_get_configured_cook_time(pos)
+  local showStr = logistica.cooking_supplier_get_show_item(pos) and "true" or "false"
 
   local cookTimeLabel = ""
   if errorText ~= "" then
@@ -53,6 +56,8 @@ local function get_cooksup_formspec(pos)
     "list["..posForm..";"..INV_CONFIG..";3.5,2.3;1,1;0]"..
     "label[5.8,2.0;"..FS("Output").."]"..
     "list["..posForm..";"..INV_MAIN..";5.8,2.3;1,1;0]"..
+    "checkbox[7.0,2.35;show_item;"..FS("Show Item")..";"..showStr.."]"..
+    "tooltip[show_item;"..SHOW_ITEM_TOOLTIP.."]"..
     cookTimeLabel..
     "label[0.5,5.6;"..FS("Excess items, provided as supply. If full, excess will be thrown out.").."]"..
     "list["..posForm..";"..INV_MAIN..";0.4,5.9;8,1;1]"..
@@ -93,6 +98,10 @@ local function on_player_receive_fields(player, formname, fields)
     logistica.toggle_machine_on_off(pos)
     show_cooksup_formspec(player:get_player_name(), pos)
   end
+  if fields.show_item then
+    logistica.cooking_supplier_set_show_item(pos, fields.show_item == "true")
+    logistica.cooking_supplier_update_front_image(pos)
+  end
   return true
 end
 
@@ -100,6 +109,15 @@ local function on_cooksup_rightclick(pos, node, clicker, itemstack, pointed_thin
   if not clicker or not clicker:is_player() then return end
   if logistica.should_hide_from_player(pos, clicker:get_player_name()) then return end
   show_cooksup_formspec(clicker:get_player_name(), pos)
+end
+
+local function on_cooksup_rotate(pos, node, player, mode, newParam2)
+  logistica.cooking_supplier_update_front_image(pos, newParam2)
+end
+
+local function after_dig_cooksup(pos, oldNode, oldMeta)
+  logistica.remove_item_on_block_front(pos)
+  logistica.on_supplier_change(pos, oldNode, oldMeta)
 end
 
 local function after_place_cooksup(pos, placer, itemstack)
@@ -215,8 +233,9 @@ function logistica.register_cooking_supplier(desc, name, tiles)
     drop = supplier_name,
     sounds = logistica.node_sound_metallic(),
     after_place_node = after_place_cooksup,
-    after_dig_node = logistica.on_supplier_change,
+    after_dig_node = after_dig_cooksup,
     on_rightclick = on_cooksup_rightclick,
+    on_rotate = on_cooksup_rotate,
     allow_metadata_inventory_put = allow_cooksup_storage_inv_put,
     allow_metadata_inventory_take = allow_cooksup_inv_take,
     allow_metadata_inventory_move = allow_cooksup_inv_move,
@@ -242,7 +261,7 @@ function logistica.register_cooking_supplier(desc, name, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1, pickaxey = 1, axey = 1, handy = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_dig_node = nil
+  def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

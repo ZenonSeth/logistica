@@ -4,9 +4,10 @@ local INV_MAIN   = "main"
 local INV_CONFIG = "config"
 local INV_HOUT   = "hout"
 
-local META_LAVA   = "lava_reserve"
-local META_CHARGE = "cook_charge"
-local META_ERROR  = "cook_err"
+local META_LAVA      = "lava_reserve"
+local META_CHARGE    = "cook_charge"
+local META_ERROR     = "cook_err"
+local META_SHOW_ITEM = "show_item"
 
 local LAVA_MAX = 2000 -- 2 buckets
 
@@ -375,8 +376,25 @@ function logistica.take_item_from_cooking_supplier(pos, _takeStack, network, col
   return ret(remaining)
 end
 
+function logistica.cooking_supplier_get_show_item(pos)
+  return minetest.get_meta(pos):get_int(META_SHOW_ITEM) == 1
+end
+
+function logistica.cooking_supplier_set_show_item(pos, shouldShow)
+  minetest.get_meta(pos):set_int(META_SHOW_ITEM, shouldShow and 1 or 0)
+end
+
+-- `newParam2` is optional, will override the lookup of node.param2 for rotation
+function logistica.cooking_supplier_update_front_image(pos, newParam2)
+  logistica.remove_item_on_block_front(pos)
+  if not logistica.cooking_supplier_get_show_item(pos) then return end
+  local item = minetest.get_meta(pos):get_inventory():get_stack(INV_MAIN, 1)
+  logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
+end
+
 function logistica.cooking_supplier_update_output(pos)
   local meta = minetest.get_meta(pos)
   update_cook_output(pos, meta, meta:get_inventory())
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.cooking_supplier_update_front_image(pos)
 end

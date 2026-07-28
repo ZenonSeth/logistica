@@ -3,6 +3,7 @@ local S = logistica.TRANSLATOR
 local INV_MAIN = "main"
 local INV_CRAFT = "crf"
 local INV_HOUT = "hout"
+local META_SHOW_ITEM = "show_item"
 
 local function ret(remaining, optError)
   return { remaining = remaining, error = optError and S(optError) or nil }
@@ -219,7 +220,24 @@ function logistica.take_item_from_crafting_supplier(pos, _takeStack, network, co
   return ret(remaining)
 end
 
+function logistica.crafting_supplier_get_show_item(pos)
+  return minetest.get_meta(pos):get_int(META_SHOW_ITEM) == 1
+end
+
+function logistica.crafting_supplier_set_show_item(pos, shouldShow)
+  minetest.get_meta(pos):set_int(META_SHOW_ITEM, shouldShow and 1 or 0)
+end
+
+-- `newParam2` is optional, will override the lookup of node.param2 for rotation
+function logistica.crafting_supplier_update_front_image(pos, newParam2)
+  logistica.remove_item_on_block_front(pos)
+  if not logistica.crafting_supplier_get_show_item(pos) then return end
+  local item = minetest.get_meta(pos):get_inventory():get_stack(INV_MAIN, 1)
+  logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
+end
+
 function logistica.crafting_supplier_update_output(pos)
   update_craft_output(pos, minetest.get_meta(pos):get_inventory())
   logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+  logistica.crafting_supplier_update_front_image(pos)
 end
