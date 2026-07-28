@@ -44,6 +44,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+  output = L("on_off_tool"),
+  recipe = {
+    {L("silverin_circuit")},
+    {L("optic_cable")},
+    {L("silverin_plate")},
+  }
+})
+
+minetest.register_craft({
   output = L("state_copier"),
   recipe = {
     {itemstrings.crystal},
