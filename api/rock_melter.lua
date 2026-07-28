@@ -30,7 +30,8 @@ minetest.after(0, function()
 end)
 
 local function is_valid_stone(itemname)
-  if minetest.get_item_group(itemname, "stone") == 0 then return false end
+  if minetest.get_item_group(itemname, "stone") == 0
+    and minetest.get_item_group(itemname, "cobble") == 0 then return false end
   local def = minetest.registered_nodes[itemname]
   if not def then return false end
   local dt = def.drawtype
