@@ -73,6 +73,7 @@ local function on_craftsup_rotate(pos, node, player, mode, newParam2)
 end
 
 local function after_dig_craftsup(pos, oldNode, oldMeta)
+  logistica.crafting_supplier_cancel_pending_display_update(pos)
   logistica.remove_item_on_block_front(pos)
   logistica.on_supplier_change(pos, oldNode, oldMeta)
 end
@@ -215,7 +216,10 @@ function logistica.register_crafting_supplier(desc, name, tiles)
   def_disabled.tiles = tiles_disabled
   def_disabled.groups = { oddly_breakable_by_hand = 3, cracky = 3, choppy = 3, not_in_creative_inventory = 1, pickaxey = 1, axey = 1, handy = 1 }
   def_disabled.on_construct = nil
-  def_disabled.after_dig_node = function(pos, _) logistica.remove_item_on_block_front(pos) end
+  def_disabled.after_dig_node = function(pos, _)
+    logistica.crafting_supplier_cancel_pending_display_update(pos)
+    logistica.remove_item_on_block_front(pos)
+  end
   def_disabled.on_punch = nil
   def_disabled.on_rightclick = nil
   def_disabled.on_timer = nil

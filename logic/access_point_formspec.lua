@@ -66,7 +66,7 @@ local STR_TOOLS_DESC = S("Show Tools only")
 local STR_LIGHT_DESC = S("Show Light sources only")
 local STR_SERCH_DESC = S("Search by text\nUse group:some_group to find items belongong to some_group")
 local STR_CLEAR_DESC = S("Clear search")
-local STR_INC_BAGS_DESC = S("Also despoit items directly from Unified Inventory bags")
+local STR_INC_BAGS_DESC = S("Also deposit items directly from Unified Inventory bags")
 
 -- height added at the top for the tab header row
 local TAB_Y = 0.8

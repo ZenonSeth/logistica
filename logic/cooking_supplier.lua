@@ -403,10 +403,18 @@ function logistica.cooking_supplier_update_output(pos)
   -- which is expensive if triggered on every single inventory click, so debounce it separately
   local hash = minetest.hash_node_position(pos)
   if pendingDisplayUpdates[hash] then return end
-  pendingDisplayUpdates[hash] = true
-  minetest.after(DISPLAY_UPDATE_DEBOUNCE_S, function()
+  pendingDisplayUpdates[hash] = minetest.after(DISPLAY_UPDATE_DEBOUNCE_S, function()
     pendingDisplayUpdates[hash] = nil
     logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
     logistica.cooking_supplier_update_front_image(pos)
   end)
+end
+
+function logistica.cooking_supplier_cancel_pending_display_update(pos)
+  local hash = minetest.hash_node_position(pos)
+  local job = pendingDisplayUpdates[hash]
+  if job then
+    job:cancel()
+    pendingDisplayUpdates[hash] = nil
+  end
 end
