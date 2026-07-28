@@ -33,7 +33,8 @@ local function is_allowed(nodeName)
   end
   return false
 end
-local COPY_INV_LISTS = { filter = true, tool = true, crf = true }
+-- "tool" holds a real physical item (node digger's dig tool), never copy it to avoid duplication
+local COPY_INV_LISTS = { filter = true, crf = true }
 
 local function base_name(nodeName)
   if nodeName:sub(-3) == "_on" then
