@@ -536,9 +536,9 @@ local function plan_item(item_name, count, virtual, expanding, network)
   return nil, last_missing
 end
 
--- Takes `count` of `item_name` from mass storage and normal suppliers only
--- (matching what count_items_in_network counts). Appends taken stacks to `taken`.
--- Returns true if the full count was collected.
+-- Takes `count` of `item_name` from mass storage, normal suppliers, and item
+-- storage (matching what count_items_in_network counts). Appends taken stacks
+-- to `taken`. Returns true if the full count was collected.
 local function take_from_storage_only(item_name, count, network, taken)
   local collected = 0
   local collector = function(st)
@@ -557,6 +557,20 @@ local function take_from_storage_only(item_name, count, network, taken)
   local supp_stack = ItemStack(item_name)
   supp_stack:set_count(still_need)
   logistica.take_stack_from_suppliers(supp_stack, network, collector, false, false, false, 0, "normal")
+
+  still_need = count - collected
+  if still_need <= 0 then return true end
+
+  -- take_stack_from_item_storage only ever removes a single item per call
+  -- (item storage only holds stack_max=1 items), so call it repeatedly until
+  -- the remaining need is met or it can't find any more.
+  while still_need > 0 do
+    local storage_stack = ItemStack(item_name)
+    storage_stack:set_count(1)
+    local result = logistica.take_stack_from_item_storage(storage_stack, network, collector, false, false, false)
+    if not result.success then break end
+    still_need = count - collected
+  end
 
   return (count - collected) <= 0
 end
