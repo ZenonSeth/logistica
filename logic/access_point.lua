@@ -8,6 +8,7 @@ local META_FILTER_TYPE = "ap_fltr"
 local META_CURR_SEARCH = "ap_curr_s"
 local META_IGNORE_METADATA = "ap_usemd"
 local META_CURR_LIQUID_INDEX = "ap_curr_l"
+local META_INCLUDE_BAGS = "ap_incbags"
 
 local STR_NO_LIQUID = S("No Liquid Storage")
 local STR_EMPTY_RESERVOIRS = S("Free Capacity:")
@@ -215,6 +216,17 @@ function logistica.access_point_toggle_use_metadata(pos)
   local new = (curr + 1) % 2
   meta:set_int(META_IGNORE_METADATA, new)
   return new == 0
+end
+
+-- off by default: whether deposit actions should also drain unified_inventory bags
+function logistica.access_point_is_set_to_include_bags(pos)
+  local meta = get_meta(pos)
+  return meta:get_int(META_INCLUDE_BAGS) == 1
+end
+
+function logistica.access_point_set_include_bags(pos, value)
+  local meta = get_meta(pos)
+  meta:set_int(META_INCLUDE_BAGS, value and 1 or 0)
 end
 
 -- returns true if page was changed, false if it wasn't

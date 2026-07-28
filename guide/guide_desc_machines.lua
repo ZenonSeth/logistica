@@ -65,6 +65,8 @@ Below the Filter and Sort sections are Deposit buttons that let you empty your i
 
 Any items that can't be deposited by a given button are left in your inventory.
 
+If the Unified Inventory mod is installed, a "Deposit from Bags too" checkbox appears. It is OFF by default; enable it to also empty any equipped Unified Inventory bags when depositing, not just your main inventory.
+
 Trash slot
 ------------------------------
 Below the player inventory is a Trash slot and a Last Deleted Item slot. Any item put into the Trash slot is immediately deleted, and a copy is moved into the Last Deleted Item slot.

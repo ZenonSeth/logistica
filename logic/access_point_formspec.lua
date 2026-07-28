@@ -27,6 +27,7 @@ local DEPOSIT_ALL_BTN = "dep_all"
 local DEPOSIT_MASS_BTN = "dep_mass"
 local DEPOSIT_SUPPLY_BTN = "dep_supply"
 local DEPOSIT_TOOL_BTN = "dep_tool"
+local DEPOSIT_INC_BAGS_CHK = "ap_inc_bags"
 
 local SUPPLY_PREV_BTN = "sup_prev"
 local SUPPLY_NEXT_BTN = "sup_next"
@@ -65,6 +66,7 @@ local STR_TOOLS_DESC = S("Show Tools only")
 local STR_LIGHT_DESC = S("Show Light sources only")
 local STR_SERCH_DESC = S("Search by text\nUse group:some_group to find items belongong to some_group")
 local STR_CLEAR_DESC = S("Clear search")
+local STR_INC_BAGS_DESC = S("Also despoit items directly from Unified Inventory bags")
 
 -- height added at the top for the tab header row
 local TAB_Y = 0.8
@@ -493,12 +495,16 @@ local function get_search_and_page_section(searchTerm, pageInfo, yOff) return
   "image_button[13.9,"..(6.5+yOff)..";0.8,0.8;logistica_icon_last.png;"..LAST_BTN..";;false;false;]"
 end
 
-local function get_deposit_section(y) return
-  "label[5.2,"..(y + 0.3)..";"..S("Deposit:").."]"..
-  "button[6.4,"..y..";1.0,0.6;"..DEPOSIT_ALL_BTN..";"..S("All").."]"..
-  "button[7.5,"..y..";2.5,0.6;"..DEPOSIT_MASS_BTN..";"..S("In Mass Storage").."]"..
-  "button[10.1,"..y..";2.5,0.6;"..DEPOSIT_SUPPLY_BTN..";"..S("In Supply Chests").."]"..
-  "button[12.7,"..y..";2.2,0.6;"..DEPOSIT_TOOL_BTN..";"..S("In Tool Chests").."]"
+local function get_deposit_section(pos, y) return
+  (minetest.global_exists("unified_inventory") and
+    "checkbox[5.2,"..(y + 0.65)..";"..DEPOSIT_INC_BAGS_CHK..";"..S("Deposit from Bags too")..";"..
+      tostring(logistica.access_point_is_set_to_include_bags(pos)).."]"..
+    "tooltip[5.2,"..(y + 0.45)..";3.0,0.5;"..STR_INC_BAGS_DESC.."]" or "")..
+  "label[5.2,"..(y + 0.1)..";"..S("Deposit:").."]"..
+  "button[6.4,"..(y - 0.2)..";1.0,0.6;"..DEPOSIT_ALL_BTN..";"..S("All").."]"..
+  "button[7.5,"..(y - 0.2)..";2.5,0.6;"..DEPOSIT_MASS_BTN..";"..S("In Mass Storage").."]"..
+  "button[10.1,"..(y - 0.2)..";2.5,0.6;"..DEPOSIT_SUPPLY_BTN..";"..S("In Supply Chests").."]"..
+  "button[12.7,"..(y - 0.2)..";2.2,0.6;"..DEPOSIT_TOOL_BTN..";"..S("In Tool Chests").."]"
 end
 
 local function get_liquid_section(invName, meta, playerName, yOff)
@@ -1195,7 +1201,7 @@ local function get_access_point_formspec(pos, invName, optMeta, playerName, optE
       get_sort_section(sortHighImg, filterSortYOff)..
       "label[5.3,"..(6.3+networkSearchYOff)..";"..S("Network: ")..currentNetwork.."]"..
       get_search_and_page_section(searchTerm, pageInfo, networkSearchYOff)..
-      get_deposit_section(9.9)
+      get_deposit_section(pos, 9.9)
   end
 
   local formH   = AC_FORM_H_AC
@@ -1325,25 +1331,42 @@ end
 
 -- tries to deposit every stack in the player's main inventory into the network, per the given
 -- restrictions; returns an error string if nothing at all could be deposited, else nil
-local function deposit_player_inventory(pos, player, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
-  local networkId = logistica.get_network_id_or_nil(pos)
-  if not networkId then return S("Access Point not connected to any network") end
-
-  local inv = player:get_inventory()
-  local size = inv:get_size("main")
+local function deposit_from_inv_list(inv, listName, networkId, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
   local depositedAny = false
+  local size = inv:get_size(listName)
   for i = 1, size do
-    local stack = inv:get_stack("main", i)
+    local stack = inv:get_stack(listName, i)
     if not stack:is_empty() then
       local origCount = stack:get_count()
       local leftover = logistica.insert_item_in_network(
         stack, networkId, false, ignoreRequesters, ignoreStorages, ignoreSuppliers, true, false, storageKind)
       if leftover < origCount then depositedAny = true end
       if leftover <= 0 then
-        inv:set_stack("main", i, ItemStack(""))
+        inv:set_stack(listName, i, ItemStack(""))
       else
         stack:set_count(leftover)
-        inv:set_stack("main", i, stack)
+        inv:set_stack(listName, i, stack)
+      end
+    end
+  end
+  return depositedAny
+end
+
+local function deposit_player_inventory(pos, player, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
+  local networkId = logistica.get_network_id_or_nil(pos)
+  if not networkId then return S("Access Point not connected to any network") end
+
+  local inv = player:get_inventory()
+  local depositedAny = deposit_from_inv_list(
+    inv, "main", networkId, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
+
+  if minetest.global_exists("unified_inventory") and logistica.access_point_is_set_to_include_bags(pos) then
+    for i = 1, 4 do
+      local bagList = "bag"..i.."contents"
+      if inv:get_size(bagList) > 0 then
+        local depositedFromBag = deposit_from_inv_list(
+          inv, bagList, networkId, ignoreRequesters, ignoreStorages, ignoreSuppliers, storageKind)
+        depositedAny = depositedAny or depositedFromBag
       end
     end
   end
@@ -1404,6 +1427,9 @@ function logistica.on_receive_access_point_formspec(player, formname, fields)
     if not logistica.access_point_change_page(pos, 2, playerName, FAKE_INV_SIZE) then return true end
   elseif fields[USE_META_BTN] then
     logistica.access_point_toggle_use_metadata(pos)
+  elseif fields["ap_inc_bags"] then -- DEPOSIT_INC_BAGS_CHK, hardcoded here to avoid adding another
+                                     -- upvalue to this already near-the-limit function
+    logistica.access_point_set_include_bags(pos, fields["ap_inc_bags"] == "true")
   elseif fields[FILTER_ALL_BTN] then
     logistica.access_point_set_filter_method(pos, playerName, 1)
   elseif fields[FILTER_NODES_BTN] then
