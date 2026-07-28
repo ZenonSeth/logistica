@@ -3,7 +3,7 @@ local S = logistica.TRANSLATOR
 local MASS_STORAGE_LIST_NAME = "storage"
 local ITEM_STORAGE_LIST_NAME = "main"
 local SUPPLIER_LIST_NAME = "main"
-local MAX_NETWORK_DEPTH_SEARCH = 8 -- somewhat arbitrary but prevents stackoverflows
+local MAX_NETWORK_DEPTH_SEARCH = logistica.settings.max_network_depth_search
 
 local h2p = minetest.get_position_from_hash
 
