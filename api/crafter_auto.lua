@@ -34,16 +34,15 @@ local function get_formspec(pos, _isOn)
     "size["..logistica.inv_size(10.5, 13.25).."]" ..
     logistica.ui.background_lava_furnace..
     "listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF]"..
-    "listring[context;INV_MAIN]"..
     "list[context;src;0.4,5;8,2;0]"..
     logistica.player_inv_formspec(0.4,7.8)..
     "list[context;dst;5.5,0.6;4,3;0]"..
     "list[context;crf;0.2,0.6;3,3;0]"..
     "list[context;crfres;3.9,1.85;1,1;0]"..
+    "listring[context;dst]"..
     "listring[current_player;main]"..
     "listring[context;src]"..
     "listring[current_player;main]"..
-    "listring[context;dst]"..
     "label[1.4,0.3;"..FS("Recipe").."]"..
     "label[7.3,0.3;"..FS("Output").."]"..
     "label[4.9,4.7;"..FS("Input").."]"..
