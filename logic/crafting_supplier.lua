@@ -236,8 +236,20 @@ function logistica.crafting_supplier_update_front_image(pos, newParam2)
   logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
 end
 
+local DISPLAY_UPDATE_DEBOUNCE_S = 0.2
+local pendingDisplayUpdates = {}
+
 function logistica.crafting_supplier_update_output(pos)
   update_craft_output(pos, minetest.get_meta(pos):get_inventory())
-  logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
-  logistica.crafting_supplier_update_front_image(pos)
+
+  -- the cache/front-image update involves an entity respawn (get_objects_inside_radius + add_entity),
+  -- which is expensive if triggered on every single inventory click, so debounce it separately
+  local hash = minetest.hash_node_position(pos)
+  if pendingDisplayUpdates[hash] then return end
+  pendingDisplayUpdates[hash] = true
+  minetest.after(DISPLAY_UPDATE_DEBOUNCE_S, function()
+    pendingDisplayUpdates[hash] = nil
+    logistica.update_cache_at_pos(pos, LOG_CACHE_SUPPLIER)
+    logistica.crafting_supplier_update_front_image(pos)
+  end)
 end

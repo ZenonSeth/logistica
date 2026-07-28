@@ -28,6 +28,9 @@ local function update_front_image(pos, newParam2)
   logistica.display_item_on_block_front(pos, item:get_name(), newParam2)
 end
 
+local DISPLAY_UPDATE_DEBOUNCE_S = 0.2
+local pendingDisplayUpdates = {}
+
 local function update_craft_output(pos, inv)
   local inputList = logistica.get_list(inv, INV_CRAFT)
   local out, _ = minetest.get_craft_result({
@@ -38,7 +41,16 @@ local function update_craft_output(pos, inv)
   local item = out and out.item or ItemStack("")
   inv:set_stack(INV_CRAFT_RES, 1, item)
   logistica.append_makes_infotext(pos, item)
-  update_front_image(pos)
+
+  -- the front-image update involves an entity respawn (get_objects_inside_radius + add_entity),
+  -- which is expensive if triggered on every single inventory click/timer tick, so debounce it
+  local hash = minetest.hash_node_position(pos)
+  if pendingDisplayUpdates[hash] then return end
+  pendingDisplayUpdates[hash] = true
+  minetest.after(DISPLAY_UPDATE_DEBOUNCE_S, function()
+    pendingDisplayUpdates[hash] = nil
+    update_front_image(pos)
+  end)
 end
 
 --------------------------------
