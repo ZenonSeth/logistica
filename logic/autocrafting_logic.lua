@@ -13,8 +13,20 @@ local function count_items(list, existingMap)
 end
 
 -- returns a name indexed map to count of items in the given list
-local function count_only_required_items(list)
-  local asList = logistica.get_smart_craft_output_results(list).requiredItems
+local function count_only_required_items(list, isAutocrafter)
+  local asList = logistica.get_smart_craft_output_results(list, isAutocrafter).requiredItems
+  if not asList then return {} end
+  local map = {}
+  for _, stack in ipairs(asList) do
+    map[stack:get_name()] = stack:get_count()
+  end
+  return map
+end
+
+-- returns a name indexed map to count of items that must be present in the source list but
+-- should never be removed from it
+local function count_presence_only_items(list, isAutocrafter)
+  local asList = logistica.get_smart_craft_output_results(list, isAutocrafter).presenceOnlyItems
   if not asList then return {} end
   local map = {}
   for _, stack in ipairs(asList) do
@@ -46,7 +58,9 @@ end
 
 -- returns true if something was crafted, false if nothing was crafted
 -- optSourceListName is optional: if nil, no checks will be made if enough materials exist
-function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optSourceListName, outputListName)
+-- isAutocrafter is optional: if true, ingredients with a same-item craft replacement must be
+-- present in the source list but are never removed from it
+function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optSourceListName, outputListName, isAutocrafter)
   local recipeList = logistica.get_list(inv, recipeList3x3Name)
 
   local craftRes = get_combined_crafting_ouputs(recipeList, true)
@@ -60,9 +74,13 @@ function logistica.autocrafting_produce_single_item(inv, recipeList3x3Name, optS
 
   if optSourceListName ~= nil then
     -- check if source has enough materials
-    local recCounts = count_only_required_items(recipeList)
+    local recCounts = count_only_required_items(recipeList, isAutocrafter)
+    local presenceCounts = count_presence_only_items(recipeList, isAutocrafter)
     local srcCounts = count_items(logistica.get_list(inv, optSourceListName))
     for name, count in pairs(recCounts) do
+      if srcCounts[name] == nil or srcCounts[name] < count then return false end
+    end
+    for name, count in pairs(presenceCounts) do
       if srcCounts[name] == nil or srcCounts[name] < count then return false end
     end
 

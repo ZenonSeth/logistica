@@ -57,7 +57,7 @@ end
 local function autocrafter_timer(pos, elapsed)
   local meta = minetest.get_meta(pos)
   local inv = meta:get_inventory()
-  local success = logistica.autocrafting_produce_single_item(inv, INV_CRAFT, INV_SRC, INV_DST)
+  local success = logistica.autocrafting_produce_single_item(inv, INV_CRAFT, INV_SRC, INV_DST, true)
   if success then logistica.start_node_timer(pos, TIMER_SHORT)
   else logistica.start_node_timer(pos, TIMER_LONG) end
   return false
