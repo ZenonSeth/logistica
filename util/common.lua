@@ -4,6 +4,10 @@ logistica.TRANSLATOR = minetest.get_translator(logistica.MODNAME)
 local META_ON_OFF_KEY = "logonoff"
 local META_INFINITE_KEY = "loginfinite"
 
+-- prefix marking our own position encoding, to tell it apart from a legacy
+-- minetest.hash_node_position value when decoding
+local POS_ENCODE_PREFIX = "l_"
+
 local charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 local function rand_str(length, seed)
   math.randomseed(seed)
@@ -182,6 +186,31 @@ function logistica.dig_node(pos, node, playerName, toolStack)
     table.insert(result, ItemStack(item))
   end
   return result
+end
+
+-- encodes pos as a string, stable regardless of world size limits
+function logistica.encode_position(pos)
+  return POS_ENCODE_PREFIX..pos.x..","..pos.y..","..pos.z
+end
+
+-- decodes a string produced by logistica.encode_position, or nil if malformed
+function logistica.decode_position(str)
+  if type(str) ~= "string" or str:sub(1, #POS_ENCODE_PREFIX) ~= POS_ENCODE_PREFIX then return nil end
+  local x, y, z = str:sub(#POS_ENCODE_PREFIX + 1):match("^(-?%d+),(-?%d+),(-?%d+)$")
+  if not x then return nil end
+  return vector.new(tonumber(x), tonumber(y), tonumber(z))
+end
+
+-- decodes either the logistica.encode_position format or a legacy
+-- minetest.hash_node_position string, for old data saved before it existed
+function logistica.compat_decode_position(str)
+  if type(str) ~= "string" or str == "" then return nil end
+  if str:sub(1, #POS_ENCODE_PREFIX) == POS_ENCODE_PREFIX then
+    return logistica.decode_position(str)
+  end
+  local hash = tonumber(str)
+  if not hash then return nil end
+  return minetest.get_position_from_hash(hash)
 end
 
 function logistica.swap_node(pos, newName)
