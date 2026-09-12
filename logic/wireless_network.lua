@@ -11,9 +11,6 @@ local WIRELESS_TRANSMITTER_MSG = S("Wireless Transmitter for Network: ")
 -- stored in format {playerName = {positionHash = true, positionHash = true, ...}, ...}
 local playerToTransmitterMap = {}
 
--- we need this because default tostring(number) function returns scientific representation which loses accuracy
-local str = function(anInt) return string.format("%.0f", anInt) end
-
 local p2h = minetest.hash_node_position
 local h2p = minetest.get_position_from_hash
 
@@ -28,14 +25,14 @@ local function get_linked_receivers(transmitterPos, metaTable)
   end
   return logistica.table_map(
     string.split(posStr, LINKED_RECEIVER_SEP),
-    function(hash) return h2p(hash) end
+    function(posHashStr) return logistica.compat_decode_position(posHashStr) end
   )
 end
 
 -- listOfReceiverPositions must be a list of positions (vectors)
 local function set_linked_receivers(transmitterPos, listOfReceiverPositions)
   local rcsStr = table.concat(
-    logistica.table_map(listOfReceiverPositions, function(position) return str(p2h(position)) end),
+    logistica.table_map(listOfReceiverPositions, function(position) return logistica.encode_position(position) end),
     LINKED_RECEIVER_SEP
   )
   local meta = minetest.get_meta(transmitterPos)
@@ -43,18 +40,18 @@ local function set_linked_receivers(transmitterPos, listOfReceiverPositions)
 end
 
 local function connect_receiver_to_transmitter(trPos, rcPos, rcMeta)
-  local trHash = p2h(trPos)
+  local trPosStr = logistica.encode_position(trPos)
   local connectedReceivers = get_linked_receivers(trPos)
   if #connectedReceivers + 1 > MAX_LINKED_RECEIVERS then return false end -- too many connections
   for _, pos in ipairs(connectedReceivers) do
     if vector.equals(rcPos, pos) then
-      rcMeta:set_string(META_LINKED_TRANSMITTER, str(trHash)) -- still ensure this is selected in receiver
+      rcMeta:set_string(META_LINKED_TRANSMITTER, trPosStr) -- still ensure this is selected in receiver
       return true
     end -- alrady in the list
   end
   table.insert(connectedReceivers, rcPos)
   set_linked_receivers(trPos, connectedReceivers)
-  rcMeta:set_string(META_LINKED_TRANSMITTER, str(trHash))
+  rcMeta:set_string(META_LINKED_TRANSMITTER, trPosStr)
   return true
 end
 
@@ -113,9 +110,8 @@ end
 
 function logistica.wifi_network_after_destroy_receiver(pos, metaDataTable)
   if type(metaDataTable) == "table" and metaDataTable.fields then
-    local trHash = tonumber(metaDataTable.fields[META_LINKED_TRANSMITTER])
-    if not trHash or trHash == "fail" then return end
-    local trPos = h2p(trHash)
+    local trPos = logistica.compat_decode_position(metaDataTable.fields[META_LINKED_TRANSMITTER])
+    if not trPos then return end
     disconnect_receiver_from_transmitter(trPos, pos)
   end
 end
@@ -144,11 +140,9 @@ end
 function logistica.wifi_network_disconect_receiver_from_current_transmitter(receiverPos)
   local rcNodeName = minetest.get_node(receiverPos).name
   if not logistica.GROUPS.wireless_receivers.is(rcNodeName) then return false end
-  local trHash = minetest.get_meta(receiverPos):get_string(META_LINKED_TRANSMITTER)
-  if trHash == "" then return end
-  trHash = tonumber(trHash)
-  if not trHash or trHash == "fail" then return end
-  local trPos = h2p(trHash)
+  local trPosStr = minetest.get_meta(receiverPos):get_string(META_LINKED_TRANSMITTER)
+  local trPos = logistica.compat_decode_position(trPosStr)
+  if not trPos then return end
   disconnect_receiver_from_transmitter(trPos, receiverPos)
 end
 
@@ -183,11 +177,8 @@ end
 
 -- returns a vector of connected receiver position, or nil if there isn't one
 function logistica.wifi_network_get_connected_transmitter_for_receiver(pos)
-  local trHash = minetest.get_meta(pos):get_string(META_LINKED_TRANSMITTER)
-  if trHash == "" then return nil end
-  trHash = tonumber(trHash)
-  if not trHash or trHash == "fail" then return nil end
-  return h2p(trHash)
+  local trPosStr = minetest.get_meta(pos):get_string(META_LINKED_TRANSMITTER)
+  return logistica.compat_decode_position(trPosStr)
 end
 
 -- returns a list of tables, each one representing a transmitter in the format:
