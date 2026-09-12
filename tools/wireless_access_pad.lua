@@ -17,14 +17,11 @@ logistica.tools.wap = {
   end,
   get_network_name_from_item = function(itemMeta)
     local posHashStr = itemMeta:get_string(META_ACCESS_POINT_POSITION)
-    if not posHashStr or posHashStr == "" then return nil end
-    local targetPos = minetest.get_position_from_hash(tonumber(posHashStr))
+    local targetPos = logistica.compat_decode_position(posHashStr)
+    if not targetPos then return nil end
     return logistica.get_network_name_or_nil(targetPos)
   end,
 }
-
--- we need this because default tostring(number) function returns scientific representation which loses accuracy
-local str = function(anInt) return string.format("%.0f", anInt) end
 
 local function on_wireless_pad_primary(itemstack, user, pointed_thing)
   local pos = pointed_thing.under
@@ -50,8 +47,7 @@ local function on_wireless_pad_primary(itemstack, user, pointed_thing)
     return
   end
 
-  local posHashStr = str(minetest.hash_node_position(pos))
-  itemMeta:set_string(META_ACCESS_POINT_POSITION, posHashStr)
+  itemMeta:set_string(META_ACCESS_POINT_POSITION, logistica.encode_position(pos))
 
   local networkName = logistica.get_network_name_or_nil(pos) or ""
   itemMeta:set_string("description", logistica.tools.wap.get_description_with_range(range, networkName))
@@ -87,12 +83,11 @@ local function on_wireless_pad_secondary(itemstack, placer, pointed_thing)
     return
   end
 
-  if posHashStr == "" then
+  local targetPos = logistica.compat_decode_position(posHashStr)
+  if not targetPos then
     logistica.show_popup(playerName, S("This WAP is not synced to any Access Point."))
     return
   end
-
-  local targetPos = minetest.get_position_from_hash(tonumber(posHashStr))
 
   local dist = vector.length(vector.subtract(placer:get_pos(), targetPos))
   if not dist or dist > range then
